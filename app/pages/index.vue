@@ -1,9 +1,7 @@
-<script setup lang="ts">
-const hello = 'Hello World';
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <h1 class="text-2xl p-4">
-    {{ hello }}
+    {{ $t('welcome') }}
   </h1>
 </template>
