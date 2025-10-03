@@ -3,5 +3,7 @@ const hello = 'Hello World';
 </script>
 
 <template>
-  <div>{{ hello }}</div>
+  <h1 class="text-2xl p-4">
+    {{ hello }}
+  </h1>
 </template>

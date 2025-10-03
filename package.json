@@ -16,8 +16,10 @@
     "@nuxt/icon": "2.0.0",
     "@nuxt/image": "1.11.0",
     "@nuxt/test-utils": "3.19.2",
+    "@tailwindcss/vite": "^4.1.14",
     "eslint": "^9.37.0",
     "nuxt": "^4.1.2",
+    "tailwindcss": "^4.1.14",
     "vue": "^3.5.22",
     "vue-router": "^4.5.1"
   },
