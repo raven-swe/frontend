@@ -18,6 +18,7 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxt/test-utils',
     '@nuxtjs/i18n',
+    '@nuxt/test-utils/module',
   ],
   vite: {
     plugins: [tailwindcss()],
