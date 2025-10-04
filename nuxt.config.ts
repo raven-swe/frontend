@@ -10,7 +10,6 @@ export default defineNuxtConfig({
       enabled: true,
     },
   },
-
   modules: [
     '@nuxt/eslint',
     '@nuxt/fonts',
@@ -19,6 +18,7 @@ export default defineNuxtConfig({
     '@nuxt/test-utils',
     '@nuxtjs/i18n',
     '@nuxt/test-utils/module',
+    '@vueuse/nuxt',
   ],
   vite: {
     plugins: [tailwindcss()],
