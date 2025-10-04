@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { useHead } from '#app';
+import { useI18n } from '#imports';
+
 const { locale, localeProperties } = useI18n();
 
 useHead(() => ({
