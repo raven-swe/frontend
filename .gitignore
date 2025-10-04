@@ -25,3 +25,7 @@ logs
 
 # pnpm lock
 pnpm-lock.yaml
+
+
+# vscode
+.vscode/*
