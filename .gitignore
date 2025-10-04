@@ -24,6 +24,8 @@ logs
 !.env.example
 
 
-
 # vscode
 .vscode/*
+
+# ignore testing coverage folder
+/coverage
