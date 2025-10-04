@@ -27,7 +27,7 @@ export default defineNuxtConfig({
     defaultLocale: 'en',
     locales: [
       { code: 'en', name: 'English', file: 'en.json' },
-      { code: 'ar', name: 'العربية', file: 'ar.json' },
+      { code: 'ar', name: 'العربية', file: 'ar.json', dir: 'rtl' },
     ],
   },
 });
