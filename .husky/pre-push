@@ -1,0 +1,16 @@
+#!/bin/sh
+
+branch_name=$(git rev-parse --abbrev-ref HEAD)
+
+# Allowed format: type/feature-name (kebab-case)
+branch_regex="^(feat|fix|chore|refactor|docs|perf|test)/[a-z0-9]+(-[a-z0-9]+)*$"
+
+if ! echo "$branch_name" | grep -Eq "$branch_regex"; then
+  echo "Invalid branch name. Expected format: type/feature-name"
+  echo "Allowed types: feat, fix, chore, refactor, docs, perf, test"
+  echo "Example: feat/login-page"
+  echo "Use 'git branch -m new-branch-name' to rename your branch and try again."
+  exit 1
+fi
+
+exit 0
