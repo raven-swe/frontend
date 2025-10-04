@@ -21,6 +21,7 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n',
     '@nuxt/test-utils/module',
     '@vueuse/nuxt',
+    '@pinia/nuxt',
   ],
   vite: {
     plugins: [tailwindcss()],
