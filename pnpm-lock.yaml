@@ -69,6 +69,9 @@ importers:
       eslint:
         specifier: ^9.37.0
         version: 9.37.0(jiti@2.6.1)
+      eslint-plugin-regex:
+        specifier: ^1.10.0
+        version: 1.10.0(eslint@9.37.0(jiti@2.6.1))
       happy-dom:
         specifier: ^19.0.2
         version: 19.0.2
@@ -2855,6 +2858,12 @@ packages:
     engines: {node: '>=20.11.0'}
     peerDependencies:
       eslint: ^7.0.0 || ^8.0.0 || ^9.0.0
+
+  eslint-plugin-regex@1.10.0:
+    resolution: {integrity: sha512-C8/qYKkkbIb0epxKzaz4aw7oVAOmm19fJpR/moUrUToq/vc4xW4sEKMlTQqH6EtNGpvLjYsbbZRlWNWwQGeTSA==}
+    engines: {node: '>=6.0.0'}
+    peerDependencies:
+      eslint: '>=4.0.0'
 
   eslint-plugin-regexp@2.10.0:
     resolution: {integrity: sha512-ovzQT8ESVn5oOe5a7gIDPD5v9bCSjIFJu57sVPDqgPRXicQzOnYfFN21WoQBQF18vrhT5o7UMKFwJQVVjyJ0ng==}
@@ -8470,6 +8479,10 @@ snapshots:
       spdx-expression-parse: 4.0.0
     transitivePeerDependencies:
       - supports-color
+
+  eslint-plugin-regex@1.10.0(eslint@9.37.0(jiti@2.6.1)):
+    dependencies:
+      eslint: 9.37.0(jiti@2.6.1)
 
   eslint-plugin-regexp@2.10.0(eslint@9.37.0(jiti@2.6.1)):
     dependencies:

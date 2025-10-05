@@ -36,6 +36,7 @@
     "@vueuse/core": "^13.9.0",
     "@vueuse/nuxt": "^13.9.0",
     "eslint": "^9.37.0",
+    "eslint-plugin-regex": "^1.10.0",
     "happy-dom": "^19.0.2",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.3",
