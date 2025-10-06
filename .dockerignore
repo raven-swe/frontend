@@ -1,0 +1,10 @@
+.nuxt
+.output
+node_modules
+.vscode
+.husky
+.github
+/test
+
+.gitignore
+README.md

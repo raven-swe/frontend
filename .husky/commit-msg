@@ -1,0 +1,16 @@
+#!/bin/sh
+
+commit_message_file=$1
+commit_message=$(cat "$commit_message_file")
+
+# Conventional commit pattern: type(scope?): description
+conventional_regex="^(feat|fix|docs|build|style|refactor|perf|test|chore)(\([a-z0-9_-]+\))?: .+"
+
+if ! echo "$commit_message" | grep -Eq "$conventional_regex"; then
+  echo "Invalid commit message format: type(scope?): description. While (scope) is optional."
+  echo "Example: docs(openapi): update API documentation"
+  echo "Allowed types: feat, fix, docs, build, style, refactor, perf, test, chore"
+  exit 1
+fi
+
+exit 0
