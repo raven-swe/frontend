@@ -21,7 +21,6 @@
     "@nuxtjs/i18n": "10.1.0",
     "@pinia/nuxt": "0.11.2",
     "@tailwindcss/vite": "^4.1.14",
-    "eslint": "^9.37.0",
     "nuxt": "^4.1.2",
     "pinia": "^3.0.3",
     "reka-ui": "^2.5.1",
@@ -36,11 +35,15 @@
     "@vue/test-utils": "^2.4.6",
     "@vueuse/core": "^13.9.0",
     "@vueuse/nuxt": "^13.9.0",
+    "eslint": "^9.37.0",
+    "eslint-plugin-regex": "^1.10.0",
     "happy-dom": "^19.0.2",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.3",
     "playwright-core": "^1.55.1",
     "prettier": "^3.6.2",
+    "prettier-plugin-tailwindcss": "^0.6.14",
+    "typescript": "^5.9.3",
     "vitest": "^3.2.4"
   },
   "lint-staged": {

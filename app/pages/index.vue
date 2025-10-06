@@ -6,7 +6,7 @@ const counter = useCounterStore();
 
 <template>
   <div>
-    <h1 class="text-2xl p-4">
+    <h1 class="p-4 text-2xl">
       {{ $t('welcome') + ` ${counter.count}` }}
     </h1>
     <Button @click="counter.increment">{{ $t('testButton') }}</Button>
