@@ -8,6 +8,14 @@ export default withNuxt({
     regex: pluginRegex,
   },
   rules: {
+    'no-console': ['warn', { allow: ['warn', 'error'] }],
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+      },
+    ],
     'vue/no-bare-strings-in-template': 'error',
     'regex/invalid': [
       'error',
