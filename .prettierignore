@@ -7,3 +7,4 @@ public
 .github
 pnpm-lock.yaml
 .pnpm-store
+package.json
