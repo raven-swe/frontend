@@ -6,12 +6,16 @@
     "build": "nuxt build",
     "start": "node .output/server/index.mjs",
     "dev": "nuxt dev",
-    "test": "vitest",
-    "coverage": "vitest run --coverage",
+    "test": "vitest run",
+    "test:cov": "vitest run --coverage .",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "prepare": "node -e \"if (process.env.NODE_ENV !== 'production') require('child_process').execSync('husky', {stdio: 'inherit'})\""
+    "prepare": "node -e \"if (process.env.NODE_ENV !== 'production') require('child_process').execSync('husky', {stdio: 'inherit'})\"",
+    "lint": "eslint . --ext .js,.ts,.vue --fix",
+    "lint:check": "eslint . --ext .js,.ts,.vue",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@nuxt/eslint": "1.9.0",
