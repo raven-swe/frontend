@@ -4,6 +4,11 @@ on:
     branches: [main, dev]
     types: [opened, synchronize, reopened]
 
+permissions:
+    contents: read
+    pull-requests: write
+    issues: write
+
 jobs:
   style-quality:
     name: Code Style & Quality
