@@ -1,0 +1,56 @@
+name: Pull Request Validations
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+    branches: [dev]
+
+jobs:
+  branch-name-validation:
+    name: Validate branch naming convention
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Enforce kebab-case branch name
+        env:
+          BRANCH_NAME: ${{ github.head_ref }}
+          BRANCH_PATTERN: '^(feat|fix|build|chore|refactor|docs|perf|test)/[a-z0-9]+(-[a-z0-9]+)*$'
+        run: |
+          echo "Checking branch: $BRANCH_NAME"
+          if ! echo "$BRANCH_NAME" | grep -Eq "$BRANCH_PATTERN"; then
+            echo "Branch name doesn't match the required pattern. Please setup your git hooks locally to avoid this error."
+            exit 1
+          fi
+
+          echo "Branch name passed."
+
+  validate-pr-title:
+    name: Validate PR title format
+    runs-on: ubuntu-latest
+
+    permissions:
+      pull-requests: read
+
+    steps:
+      - name: Check PR title format
+        env:
+          PR_TITLE: ${{github.event.pull_request.title}}
+          PREFIX_PATTERN: '^(feat|fix|build|chore|refactor|docs|perf|test)(\(.+\))?: .+'
+          POSTFIX_PATTERN: " - \\[CU-[a-zA-Z0-9]+\\]$"
+        run: |
+          CLEAN_TITLE=$(echo "$PR_TITLE" | tr -d '\r' | sed 's/[[:space:]]\+/ /g' | sed 's/^ *//;s/ *$//')  # Normalize spaces
+
+          echo "Checking PR title: $CLEAN_TITLE"
+          if ! echo "$CLEAN_TITLE" | grep -Eq "$PREFIX_PATTERN"; then
+            echo "PR title must start with a valid prefix (feat, fix, build, chore, refactor, docs, perf, test) followed by a colon and a space."
+            exit 1
+          fi
+
+          if ! echo "$CLEAN_TITLE" | grep -Eq "$POSTFIX_PATTERN"; then
+            echo "PR title must end with a valid Clickup PR ticket. (e.g., ' - [CU-1234]')"
+            exit 1
+          fi
+
+          echo "PR title passed."
