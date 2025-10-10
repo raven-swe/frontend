@@ -1,0 +1,40 @@
+name: Code Style & Quality Checks
+on:
+  pull_request:
+    branches: [main, dev]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  style-quality:
+    name: Code Style & Quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: corepack enable
+      - run: corepack prepare pnpm@latest --activate
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run Formatter
+        run: pnpm run format:check
+
+      - name: Run Linter
+        run: pnpm run lint:check
+
+      - name: Run Unit Tests
+        run: pnpm run test:cov
+
+      - name: Comment Coverage on PR
+        uses: romeovs/lcov-reporter-action@v0.4.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          lcov-file: ./coverage/lcov.info
+          filter-changed-files: true
+          delete-old-comments: true
+          title: Unit Tests Coverage Report
