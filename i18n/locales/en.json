@@ -1,4 +1,22 @@
 {
-  "welcome": "Welcome to our application!",
-  "testButton": "test button"
+  "root": {
+    "hero": {
+      "title": "Happening now",
+      "subtitle": "Join today."
+    },
+    "auth": {
+      "signin": "Sign in",
+      "signup": "Create account",
+      "signup-info": "By signing up, you agree to the Terms of Service and Privacy Policy, including Cookie Use.",
+      "google-signin": "Google Sign in",
+      "github-signin": "GitHub Sign in",
+      "already-have-account": "Already have an account?",
+      "separator": "or"
+    },
+    "footer": {
+      "about": "About",
+      "developers": "Developers",
+      "copyright": "© 2025 Raven Corp."
+    }
+  }
 }
