@@ -33,8 +33,8 @@ const buttonVariants = cva(
         'icon-sm': 'size-8.5 flex items-center justify-center [&>svg]:size-4',
         'icon-md': 'size-9 flex items-center justify-center [&>svg]:size-4.5',
         'icon-lg': 'size-10 flex items-center justify-center [&>svg]:size-5',
-        'icon-xl': 'size-[52px] flex items-center justify-center [&>svg]:size-5',
-        'icon-2xl': 'size-[65px] flex items-center justify-center [&>svg]:size-6',
+        'icon-xl': 'size-13 flex items-center justify-center [&>svg]:size-5',
+        'icon-2xl': 'size-16.25 flex items-center justify-center [&>svg]:size-6',
       },
     },
     defaultVariants: {
