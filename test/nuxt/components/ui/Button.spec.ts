@@ -20,7 +20,7 @@ describe('Button Component', () => {
   it('applies correct classes for each variant', async () => {
     const variants: { name: string; expect: string[] }[] = [
       { name: 'default', expect: ['bg-foreground', 'text-background'] },
-      { name: 'primary', expect: ['bg-primary', 'text-background'] },
+      { name: 'primary', expect: ['bg-primary', 'hover:bg-primary/90'] },
       { name: 'outline', expect: ['text-foreground', 'bg-background'] },
       { name: 'outline-destructive', expect: ['bg-background', 'text-foreground'] },
       { name: 'ghost-default', expect: ['bg-background'] },
