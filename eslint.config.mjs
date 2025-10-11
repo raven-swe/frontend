@@ -17,6 +17,7 @@ export default withNuxt({
       },
     ],
     'vue/no-bare-strings-in-template': 'error',
+    'vue/html-self-closing': 'off',
     'vue/multiword-component-names': 'off',
     'regex/invalid': [
       'error',
