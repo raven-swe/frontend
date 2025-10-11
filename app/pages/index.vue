@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { useCounterStore } from '@/stores/counter';
-import Button from '@/components/ui/Button.vue';
+import Button from '~/components/ui/Button.vue';
 const counter = useCounterStore();
+
+const { data, error } = useFetch('/api/user/ravenbot');
 </script>
 
 <template>
@@ -10,5 +11,11 @@ const counter = useCounterStore();
       {{ $t('welcome') + ` ${counter.count}` }}
     </h1>
     <Button @click="counter.increment">{{ $t('testButton') }}</Button>
+    <p v-if="data">
+      {{ data }}
+    </p>
+    <p v-if="error">
+      {{ error.data.message }}
+    </p>
   </div>
 </template>
