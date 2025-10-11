@@ -1,4 +1,15 @@
 {
-  "welcome": "مرحبًا بك في تطبيقنا!",
-  "testButton": "زرار التجربه"
+  "testing": {
+    "user": {
+      "name": "جون دو",
+      "username": "johndoe"
+    },
+    "test-button": "زر الاختبار",
+    "welcome": "مرحبا بكم في ريفن",
+    "post": "بريد",
+    "follow": "يتبع",
+    "unfollow": "إلغاء المتابعة",
+    "following": "متابع",
+    "subscribe": "الاشتراك"
+  }
 }
