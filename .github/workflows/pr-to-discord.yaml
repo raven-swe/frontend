@@ -15,7 +15,6 @@ jobs:
           STATUS_TEXT="${{ github.event.pull_request.merged && '✅ Merged' || github.event.action == 'closed' && '❌ Closed' || '🆕 Opened' }}"
           COLOR=$([ "${{ github.event.pull_request.merged }}" == "true" ] && echo 65280 || ([ "${{ github.event.action }}" == "closed" ] && echo 16711680 || echo 3447003))
 
-          # Fetch latest commit info (message and short SHA)
           COMMIT_SHA="${{ github.event.pull_request.head.sha }}"
           COMMIT_SHORT=$(echo "$COMMIT_SHA" | cut -c1-7)
           COMMIT_URL="${{ github.event.pull_request.head.repo.html_url }}/commit/$COMMIT_SHA"
