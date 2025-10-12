@@ -11,10 +11,11 @@ jobs:
     steps:
       - name: Verify Authorized User
         run: |
+          TARGET_BRANCH="${{ github.event.pull_request.base.ref }}"
           PR_AUTHOR="${{ github.actor }}"
           ALLOWED_USER="AhmedSobhy01"
 
-          if [ "$PR_AUTHOR" != "$ALLOWED_USER" ]; then
+          if [ "$PR_AUTHOR" != "$ALLOWED_USER" ] && [ "$TARGET_BRANCH" = "main" ]; then
             echo "Unauthorized PR to main by $PR_AUTHOR, only $ALLOWED_USER is allowed."
             exit 1
           fi
