@@ -1,0 +1,62 @@
+name: Notify Discord on PR
+
+on:
+  pull_request:
+    types: [opened, reopened, closed, synchronize]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord embed via curl
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          STATUS_TEXT="${{ github.event.pull_request.merged && '✅ Merged' || github.event.action == 'closed' && '❌ Closed' || '🆕 Opened' }}"
+          COLOR=$([ "${{ github.event.pull_request.merged }}" == "true" ] && echo 65280 || ([ "${{ github.event.action }}" == "closed" ] && echo 16711680 || echo 3447003))
+
+          # Fetch latest commit info (message and short SHA)
+          COMMIT_SHA="${{ github.event.pull_request.head.sha }}"
+          COMMIT_SHORT=$(echo "$COMMIT_SHA" | cut -c1-7)
+          COMMIT_URL="${{ github.event.pull_request.head.repo.html_url }}/commit/$COMMIT_SHA"
+
+          PAYLOAD=$(jq -n --arg title "Pull Request #${{ github.event.pull_request.number }}" \
+                          --arg url "${{ github.event.pull_request.html_url }}" \
+                          --arg desc "**${{ github.event.pull_request.title }}**" \
+                          --arg author "${{ github.event.pull_request.user.login }}" \
+                          --arg status "$STATUS_TEXT" \
+                          --arg head "${{ github.event.pull_request.head.ref }}" \
+                          --arg base "${{ github.event.pull_request.base.ref }}" \
+                          --arg commits "${{ github.event.pull_request.commits }}" \
+                          --arg additions "${{ github.event.pull_request.additions }}" \
+                          --arg deletions "${{ github.event.pull_request.deletions }}" \
+                          --arg repo "${{ github.repository }}" \
+                          --arg time "${{ github.event.pull_request.updated_at }}" \
+                          --arg commit_short "$COMMIT_SHORT" \
+                          --arg commit_url "$COMMIT_URL" \
+                          --argjson color $COLOR \
+                          '{
+                            "embeds": [
+                              {
+                                "title": $title,
+                                "url": $url,
+                                "description": $desc,
+                                "color": $color,
+                                "fields": [
+                                  {"name": "Author", "value": $author, "inline": true},
+                                  {"name": "Status", "value": $status, "inline": true},
+                                  {"name": "Branches", "value": ($head + " → " + $base), "inline": false},
+                                  {"name": "Commits", "value": ($commits + " commits"), "inline": true},
+                                  {"name": "Changes", "value": ("+" + $additions + " / -" + $deletions), "inline": true},
+                                  {"name": "Last Commit", "value": ("[`" + $commit_short + "`](" + $commit_url + ") "), "inline": false}
+                                ],
+                                "footer": {"text": ("Repository: " + $repo)},
+                                "timestamp": $time
+                              }
+                            ]
+                          }')
+
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "$PAYLOAD" \
+               "$DISCORD_WEBHOOK"
