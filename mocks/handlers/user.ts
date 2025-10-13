@@ -1,9 +1,9 @@
 import { http, HttpResponse } from 'msw';
 
 const mockUsers = {
-  johndoe: { id: 'abc-123', name: 'John Doe' },
-  janedoe: { id: 'xyz-456', name: 'Jane Doe' },
-  ravenbot: { id: 'bot-001', name: 'Raven Bot' },
+  johndoe: { id: 'abc-123', name: 'John Doe', username: 'johndoe' },
+  janedoe: { id: 'xyz-456', name: 'Jane Doe', username: 'janedoe' },
+  ravenbot: { id: 'bot-001', name: 'Raven Bot', username: 'ravenbot' },
 };
 
 const API_URL = process.env.BACKEND_URL;
