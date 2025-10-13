@@ -3,7 +3,7 @@
 <template>
   <div>
     <h1 class="p-4 text-2xl">
-      {{ $t('welcome') }}
+      {{ $t('testing.welcome') }}
     </h1>
   </div>
 </template>
