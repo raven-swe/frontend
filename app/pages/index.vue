@@ -17,15 +17,19 @@ import Button from '~/components/ui/Button.vue';
         <main>
           <section>
             <div class="flex flex-col gap-4">
-              <Button variant="outline" class="w-75">{{ $t('root.auth.github-signin') }}</Button>
-              <Button variant="outline" class="w-75">{{ $t('root.auth.google-signin') }}</Button>
+              <Button id="github-signin" variant="outline" class="w-75">{{
+                $t('root.auth.github-signin')
+              }}</Button>
+              <Button id="google-signin" variant="outline" class="w-75">{{
+                $t('root.auth.google-signin')
+              }}</Button>
             </div>
             <div class="flex max-w-75 items-center justify-center gap-2 py-2">
               <div class="w-full border-b-1" />
               <span class="uppercase">{{ $t('root.auth.separator') }}</span>
               <div class="w-full border-b-1" />
             </div>
-            <Button variant="default" class="w-75">{{ $t('root.auth.signup') }}</Button>
+            <Button id="signup" variant="default" class="w-75">{{ $t('root.auth.signup') }}</Button>
             <p class="text-muted-foreground mt-4 max-w-75 text-xs">
               {{ $t('root.auth.signup-info') }}
             </p>
@@ -34,7 +38,7 @@ import Button from '~/components/ui/Button.vue';
             <p class="font-semibold">
               {{ $t('root.auth.already-have-account') }}
             </p>
-            <Button variant="outline" class="my-4 w-75" type="button">
+            <Button id="signin" variant="outline" class="my-4 w-75" type="button">
               {{ $t('root.auth.signin') }}
             </Button>
           </section>
