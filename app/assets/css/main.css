@@ -1,53 +1,46 @@
 @import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
 :root {
-  --bg-dark: oklch(0.92 0 230);
-  --bg: oklch(0.96 0 230);
-  --bg-light: oklch(1 0 230);
-  --text: oklch(0.15 0 230);
-  --text-muted: oklch(0.4 0 230);
-  --highlight: oklch(1 0 230);
-  --border: oklch(0.6 0 230);
-  --border-muted: oklch(0.7 0 230);
-  --primary: oklch(0.4 0.1 230);
-  --secondary: oklch(0.4 0.1 50);
-  --danger: oklch(0.5 0.05 30);
-  --warning: oklch(0.5 0.05 100);
-  --success: oklch(0.5 0.05 160);
-  --info: oklch(0.5 0.05 260);
+  --background: #ffffff;
+  --foreground: #0f1419;
+  --border: #eff3f4;
+  --input: #d1d9de;
+  --muted-foreground: #536471;
+  --primary: #e33b7f;
+  --accent: #f7f9f9;
+  --ring: #888a8c;
+  --ring-primary: color-mix(in oklch, var(--primary) 60%, white);
+  --destructive: #f4212e;
 }
 
 .dark {
-  --bg-dark: oklch(0.1 0 230);
-  --bg: oklch(0.15 0 230);
-  --bg-light: oklch(0.2 0 230);
-  --text: oklch(0.96 0 230);
-  --text-muted: oklch(0.76 0 230);
-  --highlight: oklch(0.5 0 230);
-  --border: oklch(0.4 0 230);
-  --border-muted: oklch(0.3 0 230);
-  --primary: oklch(0.76 0.1 230);
-  --secondary: oklch(0.76 0.1 50);
-  --danger: oklch(0.7 0.05 30);
-  --warning: oklch(0.7 0.05 100);
-  --success: oklch(0.7 0.05 160);
-  --info: oklch(0.7 0.05 260);
+  --background: #000000;
+  --foreground: #e7e9ea;
+  --border: #303336;
+  --input: #536471;
+  --muted-foreground: #71767b;
+  --primary: #e33b7f;
+  --accent: #16181c;
+  --ring: #f7f9fa;
+  --ring-primary: color-mix(in oklch, var(--primary) 60%, white);
+  --destructive: #82181a;
 }
 
 @theme inline {
-  --color-background-dark: var(--bg-dark);
-  --color-background: var(--bg);
-  --color-background-light: var(--bg-light);
-  --color-text: var(--text);
-  --color-text-muted: var(--text-muted);
-  --color-highlight: var(--highlight);
-  --color-border-muted: var(--border-muted);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
   --color-border: var(--border);
+  --color-muted-foreground: var(--muted-foreground);
   --color-primary: var(--primary);
-  --color-secondary: var(--secondary);
-  --color-danger: var(--danger);
-  --color-warning: var(--warning);
-  --color-success: var(--success);
-  --color-info: var(--info);
+  --color-accent: var(--accent);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --text-xs: 0.75rem;
+  --color-destructive: var(--destructive);
+  --color-ring-primary: var(--ring-primary);
 }
 
 @layer base {
@@ -56,6 +49,10 @@
   }
 
   body {
-    @apply bg-background-dark text-text;
+    @apply bg-background text-foreground;
+  }
+
+  button {
+    @apply cursor-pointer select-none;
   }
 }
