@@ -1,4 +1,17 @@
 {
+  "testing": {
+    "user": {
+      "name": "جون دو",
+      "username": "johndoe"
+    },
+    "test-button": "زر الاختبار",
+    "welcome": "مرحبا بكم في ريفن",
+    "post": "نشر",
+    "follow": "متابعة",
+    "unfollow": "إلغاء المتابعة",
+    "following": "متابع",
+    "subscribe": "الاشتراك"
+  },
   "root": {
     "hero": {
       "title": "يحدث الآن",

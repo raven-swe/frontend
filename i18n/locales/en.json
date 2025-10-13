@@ -1,4 +1,17 @@
 {
+  "testing": {
+    "welcome": "Welcome to Raven",
+    "test-button": "Test Button",
+    "post": "Post",
+    "following": "Following",
+    "unfollow": "Unfollow",
+    "follow": "Follow",
+    "subscribe": "Subscribe",
+    "user": {
+      "name": "John Doe",
+      "username": "johndoe"
+    }
+  },
   "root": {
     "hero": {
       "title": "Happening now",

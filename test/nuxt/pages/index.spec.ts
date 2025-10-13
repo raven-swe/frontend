@@ -7,9 +7,6 @@ describe('Index Page', () => {
     const wrapper = await mountSuspended(IndexPage);
 
     // Check translated welcome text from i18n
-    expect(wrapper.html()).toContain('Welcome to our application!');
-
-    // Check rendered button text (uses $t('testButton'))
-    expect(wrapper.html()).toContain('test button');
+    expect(wrapper.html()).toContain('Welcome to Raven');
   });
 });

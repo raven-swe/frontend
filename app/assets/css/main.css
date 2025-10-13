@@ -12,6 +12,7 @@
   --primary: #e33b7f;
   --accent: #f7f9f9;
   --ring: #888a8c;
+  --ring-primary: color-mix(in oklch, var(--primary) 60%, white);
   --destructive: #f4212e;
 }
 
@@ -24,6 +25,7 @@
   --primary: #e33b7f;
   --accent: #16181c;
   --ring: #f7f9fa;
+  --ring-primary: color-mix(in oklch, var(--primary) 60%, white);
   --destructive: #82181a;
 }
 
@@ -38,6 +40,7 @@
   --color-ring: var(--ring);
   --text-xs: 0.75rem;
   --color-destructive: var(--destructive);
+  --color-ring-primary: var(--ring-primary);
 }
 
 @layer base {
@@ -47,5 +50,9 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+
+  button {
+    @apply cursor-pointer select-none;
   }
 }
