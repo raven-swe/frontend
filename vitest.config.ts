@@ -8,6 +8,7 @@ export default defineConfig({
       reporter: ['text', 'json', 'lcov'],
       reportsDirectory: './coverage',
       include: ['app/**'],
+      exclude: ['**/pages/playground/**'],
     },
     projects: [
       {
