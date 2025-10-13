@@ -5,14 +5,14 @@ import Button from '~/components/ui/Button.vue';
 <template>
   <div class="bg-background flex h-screen w-screen flex-col">
     <div class="flex flex-1 flex-row items-center justify-center">
-      <section class="hidden flex-11/20 justify-center lg:flex">
+      <section class="hidden basis-[55%] justify-center lg:flex">
         <img src="https://placehold.co/400x400" alt="" class="size-110 p-8" />
       </section>
-      <section class="w-fit min-w-fit p-8 lg:flex-9/20">
+      <section class="h-full min-w-fit p-8 lg:h-fit lg:basis-[45%]">
         <header>
           <img src="https://placehold.co/400x400" alt="" class="size-18 lg:hidden" />
-          <h1 class="my-12 text-[4rem] font-bold">{{ $t('root.hero.title') }}</h1>
-          <h2 class="mb-8 text-[2rem] font-semibold">{{ $t('root.hero.subtitle') }}</h2>
+          <h1 class="my-12 text-4xl font-bold sm:text-[4rem]">{{ $t('root.hero.title') }}</h1>
+          <h2 class="mb-8 text-2xl font-semibold sm:text-[2rem]">{{ $t('root.hero.subtitle') }}</h2>
         </header>
         <main>
           <section>
