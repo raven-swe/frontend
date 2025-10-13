@@ -32,4 +32,14 @@ export default defineNuxtConfig({
       { code: 'ar', name: 'العربية', file: 'ar.json', dir: 'rtl' },
     ],
   },
+  hooks: {
+    'pages:extend'(pages) {
+      // Remove playground pages in production
+      if (process.env.NODE_ENV === 'production') {
+        const filteredPages = pages.filter((page) => !page.file?.includes('/pages/playground/'));
+        pages.length = 0;
+        pages.push(...filteredPages);
+      }
+    },
+  },
 });
