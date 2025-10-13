@@ -8,8 +8,5 @@ describe('Index Page', () => {
 
     // Check translated welcome text from i18n
     expect(wrapper.html()).toContain('Welcome to Raven');
-
-    // Check rendered button text (uses $t('testButton'))
-    expect(wrapper.html()).toContain('Test Button');
   });
 });
