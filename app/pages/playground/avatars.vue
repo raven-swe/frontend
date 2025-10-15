@@ -11,7 +11,7 @@ import Avatar from '@/components/ui/Avatar.vue';
       <Avatar :img="'https://placehold.co/64x64'" size="md" />
     </div>
     <div class="p-4">
-      <Avatar :img="'https://placehold.co/96x96'" size="lg" />
+      <Avatar size="lg" />
     </div>
     <div class="p-4">
       <Avatar :img="'https://placehold.co/368x368'" size="xl" variant="default" />

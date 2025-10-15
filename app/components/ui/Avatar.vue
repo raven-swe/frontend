@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { cva } from 'class-variance-authority';
-import { AvatarRoot, AvatarImage, AvatarFallback } from 'reka-ui';
+import { AvatarRoot, AvatarFallback } from 'reka-ui';
+import AvatarImg from './AvatarImg.vue';
 
 const avatarRoot = cva('relative flex shrink-0 overflow-hidden rounded-full', {
   variants: {
@@ -30,14 +31,18 @@ interface Props {
 withDefaults(defineProps<Props>(), {
   variant: 'primary',
   size: 'md',
-  img: 'https://placehold.co/100x100',
+  img: '/default_profile.png',
 });
 </script>
 
 <template>
   <AvatarRoot :class="avatarRoot({ variant, size })">
-    <AvatarImage class="aspect-square size-full" :src="img" alt="User Avatar" />
-    <AvatarFallback class="bg-muted flex size-full items-center justify-center rounded-full" />
+    <AvatarImg :src="img" alt="User Avatar" />
+    <AvatarFallback
+      class="flex size-full items-center justify-center rounded-full bg-gray-200 text-gray-600"
+    >
+      ?
+    </AvatarFallback>
   </AvatarRoot>
 </template>
 
