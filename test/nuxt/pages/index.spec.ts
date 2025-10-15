@@ -2,11 +2,16 @@ import { describe, expect, it } from 'vitest';
 import { mountSuspended } from '@nuxt/test-utils/runtime';
 import IndexPage from '@/pages/index.vue';
 
-describe('Index Page', () => {
-  it('renders welcome heading and button text', async () => {
+describe('Auth Page', () => {
+  it('renders page with correct content', async () => {
     const wrapper = await mountSuspended(IndexPage);
 
-    // Check translated welcome text from i18n
-    expect(wrapper.html()).toContain('Welcome to Raven');
+    const html = wrapper.html();
+    expect(html).toContain('Happening now');
+    expect(html).toContain('Join today');
+    expect(wrapper.find('#github-signin').exists()).toBe(true);
+    expect(wrapper.find('#google-signin').exists()).toBe(true);
+    expect(wrapper.find('#signup').exists()).toBe(true);
+    expect(wrapper.find('#signin').exists()).toBe(true);
   });
 });

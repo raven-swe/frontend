@@ -11,5 +11,25 @@
     "unfollow": "إلغاء المتابعة",
     "following": "متابع",
     "subscribe": "الاشتراك"
+  },
+  "root": {
+    "hero": {
+      "title": "يحدث الآن",
+      "subtitle": "انضم اليوم"
+    },
+    "auth": {
+      "signin": "تسجيل الدخول",
+      "signup": "إنشاء حساب",
+      "signup-info": "بالتسجيل، فإنك توافق على شروط الخدمة وسياسة الخصوصية، بما في ذلك استخدام ملفات تعريف الارتباط.",
+      "google-signin": "تسجيل الدخول عبر جوجل",
+      "github-signin": "تسجيل الدخول عبر GitHub",
+      "already-have-account": "هل لديك حساب بالفعل؟",
+      "separator": "أو"
+    },
+    "footer": {
+      "about": "حول",
+      "developers": "المطورون",
+      "copyright": "© 2025 Raven Corp."
+    }
   }
 }
