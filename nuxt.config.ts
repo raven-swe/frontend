@@ -10,8 +10,6 @@ export default defineNuxtConfig({
       enabled: true,
     },
   },
-  imports: { autoImport: false },
-  components: false,
   modules: [
     '@nuxt/eslint',
     '@nuxt/fonts',
