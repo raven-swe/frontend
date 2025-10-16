@@ -37,6 +37,7 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
+    "@faker-js/faker": "^10.1.0",
     "@nuxt/test-utils": "3.19.2",
     "@testing-library/vue": "^8.1.0",
     "@vitest/coverage-istanbul": "^3.2.4",
