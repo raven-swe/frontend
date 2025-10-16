@@ -22,7 +22,7 @@
       "explore": "Explore",
       "notifications": "Notifications",
       "messages": "Messages",
-      "bookmarks": "Bookmarks",
+
       "profile": "Profile",
       "more": "More"
     }
@@ -80,7 +80,6 @@
       "description": "Dialog Description"
     }
   },
-
   "root": {
     "hero": {
       "title": "Happening now",
