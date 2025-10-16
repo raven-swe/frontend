@@ -7,6 +7,7 @@ const props = defineProps<{
   defaultValue?: string | number;
   modelValue?: string | number;
   class?: HTMLAttributes['class'];
+  placeholder: string;
 }>();
 
 const emits = defineEmits<{
@@ -51,7 +52,7 @@ const focused = ref(false);
           },
         )
       "
-      >{{ $attrs.placeholder }}</span
+      >{{ props.placeholder }}</span
     >
   </label>
 </template>
