@@ -18,8 +18,12 @@ describe('Avatar Component', () => {
 
   it('renders fallback if image fails or not found', async () => {
     const wrapper = await mountSuspended(Avatar, {
-      props: { img: '' }, // missing or broken image
+      props: { img: 'https://img.invalid-url.com' }, // missing or broken image
     });
+    // Trigger image error (so you don't have to wait for timeout)
+    const img = wrapper.find('img');
+    await img.trigger('error');
+
     const fallback = wrapper.findComponent({ name: 'AvatarFallback' });
     expect(fallback.exists()).toBe(true);
     expect(wrapper.text()).toContain('?');
@@ -35,9 +39,9 @@ describe('Avatar Component', () => {
     expect(classes).toContain('size-16');
   });
 
-  it('applies correct classes for variant: default', async () => {
+  it('applies correct classes for variant: secondary', async () => {
     const wrapper = await mountSuspended(Avatar, {
-      props: { variant: 'default' },
+      props: { variant: 'secondary' },
     });
     const root = wrapper.findComponent({ name: 'AvatarRoot' });
     const classes = root.classes();

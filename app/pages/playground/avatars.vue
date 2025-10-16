@@ -14,7 +14,7 @@ import Avatar from '@/components/ui/Avatar.vue';
       <Avatar :img="'https://placehold.co/96x96'" size="lg" />
     </div>
     <div class="p-4">
-      <Avatar :img="'https://placehold.co/368x368'" size="xl" variant="default" />
+      <Avatar :img="'https://placehold.co/368x368'" size="xl" variant="secondary" />
     </div>
   </div>
 </template>

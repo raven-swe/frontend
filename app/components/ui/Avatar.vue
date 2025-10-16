@@ -6,8 +6,8 @@ import AvatarImg from './AvatarImg.vue';
 const avatarRoot = cva('relative flex shrink-0 overflow-hidden rounded-full', {
   variants: {
     variant: {
-      default: 'cursor-default',
       primary: 'cursor-pointer hover:brightness-96',
+      secondary: 'cursor-default',
     },
     size: {
       sm: 'size-10',
