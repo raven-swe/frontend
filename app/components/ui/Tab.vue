@@ -2,6 +2,7 @@
   <div
     class="hover:hover:bg-foreground/10 flex h-[53px] cursor-pointer items-center justify-center px-4 text-[15px] transition-colors"
     :class="[isActive ? 'text-foreground font-bold' : 'text-muted-foreground font-medium']"
+    aria-role="tab"
   >
     <NuxtLink :to="route" class="relative flex h-full items-center">
       {{ label }}

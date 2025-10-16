@@ -1,7 +1,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div class="tabs border-border flex w-full border-b">
+  <div class="tabs border-border flex w-full border-b" aria-role="tablist">
     <slot />
   </div>
 </template>
