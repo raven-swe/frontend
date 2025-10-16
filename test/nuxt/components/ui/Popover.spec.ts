@@ -75,7 +75,7 @@ describe('PopoverTrigger Component', () => {
 
 describe('PopoverContent Component', () => {
   it('renders slot content within popover context', async () => {
-    const _wrapper = await mountSuspended(Popover, {
+    void (await mountSuspended(Popover, {
       props: { open: true }, // Open the popover to render content
       slots: {
         default: () => [
@@ -95,13 +95,13 @@ describe('PopoverContent Component', () => {
           ),
         ],
       },
-    });
+    }));
     // Check in document body since content is portaled
     expect(document.body.innerHTML).toContain('Content');
   });
 
   it('applies default classes within popover context', async () => {
-    const _wrapper = await mountSuspended(Popover, {
+    void (await mountSuspended(Popover, {
       props: { open: true },
       slots: {
         default: () => [
@@ -121,14 +121,14 @@ describe('PopoverContent Component', () => {
           ),
         ],
       },
-    });
+    }));
     // Check in document body for portaled content
     const hasPopoverBg = document.querySelector('[class*="bg-popover"]');
     expect(hasPopoverBg).toBeTruthy();
   });
 
   it('applies custom class within popover context', async () => {
-    const _wrapper = await mountSuspended(Popover, {
+    void (await mountSuspended(Popover, {
       props: { open: true },
       slots: {
         default: () => [
@@ -148,7 +148,7 @@ describe('PopoverContent Component', () => {
           ),
         ],
       },
-    });
+    }));
     // Check in document body for portaled content
     const customElement = document.querySelector('.custom-class');
     expect(customElement).toBeTruthy();
@@ -199,7 +199,7 @@ describe('PopoverContent Component', () => {
   });
 
   it('applies animation classes within popover context', async () => {
-    const _wrapper = await mountSuspended(Popover, {
+    void (await mountSuspended(Popover, {
       props: { open: true },
       slots: {
         default: () => [
@@ -219,14 +219,14 @@ describe('PopoverContent Component', () => {
           ),
         ],
       },
-    });
+    }));
     // Check in document body for portaled content
     const animatedElement = document.querySelector('[class*="animate-in"]');
     expect(animatedElement).toBeTruthy();
   });
 
   it('applies positioning classes within popover context', async () => {
-    const _wrapper = await mountSuspended(Popover, {
+    void (await mountSuspended(Popover, {
       props: { open: true },
       slots: {
         default: () => [
@@ -246,14 +246,14 @@ describe('PopoverContent Component', () => {
           ),
         ],
       },
-    });
+    }));
     // Check in document body for portaled content
     const positionedElement = document.querySelector('[class*="slide-in-from"]');
     expect(positionedElement).toBeTruthy();
   });
 
   it('has correct z-index and width within popover context', async () => {
-    const _wrapper = await mountSuspended(Popover, {
+    void (await mountSuspended(Popover, {
       props: { open: true },
       slots: {
         default: () => [
@@ -273,7 +273,7 @@ describe('PopoverContent Component', () => {
           ),
         ],
       },
-    });
+    }));
     // Check in document body for portaled content
     const zIndexElement = document.querySelector('[class*="z-50"]');
     expect(zIndexElement).toBeTruthy();
