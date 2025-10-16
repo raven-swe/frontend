@@ -29,3 +29,7 @@ logs
 
 # ignore testing coverage folder
 /coverage
+
+# ignore mock data folder
+/mocks/data/*
+!/mocks/data/.gitkeep
