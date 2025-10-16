@@ -1,30 +1,23 @@
 <script lang="ts" setup>
-import type { LeftSidebarTab } from '~/types/leftsidebar';
-
-const props = defineProps<{
-  tab: LeftSidebarTab;
-}>();
-
-const route = useRoute();
-const isActive = computed(() => {
-  if (props.tab.route === '#') return false;
-  return route.path.startsWith(props.tab.route);
+const props = defineProps({
+  active: {
+    type: Boolean,
+    default: false,
+  },
 });
-const textStyle = computed(() => (isActive.value ? 'font-bold' : 'font-normal'));
-const iconType = computed(() => (isActive.value ? '' : 'outline-'));
+const textStyle = computed(() => (props.active ? 'font-bold' : 'font-normal'));
 </script>
-
 <template>
   <NuxtLink
-    :to="tab.route"
-    class="text-foreground hover:bg-foreground/10 flex items-center justify-start rounded-full p-3 xl:w-auto"
+    to="#"
+    class="dark:hover:bg-dim-200 flex w-min items-center justify-start rounded-full p-3 text-black hover:bg-gray-200 dark:text-white"
   >
-    <div class="text-foreground flex h-6 w-6 items-center justify-center">
-      <Icon :name="`ic:${iconType}${tab.icon}`" size="24" />
+    <div class="text-dark">
+      <slot name="icon" />
     </div>
 
     <div class="ms-3 hidden text-xl xl:block" :class="textStyle">
-      {{ $t(`leftsidebar.nav.${tab.label}`) }}
+      <slot name="lable" />
     </div>
   </NuxtLink>
 </template>
