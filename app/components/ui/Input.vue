@@ -21,16 +21,19 @@ const focused = ref(false);
 </script>
 
 <template>
-  <div class="relative w-fit" :class="props.class">
+  <label
+    class="group border-muted-foreground/60 relative block rounded-md border bg-transparent px-2 pt-5.5 pb-2 text-base transition-[color]"
+    :class="
+      cn(
+        'has-[input[aria-invalid=true]]:ring-destructive has-[input[aria-invalid=true]]:border-destructive',
+        'has-[input:focus-visible]:border-primary has-[input:focus-visible]:ring-primary has-[input:focus-visible]:ring-[1px]',
+        props.class,
+      )
+    "
+  >
     <input
       v-model="modelValue"
-      :class="
-        cn(
-          'peer file:text-foreground border-muted-foreground/60 w-full min-w-0 rounded-md border bg-transparent px-2 pt-5.5 pb-2 text-base transition-[color] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
-          'focus-visible:border-primary focus-visible:ring-primary focus-visible:ring-[1px]',
-          'aria-invalid:ring-destructive dark:aria-invalid:ring-destructive aria-invalid:border-destructive',
-        )
-      "
+      class="peer file:text-foreground w-full min-w-0 outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
       v-bind="$attrs"
       @focus="focused = true"
       @blur="focused = false"
@@ -38,23 +41,28 @@ const focused = ref(false);
     <span
       :class="
         cn(
-          'text-muted-foreground origin-start pointer-events-none absolute transition-all duration-200 ease-out',
+          'text-muted-foreground origin-start peer-[input[aria-invalid=true]]:text-destructive pointer-events-none absolute transition-all duration-200 ease-out',
           {
             'start-2 top-1.5 text-xs': focused || modelValue,
             'text-muted-foreground start-2 top-1/2 -translate-y-1/2 text-lg': !(
               focused || modelValue
             ),
-            'text-primary peer-[aria-invalid]:text-destructive': focused,
+            'text-primary': focused,
           },
         )
       "
       >{{ $attrs.placeholder }}</span
     >
-  </div>
+  </label>
 </template>
 
 <style scoped>
 input::placeholder {
   color: transparent;
+}
+/* style webkit autofill */
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 30px var(--color-input) inset !important;
+  -webkit-text-fill-color: var(--color-foreground) !important;
 }
 </style>
