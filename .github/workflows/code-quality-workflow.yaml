@@ -2,7 +2,7 @@ name: Code Style & Quality Checks
 on:
   pull_request:
     branches: [main, dev]
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, ready_for_review]
 
 permissions:
   contents: read
@@ -11,12 +11,13 @@ permissions:
 
 jobs:
   style-quality:
+    if: github.event.pull_request.draft == false
     name: Code Style & Quality
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Corepack
         run: corepack enable
 
