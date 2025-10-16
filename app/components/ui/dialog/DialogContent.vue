@@ -5,11 +5,14 @@ import { reactiveOmit } from '@vueuse/core';
 import { DialogClose, DialogContent, DialogPortal, useForwardPropsEmits } from 'reka-ui';
 import { cn } from '@/utils';
 import DialogOverlay from './DialogOverlay.vue';
+import Button from '@/components/ui/Button.vue';
 
-const props = defineProps<DialogContentProps & { class?: HTMLAttributes['class'] }>();
+const props = defineProps<
+  DialogContentProps & { class?: HTMLAttributes['class']; headerClass?: HTMLAttributes['class'] }
+>();
 const emits = defineEmits<DialogContentEmits>();
 
-const delegatedProps = reactiveOmit(props, 'class');
+const delegatedProps = reactiveOmit(props, 'class', 'headerClass');
 
 const forwarded = useForwardPropsEmits(delegatedProps, emits);
 </script>
@@ -22,19 +25,29 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
       v-bind="forwarded"
       :class="
         cn(
-          'bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg duration-200 sm:max-w-lg',
+          'bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 flex h-full w-full translate-x-[-50%] translate-y-[-50%] flex-col border shadow-lg duration-200 sm:h-160 sm:max-w-xl sm:rounded-2xl',
           props.class,
         )
       "
     >
-      <slot />
+      <div class="relative flex flex-row items-center justify-start gap-2 p-2">
+        <DialogClose as-child>
+          <Button variant="ghost-default" size="icon-xs" class="absolute inset-2">
+            <Icon name="lucide:x" class="size-5" />
+            <span class="sr-only">{{ $t('ui.close') }}</span>
+          </Button>
+        </DialogClose>
+        <div
+          v-if="$slots.header"
+          :class="cn('flex h-8 w-full items-center ps-10 text-lg font-medium', props.headerClass)"
+        >
+          <slot name="header" />
+        </div>
+      </div>
 
-      <DialogClose
-        class="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute start-4 top-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
-      >
-        <Icon name="lucide:x" class="size-4" />
-        <span class="sr-only">{{ $t('ui.close') }}</span>
-      </DialogClose>
+      <div class="flex h-full w-full flex-col gap-4 px-6 pb-6">
+        <slot />
+      </div>
     </DialogContent>
   </DialogPortal>
 </template>
