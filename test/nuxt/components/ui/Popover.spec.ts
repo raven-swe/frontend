@@ -171,7 +171,7 @@ describe('PopoverContent Component', () => {
   });
 
   it('wraps content in ClientOnly and PopoverPortal', async () => {
-    const _wrapper = await mountSuspended(Popover, {
+    const wrapper = await mountSuspended(Popover, {
       props: { open: true },
       slots: {
         default: () => [
