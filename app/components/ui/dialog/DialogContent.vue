@@ -31,7 +31,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
       "
     >
       <div class="relative flex flex-row items-center justify-start gap-2 p-2">
-        <DialogClose as-child>
+        <DialogClose data-slot="dialog-close" as-child>
           <Button variant="ghost-default" size="icon-xs" class="absolute inset-2">
             <Icon name="lucide:x" class="size-5" />
             <span class="sr-only">{{ $t('ui.close') }}</span>
