@@ -10,6 +10,9 @@
     "user": {
       "name": "John Doe",
       "username": "johndoe"
+    },
+    "tweets": {
+      "tweet-not-found": "Tweet not found"
     }
   },
   "root": {
