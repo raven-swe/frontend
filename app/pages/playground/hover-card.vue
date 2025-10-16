@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { HoverCard, HoverCardTrigger, HoverCardContent } from '~/components/ui/hover-card';
+import { HoverCardRoot, HoverCardTrigger, HoverCardContent } from '~/components/ui/HoverCard';
 import Avatar from '@/components/ui/Avatar.vue';
 import { ref } from 'vue';
 import Button from '@/components/ui/Button.vue';
@@ -9,7 +9,7 @@ const isFollowing = ref(false);
 
 <template>
   <div class="mx-auto flex h-screen items-center justify-center">
-    <HoverCard>
+    <HoverCardRoot>
       <HoverCardTrigger>
         <NuxtLink to="users/john-doe">
           <Avatar
@@ -85,7 +85,7 @@ const isFollowing = ref(false);
           </div>
         </div>
       </HoverCardContent>
-    </HoverCard>
+    </HoverCardRoot>
   </div>
 </template>
 
