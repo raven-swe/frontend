@@ -55,6 +55,31 @@
     "following": "متابع",
     "followers": "المتابعون"
   },
+  "leftsidebar": {
+    "nav": {
+      "home": "الرئيسية",
+      "explore": "استكشف",
+      "notifications": "الإشعارات",
+      "messages": "الرسائل",
+      "bookmarks": "المفضلة",
+      "profile": "الملف الشخصي",
+      "more": "المزيد"
+    }
+  },
+  "rightsidebar": {
+    "whatsHappening": {
+      "title": "ماذا يحدث",
+      "tweets": "تغريدات"
+    },
+    "whoToFollow": {
+      "title": "من تتابع",
+      "follow": "متابعة"
+    },
+    "showMore": "عرض المزيد"
+  },
+  "homepage": {
+    "tweets": "التغريدات"
+  },
   "root": {
     "hero": {
       "title": "يحدث الآن",
