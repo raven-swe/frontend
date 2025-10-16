@@ -2,7 +2,7 @@ import { http, HttpResponse } from 'msw';
 import type { Tweet } from '../../types/tweets';
 import tweetsData from '../data/tweet.json' assert { type: 'json' };
 
-const API_URL = '';
+const API_URL = process.env.BACKEND_URL;
 const initialTweets = (tweetsData as unknown as Tweet[]) || [];
 const tweets = new Map<string, Tweet>(initialTweets.map((t) => [t.id, { ...t }]));
 
@@ -37,6 +37,18 @@ const unretweet = (t: Tweet) => {
 };
 
 export const handlers = [
+  // Get All Tweets
+  http.get(`${API_URL}/tweets`, () => {
+    return HttpResponse.json(
+      {
+        success: true,
+        message: 'Tweets fetched successfully.',
+        data: Array.from(tweets.values()),
+      },
+      { status: 200 },
+    );
+  }),
+
   // GET /tweets/:id — fetch a tweet by id
   http.get(`${API_URL}/tweets/:id`, ({ params }) => {
     const { id } = params as { id: string };
