@@ -39,7 +39,7 @@ withDefaults(defineProps<Props>(), {
   <AvatarRoot :class="avatarRoot({ variant, size })">
     <AvatarImg :src="img" alt="User Avatar" />
     <AvatarFallback
-      class="flex size-full items-center justify-center rounded-full bg-gray-200 text-gray-600"
+      class="bg-input text-foreground flex size-full items-center justify-center rounded-full"
     >
       ?
     </AvatarFallback>
