@@ -12,6 +12,31 @@
       "username": "johndoe"
     }
   },
+  "leftsidebar": {
+    "nav": {
+      "home": "Home",
+      "explore": "Explore",
+      "notifications": "Notifications",
+      "messages": "Messages",
+      "bookmarks": "Bookmarks",
+      "profile": "Profile",
+      "more": "More"
+    }
+  },
+  "rightsidebar": {
+    "whatsHappening": {
+      "title": "What's happening",
+      "tweets": "Tweets"
+    },
+    "whoToFollow": {
+      "title": "Who to follow",
+      "follow": "Follow"
+    },
+    "showMore": "Show more"
+  },
+  "homepage": {
+    "tweets": "Tweets"
+  },
   "root": {
     "hero": {
       "title": "Happening now",
