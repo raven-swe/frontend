@@ -5,16 +5,16 @@ import Avatar from '@/components/ui/Avatar.vue';
 <template>
   <div>
     <div class="p-4">
-      <Avatar :img="'https://placehold.co/40x40'" size="sm" />
+      <Avatar img="https://placehold.co/40x40" size="sm" />
     </div>
     <div class="p-4">
-      <Avatar :img="'https://placehold.co/64x64'" size="md" />
+      <Avatar img="https://placehold.co/64x64" size="md" />
     </div>
     <div class="p-4">
-      <Avatar :img="'https://placehold.co/96x96'" size="lg" />
+      <Avatar img="https://placehold.co/96x96" size="lg" />
     </div>
     <div class="p-4">
-      <Avatar :img="'https://placehold.co/368x368'" size="xl" variant="secondary" />
+      <Avatar img="https://placehold.co/368x368" size="xl" variant="secondary" />
     </div>
   </div>
 </template>
