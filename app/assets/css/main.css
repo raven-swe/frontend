@@ -1,15 +1,16 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-
 @custom-variant dark (&:is(.dark *));
-
 :root {
   --background: #ffffff;
   --foreground: #0f1419;
   --border: #eff3f4;
   --input: #d1d9de;
   --muted-foreground: #536471;
-  --primary: #e33b7f;
+  --primary: #f91880;
+  --brand-red: #f91880;
+  --brand-blue: #1d9bf0;
+  --brand-turquoise: #2ec593;
   --accent: #f7f9f9;
   --ring: #888a8c;
   --ring-primary: color-mix(in oklch, var(--primary) 60%, white);
@@ -25,6 +26,9 @@
   --primary: #e33b7f;
   --accent: #16181c;
   --ring: #f7f9fa;
+  --brand-red: #f91880;
+  --brand-blue: #3b82f6;
+  --brand-turquoise: #00b77a;
   --ring-primary: color-mix(in oklch, var(--primary) 60%, white);
   --destructive: #82181a;
 }
@@ -41,17 +45,18 @@
   --text-xs: 0.75rem;
   --color-destructive: var(--destructive);
   --color-ring-primary: var(--ring-primary);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-turquoise: var(--brand-turquoise);
+  --color-brand-red: var(--brand-red);
 }
 
 @layer base {
   * {
     @apply border-border;
   }
-
   body {
     @apply bg-background text-foreground;
   }
-
   button {
     @apply cursor-pointer select-none;
   }

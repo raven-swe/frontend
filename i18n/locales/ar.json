@@ -12,7 +12,8 @@
     "following": "متابع",
     "subscribe": "الاشتراك",
     "tweets": {
-      "tweet-not-found": "التغريدة غير موجودة"
+      "tweet-not-found": "التغريدة غير موجودة",
+      "tweets-list": "قائمة التغريدات"
     }
   },
   "root": {

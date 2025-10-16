@@ -12,7 +12,8 @@
       "username": "johndoe"
     },
     "tweets": {
-      "tweet-not-found": "Tweet not found"
+      "tweet-not-found": "Tweet not found",
+      "tweets-list": "Tweets List"
     }
   },
   "root": {
