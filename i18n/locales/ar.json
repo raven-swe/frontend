@@ -2,7 +2,10 @@
   "testing": {
     "user": {
       "name": "جون دو",
-      "username": "johndoe"
+      "username": "johndoe",
+      "bio": "مجرد متحمس للتكنولوجيا.",
+      "num-followers": "1.2 ألف",
+      "num-following": "500"
     },
     "test-button": "زر الاختبار",
     "welcome": "مرحبا بكم في ريفن",

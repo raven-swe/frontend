@@ -9,7 +9,10 @@
     "subscribe": "Subscribe",
     "user": {
       "name": "John Doe",
-      "username": "johndoe"
+      "username": "johndoe",
+      "bio": "Just another tech enthusiast.",
+      "num-followers": "1.2K",
+      "num-following": "500"
     }
   },
   "root": {
