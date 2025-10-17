@@ -16,6 +16,7 @@
   --destructive: #f4212e;
   --popover: 0 0% 100%;
   --popover-foreground: 222.2 84% 4.9%;
+  --dialog-backdrop: rgba(91, 112, 131, 0.4);
 }
 
 .dark {
@@ -49,6 +50,7 @@
   --color-popover-foreground: hsl(var(--popover-foreground));
   --animate-duration: 150ms;
   --animate-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  --color-dialog-backdrop: var(--dialog-backdrop);
 }
 
 @layer base {
