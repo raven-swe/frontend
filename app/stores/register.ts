@@ -47,6 +47,12 @@ export const useRegisterStore = defineStore('register', () => {
       throw new Error('failed to complete registration');
     }
   };
+
+  const previousStep = () => {
+    if (step.value > 0) {
+      step.value -= 1;
+    }
+  };
   return {
     step,
     open,
@@ -54,5 +60,6 @@ export const useRegisterStore = defineStore('register', () => {
     submitRegisterationInfo,
     submitOtp,
     submitPassword,
+    previousStep,
   };
 });
