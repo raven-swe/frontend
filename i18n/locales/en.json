@@ -53,7 +53,10 @@
     "PASSWORD_MISMATCH": "Passwords do not match",
     "PASSWORD_TOO_SHORT": "Password must be at least 8 characters long",
     "PASSWORD_INVALID": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
-    "EMAIL_ALREADY_EXISTS": "An account with this email already exists"
+    "EMAIL_ALREADY_EXISTS": "An account with this email already exists",
+    "OTP_TOO_SHORT": "OTP must be 6 digits",
+    "OTP_TOO_LONG": "OTP must be 6 digits",
+    "INVALID_OTP": "The OTP you entered is invalid"
   },
   "register": {
     "register-info": {
@@ -77,6 +80,11 @@
           "label": "Year"
         }
       }
+    },
+    "otp": {
+      "title": "We sent you a code",
+      "description": "Enter it below to verify {email}.",
+      "resend-code": "Resend code"
     }
   }
 }

@@ -2,6 +2,7 @@
 import { Dialog, DialogContent } from '~/components/ui/dialog';
 import RegisterationInfoForm from './RegisterationInfoForm.vue';
 import Button from '~/components/ui/Button.vue';
+import OtpForm from './OtpForm.vue';
 
 const registerStore = useRegisterStore();
 </script>
@@ -19,8 +20,9 @@ const registerStore = useRegisterStore();
           <Icon name="lucide:arrow-left" />
         </Button>
       </template>
-      <div class="flex flex-1 flex-col px-18">
+      <div class="flex flex-1 flex-col px-12">
         <RegisterationInfoForm v-if="registerStore.step === 0" />
+        <OtpForm v-if="registerStore.step === 1" />
       </div>
     </DialogContent>
   </Dialog>

@@ -4,7 +4,11 @@ export const useRegisterStore = defineStore('register', () => {
   const step = ref(0);
   const open = ref(false);
   const creationToken = ref<string | null>(null);
-  const registerationInfo = ref<RegisterationInfoSchema | null>(null);
+  const registerationInfo = ref<RegisterationInfoSchema | null>({
+    name: 'ahmne',
+    email: 'ahmne@example.com',
+    birthDate: '2005-01-01',
+  });
 
   const openDialog = () => {
     open.value = true;
@@ -27,17 +31,19 @@ export const useRegisterStore = defineStore('register', () => {
     }
   };
 
-  const submitOtp = async (otp: string) => {
+  const submitOtp = async (otp: string): Promise<boolean> => {
     try {
       await $fetch<ApiResponseBase>('/api/auth/register/verify', {
         method: 'POST',
         body: { otp, creationToken: creationToken.value },
       });
       step.value = 2;
+      return true;
     } catch {
-      throw new Error('failed to verify OTP');
+      return false;
     }
   };
+
   const submitPassword = async (password: string) => {
     try {
       await $fetch<ApiResponseBase>('/api/auth/register/complete', {

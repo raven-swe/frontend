@@ -18,7 +18,6 @@ const schema = yup.object({
     .max(today, $t('errors.AGE_RESTRICTION')) // no future dates
     .max(thirteenYearsAgo, $t('errors.AGE_RESTRICTION')), // at least 13 years old
 });
-console.log(registerStore.registerationInfo);
 const { errors, values, defineField, handleSubmit, isSubmitting, setFieldError } = useForm({
   validationSchema: schema,
   initialValues: registerStore.registerationInfo,
@@ -36,7 +35,6 @@ const [_birthDate, birthDateAttrs] = defineField('birthDate');
 const emailExists = ref(false);
 
 const checkEmail = useDebounceFn(async (email: string) => {
-  emailExists.value = false;
   setFieldError('email', undefined);
   if (!email || errors.value.email) return; // skip if already invalid email format
   try {
@@ -45,10 +43,11 @@ const checkEmail = useDebounceFn(async (email: string) => {
   } catch (err) {
     console.error('Failed to check email', err);
   }
-}, 500); // 500ms debounce
+}, 300);
 watch(
   () => values.email,
   (email) => {
+    emailExists.value = true;
     checkEmail(email);
   },
 );
@@ -62,7 +61,7 @@ watch(errors, (errs) => {
 
 <template>
   <form class="flex h-full flex-col justify-between" @submit.prevent="onSubmit">
-    <DialogHeader class="py-10">
+    <DialogHeader class="py-6">
       <DialogTitle class="text-4xl font-bold">{{ $t('register.register-info.title') }}</DialogTitle>
     </DialogHeader>
     <div class="flex flex-col gap-4">
