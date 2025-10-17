@@ -52,5 +52,29 @@
     "PASSWORD_MISMATCH": "Passwords do not match",
     "PASSWORD_TOO_SHORT": "Password must be at least 8 characters long",
     "PASSWORD_INVALID": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+  },
+  "register": {
+    "register-info": {
+      "title": "Create your account",
+      "name": {
+        "label": "Name"
+      },
+      "email": {
+        "label": "Email"
+      },
+      "date-of-birth": {
+        "title": "Date of Birth",
+        "description": "This will not be shown publicly. Confirm your own age, even if this account is for a business, a pet, or something else.",
+        "month": {
+          "label": "Month"
+        },
+        "day": {
+          "label": "Day"
+        },
+        "year": {
+          "label": "Year"
+        }
+      }
+    }
   }
 }
