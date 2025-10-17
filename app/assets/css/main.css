@@ -26,7 +26,7 @@
   --accent: #16181c;
   --ring: #f7f9fa;
   --ring-primary: color-mix(in oklch, var(--primary) 60%, white);
-  --destructive: #82181a;
+  --destructive: #f4212e;
 }
 
 @theme inline {
