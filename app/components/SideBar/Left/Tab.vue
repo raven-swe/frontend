@@ -17,7 +17,7 @@ const iconType = computed(() => (isActive.value ? 'heroicons-solid' : 'heroicons
 <template>
   <NuxtLink
     :to="tab.route"
-    class="text-foreground hover:bg-accent flex w-min items-center justify-start rounded-full p-3"
+    class="text-foreground hover:bg-foreground/10 flex w-min items-center justify-start rounded-full p-3"
   >
     <div class="text-foreground">
       <Icon :name="`${iconType}:${tab.icon}`" size="24" />
