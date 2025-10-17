@@ -42,6 +42,7 @@
   },
   "ui": {
     "close": "Close",
-    "next": "Next"
+    "next": "Next",
+    "loading": "Loading"
   }
 }

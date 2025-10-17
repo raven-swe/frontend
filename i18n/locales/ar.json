@@ -30,6 +30,11 @@
       "about": "حول",
       "developers": "المطورون",
       "copyright": "© 2025 Raven Corp."
+    },
+    "ui": {
+      "close": "أغلق",
+      "next": "التالي",
+      "loading": "جار التحميل"
     }
   }
 }
