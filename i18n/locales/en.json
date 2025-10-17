@@ -85,6 +85,11 @@
       "title": "We sent you a code",
       "description": "Enter it below to verify {email}.",
       "resend-code": "Resend code"
+    },
+    "password": {
+      "title": "You'll need a password",
+      "description": "Make sure it's 8 characters or more.",
+      "disclaimer": "By signing up, you agree to the Terms of Service and Privacy Policy, including Cookie Use. Raven may use your contact information, including your email address and phone number for purposes outlined in our Privacy Policy, like keeping your account secure and personalizing our services, including ads. Others will be able to find you by email or phone number, when provided, unless you choose otherwise here."
     }
   }
 }

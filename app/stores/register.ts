@@ -61,9 +61,10 @@ export const useRegisterStore = defineStore('register', () => {
         method: 'POST',
         body: { password, creationToken: creationToken.value },
       });
-      step.value = 3;
+      console.warn('account created, redirecting to home');
+      navigateTo('/home');
     } catch {
-      throw new Error('failed to complete registration');
+      console.error('Failed to complete registeration');
     }
   };
 
