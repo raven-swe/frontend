@@ -32,6 +32,13 @@ export const handlers = [
     const url = new URL(request.url);
     const email = url.searchParams.get('email');
 
+    if (email == 'test@example.com') {
+      return HttpResponse.json(
+        { success: true, message: 'User found', data: { exists: true } },
+        { status: 200 },
+      );
+    }
+
     const user = mockUsers.find((user) => user.email === email);
 
     return HttpResponse.json(

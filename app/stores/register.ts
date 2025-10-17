@@ -4,6 +4,7 @@ export const useRegisterStore = defineStore('register', () => {
   const step = ref(0);
   const open = ref(false);
   const creationToken = ref<string | null>(null);
+  const registerationInfo = ref<RegisterationInfoSchema | null>(null);
 
   const openDialog = () => {
     open.value = true;
@@ -11,6 +12,7 @@ export const useRegisterStore = defineStore('register', () => {
 
   const submitRegisterationInfo = async (data: RegisterationInfoSchema) => {
     try {
+      registerationInfo.value = data;
       const response = await $fetch<ApiSuccessResponse<{ creationToken: string }>>(
         '/api/auth/register/start',
         {
@@ -56,6 +58,7 @@ export const useRegisterStore = defineStore('register', () => {
   return {
     step,
     open,
+    registerationInfo,
     openDialog,
     submitRegisterationInfo,
     submitOtp,

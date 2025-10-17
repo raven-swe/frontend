@@ -47,11 +47,13 @@
   "errors": {
     "INVALID_EMAIL": "Invalid email address",
     "NAME_TOO_SHORT": "Name must be at least 2 characters long",
+    "NAME_TOO_LONG": "Name must be at most 50 characters long",
     "AGE_RESTRICTION": "You must be at least 13 years old",
     "OTP_LENGTH": "OTP must be 6 digits",
     "PASSWORD_MISMATCH": "Passwords do not match",
     "PASSWORD_TOO_SHORT": "Password must be at least 8 characters long",
-    "PASSWORD_INVALID": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+    "PASSWORD_INVALID": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+    "EMAIL_ALREADY_EXISTS": "An account with this email already exists"
   },
   "register": {
     "register-info": {
