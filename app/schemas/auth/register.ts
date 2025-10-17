@@ -1,5 +1,5 @@
 import z from 'zod';
-export const step1Schema = z.object({
+export const registerationInfoSchema = z.object({
   email: z.email($t('errors.INVALID_EMAIL')),
   name: z.string().min(2, $t('errors.NAME_TOO_SHORT')),
   birthDate: z.string().refine((date) => {
@@ -10,15 +10,15 @@ export const step1Schema = z.object({
   }, $t('errors.AGE_RESTRICTION')),
 });
 
-export type Step1Data = z.infer<typeof step1Schema>;
+export type RegisterationInfoSchema = z.infer<typeof registerationInfoSchema>;
 
-export const step2Schema = z.object({
+export const otpSchema = z.object({
   otp: z.string().length(6, $t('errors.OTP_LENGTH')),
 });
 
-export type Step2Data = z.infer<typeof step2Schema>;
+export type OtpSchemaType = z.infer<typeof otpSchema>;
 
-export const step3Schema = z
+export const PasswordSchema = z
   .object({
     password: z.string().min(8, $t('errors.PASSWORD_TOO_SHORT')),
   })
@@ -28,4 +28,4 @@ export const step3Schema = z
     $t('errors.PASSWORD_INVALID'),
   );
 
-export type Step3Data = z.infer<typeof step3Schema>;
+export type PasswordSchemaType = z.infer<typeof PasswordSchema>;
