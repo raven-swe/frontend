@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Button from '~/components/ui/Button.vue';
+const registerStore = useRegisterStore();
 </script>
 
 <template>
@@ -15,6 +16,7 @@ import Button from '~/components/ui/Button.vue';
           <h2 class="mb-8 text-2xl font-semibold sm:text-[2rem]">{{ $t('root.hero.subtitle') }}</h2>
         </header>
         <main>
+          <AuthRegisterDialog />
           <section>
             <div class="flex flex-col gap-4">
               <Button id="github-signin" variant="outline" class="w-75">{{
@@ -29,7 +31,9 @@ import Button from '~/components/ui/Button.vue';
               <span class="uppercase">{{ $t('root.auth.separator') }}</span>
               <div class="w-full border-b-1" />
             </div>
-            <Button id="signup" variant="default" class="w-75">{{ $t('root.auth.signup') }}</Button>
+            <Button id="signup" variant="default" class="w-75" @click="registerStore.openDialog">{{
+              $t('root.auth.signup')
+            }}</Button>
             <p class="text-muted-foreground mt-4 max-w-75 text-xs">
               {{ $t('root.auth.signup-info') }}
             </p>
