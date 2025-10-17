@@ -4,6 +4,8 @@ import type {
   ApiValidationErrorResponse,
 } from '#shared/types/api';
 
+import { FetchError } from 'ofetch';
+
 const API_URL = process.env.BACKEND_URL;
 
 export default defineEventHandler(async (event) => {
@@ -18,29 +20,20 @@ export default defineEventHandler(async (event) => {
     );
     return response;
   } catch (error) {
-    const response = (error as { data: unknown }).data as
-      | ApiErrorResponse
-      | ApiValidationErrorResponse
-      | undefined;
-    if (response?.error?.code === 'VALIDATION_ERROR') {
+    if (error instanceof FetchError) {
+      const fetchError = error as FetchError<ApiErrorResponse | ApiValidationErrorResponse>;
+
       throw createError({
-        statusCode: 400,
-        statusMessage: 'Validation Error',
-        data: response.error,
+        statusCode: fetchError.status ?? 500,
+        statusMessage: fetchError.data?.error?.message ?? 'Internal Server Error',
+        data: fetchError.data?.error,
       });
     }
 
-    if (response?.error) {
-      throw createError({
-        statusCode: 500,
-        statusMessage: response.error.message || 'Internal Server Error',
-        data: response.error,
-      });
-    }
-
+    // Fallback for non-Fetch errors
     throw createError({
       statusCode: 500,
-      statusMessage: 'Internal Server Error',
+      statusMessage: error instanceof Error ? error.message : 'Internal Server Error',
     });
   }
 });
