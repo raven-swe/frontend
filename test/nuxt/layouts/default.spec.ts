@@ -49,10 +49,10 @@ describe('Default Layout', () => {
     expect(wrapper.html()).toContain('min-h-screen');
   });
 
-  it('applies dark mode classes', async () => {
+  it('applies theme classes', async () => {
     const wrapper = await mountSuspended(DefaultLayout);
 
-    expect(wrapper.html()).toContain('dark:bg-dim-900');
-    expect(wrapper.html()).toContain('dark:border-gray-700');
+    expect(wrapper.html()).toContain('bg-background');
+    expect(wrapper.html()).toContain('border-border');
   });
 });

@@ -46,7 +46,7 @@ describe('SideBar Right PreviewCard Component', () => {
   it('has show more link', async () => {
     const wrapper = await mountSuspended(PreviewCard);
 
-    const showMore = wrapper.find('.cursor-pointer.text-blue-400');
+    const showMore = wrapper.find('.cursor-pointer.text-primary');
     expect(showMore.exists()).toBe(true);
   });
 });
