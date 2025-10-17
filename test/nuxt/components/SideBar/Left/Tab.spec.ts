@@ -51,10 +51,9 @@ describe('SideBar Left Tab Component', () => {
     });
 
     // Check if icon container exists
-    const iconContainer = wrapper.find('.text-dark');
+    const iconContainer = wrapper.find('.text-foreground');
     expect(iconContainer.exists()).toBe(true);
   });
-
   it('handles inactive tab (route: #)', async () => {
     const inactiveTab = {
       label: 'test',
