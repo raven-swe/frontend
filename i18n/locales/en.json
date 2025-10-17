@@ -40,6 +40,14 @@
   "homepage": {
     "tweets": "Tweets"
   },
+  "profile": {
+    "tabs": {
+      "posts": "Posts",
+      "replies": "Replies",
+      "media": "Media",
+      "likes": "Likes"
+    }
+  },
   "playground": {
     "dialog": {
       "title": "Create your account",
