@@ -2,7 +2,7 @@
 
 <template>
   <div>
-    <div class="dark:bg-dim-900 bg-white">
+    <div class="bg-background">
       <div class="flex min-h-screen justify-center">
         <div class="flex w-full max-w-7xl sm:justify-center">
           <!-- Left sidebar -->
@@ -13,9 +13,7 @@
           </div>
 
           <!-- Main content -->
-          <main
-            class="flex-1 border-x border-gray-200 sm:w-[590px] sm:flex-none md:w-[600px] dark:border-gray-700"
-          >
+          <main class="border-border flex-1 border-x sm:w-[590px] sm:flex-none md:w-[600px]">
             <slot />
           </main>
 

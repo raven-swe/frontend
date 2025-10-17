@@ -24,15 +24,15 @@
     }
   },
   "rightsidebar": {
-    "whatsHappening": {
+    "whats-happening": {
       "title": "What's happening",
       "tweets": "Tweets"
     },
-    "whoToFollow": {
+    "who-to-follow": {
       "title": "Who to follow",
       "follow": "Follow"
     },
-    "showMore": "Show more"
+    "show-more": "Show more"
   },
   "homepage": {
     "tweets": "Tweets"

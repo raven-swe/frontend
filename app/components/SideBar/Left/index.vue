@@ -3,7 +3,7 @@ import { SIDEBAR_TABS } from '~/constants/leftsidebar';
 </script>
 <template>
   <div class="flex h-screen flex-col">
-    <div class="my-2 w-min p-2 hover:rounded-full hover:bg-blue-50 dark:bg-white/20">
+    <div class="hover:bg-accent my-2 w-min p-2 hover:rounded-full">
       <NuxtLink to="/">
         <LogoRaven class="h-8 w-8" />
       </NuxtLink>

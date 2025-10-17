@@ -46,23 +46,23 @@ const whoToFollowItems = [
 <template>
   <div>
     <!-- preview Card -->
-    <SideBarRightPreviewCard :title="$t('rightsidebar.whatsHappening.title')">
+    <SideBarRightPreviewCard :title="$t('rightsidebar.whats-happening.title')">
       <div>
         <SideBarRightPreviewCardItem
           v-for="(happingItem, index) in whatHappeningItems"
           :key="index"
         >
-          <h2 class="text-md font-bold text-gray-800 dark:text-white">
+          <h2 class="text-md text-foreground font-bold">
             {{ happingItem.title }}
           </h2>
-          <p class="text-sm text-gray-400">
-            {{ happingItem.count }} {{ $t('rightsidebar.whatsHappening.tweets') }}
+          <p class="text-muted-foreground text-sm">
+            {{ happingItem.count }} {{ $t('rightsidebar.whats-happening.tweets') }}
           </p>
         </SideBarRightPreviewCardItem>
       </div>
     </SideBarRightPreviewCard>
     <!-- Who to follow -->
-    <SideBarRightPreviewCard :title="$t('rightsidebar.whoToFollow.title')">
+    <SideBarRightPreviewCard :title="$t('rightsidebar.who-to-follow.title')">
       <SideBarRightPreviewCardItem
         v-for="whoFollowItem in whoToFollowItems"
         :key="whoFollowItem.username"
@@ -75,17 +75,15 @@ const whoToFollowItems = [
               class="h-10 w-10 rounded-full"
             />
             <div class="ms-3 flex flex-col">
-              <h1 class="text-md font-bold text-gray-900 dark:text-white">
+              <h1 class="text-md text-foreground font-bold">
                 {{ whoFollowItem.name }}
               </h1>
-              <p class="text-xs text-gray-500">{{ whoFollowItem.username }}</p>
+              <p class="text-muted-foreground text-xs">{{ whoFollowItem.username }}</p>
             </div>
           </div>
           <div class="flex h-full">
-            <button
-              class="cursor-pointer rounded-full bg-black px-4 py-2 text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200"
-            >
-              {{ $t('rightsidebar.whoToFollow.follow') }}
+            <button class="bg-foreground text-background cursor-pointer rounded-full px-4 py-2">
+              {{ $t('rightsidebar.who-to-follow.follow') }}
             </button>
           </div>
         </div>

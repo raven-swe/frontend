@@ -10,6 +10,13 @@ export default defineNuxtConfig({
       enabled: true,
     },
   },
+  typescript: {
+    strict: true,
+    sharedTsConfig: {
+      include: ['../shared/types/**/*.ts', '../mocks/**/*.ts', '../test/**/*.ts'],
+    },
+  },
+
   modules: [
     '@nuxt/eslint',
     '@nuxt/fonts',
