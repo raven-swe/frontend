@@ -61,15 +61,15 @@
     }
   },
   "rightsidebar": {
-    "whatsHappening": {
+    "whats-happening": {
       "title": "ماذا يحدث",
       "tweets": "تغريدات"
     },
-    "whoToFollow": {
+    "who-to-follow": {
       "title": "من تتابع",
       "follow": "متابعة"
     },
-    "showMore": "عرض المزيد"
+    "show-more": "عرض المزيد"
   },
   "homepage": {
     "tweets": "التغريدات"
