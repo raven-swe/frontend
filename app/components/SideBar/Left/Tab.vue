@@ -6,15 +6,17 @@ const props = defineProps<{
 }>();
 
 const route = useRoute();
-const isActive = computed(() => route.path === props.tab.route);
+const isActive = computed(() => {
+  if (props.tab.route === '#') return false;
+  return route.path.startsWith(props.tab.route);
+});
 const textStyle = computed(() => (isActive.value ? 'font-bold' : 'font-normal'));
 const iconType = computed(() => (isActive.value ? 'heroicons-solid' : 'heroicons-outline'));
 </script>
 
 <template>
-  <!-- will navigate to tab.route later -->
   <NuxtLink
-    to="#"
+    :to="tab.route"
     class="dark:hover:bg-dim-200 flex w-min items-center justify-start rounded-full p-3 text-black hover:bg-gray-200 dark:text-white"
   >
     <div class="text-dark">
