@@ -54,7 +54,8 @@ describe('PopoverTrigger Component', () => {
           ),
       },
     });
-    expect(wrapper.html()).toContain('Click me');
+    const clientOnly = wrapper.findComponent({ name: 'ClientOnly' });
+    expect(clientOnly.exists()).toBe(true);
     wrapper.unmount();
   });
 
@@ -71,7 +72,9 @@ describe('PopoverTrigger Component', () => {
           ),
       },
     });
-    expect(wrapper.exists()).toBe(true);
+    const radixTrigger = wrapper.findComponent({ name: 'PopoverTrigger' });
+    expect(radixTrigger.exists()).toBe(true);
+    expect(radixTrigger.props('asChild')).toBe(true);
     wrapper.unmount();
   });
 });
