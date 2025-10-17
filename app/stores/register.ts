@@ -5,9 +5,9 @@ export const useRegisterStore = defineStore('register', () => {
   const open = ref(false);
   const creationToken = ref<string | null>(null);
   const registerationInfo = ref<RegisterationInfoSchema | null>({
-    name: 'ahmne',
-    email: 'ahmne@example.com',
-    birthDate: '2005-01-01',
+    name: '',
+    email: '',
+    birthDate: '',
   });
 
   const openDialog = () => {
