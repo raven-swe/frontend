@@ -13,6 +13,7 @@ const iconType = computed(() => (isActive.value ? '' : 'outline-'));
 </script>
 
 <template>
+  <!-- will navigate to tab.route later -->
   <NuxtLink
     :to="tab.route"
     class="text-foreground hover:bg-foreground/10 flex items-center justify-start rounded-full p-3 xl:w-auto"
