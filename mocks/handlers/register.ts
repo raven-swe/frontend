@@ -3,6 +3,11 @@ import rawUsers from '../data/mock-users.json' assert { type: 'json' };
 import type { User } from '#shared/types/user';
 import jwt from 'jsonwebtoken';
 import { faker } from '@faker-js/faker';
+import type {
+  ApiErrorResponse,
+  ApiSuccessResponse,
+  ApiValidationErrorResponse,
+} from '#shared/types/api';
 
 const mockUsers = rawUsers as User[];
 
@@ -31,33 +36,6 @@ export const handlers = [
 
     return HttpResponse.json(
       { success: true, message: user ? 'User found' : 'User not found', data: { exists: !!user } },
-      { status: 200 },
-    );
-  }),
-
-  http.post(`${API_URL}/auth/login`, async ({ request }) => {
-    const { identifier, password } = (await request.json()) as {
-      identifier: string;
-      password: string;
-    };
-    const user = mockUsers.find(
-      (user) =>
-        (user.email === identifier || user.username === identifier) && password === 'password123',
-    );
-
-    if (!user) {
-      return HttpResponse.json(
-        { success: false, error: { message: 'Invalid credentials', code: 'INVALID_CREDENTIALS' } },
-        { status: 401 },
-      );
-    }
-
-    return HttpResponse.json(
-      {
-        success: true,
-        message: 'Login successful',
-        data: { accessToken: generateAuthToken(user), refreshToken: generateRefreshToken(user) },
-      },
       { status: 200 },
     );
   }),
@@ -98,19 +76,57 @@ export const handlers = [
   }),
 
   http.post(`${API_URL}/auth/register/start`, async ({ request }) => {
-    const { email, name, birthDate } = (await request.json()) as {
-      name: string;
-      email: string;
-      birthDate: `${number}-${number}-${number}`;
-      recaptchaToken: string;
-    };
+    const body = (await request.json()) as
+      | {
+          name: string;
+          email: string;
+          birthDate: `${number}-${number}-${number}`;
+          recaptchaToken: string;
+        }
+      | undefined;
+
+    if (!body || !body.name || !body.email || !body.birthDate) {
+      return HttpResponse.json(
+        {
+          success: false,
+          error: {
+            message: 'Validation error',
+            code: 'VALIDATION_ERROR',
+            errors: [
+              { field: 'name', message: 'Name is required' },
+              { field: 'email', message: 'Email is required' },
+              { field: 'birthDate', message: 'Birth date is required' },
+            ],
+          },
+        } as ApiValidationErrorResponse,
+        { status: 400 },
+      );
+    }
+    const { email, name, birthDate } = body;
+
+    if (new Date(birthDate) > new Date()) {
+      return HttpResponse.json(
+        {
+          success: false,
+          error: {
+            message: 'Invalid birth date',
+            code: 'INVALID_BIRTHDATE',
+          },
+        } as ApiErrorResponse,
+        { status: 400 },
+      );
+    }
 
     const creationToken = jwt.sign({ email, name, birthDate }, 'creation_secret', {
       expiresIn: '5m',
     });
 
     return HttpResponse.json(
-      { success: true, message: 'Registration started', data: { creationToken } },
+      {
+        success: true,
+        message: 'Registration started',
+        data: { creationToken },
+      } as ApiSuccessResponse<{ creationToken: string }>,
       { status: 200 },
     );
   }),
