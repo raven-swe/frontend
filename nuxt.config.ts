@@ -20,6 +20,7 @@ export default defineNuxtConfig({
     '@nuxt/test-utils/module',
     '@vueuse/nuxt',
     '@pinia/nuxt',
+    '@nuxt/image',
   ],
   vite: {
     plugins: [tailwindcss()],

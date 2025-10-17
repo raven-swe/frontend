@@ -14,6 +14,9 @@
   --ring: #888a8c;
   --ring-primary: color-mix(in oklch, var(--primary) 60%, white);
   --destructive: #f4212e;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --dialog-backdrop: rgba(91, 112, 131, 0.4);
 }
 
 .dark {
@@ -27,6 +30,8 @@
   --ring: #f7f9fa;
   --ring-primary: color-mix(in oklch, var(--primary) 60%, white);
   --destructive: #82181a;
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
 }
 
 @theme inline {
@@ -41,6 +46,11 @@
   --text-xs: 0.75rem;
   --color-destructive: var(--destructive);
   --color-ring-primary: var(--ring-primary);
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --animate-duration: 150ms;
+  --animate-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  --color-dialog-backdrop: var(--dialog-backdrop);
 }
 
 @layer base {
