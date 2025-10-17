@@ -44,6 +44,17 @@ export const useRegisterStore = defineStore('register', () => {
     }
   };
 
+  const resendOtp = async () => {
+    try {
+      await $fetch<ApiResponseBase>('/api/auth/register/resend-otp', {
+        method: 'POST',
+        body: { creationToken: creationToken.value },
+      });
+    } catch {
+      console.error('Failed to resend otp');
+    }
+  };
+
   const submitPassword = async (password: string) => {
     try {
       await $fetch<ApiResponseBase>('/api/auth/register/complete', {
@@ -70,5 +81,6 @@ export const useRegisterStore = defineStore('register', () => {
     submitOtp,
     submitPassword,
     previousStep,
+    resendOtp,
   };
 });

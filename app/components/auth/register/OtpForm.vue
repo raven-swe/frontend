@@ -50,7 +50,7 @@ const [_otp, otpAttrs] = defineField('otp');
         }}
       </DialogDescription>
     </DialogHeader>
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-2">
       <FieldInput
         placeholder="Verification Code"
         inputmode="numeric"
@@ -59,6 +59,15 @@ const [_otp, otpAttrs] = defineField('otp');
         name="otp"
         v-bind="otpAttrs"
       />
+      <Button
+        type="button"
+        variant="link"
+        size="link"
+        class="w-fit"
+        @click="registerStore.resendOtp"
+      >
+        {{ $t('register.otp.resend-code') }}
+      </Button>
     </div>
     <DialogFooter class="mt-auto">
       <Button

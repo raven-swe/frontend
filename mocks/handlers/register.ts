@@ -180,6 +180,28 @@ export const handlers = [
     }
   }),
 
+  http.post(`${API_URL}/auth/register/resend-otp`, async ({ request }) => {
+    const { creationToken } = (await request.json()) as {
+      creationToken: string;
+    };
+    if (!creationToken) {
+      return HttpResponse.json(
+        {
+          success: false,
+          error: { message: 'No creation token provided' },
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    return HttpResponse.json(
+      { success: true, message: 'OTP resent successfully' },
+      { status: 200 },
+    );
+  }),
+
   http.post(`${API_URL}/auth/register/complete`, async ({ request }) => {
     const { creationToken } = (await request.json()) as {
       creationToken: string;
