@@ -97,7 +97,7 @@ function main() {
   mkdirSync(outDir, { recursive: true });
   writeFileSync(outFile, JSON.stringify(data, null, 2), 'utf-8');
   // eslint-disable-next-line no-console
-  console.log(`Wrote ${data.length} tweets to ${path.relative(process.cwd(), outFile)}`);
+  // console.log(`Wrote ${data.length} tweets to ${path.relative(process.cwd(), outFile)}`);
 }
 
 main();
