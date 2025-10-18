@@ -1,10 +1,14 @@
-import type { RegisterationInfoSchema } from '~/schemas/auth/register';
+type RegisterationInfo = {
+  name: string;
+  email: string;
+  birthDate: string;
+};
 
 export const useRegisterStore = defineStore('register', () => {
   const step = ref(0);
   const open = ref(false);
   const creationToken = ref<string | null>(null);
-  const registerationInfo = ref<RegisterationInfoSchema | null>({
+  const registerationInfo = ref<RegisterationInfo | null>({
     name: '',
     email: '',
     birthDate: '',
@@ -14,7 +18,7 @@ export const useRegisterStore = defineStore('register', () => {
     open.value = true;
   };
 
-  const submitRegisterationInfo = async (data: RegisterationInfoSchema) => {
+  const submitRegisterationInfo = async (data: RegisterationInfo) => {
     try {
       registerationInfo.value = data;
       const response = await $fetch<ApiSuccessResponse<{ creationToken: string }>>(
