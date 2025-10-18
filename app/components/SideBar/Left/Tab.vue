@@ -11,16 +11,16 @@ const isActive = computed(() => {
   return route.path.startsWith(props.tab.route);
 });
 const textStyle = computed(() => (isActive.value ? 'font-bold' : 'font-normal'));
-const iconType = computed(() => (isActive.value ? 'heroicons-solid' : 'heroicons-outline'));
+const iconType = computed(() => (isActive.value ? '' : 'outline-'));
 </script>
 
 <template>
   <NuxtLink
     :to="tab.route"
-    class="text-foreground hover:bg-foreground/10 flex w-min items-center justify-start rounded-full p-3"
+    class="text-foreground hover:bg-foreground/10 flex items-center justify-start rounded-full p-3 xl:w-auto"
   >
-    <div class="text-foreground">
-      <Icon :name="`${iconType}:${tab.icon}`" size="24" />
+    <div class="text-foreground flex h-6 w-6 items-center justify-center">
+      <Icon :name="`ic:${iconType}${tab.icon}`" size="24" />
     </div>
 
     <div class="ms-3 hidden text-xl xl:block" :class="textStyle">

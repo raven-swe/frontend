@@ -8,32 +8,28 @@ export const SIDEBAR_TABS: LeftSidebarTab[] = [
   },
   {
     label: 'explore',
-    icon: 'magnifying-glass',
+    icon: 'search',
     route: '/explore',
   },
   {
     label: 'notifications',
-    icon: 'bell',
+    icon: 'notifications',
     route: '/notifications',
   },
   {
     label: 'messages',
-    icon: 'envelope',
+    icon: 'chat',
     route: '/messages',
   },
-  {
-    label: 'bookmarks',
-    icon: 'bookmark',
-    route: '/bookmarks',
-  },
+
   {
     label: 'profile',
-    icon: 'user',
+    icon: 'person',
     route: '/profile',
   },
   {
     label: 'more',
-    icon: 'ellipsis-horizontal-circle',
+    icon: 'more-horiz',
     route: '#',
   },
 ];
