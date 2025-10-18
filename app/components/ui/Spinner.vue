@@ -8,18 +8,18 @@ const props = withDefaults(
     size?: string | number;
   }>(),
   {
-    size: '1rem',
+    size: '2rem',
   },
 );
 </script>
 
 <template>
   <Icon
-    name="lucide:loader-circle"
+    name="mingcute:loading-3-fill"
     role="status"
     mode="svg"
     :size="props.size"
     :aria-label="$t('ui.loading')"
-    :class="cn('!block size-4 animate-spin', props.class)"
+    :class="cn('!block animate-spin', props.class)"
   />
 </template>

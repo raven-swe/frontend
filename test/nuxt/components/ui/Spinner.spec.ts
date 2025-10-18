@@ -17,7 +17,6 @@ describe('Spinner', () => {
     // defaults
     expect(icon.attributes('role')).toBe('status');
     expect(icon.classes()).toContain('animate-spin');
-    expect(icon.classes()).toContain('size-4');
   });
 
   it('applies custom classes to the spinner', async () => {
