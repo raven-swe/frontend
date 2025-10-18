@@ -28,6 +28,7 @@ export const useRegisterStore = defineStore('register', () => {
           body: data,
         },
       );
+      if (!response.success) throw new Error('API indicated failure');
       creationToken.value = response.data.creationToken;
       step.value = 1;
     } catch {
@@ -37,10 +38,11 @@ export const useRegisterStore = defineStore('register', () => {
 
   const submitOtp = async (otp: string): Promise<boolean> => {
     try {
-      await $fetch<ApiResponseBase>('/api/auth/register/verify', {
+      const response = await $fetch<ApiResponseBase>('/api/auth/register/verify', {
         method: 'POST',
         body: { otp, creationToken: creationToken.value },
       });
+      if (!response.success) throw new Error('API indicated failure');
       step.value = 2;
       return true;
     } catch {
