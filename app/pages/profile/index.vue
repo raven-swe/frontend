@@ -1,33 +1,19 @@
-<script lang="ts" setup>
-import ProfileDetails from '~/components/profile/ProfileDetails.vue';
-import Tabs from '@/components/ui/Tabs.vue';
-import Tab from '@/components/ui/Tab.vue';
+<script setup>
+definePageMeta({
+  layout: 'profile',
+});
+
+const posts = [
+  { id: 1, content: 'Post 1' },
+  { id: 2, content: 'Post 2' },
+  { id: 3, content: 'Post 3' },
+];
 </script>
 
 <template>
   <div>
-    <ProfileDetails />
-    <Tabs>
-      <Tab
-        :label="$t('profile.tabs.posts')"
-        route="/home"
-        :is-active="$route.path === '/profile'"
-      />
-      <Tab
-        :label="$t('profile.tabs.replies')"
-        route="/home"
-        :is-active="$route.path !== '/profile'"
-      />
-      <Tab
-        :label="$t('profile.tabs.media')"
-        route="/home"
-        :is-active="$route.path !== '/profile'"
-      />
-      <Tab
-        :label="$t('profile.tabs.likes')"
-        route="/home"
-        :is-active="$route.path !== '/profile'"
-      />
-    </Tabs>
+    <div v-for="post in posts" :key="post.id">
+      <p>{{ post.content }}</p>
+    </div>
   </div>
 </template>
