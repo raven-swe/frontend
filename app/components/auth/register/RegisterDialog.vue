@@ -16,6 +16,7 @@ const registerStore = useRegisterStore();
           v-if="registerStore.step !== 0"
           variant="ghost-default"
           size="icon-xs"
+          data-test-id="back-button"
           @click="registerStore.previousStep"
         >
           <Icon name="lucide:arrow-left" />
