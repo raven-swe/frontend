@@ -10,7 +10,10 @@
     "follow": "متابعة",
     "unfollow": "إلغاء المتابعة",
     "following": "متابع",
-    "subscribe": "الاشتراك"
+    "subscribe": "الاشتراك",
+    "tweets": {
+      "tweet-not-found": "التغريدة غير موجودة"
+    }
   },
   "root": {
     "hero": {
