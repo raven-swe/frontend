@@ -35,5 +35,9 @@
       "developers": "Developers",
       "copyright": "© 2025 Raven Corp."
     }
+  },
+  "ui": {
+    "close": "Close",
+    "next": "Next"
   }
 }
