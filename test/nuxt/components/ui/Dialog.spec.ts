@@ -1,16 +1,14 @@
 // @vitest-environment nuxt
 import { describe, expect, it } from 'vitest';
 import { mountSuspended } from '@nuxt/test-utils/runtime';
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogFooter,
-  DialogTitle,
-  DialogHeader,
-  DialogDescription,
-  DialogClose,
-} from '@/components/ui/dialog';
+import Dialog from '@/components/ui/dialog/Dialog.vue';
+import DialogTrigger from '@/components/ui/dialog/DialogTrigger.vue';
+import DialogContent from '@/components/ui/dialog/DialogContent.vue';
+import DialogFooter from '@/components/ui/dialog/DialogFooter.vue';
+import DialogTitle from '@/components/ui/dialog/DialogTitle.vue';
+import DialogHeader from '@/components/ui/dialog/DialogHeader.vue';
+import DialogDescription from '@/components/ui/dialog/DialogDescription.vue';
+import DialogClose from '@/components/ui/dialog/DialogClose.vue';
 
 describe('Dialog component', () => {
   it('renders trigger and content (opens on trigger click)', async () => {
