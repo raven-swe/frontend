@@ -17,6 +17,7 @@ const props = withDefaults(
   <Icon
     name="lucide:loader-circle"
     role="status"
+    mode="svg"
     :size="props.size"
     :aria-label="$t('ui.loading')"
     :class="cn('!block size-4 animate-spin', props.class)"
