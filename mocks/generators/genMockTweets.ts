@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 function makeAuthor(index: number) {
-  const username = faker.internet.userName().toLowerCase() + index;
+  const username = faker.internet.username().toLowerCase() + index;
   return {
     username,
     displayName: faker.person.fullName(),
@@ -22,7 +22,7 @@ function randomEntities() {
   const mentionsCount = faker.number.int({ min: 0, max: 2 });
   const hashtagsCount = faker.number.int({ min: 0, max: 2 });
   const mentions = Array.from({ length: mentionsCount }, () => ({
-    username: faker.internet.userName().toLowerCase(),
+    username: faker.internet.username().toLowerCase(),
     startPosition: faker.number.int({ min: 0, max: 20 }),
   }));
   const hashtags = Array.from({ length: hashtagsCount }, () => ({
@@ -96,7 +96,7 @@ function main() {
   const outFile = path.join(outDir, 'tweet.json');
   mkdirSync(outDir, { recursive: true });
   writeFileSync(outFile, JSON.stringify(data, null, 2), 'utf-8');
-  // eslint-disable-next-line no-console
+
   // console.log(`Wrote ${data.length} tweets to ${path.relative(process.cwd(), outFile)}`);
 }
 
