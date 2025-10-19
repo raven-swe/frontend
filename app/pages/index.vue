@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import Button from '~/components/ui/Button.vue';
+definePageMeta({
+  layout: false, // Disable layout for this page
+});
 </script>
 
 <template>
