@@ -15,16 +15,21 @@ const buttonVariants = cva(
         'outline-destructive':
           'border-input text-foreground hover:border-destructive border-1 bg-background hover:text-destructive hover:bg-destructive/10 focus-visible:bg-foreground/10 focus-visible:ring-ring',
 
-        'ghost-default': 'bg-background focus-visible:bg-foreground/10 focus-visible:ring-ring',
+        'ghost-default':
+          'bg-background hover:bg-foreground/10 focus-visible:bg-foreground/10 focus-visible:ring-ring',
 
         'ghost-primary':
           'hover:text-primary hover:bg-primary/10 focus-visible:bg-primary/10 focus-visible:ring-ring-primary',
         'tweet-icon-blue':
-          'hover:hover:bg-brand-blue/10 focus-visible:bg-brand-blue/10 focus-visible:ring-ring-brand-blue',
+          'hover:bg-brand-blue/10 focus-visible:bg-brand-blue/10 focus-visible:ring-brand-blue',
         'tweet-icon-red':
-          'hover: hover:bg-brand-red/10 focus-visible:bg-brand-red/10 focus-visible:ring-ring-brand-red',
+          'hover:bg-brand-red/10 focus-visible:bg-brand-red/10 focus-visible:ring-brand-red',
         'tweet-icon-turquoise':
-          'hover: hover:bg-brand-turquoise/10 focus-visible:bg-brand-turquoise/10 focus-visible:ring-ring-brand-turquoise',
+          'hover:bg-brand-turquoise/10 focus-visible:bg-brand-turquoise/10 focus-visible:ring-brand-turquoise',
+        'tweet-icon-red-active':
+          'hover:bg-brand-red/20 text-brand-red focus-visible:bg-brand-red/20 focus-visible:ring-ring-brand-red',
+        'tweet-icon-turquoise-active':
+          'hover:bg-brand-turquoise/20 text-brand-turquoise focus-visible:bg-brand-turquoise/20 focus-visible:ring-ring-brand-turquoise',
       },
       size: {
         xs: 'h-8 px-4 text-sm has-[>svg]:px-2.5 [&>svg]:size-4',
