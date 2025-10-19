@@ -1,8 +1,13 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import ProfileAvatarSection from '~/components/profile/ProfileAvatarSection.vue';
+import ProfileCover from '~/components/profile/ProfileCover.vue';
+import ProfileDetails from '~/components/profile/ProfileDetails.vue';
+</script>
 
 <template>
   <div>
-    <h1 class="p-4 text-2xl font-bold">{{ $t('leftsidebar.nav.profile') }}</h1>
-    <!-- Profile content will go here -->
+    <ProfileCover />
+    <ProfileAvatarSection />
+    <ProfileDetails />
   </div>
 </template>
