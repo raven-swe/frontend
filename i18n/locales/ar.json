@@ -15,6 +15,31 @@
       "tweet-not-found": "التغريدة غير موجودة"
     }
   },
+  "leftsidebar": {
+    "nav": {
+      "home": "الرئيسية",
+      "explore": "استكشف",
+      "notifications": "الإشعارات",
+      "messages": "الرسائل",
+      "bookmarks": "المفضلة",
+      "profile": "الملف الشخصي",
+      "more": "المزيد"
+    }
+  },
+  "rightsidebar": {
+    "whats-happening": {
+      "title": "ماذا يحدث",
+      "tweets": "تغريدات"
+    },
+    "who-to-follow": {
+      "title": "من تتابع",
+      "follow": "متابعة"
+    },
+    "show-more": "عرض المزيد"
+  },
+  "homepage": {
+    "tweets": "التغريدات"
+  },
   "root": {
     "hero": {
       "title": "يحدث الآن",
