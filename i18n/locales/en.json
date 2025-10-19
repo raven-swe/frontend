@@ -57,6 +57,12 @@
       "description": "Dialog Description"
     }
   },
+  "profile": {
+    "edit-profile": "Edit Profile",
+    "joined": "Joined",
+    "following": "Following",
+    "followers": "Followers"
+  },
   "root": {
     "hero": {
       "title": "Happening now",
