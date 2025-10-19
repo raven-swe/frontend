@@ -101,6 +101,12 @@
   "homepage": {
     "tweets": "التغريدات"
   },
+  "profile": {
+    "edit-profile": "تعديل الملف الشخصي",
+    "joined": "انضم في",
+    "following": "متابع",
+    "followers": "المتابعون"
+  },
   "root": {
     "hero": {
       "title": "يحدث الآن",
