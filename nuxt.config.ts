@@ -26,7 +26,7 @@ export default defineNuxtConfig({
     '@nuxt/test-utils/module',
     '@vueuse/nuxt',
     '@pinia/nuxt',
-    '@nuxt/image',
+    '@nuxt/image-edge',
   ],
   vite: {
     plugins: [tailwindcss()],
