@@ -13,7 +13,9 @@ if (error.value) console.error(error.value);
   <div class="p-4">
     <div v-if="tweets.length > 0" class="mb-4">
       {{ $t('testing.tweets.tweets-list') }}
-      <div class="mt-4 flex flex-col gap-4">
+      <div
+        class="border-border mt-4 flex w-full max-w-[700px] flex-col gap-4 border-s-2 border-e-2"
+      >
         <TweetDefaultCard v-for="tweet in tweets" :key="tweet.id" :tweet="tweet" />
       </div>
     </div>

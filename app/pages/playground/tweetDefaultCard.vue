@@ -1,24 +1,14 @@
 <script setup lang="ts">
-import Button from '~/components/ui/Button.vue';
+import Avatar from '~/components/ui/Avatar.vue';
 import type { Tweet } from '~~/shared/types/tweets';
-
+import { relativeTime } from '~/utils/item';
+import TweetMedia from './tweetMedia.vue';
+import TweetActionButtons from './tweetActionButtons.vue';
 interface Props {
   tweet: Tweet;
 }
 const props = defineProps<Props>();
-console.log(1231231);
 // Format createdAt to a short relative time like "6h", "3d", "2m"
-const relativeTime = (iso: string) => {
-  const now = Date.now();
-  const then = new Date(iso).getTime();
-  const diff = Math.max(0, Math.floor((now - then) / 1000));
-  if (diff < 60) return `${diff}s`;
-  if (diff < 3600) return `${Math.floor(diff / 60)}m`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
-  if (diff < 2592000) return `${Math.floor(diff / 86400)}d`;
-  const months = Math.floor(diff / 2592000);
-  return `${months}mo`;
-};
 
 type Segment = { type: 'text' | 'mention' | 'hashtag'; text: string; href?: string };
 
@@ -42,7 +32,7 @@ const contentSegments = computed<Segment[]>(() => {
 
   for (const m of entities.mentions || []) {
     const start = m.startPosition;
-    const text = `@${m.username}`;
+    const text = `@${m.username} `;
     ranges.push({
       start,
       end: start + text.length,
@@ -53,7 +43,7 @@ const contentSegments = computed<Segment[]>(() => {
   }
   for (const h of entities.hashtags || []) {
     const start = h.startPosition;
-    const text = `#${h.hashtag}`;
+    const text = `#${h.hashtag} `;
     ranges.push({
       start,
       end: start + text.length,
@@ -78,21 +68,15 @@ const contentSegments = computed<Segment[]>(() => {
   }
   return segments;
 });
-
-const firstImage = computed(() => props.tweet.media?.find((m) => m.type === 'IMAGE'));
 </script>
 
 <template>
-  <article class="border-border flex gap-3 border-b p-4">
-    <!-- Avatar -->
-    <!-- <NuxtImg
-      :src="props.tweet.author.avatarUrl"
-      :alt="props.tweet.author.displayName"
-      class="size-12 rounded-full object-cover"
-      format="webp"
-      width="48"
-      height="48"
-    /> -->
+  <article class="border-b-border flex w-full max-w-[700px] gap-3 border-b-1 p-4">
+    <Avatar
+      :img="props.tweet.author.avatarUrl || '/default_profile.png'"
+      size="sm"
+      variant="primary"
+    />
 
     <!-- Main -->
     <div class="min-w-0 flex-1">
@@ -128,48 +112,10 @@ const firstImage = computed(() => props.tweet.media?.find((m) => m.type === 'IMA
       </p>
 
       <!-- Media (single image basic layout) -->
-      <div
-        v-if="firstImage"
-        class="ring-border mt-3 max-w-[34rem] overflow-hidden rounded-2xl ring-1"
-      >
-        <NuxtImg
-          :src="firstImage!.url"
-          :alt="firstImage!.altText || 'Tweet media'"
-          class="h-auto w-full object-cover"
-          :width="firstImage!.width || 600"
-          :height="firstImage!.height || 400"
-          format="webp"
-        />
-      </div>
+      <TweetMedia :media="props.tweet.media" />
 
       <!-- Actions -->
-      <div class="text-muted-foreground mt-3 flex max-w-[30rem] flex-row gap-2 text-sm">
-        <label
-          class="hover:text-brand-blue relative flex w-fit items-center justify-center gap-[1px]"
-        >
-          <Button variant="tweet-icon-turquoise" size="icon-xs">
-            <Icon name="tabler:message-circle-2" class="size-5" />
-          </Button>
-          <span class="absolute start-7">{{ props.tweet.replyCount }}</span>
-        </label>
-
-        <label
-          class="hover:text-brand-turquoise relative flex w-fit items-center justify-center gap-[1px]"
-        >
-          <Button variant="tweet-icon-turquoise" size="icon-xs">
-            <Icon name="tabler:repeat" />
-          </Button>
-          <span class="absolute start-7">{{ props.tweet.retweetCount }}</span>
-        </label>
-        <label
-          class="hover:text-brand-red relative flex w-fit items-center justify-center gap-[1px]"
-        >
-          <Button variant="tweet-icon-red" size="icon-xs">
-            <Icon name="tabler:heart" />
-          </Button>
-          <span class="absolute start-7">{{ props.tweet.likeCount }}</span>
-        </label>
-      </div>
+      <TweetActionButtons :tweet="props.tweet" />
     </div>
   </article>
 </template>
