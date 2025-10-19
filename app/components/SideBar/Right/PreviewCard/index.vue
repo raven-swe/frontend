@@ -13,7 +13,7 @@ const props = defineProps({
     </h1>
     <slot />
 
-    <div class="text-primary hover:bg-background cursor-pointer p-3 text-sm">
+    <div class="text-primary hover:bg-foreground/10 cursor-pointer p-3 text-sm">
       {{ $t('rightsidebar.show-more') }}
     </div>
   </div>
