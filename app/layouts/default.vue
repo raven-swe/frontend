@@ -13,7 +13,7 @@
           </div>
 
           <!-- Main content -->
-          <main class="border-border flex-1 border-x sm:w-[550px] sm:flex-none">
+          <main class="border-border flex-1 border-x sm:w-[590px] sm:flex-none md:w-[600px]">
             <slot />
           </main>
 

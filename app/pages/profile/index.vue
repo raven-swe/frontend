@@ -1,8 +1,19 @@
-<script lang="ts" setup></script>
+<script setup>
+definePageMeta({
+  layout: 'profile',
+});
+
+const posts = [
+  { id: 1, content: 'Post 1' },
+  { id: 2, content: 'Post 2' },
+  { id: 3, content: 'Post 3' },
+];
+</script>
 
 <template>
   <div>
-    <h1 class="p-4 text-2xl font-bold">{{ $t('leftsidebar.nav.profile') }}</h1>
-    <!-- Profile content will go here -->
+    <div v-for="post in posts" :key="post.id">
+      <p>{{ post.content }}</p>
+    </div>
   </div>
 </template>
