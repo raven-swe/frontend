@@ -122,21 +122,21 @@ watch([dateSelect.selectedDay, dateSelect.selectedMonth, dateSelect.selectedYear
             class="flex-1/2"
             :options="dateSelect.months.value"
             placeholder="Month"
-            name="birthDate"
+            name="birth-month"
           />
           <Select
             v-model="dateSelect.selectedDay.value"
             class="flex-1/4"
             :options="dateSelect.days.value"
             placeholder="Day"
-            name="birthDate"
+            name="birth-day"
           />
           <Select
             v-model="dateSelect.selectedYear.value"
             class="flex-1/4"
             :options="dateSelect.years.value"
             placeholder="Year"
-            name="birthDate"
+            name="birth-year"
           />
         </div>
         <p
