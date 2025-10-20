@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import Button from '~/components/ui/Button.vue';
+import { useLoginStore } from '~/stores/auth/login';
+
+const loginStore = useLoginStore();
 </script>
 
 <template>
@@ -38,9 +41,10 @@ import Button from '~/components/ui/Button.vue';
             <p class="font-semibold">
               {{ $t('root.auth.already-have-account') }}
             </p>
-            <Button id="signin" variant="outline" class="my-4 w-75" type="button">
+            <Button id="signin" variant="outline" class="my-4 w-75" @click="loginStore.openDialog">
               {{ $t('root.auth.signin') }}
             </Button>
+            <AuthLoginDialog />
           </section>
         </main>
       </section>
