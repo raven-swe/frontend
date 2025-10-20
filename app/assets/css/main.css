@@ -17,6 +17,7 @@
   --popover: 0 0% 100%;
   --popover-foreground: 222.2 84% 4.9%;
   --dialog-backdrop: rgba(91, 112, 131, 0.4);
+  --oauth: #ffffff;
 }
 
 .dark {
@@ -32,6 +33,7 @@
   --destructive: #82181a;
   --popover: 222.2 84% 4.9%;
   --popover-foreground: 210 40% 98%;
+  --oauth: #ffffff;
 }
 
 @theme inline {
@@ -51,6 +53,7 @@
   --animate-duration: 150ms;
   --animate-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   --color-dialog-backdrop: var(--dialog-backdrop);
+  --color-oauth: var(--oauth);
 }
 
 @layer base {
@@ -64,5 +67,19 @@
 
   button {
     @apply cursor-pointer select-none;
+  }
+}
+
+@layer components {
+  .input-readonly {
+    @apply bg-accent/100 text-muted-foreground border-input cursor-not-allowed;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  .input-readonly:focus {
+    @apply bg-accent/100 text-muted-foreground ring-0 outline-none;
+    outline: none !important;
+    box-shadow: none !important;
   }
 }
