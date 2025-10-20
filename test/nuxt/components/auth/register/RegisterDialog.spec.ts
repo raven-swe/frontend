@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { mountSuspended } from '@nuxt/test-utils/runtime';
+import messages from '@@/i18n/locales/en.json';
 
 import { createPinia, setActivePinia } from 'pinia';
 import { createI18n } from 'vue-i18n';
@@ -7,16 +8,16 @@ import { reactive } from 'vue';
 
 const i18n = createI18n({
   locale: 'en',
-  messages: { en: await import('@@/i18n/locales/en.json') },
+  messages: { en: messages },
 });
 
 describe('RegisterDialog Component', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
-    vi.unmock('@/stores/register'); // remove the store mock
-    vi.resetModules(); // reset Node module cache
+    vi.unmock('@/stores/register');
+    vi.resetModules();
     vi.resetAllMocks();
-    document.body.innerHTML = ''; // clean DOM just in case
+    document.body.innerHTML = '';
   });
 
   it('renders dialog content when store.open is true (step 0)', async () => {
