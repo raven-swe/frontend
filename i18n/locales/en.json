@@ -45,8 +45,8 @@
     "next": "Next"
   },
   "errors": {
-    "INVALID_EMAIL": "Invalid email address",
-    "NAME_TOO_SHORT": "Name must be at least 2 characters long",
+    "INVALID_EMAIL": "Please enter a valid email.",
+    "NAME_TOO_SHORT": "What's your name?",
     "NAME_TOO_LONG": "Name must be at most 50 characters long",
     "AGE_RESTRICTION": "You must be at least 13 years old",
     "OTP_LENGTH": "OTP must be 6 digits",

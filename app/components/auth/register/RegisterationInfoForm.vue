@@ -21,7 +21,6 @@ const schema = yup.object({
 const { errors, values, defineField, handleSubmit, isSubmitting, setFieldError } = useForm({
   validationSchema: schema,
   initialValues: registerStore.registerationInfo,
-  validateOnMount: true,
 });
 
 const onSubmit = handleSubmit(async (values) => {
@@ -35,11 +34,15 @@ const [_birthDate, birthDateAttrs] = defineField('birthDate');
 const emailExists = ref(false);
 
 const checkEmail = useDebounceFn(async (email: string) => {
+  if (errors.value.email) return; // skip if already invalid email format
   setFieldError('email', undefined);
   if (!email || errors.value.email) return; // skip if already invalid email format
   try {
     const res = await $fetch(`/api/auth/check-email?email=${encodeURIComponent(email)}`);
     emailExists.value = res.data.exists;
+    if (res.data.exists) {
+      setFieldError('email', $t('errors.EMAIL_ALREADY_EXISTS'));
+    }
   } catch (err) {
     console.error('Failed to check email', err);
   }
@@ -47,7 +50,6 @@ const checkEmail = useDebounceFn(async (email: string) => {
 watch(
   () => values.email,
   (email) => {
-    emailExists.value = true;
     checkEmail(email);
   },
 );
