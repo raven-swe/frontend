@@ -1,16 +1,16 @@
 {
   "testing": {
-    "welcome": "Welcome to Raven",
-    "test-button": "Test Button",
-    "post": "Post",
-    "following": "Following",
-    "unfollow": "Unfollow",
-    "follow": "Follow",
-    "subscribe": "Subscribe",
     "user": {
       "name": "John Doe",
       "username": "johndoe"
-    }
+    },
+    "welcome": "Welcome to Raven",
+    "test-button": "Test Button",
+    "post": "Post",
+    "follow": "Follow",
+    "following": "Following",
+    "unfollow": "Unfollow",
+    "subscribe": "Subscribe"
   },
   "playground": {
     "dialog": {
@@ -29,10 +29,15 @@
       "signin": "Sign in",
       "signup": "Create account",
       "signup-info": "By signing up, you agree to the Terms of Service and Privacy Policy, including Cookie Use.",
-      "google-signin": "Google Sign in",
-      "github-signin": "GitHub Sign in",
+      "google-signin": "Sign in with Google",
+      "github-signin": "Sign in with GitHub",
+      "google-signup": "Sign up with Google",
+      "github-signup": "Sign up with GitHub",
       "already-have-account": "Already have an account?",
-      "separator": "or"
+      "separator": "or",
+      "forget-password": "Forgot password?",
+      "dont-have-account": "Don't have an account?",
+      "email-not-found": "Sorry, we could not find your account."
     },
     "footer": {
       "about": "About",
@@ -43,5 +48,18 @@
   "ui": {
     "close": "Close",
     "next": "Next"
+  },
+  "errors": {
+    "INVALID_EMAIL": "Invalid email address",
+    "NAME_TOO_SHORT": "Name must be at least 2 characters long",
+    "AGE_RESTRICTION": "You must be at least 13 years old",
+    "OTP_LENGTH": "OTP must be 6 digits",
+    "PASSWORD_MISMATCH": "Passwords do not match",
+    "PASSWORD_TOO_SHORT": "Password must be at least 8 characters long",
+    "PASSWORD_INVALID": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+    "PASSWORD_REQUIRED": "Password is required",
+    "IDENTIFIER_REQUIRED": "Identifier is required",
+    "USER_NOT_FOUND": "User not found",
+    "INVALID_CREDENTIALS": "Invalid credentials"
   }
 }

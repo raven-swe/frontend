@@ -4,13 +4,21 @@
       "name": "جون دو",
       "username": "johndoe"
     },
-    "test-button": "زر الاختبار",
     "welcome": "مرحبا بكم في ريفن",
+    "test-button": "زر الاختبار",
     "post": "نشر",
     "follow": "متابعة",
-    "unfollow": "إلغاء المتابعة",
     "following": "متابع",
+    "unfollow": "إلغاء المتابعة",
     "subscribe": "الاشتراك"
+  },
+  "playground": {
+    "dialog": {
+      "title": "إنشاء حسابك",
+      "open": "فتح النافذة",
+      "content": "هذه هى النافذة",
+      "description": "وصف النافذة"
+    }
   },
   "root": {
     "hero": {
@@ -23,13 +31,35 @@
       "signup-info": "بالتسجيل، فإنك توافق على شروط الخدمة وسياسة الخصوصية، بما في ذلك استخدام ملفات تعريف الارتباط.",
       "google-signin": "تسجيل الدخول عبر جوجل",
       "github-signin": "تسجيل الدخول عبر GitHub",
+      "google-signup": "التسجيل عبر جوجل",
+      "github-signup": "التسجيل عبر GitHub",
       "already-have-account": "هل لديك حساب بالفعل؟",
-      "separator": "أو"
+      "separator": "أو",
+      "forget-password": "نسيت كلمة المرور؟",
+      "dont-have-account": "ليس لديك حساب؟",
+      "email-not-found": "عذراً، لم نتمكن من العثور على حسابك."
     },
     "footer": {
       "about": "حول",
       "developers": "المطورون",
       "copyright": "© 2025 Raven Corp."
+    },
+    "ui": {
+      "close": "إغلاق",
+      "next": "التالي"
+    },
+    "errors": {
+      "INVALID_EMAIL": "عنوان بريد إلكتروني غير صالح",
+      "NAME_TOO_SHORT": "يجب أن يتكون الاسم من حرفين على الأقل",
+      "AGE_RESTRICTION": "يجب أن تكون على الأقل 13 عامًا",
+      "OTP_LENGTH": "يجب أن يتكون OTP من 6 أرقام",
+      "PASSWORD_MISMATCH": "كلمات المرور غير متطابقة",
+      "PASSWORD_TOO_SHORT": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل",
+      "PASSWORD_INVALID": "يجب أن تحتوي كلمة المرور على حرف كبير واحد على الأقل، وحرف صغير واحد على الأقل، ورقم واحد، ورمز خاص واحد",
+      "PASSWORD_REQUIRED": "مطلوب كلمة المرور",
+      "IDENTIFIER_REQUIRED": "مطلوب معرف",
+      "USER_NOT_FOUND": "لم يتم العثور على المستخدم",
+      "INVALID_CREDENTIALS": "بيانات الاعتماد غير صالحة"
     }
   }
 }
