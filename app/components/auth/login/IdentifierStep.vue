@@ -96,7 +96,7 @@ const [_identifier, identifierAttrs] = defineField('identifier');
       >
     </UiDialogFooter>
   </form>
-  <span v-if="loading" class="my-auto text-center">{{ 'loading...' }}</span>
+  <UiSpinner v-if="loading" class="my-auto text-center"></UiSpinner>
 </template>
 
 <style scoped>

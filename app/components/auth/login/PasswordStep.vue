@@ -94,9 +94,10 @@ const [_password, passwordAttrs] = defineField('password');
       >
     </UiDialogFooter>
 
-    <span v-if="loading" class="my-auto text-center">
+    <!-- <span v-if="loading" class="my-auto text-center">
       {{ 'loading...' }}
-    </span>
+    </span> -->
+    <UiSpinner v-if="loading" class="my-auto text-center"></UiSpinner>
   </form>
 </template>
 
