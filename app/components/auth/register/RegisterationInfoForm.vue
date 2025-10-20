@@ -10,38 +10,61 @@ const registerStore = useRegisterStore();
 const today = new Date();
 const thirteenYearsAgo = new Date(today.getFullYear() - 13, today.getMonth(), today.getDate());
 const schema = yup.object({
-  email: yup.string().email($t('errors.INVALID_EMAIL')),
+  email: yup.string().min(1, $t('errors.INVALID_EMAIL')).email($t('errors.INVALID_EMAIL')),
   name: yup.string().min(1, $t('errors.NAME_TOO_SHORT')).max(50, $t('errors.NAME_TOO_LONG')),
   birthDate: yup
     .date()
     .typeError($t('errors.AGE_RESTRICTION'))
+    .required($t('errors.AGE_RESTRICTION'))
     .max(today, $t('errors.AGE_RESTRICTION')) // no future dates
     .max(thirteenYearsAgo, $t('errors.AGE_RESTRICTION')), // at least 13 years old
 });
-const { errors, values, defineField, handleSubmit, isSubmitting, setFieldError } = useForm({
-  validationSchema: schema,
-  initialValues: registerStore.registerationInfo,
-});
+const { errors, values, defineField, handleSubmit, isSubmitting, setFieldError, setFieldValue } =
+  useForm<yup.InferType<typeof schema>>({
+    validationSchema: schema,
+    initialValues: {
+      name: registerStore.registerationInfo?.name ?? '',
+      email: registerStore.registerationInfo?.email ?? '',
+      birthDate: registerStore.registerationInfo?.birthDate
+        ? new Date(registerStore.registerationInfo.birthDate)
+        : undefined,
+    },
+  });
 
 const onSubmit = handleSubmit(async (values) => {
-  await registerStore.submitRegisterationInfo(values);
+  if (!values.birthDate) {
+    setFieldError('birthDate', $t('errors.AGE_RESTRICTION'));
+    return;
+  }
+  if (!values.birthDate || !values.email || !values.name) return;
+
+  // Format date as yyyy-mm-dd
+  const formattedBirthDate = values.birthDate.toISOString().split('T')[0] as string;
+  const vals = {
+    name: values.name,
+    email: values.email,
+    birthDate: formattedBirthDate,
+  };
+  await registerStore.submitRegisterationInfo(vals);
 });
 
 const [_email, emailAttrs] = defineField('email');
 const [_name, nameAttrs] = defineField('name');
-const [_birthDate, birthDateAttrs] = defineField('birthDate');
 
 const emailExists = ref(false);
 
-const checkEmail = useDebounceFn(async (email: string) => {
-  if (errors.value.email) return; // skip if already invalid email format
-  setFieldError('email', undefined);
-  if (!email || errors.value.email) return; // skip if already invalid email format
+const checkEmail = useDebounceFn(async (email: string | undefined) => {
+  if (!email) return;
   try {
     const res = await $fetch(`/api/auth/check-email?email=${encodeURIComponent(email)}`);
-    emailExists.value = res.data.exists;
-    if (res.data.exists) {
+    emailExists.value = !!res.data.exists;
+
+    if (emailExists.value) {
       setFieldError('email', $t('errors.EMAIL_ALREADY_EXISTS'));
+    } else {
+      if (errors.value.email === $t('errors.EMAIL_ALREADY_EXISTS')) {
+        setFieldError('email', undefined);
+      }
     }
   } catch (err) {
     console.error('Failed to check email', err);
@@ -59,6 +82,23 @@ watch(errors, (errs) => {
     setFieldError('email', $t('errors.EMAIL_ALREADY_EXISTS'));
   }
 });
+const dateSelect = useDateSelect(
+  new Date().getFullYear() - 100,
+  new Date().getFullYear(),
+  values.birthDate,
+);
+
+watch([dateSelect.selectedDay, dateSelect.selectedMonth, dateSelect.selectedYear], () => {
+  const day = dateSelect.selectedDay.value;
+  const month = dateSelect.selectedMonth.value;
+  const year = dateSelect.selectedYear.value;
+  if (day && month && year) {
+    const birthDate = new Date(Number(year), Number(month) - 1, Number(day));
+    if (birthDate.getDate() === Number(day)) {
+      setFieldValue('birthDate', birthDate);
+    }
+  }
+});
 </script>
 
 <template>
@@ -74,12 +114,36 @@ watch(errors, (errs) => {
         <p class="text-muted-foreground mb-4 text-sm">
           {{ $t('register.register-info.date-of-birth.description') }}
         </p>
-        <FieldInput
-          placeholder="Date of Birth"
-          type="date"
-          name="birthDate"
-          v-bind="birthDateAttrs"
-        />
+        <div class="flex gap-2">
+          <UiSelect
+            v-model="dateSelect.selectedMonth.value"
+            class="flex-1/2"
+            :options="dateSelect.months.value"
+            placeholder="Month"
+            name="birthDate"
+          />
+          <UiSelect
+            v-model="dateSelect.selectedDay.value"
+            class="flex-1/4"
+            :options="dateSelect.days.value"
+            placeholder="Day"
+            name="birthDate"
+          />
+          <UiSelect
+            v-model="dateSelect.selectedYear.value"
+            class="flex-1/4"
+            :options="dateSelect.years.value"
+            placeholder="Year"
+            name="birthDate"
+          />
+        </div>
+        <p
+          v-if="errors.birthDate"
+          data-test-id="birth-date-error"
+          class="text-destructive ps-1 text-xs"
+        >
+          {{ errors.birthDate }}
+        </p>
       </div>
     </div>
     <DialogFooter class="mt-auto">
