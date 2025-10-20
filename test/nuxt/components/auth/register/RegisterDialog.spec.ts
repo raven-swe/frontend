@@ -26,6 +26,7 @@ describe('RegisterDialog Component', () => {
       open: true,
       step: 0,
       previousStep: vi.fn(),
+      resetInitialData: vi.fn(),
     });
     vi.doMock('@/stores/register', () => ({
       useRegisterStore: () => store,
@@ -50,9 +51,10 @@ describe('RegisterDialog Component', () => {
     expect(closeButton).toBeTruthy();
     // clicking the close button should close the dialog (teleported content removed)
     closeButton!.click();
-    await new Promise((r) => setTimeout(r, 0));
+    await new Promise((r) => setTimeout(r, 50));
     expect(store.open).toBe(false);
     expect(document.querySelector('[data-slot="dialog-content"]')).toBeFalsy();
+    expect(store.resetInitialData).toHaveBeenCalled();
   });
 
   it('does not render dialog content when store.open is false', async () => {
