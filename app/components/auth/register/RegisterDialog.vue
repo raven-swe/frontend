@@ -6,10 +6,15 @@ import OtpForm from './OtpForm.vue';
 import PasswordForm from './PasswordForm.vue';
 
 const registerStore = useRegisterStore();
+
+function handleOpenChange(val: boolean) {
+  if (!val) registerStore.resetInitialData();
+  registerStore.open = val;
+}
 </script>
 
 <template>
-  <Dialog :open="registerStore.open" @update:open="(val: boolean) => (registerStore.open = val)">
+  <Dialog :open="registerStore.open" @update:open="handleOpenChange">
     <DialogContent :hide-close-button="registerStore.step !== 0" header-class="ps-0">
       <template #header>
         <Button

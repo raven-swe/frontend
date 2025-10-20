@@ -18,6 +18,16 @@ export const useRegisterStore = defineStore('register', () => {
     open.value = true;
   };
 
+  const resetInitialData = () => {
+    step.value = 0;
+    creationToken.value = null;
+    registerationInfo.value = {
+      name: '',
+      email: '',
+      birthDate: '',
+    };
+  };
+
   const submitRegisterationInfo = async (data: RegisterationInfo) => {
     try {
       registerationInfo.value = data;
@@ -89,5 +99,6 @@ export const useRegisterStore = defineStore('register', () => {
     submitPassword,
     previousStep,
     resendOtp,
+    resetInitialData,
   };
 });
