@@ -9,6 +9,8 @@ const props = defineProps<{
   class?: HTMLAttributes['class'];
   placeholder: string;
   maxlength?: number | string;
+  type?: 'text' | 'textarea' | 'number';
+  rows?: number;
 }>();
 
 const showCharCount = props.maxlength !== undefined;
@@ -29,6 +31,8 @@ const remainingChars = computed(() => {
   const current = modelValue.value?.toString().length || 0;
   return max - current;
 });
+
+const isTextarea = computed(() => props.type === 'textarea');
 </script>
 
 <template>
@@ -38,23 +42,42 @@ const remainingChars = computed(() => {
       :class="
         cn(
           'has-[input[aria-invalid=true]]:ring-destructive has-[input[aria-invalid=true]]:border-destructive',
+          'has-[textarea[aria-invalid=true]]:ring-destructive has-[textarea[aria-invalid=true]]:border-destructive',
           'has-[input:focus-visible]:border-primary has-[input:focus-visible]:ring-primary has-[input:focus-visible]:ring-[1px]',
+          'has-[textarea:focus-visible]:border-primary has-[textarea:focus-visible]:ring-primary has-[textarea:focus-visible]:ring-[1px]',
           props.class,
         )
       "
     >
+      <!-- Input element -->
       <input
+        v-if="!isTextarea"
         v-model="modelValue"
         class="peer file:text-foreground w-full min-w-0 outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
         v-bind="$attrs"
+        :type="props.type || 'text'"
         :maxlength="props.maxlength"
         @focus="focused = true"
         @blur="focused = false"
       />
+
+      <!-- Textarea element -->
+      <textarea
+        v-else
+        v-model="modelValue"
+        class="peer w-full min-w-0 resize-none outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+        v-bind="$attrs"
+        :rows="props.rows || 3"
+        :maxlength="props.maxlength"
+        @focus="focused = true"
+        @blur="focused = false"
+      ></textarea>
+
       <span
         :class="
           cn(
-            'text-muted-foreground origin-start peer-[input[aria-invalid=true]]:text-destructive pointer-events-none absolute transition-all duration-200 ease-out',
+            'text-muted-foreground origin-start pointer-events-none absolute transition-all duration-200 ease-out',
+            'peer-[input[aria-invalid=true]]:text-destructive peer-[textarea[aria-invalid=true]]:text-destructive',
             {
               'start-2 top-1.5 text-xs': focused || modelValue,
               'text-muted-foreground start-2 top-1/2 -translate-y-1/2 text-lg': !(
@@ -78,7 +101,8 @@ const remainingChars = computed(() => {
 </template>
 
 <style scoped>
-input::placeholder {
+input::placeholder,
+textarea::placeholder {
   color: transparent;
 }
 /* style webkit autofill */

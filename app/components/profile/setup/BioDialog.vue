@@ -42,7 +42,8 @@ const handleSubmit = () => {
           <div class="mx-2 mt-2 mb-auto p-4">
             <uiInput
               v-model="bio"
-              type="text"
+              type="textarea"
+              :rows="2"
               placeholder="Your bio"
               class="w-full max-w-md"
               maxlength="160"
