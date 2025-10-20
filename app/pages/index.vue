@@ -3,6 +3,10 @@ import Button from '~/components/ui/Button.vue';
 import { useLoginStore } from '~/stores/auth/login';
 
 const loginStore = useLoginStore();
+
+definePageMeta({
+  layout: false, // Disable layout for this page
+});
 </script>
 
 <template>

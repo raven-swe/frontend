@@ -8,8 +8,8 @@ export default defineConfig({
       provider: 'istanbul',
       reporter: ['text', 'json', 'lcov'],
       reportsDirectory: './coverage',
-      include: ['app/**'],
-      exclude: ['**/pages/playground/**'],
+      include: ['app/**', 'server/**'],
+      exclude: ['**/pages/playground/**', '**/plugins/**'],
     },
     projects: [
       {
