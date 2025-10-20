@@ -15,37 +15,23 @@
       "tweet-not-found": "Tweet not found"
     }
   },
-  "leftsidebar": {
-    "nav": {
-      "home": "Home",
-      "explore": "Explore",
-      "notifications": "Notifications",
-      "messages": "Messages",
-      "bookmarks": "Bookmarks",
-      "profile": "Profile",
-      "more": "More"
-    }
-  },
-  "rightsidebar": {
-    "whats-happening": {
-      "title": "What's happening",
-      "tweets": "Tweets"
-    },
-    "who-to-follow": {
-      "title": "Who to follow",
-      "follow": "Follow"
-    },
-    "show-more": "Show more"
-  },
-  "homepage": {
-    "tweets": "Tweets"
-  },
   "profile": {
     "tabs": {
       "posts": "Posts",
       "replies": "Replies",
       "media": "Media",
       "likes": "Likes"
+    },
+    "setup": {
+      "setup-profile": "Set up profile",
+      "pick-profile-picture": "Pick a profile picture",
+      "profile-picture-desc": "Have a favorite selfie? Upload it now.",
+      "pick-header-photo": "Pick a header photo",
+      "cover-photo-desc": "People who visit your profile will see it. Show your style.",
+      "enter-bio": "Describe yourself",
+      "bio-desc": "What makes you special? Don't think too hard, just have fun with it.",
+      "add-location": "Where do you live?",
+      "location-desc": "Find accounts in the same location as you."
     }
   },
   "playground": {
@@ -104,6 +90,7 @@
   "ui": {
     "close": "Close",
     "next": "Next",
-    "loading": "Loading"
+    "loading": "Loading",
+    "skip-for-now": "Skip for now"
   }
 }
