@@ -1,13 +1,19 @@
 <script lang="ts" setup>
 import type { buttonVariants } from '~~/types/ui';
 
+const bio = ref('');
 const actionButton = computed(() => {
-  const hasImage = false;
+  const isBioSet = bio.value.trim().length > 0;
   return {
-    text: hasImage ? $t('ui.next') : $t('ui.skip-for-now'),
-    variant: (hasImage ? 'primary' : 'outline') as buttonVariants,
+    text: isBioSet ? $t('ui.next') : $t('ui.skip-for-now'),
+    variant: (isBioSet ? 'primary' : 'outline') as buttonVariants,
   };
 });
+
+const handleSubmit = () => {
+  // eslint disable-next-line no-console
+  console.log('Bio submitted:', bio.value);
+};
 </script>
 
 <template>
@@ -33,11 +39,17 @@ const actionButton = computed(() => {
               {{ $t('profile.setup.bio-desc') }}
             </UiDialogDescription>
           </UiDialogHeader>
-          <div class="mx-2 flex flex-grow items-center justify-center">
-            <uiInput type="text" placeholder="Your bio" class="w-full max-w-md" maxlength="160" />
+          <div class="mx-2 mt-2 mb-auto p-4">
+            <uiInput
+              v-model="bio"
+              type="text"
+              placeholder="Your bio"
+              class="w-full max-w-md"
+              maxlength="160"
+            />
           </div>
           <UiDialogFooter>
-            <UiButton :variant="actionButton.variant" class="w-100" size="xl">
+            <UiButton :variant="actionButton.variant" class="w-100" size="xl" @click="handleSubmit">
               {{ actionButton.text }}
             </UiButton>
           </UiDialogFooter>

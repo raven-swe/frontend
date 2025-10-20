@@ -1,13 +1,18 @@
 <script lang="ts" setup>
 import type { buttonVariants } from '~~/types/ui';
 
+const location = ref('');
 const actionButton = computed(() => {
-  const isLocationSet = false;
+  const isLocationSet = location.value.trim().length > 0;
   return {
     text: isLocationSet ? $t('ui.next') : $t('ui.skip-for-now'),
     variant: (isLocationSet ? 'primary' : 'outline') as buttonVariants,
   };
 });
+const handleSubmit = () => {
+  // eslint disable-next-line no-console
+  console.log('Location submitted:', location.value);
+};
 </script>
 
 <template>
@@ -28,16 +33,21 @@ const actionButton = computed(() => {
             <UiDialogTitle class="text-3xl font-bold">{{
               $t('profile.setup.add-location')
             }}</UiDialogTitle>
-            <!--  -->
             <UiDialogDescription>
               {{ $t('profile.setup.location-desc') }}
             </UiDialogDescription>
           </UiDialogHeader>
-          <div class="mx-2 flex flex-grow items-center justify-center">
-            <uiInput type="text" placeholder="location" class="w-full max-w-md" maxlength="30" />
+          <div class="mx-2 mt-2 mb-auto p-4">
+            <uiInput
+              v-model="location"
+              type="text"
+              placeholder="location"
+              class="w-full max-w-md"
+              maxlength="30"
+            />
           </div>
           <UiDialogFooter>
-            <UiButton :variant="actionButton.variant" class="w-100" size="xl">
+            <UiButton :variant="actionButton.variant" class="w-100" size="xl" @click="handleSubmit">
               {{ actionButton.text }}
             </UiButton>
           </UiDialogFooter>
