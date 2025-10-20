@@ -5,6 +5,8 @@ import FieldInput from '~/components/ui/form/FieldInput.vue';
 import { DialogFooter, DialogHeader, DialogTitle } from '~/components/ui/dialog';
 import Button from '~/components/ui/Button.vue';
 import { useDebounceFn } from '@vueuse/core';
+import useDateSelect from '@/composables/useDateSelect';
+import Select from '~/components/ui/Select.vue';
 
 const registerStore = useRegisterStore();
 const today = new Date();
@@ -115,21 +117,21 @@ watch([dateSelect.selectedDay, dateSelect.selectedMonth, dateSelect.selectedYear
           {{ $t('register.register-info.date-of-birth.description') }}
         </p>
         <div class="flex gap-2">
-          <UiSelect
+          <Select
             v-model="dateSelect.selectedMonth.value"
             class="flex-1/2"
             :options="dateSelect.months.value"
             placeholder="Month"
             name="birthDate"
           />
-          <UiSelect
+          <Select
             v-model="dateSelect.selectedDay.value"
             class="flex-1/4"
             :options="dateSelect.days.value"
             placeholder="Day"
             name="birthDate"
           />
-          <UiSelect
+          <Select
             v-model="dateSelect.selectedYear.value"
             class="flex-1/4"
             :options="dateSelect.years.value"

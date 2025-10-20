@@ -1,6 +1,6 @@
 import { ref, computed, watch } from 'vue';
 
-export function useDateSelect(
+export default function useDateSelect(
   startYear = 1900,
   endYear = new Date().getFullYear(),
   initialDate?: Date,
