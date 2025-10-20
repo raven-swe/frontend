@@ -52,7 +52,7 @@ const [_otp, otpAttrs] = defineField('otp');
     </DialogHeader>
     <div class="flex flex-col gap-2">
       <FieldInput
-        placeholder="Verification Code"
+        :placeholder="$t('register.otp.label')"
         inputmode="numeric"
         type="text"
         pattern="[0-9]*"

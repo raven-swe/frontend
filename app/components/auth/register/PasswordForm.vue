@@ -39,7 +39,7 @@ const [_password, passwordAttrs] = defineField('password');
     </DialogHeader>
     <div class="flex flex-col gap-2">
       <FieldInput
-        placeholder="Verification Code"
+        :placeholder="$t('register.password.label')"
         type="password"
         name="password"
         v-bind="passwordAttrs"
