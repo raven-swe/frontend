@@ -39,8 +39,6 @@ export const loginHandlers = [
     const url = new URL(request.url);
     const identifier = url.searchParams.get('identifier');
 
-    console.log('id in mock', identifier);
-
     if (!identifier) {
       return HttpResponse.json(
         {
