@@ -19,7 +19,7 @@ const buttonVariants = cva(
           'bg-background hover:bg-foreground/10 focus-visible:bg-foreground/10 focus-visible:ring-ring',
 
         'ghost-primary':
-          'hover:text-primary hover:bg-primary/10 focus-visible:bg-primary/10 focus-visible:ring-ring-primary',
+          'hover:text-primary hover:bg-primary/10 focus-visible:bg-primary/10 focus-visible:ring-ring-primary text-primary',
         'tweet-icon-blue':
           'hover:bg-brand-blue/10 focus-visible:bg-brand-blue/10 focus-visible:ring-brand-blue',
         'tweet-icon-red':
