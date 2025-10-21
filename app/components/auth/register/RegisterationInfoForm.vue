@@ -33,10 +33,6 @@ const { errors, values, defineField, handleSubmit, isSubmitting, setFieldError, 
   });
 
 const onSubmit = handleSubmit(async (values) => {
-  if (!values.birthDate) {
-    setFieldError('birthDate', $t('errors.AGE_RESTRICTION'));
-    return;
-  }
   if (!values.birthDate || !values.email || !values.name) return;
 
   // Format date as yyyy-mm-dd
