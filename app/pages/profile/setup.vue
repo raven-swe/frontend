@@ -3,6 +3,7 @@ import { useProfileSetupFlow } from '~/composables/useProfileSetupFlow';
 import ProfilePictureDialog from '~/components/profile/setup/ProfilePictureDialog.vue';
 import LocationDialog from '~/components/profile/setup/LocationDialog.vue';
 import BioDialog from '~/components/profile/setup/BioDialog.vue';
+import ConfirmationDialog from '~/components/profile/setup/ConfirmationDialog.vue';
 
 definePageMeta({
   layout: 'profile',
@@ -12,12 +13,14 @@ const {
   isProfilePictureDialogOpen,
   isBioDialogOpen,
   isLocationDialogOpen,
+  isConfirmationDialogOpen,
   startFlow,
   nextStep,
   setProfilePicture,
   setBio,
   setLocation,
   closeFlow,
+  submitProfile,
 } = useProfileSetupFlow();
 
 const handleProfilePictureSubmit = (image: string | null) => {
@@ -37,6 +40,11 @@ const handleLocationSubmit = (location: string | null) => {
 
 const handleDialogClose = () => {
   closeFlow();
+};
+
+const handleConfirmationSubmit = async () => {
+  closeFlow();
+  submitProfile();
 };
 </script>
 
@@ -67,6 +75,9 @@ const handleDialogClose = () => {
         @submit="handleLocationSubmit"
         @update:open="handleDialogClose"
       />
+
+      <!-- Confirmation Dialog -->
+      <ConfirmationDialog :open="isConfirmationDialogOpen" @submit="handleConfirmationSubmit" />
     </div>
   </div>
 </template>

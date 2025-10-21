@@ -78,6 +78,10 @@ export const useProfileSetupFlow = () => {
     () => isFlowActive.value && currentStep.value === 'location',
   );
 
+  const isConfirmationDialogOpen = computed(
+    () => isFlowActive.value && currentStep.value === 'complete',
+  );
+
   return {
     // State
     currentStep,
@@ -88,6 +92,7 @@ export const useProfileSetupFlow = () => {
     isProfilePictureDialogOpen,
     isBioDialogOpen,
     isLocationDialogOpen,
+    isConfirmationDialogOpen,
 
     // Methods
     startFlow,
