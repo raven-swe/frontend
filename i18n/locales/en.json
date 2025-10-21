@@ -31,7 +31,9 @@
       "enter-bio": "Describe yourself",
       "bio-desc": "What makes you special? Don't think too hard, just have fun with it.",
       "add-location": "Where do you live?",
-      "location-desc": "Find accounts in the same location as you."
+      "location-desc": "Find accounts in the same location as you.",
+      "click-to-save": "Click to save updates",
+      "confirmation-dialog": "confirmation Dialog"
     }
   },
   "playground": {
@@ -91,6 +93,7 @@
     "close": "Close",
     "next": "Next",
     "loading": "Loading",
-    "skip-for-now": "Skip for now"
+    "skip-for-now": "Skip for now",
+    "save": "Save"
   }
 }
