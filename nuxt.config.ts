@@ -16,6 +16,7 @@ export default defineNuxtConfig({
       include: ['../shared/types/**/*.ts', '../mocks/**/*.ts', '../test/**/*.ts'],
     },
   },
+
   modules: [
     '@nuxt/eslint',
     '@nuxt/fonts',

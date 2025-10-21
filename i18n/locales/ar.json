@@ -10,7 +10,60 @@
     "follow": "متابعة",
     "unfollow": "إلغاء المتابعة",
     "following": "متابع",
-    "subscribe": "الاشتراك"
+    "subscribe": "الاشتراك",
+    "tweets": {
+      "tweet-not-found": "التغريدة غير موجودة"
+    }
+  },
+  "leftsidebar": {
+    "nav": {
+      "home": "الرئيسية",
+      "explore": "استكشف",
+      "notifications": "الإشعارات",
+      "messages": "الرسائل",
+      "bookmarks": "المفضلة",
+      "profile": "الملف الشخصي",
+      "more": "المزيد"
+    }
+  },
+  "rightsidebar": {
+    "whats-happening": {
+      "title": "ماذا يحدث",
+      "tweets": "تغريدات"
+    },
+    "who-to-follow": {
+      "title": "من تتابع",
+      "follow": "متابعة"
+    },
+    "show-more": "عرض المزيد"
+  },
+  "homepage": {
+    "tweets": "التغريدات"
+  },
+  "leftsidebar": {
+    "nav": {
+      "home": "الرئيسية",
+      "explore": "استكشف",
+      "notifications": "الإشعارات",
+      "messages": "الرسائل",
+      "bookmarks": "المفضلة",
+      "profile": "الملف الشخصي",
+      "more": "المزيد"
+    }
+  },
+  "rightsidebar": {
+    "whats-happening": {
+      "title": "ماذا يحدث",
+      "tweets": "تغريدات"
+    },
+    "who-to-follow": {
+      "title": "من تتابع",
+      "follow": "متابعة"
+    },
+    "show-more": "عرض المزيد"
+  },
+  "homepage": {
+    "tweets": "التغريدات"
   },
   "root": {
     "hero": {
@@ -30,6 +83,11 @@
       "about": "حول",
       "developers": "المطورون",
       "copyright": "© 2025 Raven Corp."
+    },
+    "ui": {
+      "close": "أغلق",
+      "next": "التالي",
+      "loading": "جار التحميل"
     }
   }
 }
