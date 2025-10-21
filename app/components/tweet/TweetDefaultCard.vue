@@ -2,8 +2,8 @@
 import Avatar from '~/components/ui/Avatar.vue';
 import type { Tweet } from '~~/shared/types/tweets';
 import { relativeTime } from '~/utils/item';
-import TweetMedia from './tweetMedia.vue';
-import TweetActionButtons from './tweetActionButtons.vue';
+import TweetMedia from './TweetMedia.vue';
+import TweetActionButtons from './TweetActionButtons.vue';
 interface Props {
   tweet: Tweet;
 }

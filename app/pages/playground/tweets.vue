@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Tweet } from '~~/shared/types/tweets';
-import TweetDefaultCard from './tweetDefaultCard.vue';
+import TweetDefaultCard from '../../components/tweet/TweetDefaultCard.vue';
 const tweets = ref<Tweet[]>([]);
 
 const { data: tweetsData, error } = await useFetch<{ data: Tweet[] }>('/api/tweets');
