@@ -16,22 +16,12 @@ const { errors, defineField, handleSubmit, isSubmitting, setErrors } = useForm({
   },
 });
 
-const invalidOtp = ref(false);
-
 const onSubmit = handleSubmit(async (values) => {
-  invalidOtp.value = false;
-  invalidOtp.value = !(await registerStore.submitOtp(values.otp));
-});
-
-watch(invalidOtp, (isInvalid) => {
-  if (isInvalid) {
-    setErrors({
-      otp: $t('errors.INVALID_OTP'),
-    });
+  const success = await registerStore.submitOtp(values.otp);
+  if (!success) {
+    setErrors({ otp: $t('errors.INVALID_OTP') });
   } else {
-    setErrors({
-      otp: undefined,
-    });
+    setErrors({ otp: undefined });
   }
 });
 
