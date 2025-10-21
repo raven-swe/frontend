@@ -4,8 +4,8 @@ type SetupStep = 'picture' | 'bio' | 'location' | 'complete';
 
 interface ProfileSetupData {
   profilePicture: string | null;
-  bio: string;
-  location: string;
+  bio: string | null;
+  location: string | null;
 }
 
 export const useProfileSetupFlow = () => {
@@ -36,11 +36,11 @@ export const useProfileSetupFlow = () => {
     formData.value.profilePicture = image;
   };
 
-  const setBio = (bio: string) => {
+  const setBio = (bio: string | null) => {
     formData.value.bio = bio;
   };
 
-  const setLocation = (location: string) => {
+  const setLocation = (location: string | null) => {
     formData.value.location = location;
   };
 
