@@ -57,7 +57,7 @@
       "description": "Dialog Description"
     }
   },
-  "profile": {
+  "profile-info": {
     "edit-profile": "Edit Profile",
     "joined": "Joined",
     "following": "Following",
