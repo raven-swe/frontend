@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { showToaster } from '@/utils/showToaster';
 
 type LoginSchema = {
   identifier: string;
@@ -11,7 +12,7 @@ export const useLoginStore = defineStore('login', () => {
   const step = ref(0);
   const open = ref(false);
   const identifier = ref('');
-  const identifierExists = ref<boolean | null>(null);
+  const type = ref<string | null>(null);
   const accessToken = ref<string | null>(null);
   const refreshToken = ref<string | null>(null);
   const errorMessage = ref<string | null>(null);
@@ -29,40 +30,38 @@ export const useLoginStore = defineStore('login', () => {
   const resetForm = () => {
     step.value = 0;
     identifier.value = '';
-    identifierExists.value = null;
     accessToken.value = null;
     refreshToken.value = null;
     errorMessage.value = null;
   };
 
-  /**
-   * Step 1️⃣: Check if identifier exists
-   * Endpoint: GET /auth/check-identifier?identifier=<user_identifier>
-   */
   const checkIdentifierExists = async (_identifier: string) => {
-    loading.value = true;
     errorMessage.value = null;
+    type.value = null;
+    loading.value = true;
 
     try {
-      const response = await $fetch<ApiSuccessResponse<{ exists: boolean }>>(
+      const response = await $fetch<ApiSuccessResponse<{ exists: boolean; type: string }>>(
         '/api/auth/check-identifier',
         {
           method: 'GET',
           query: { identifier: _identifier },
         },
       );
-      identifierExists.value = response.data.exists;
+
       identifier.value = _identifier;
-      console.log('identifier', identifier.value);
-      console.log('exists', response.data.exists);
-      step.value = response.data.exists ? 1 : 0;
+
+      if (response.data.exists) {
+        step.value = 1;
+        type.value = response.data.type || 'email';
+      } else {
+        step.value = 0;
+        type.value = null;
+      }
 
       return response.data.exists;
     } catch (error) {
-      const msg =
-        error?.data?.message ||
-        error?.data?.error?.message ||
-        'Unknown error occurred while checking identifier';
+      const msg = error?.data?.message || 'Unexpected error occurred';
       errorMessage.value = msg;
       console.error('❌ Failed to check identifier:', msg);
       throw new Error(msg);
@@ -71,13 +70,9 @@ export const useLoginStore = defineStore('login', () => {
     }
   };
 
-  /**
-   * Step 2️⃣: Perform login
-   * Endpoint: POST /auth/login
-   */
   const submitLogin = async (data: LoginSchema) => {
-    loading.value = true;
     errorMessage.value = null;
+    loading.value = true;
 
     try {
       const response = await $fetch<
@@ -86,20 +81,17 @@ export const useLoginStore = defineStore('login', () => {
         method: 'POST',
         body: data,
       });
+
       accessToken.value = response.data.accessToken;
       refreshToken.value = response.data.refreshToken;
-      console.log('✅ Login successful', response.data);
       sessionStorage.setItem('accessToken', response.data.accessToken);
       sessionStorage.setItem('refreshToken', response.data.refreshToken);
-      // identifier.value = data.identifier;
       step.value = 0;
       open.value = false;
-      router.push('/playground/buttons');
+      showToaster('success', 'Login successful');
+      router.push('/home');
     } catch (error) {
-      const msg =
-        error?.data?.message ||
-        error?.data?.error?.message ||
-        'Unknown error occurred during login';
+      const msg = error?.data?.message || error?.data?.error?.message || 'Invalid credentials';
       errorMessage.value = msg;
       console.error('❌ Login failed', msg);
       throw new Error(msg);
@@ -113,17 +105,14 @@ export const useLoginStore = defineStore('login', () => {
   };
 
   return {
-    // state
     step,
     open,
     identifier,
-    identifierExists,
+    type,
     accessToken,
     refreshToken,
     errorMessage,
     loading,
-
-    // actions
     openDialog,
     closeDialog,
     resetForm,

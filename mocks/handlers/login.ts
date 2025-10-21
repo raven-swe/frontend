@@ -72,8 +72,8 @@ export const loginHandlers = [
         {
           success: true,
           message: 'User found',
-          data: { exists: true },
-        } as ApiSuccessResponse<{ exists: boolean }>,
+          data: { exists: true, type: 'email' },
+        } as ApiSuccessResponse<{ exists: boolean; type: string }>,
         { status: 200 },
       );
     }
@@ -85,8 +85,8 @@ export const loginHandlers = [
         {
           success: true,
           message: 'User not found',
-          data: { exists: false },
-        } as ApiSuccessResponse<{ exists: boolean }>,
+          data: { exists: false, type: null },
+        } as ApiSuccessResponse<{ exists: boolean; type: string | null }>,
         { status: 200 },
       );
     }
@@ -95,8 +95,11 @@ export const loginHandlers = [
       {
         success: true,
         message: user ? 'User found' : 'User not found',
-        data: { exists: !!user },
-      } as ApiSuccessResponse<{ exists: boolean }>,
+        data: {
+          exists: !!user,
+          type: user ? (user.email === identifier ? 'email' : 'username') : null,
+        },
+      } as ApiSuccessResponse<{ exists: boolean; type: string | null }>,
       { status: 200 },
     );
   }),

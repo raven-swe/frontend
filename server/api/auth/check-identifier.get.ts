@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event);
   const identifier = query.identifier as string;
   try {
-    const response = await $fetch<ApiSuccessResponse<{ exists: boolean }>>(
+    const response = await $fetch<ApiSuccessResponse<{ exists: boolean; type: string | null }>>(
       `${API_URL}/auth/check-identifier?identifier=${encodeURIComponent(identifier)}`,
       {
         method: 'GET',
