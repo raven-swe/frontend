@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
-import { mockNuxtImport, registerEndpoint } from '@nuxt/test-utils/runtime';
-import { useRegisterStore } from '@/stores/register';
+import { mockNuxtImport } from '@nuxt/test-utils/runtime';
+import { reactive } from 'vue';
 
 const { navigateToMock } = vi.hoisted(() => {
   return {
@@ -18,53 +18,54 @@ mockNuxtImport('navigateTo', () => {
 describe('Register Store', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+    vi.resetModules();
+    vi.clearAllMocks();
   });
 
-  it('has correct initial state', () => {
+  it('has correct initial state', async () => {
+    const { useRegisterStore } = await import('@/stores/register');
     const store = useRegisterStore();
     expect(store.step).toBe(0);
     expect(store.open).toBe(false);
     expect(store.registerationInfo).toBeTruthy();
   });
 
-  it('openDialog sets open to true', () => {
+  it('openDialog sets open to true', async () => {
+    const { useRegisterStore } = await import('@/stores/register');
     const store = useRegisterStore();
     store.openDialog();
     expect(store.open).toBe(true);
   });
 
   it('submitRegisterationInfo calls $fetch and updates step on success', async () => {
-    registerEndpoint('/api/auth/register/start', {
-      method: 'POST',
-      handler: () => {
-        return {
-          success: true,
-          message: 'Registration started',
-          data: { creationToken: 'ct-123' },
-        };
-      },
+    const registerationService = reactive({
+      start: vi.fn().mockResolvedValue({
+        data: { creationToken: 'test-token' },
+      }),
     });
+    vi.doMock('@/services/auth/registerationService', () => ({
+      registerationService,
+    }));
 
+    const { useRegisterStore } = await import('@/stores/register');
     const store = useRegisterStore();
     const payload = { name: 'Alice', email: 'a@b.com', birthDate: '2000-01-01' };
 
     await store.submitRegisterationInfo(payload);
 
+    expect(registerationService.start).toHaveBeenCalledWith(payload);
     expect(store.step).toBe(1);
     expect(store.registerationInfo).toEqual(payload);
   });
 
   it('submitRegisterationInfo handles failure gracefully', async () => {
-    // register a failing endpoint
-    registerEndpoint('/api/auth/register/start', {
-      method: 'POST',
-      handler: () => {
-        return {
-          success: false,
-          message: 'Registration failed',
-        };
-      },
+    const registerationService = reactive({
+      start: vi.fn().mockRejectedValue({ message: 'Internal server error', success: false }),
     });
+    vi.doMock('@/services/auth/registerationService', () => ({
+      registerationService,
+    }));
+    const { useRegisterStore } = await import('@/stores/register');
 
     const store = useRegisterStore();
     const payload = { name: 'Bob', email: 'b@c.com', birthDate: '2000-01-01' };
@@ -72,18 +73,23 @@ describe('Register Store', () => {
 
     // expect that step
     expect(store.step).toBe(0);
+    expect(registerationService.start).toHaveBeenCalledWith(payload);
   });
 
   it('submitOtp advances step on success and returns false on failure', async () => {
-    registerEndpoint('/api/auth/register/verify', {
-      method: 'POST',
-      handler: () => {
-        return {
-          success: true,
+    const registerationService = reactive({
+      verify: vi
+        .fn()
+        .mockResolvedValueOnce({
           message: 'Verified',
-        };
-      },
+          success: true,
+        })
+        .mockRejectedValueOnce({ message: 'Internal server error', success: false }),
     });
+    vi.doMock('@/services/auth/registerationService', () => ({
+      registerationService,
+    }));
+    const { useRegisterStore } = await import('@/stores/register');
 
     const store = useRegisterStore();
     store.creationToken = 'ct-1';
@@ -92,15 +98,6 @@ describe('Register Store', () => {
     expect(ok).toBe(true);
     expect(store.step).toBe(2);
 
-    registerEndpoint('/api/auth/register/verify', {
-      method: 'POST',
-      handler: () => {
-        return {
-          success: false,
-          message: 'Verification failed',
-        };
-      },
-    });
     store.step = 0;
     const failed = await store.submitOtp('0000');
     expect(failed).toBe(false);
@@ -108,15 +105,14 @@ describe('Register Store', () => {
   });
 
   it('submitPassword calls $fetch and navigates on success', async () => {
-    registerEndpoint('/api/auth/register/complete', {
-      method: 'POST',
-      handler: () => {
-        return {
-          success: true,
-          message: 'Registration complete',
-        };
-      },
+    const registerationService = reactive({
+      complete: vi.fn().mockResolvedValueOnce({ message: 'Registration complete', success: true }),
     });
+    vi.doMock('@/services/auth/registerationService', () => ({
+      registerationService,
+    }));
+
+    const { useRegisterStore } = await import('@/stores/register');
 
     const store = useRegisterStore();
     store.creationToken = 'ct-final';
@@ -126,7 +122,8 @@ describe('Register Store', () => {
     expect(navigateToMock).toHaveBeenCalledWith('/home');
   });
 
-  it('previousStep decrements step but not below 0', () => {
+  it('previousStep decrements step but not below 0', async () => {
+    const { useRegisterStore } = await import('@/stores/register');
     const store = useRegisterStore();
     store.step = 2;
     store.previousStep();
@@ -135,5 +132,42 @@ describe('Register Store', () => {
     expect(store.step).toBe(0);
     store.previousStep();
     expect(store.step).toBe(0);
+  });
+
+  it('resetInitialData resets store state', async () => {
+    const { useRegisterStore } = await import('@/stores/register');
+    const store = useRegisterStore();
+    store.step = 2;
+    store.registerationInfo = { name: 'Test', email: 'test@example.com', birthDate: '2000-01-01' };
+    store.resetInitialData();
+    expect(store.step).toBe(0);
+    expect(store.open).toBe(false);
+    expect(store.registerationInfo).toEqual({ name: '', email: '', birthDate: '' });
+  });
+
+  it('call resendOtp handles errors gracefully', async () => {
+    const registerationService = reactive({
+      start: vi.fn().mockResolvedValue({
+        data: { creationToken: 'test-token' },
+      }),
+      resendOtp: vi
+        .fn()
+        .mockRejectedValueOnce({ message: 'Internal server error', success: false }),
+    });
+    vi.doMock('@/services/auth/registerationService', () => ({
+      registerationService,
+    }));
+    const { useRegisterStore } = await import('@/stores/register');
+
+    const store = useRegisterStore();
+    await store.submitRegisterationInfo({
+      name: 'john',
+      email: 'john@example.com',
+      birthDate: '2000-01-01',
+    });
+
+    await store.resendOtp();
+
+    expect(registerationService.resendOtp).toHaveBeenCalledWith('test-token');
   });
 });
