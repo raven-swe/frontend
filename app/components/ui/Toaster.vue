@@ -4,7 +4,7 @@ import { cva } from 'class-variance-authority';
 import { cn } from '@/utils';
 
 const toasterVariants = cva(
-  'toaster fixed z-50 flex flex-col gap-3 p-4 md:p-6 rounded-lg max-w-xs w-auto m-4',
+  'toaster fixed z-[9999] flex flex-col gap-3 p-4 md:p-6 rounded-lg max-w-xs w-auto m-4',
   {
     variants: {
       position: {
