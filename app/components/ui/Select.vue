@@ -21,7 +21,7 @@ const modelValue = useVModel(props, 'modelValue', emits, {
 
 <template>
   <div
-    class="group border-muted-foreground/60 relative block rounded-md border bg-transparent pt-4 text-base transition-[color]"
+    class="group border-muted-foreground/60 relative block overflow-clip rounded-md border bg-transparent pt-4 text-base transition-[color]"
     :class="
       cn(
         'has-[select[aria-invalid=true]]:ring-destructive has-[select[aria-invalid=true]]:border-destructive',
@@ -61,3 +61,11 @@ const modelValue = useVModel(props, 'modelValue', emits, {
     />
   </div>
 </template>
+
+<style scoped>
+select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 30px var(--color-input-autofill) inset !important;
+  -webkit-text-fill-color: var(--color-foreground) !important;
+  color: var(--color-foreground);
+}
+</style>
