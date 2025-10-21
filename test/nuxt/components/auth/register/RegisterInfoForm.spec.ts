@@ -61,6 +61,17 @@ describe('RegisterInfoForm.vue', () => {
         .mockResolvedValueOnce(true)
         .mockResolvedValueOnce(false),
     });
+    const registerationService = reactive({
+      checkEmail: vi
+        .fn()
+        .mockResolvedValueOnce(false)
+        .mockResolvedValueOnce(true)
+        .mockResolvedValueOnce(false),
+    });
+
+    vi.doMock('@/services/auth/registerationService', () => ({
+      registerationService,
+    }));
     vi.doMock('@/stores/register', () => ({
       useRegisterStore: () => store,
     }));
@@ -154,8 +165,15 @@ describe('RegisterInfoForm.vue', () => {
   it('submits form with valid input', async () => {
     const store = reactive({
       submitRegisterationInfo: vi.fn(),
-      checkEmailExists: vi.fn().mockResolvedValue(false),
     });
+    const registerationService = reactive({
+      checkEmail: vi.fn().mockResolvedValue(false),
+    });
+
+    vi.doMock('@/services/auth/registerationService', () => ({
+      registerationService,
+    }));
+
     vi.doMock('@/stores/register', () => ({
       useRegisterStore: () => store,
     }));

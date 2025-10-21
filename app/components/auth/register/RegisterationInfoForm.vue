@@ -7,6 +7,7 @@ import Button from '~/components/ui/Button.vue';
 import { useDebounceFn } from '@vueuse/core';
 import useDateSelect from '@/composables/useDateSelect';
 import Select from '~/components/ui/Select.vue';
+import { registerationService } from '~/services/auth/registerationService';
 
 const registerStore = useRegisterStore();
 const today = new Date();
@@ -51,7 +52,7 @@ const [_name, nameAttrs] = defineField('name');
 const emailExists = ref(false);
 
 const checkEmail = useDebounceFn(async (email: string) => {
-  return await registerStore.checkEmailExists(email);
+  return await registerationService.checkEmail(email);
 }, 300);
 watch(
   () => values.email,

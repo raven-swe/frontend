@@ -63,15 +63,6 @@ export const useRegisterStore = defineStore('register', () => {
     }
   };
 
-  const checkEmailExists = async (email: string): Promise<boolean> => {
-    try {
-      return registerationService.checkEmail(email);
-    } catch (err) {
-      console.error('Failed to check email', err);
-      return false;
-    }
-  };
-
   const previousStep = () => {
     if (step.value > 0) {
       step.value -= 1;
@@ -88,6 +79,5 @@ export const useRegisterStore = defineStore('register', () => {
     previousStep,
     resendOtp,
     resetInitialData,
-    checkEmailExists,
   };
 });
