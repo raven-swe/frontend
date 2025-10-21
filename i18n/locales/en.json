@@ -1,4 +1,4 @@
-`{
+{
   "testing": {
     "welcome": "Welcome to Raven",
     "test-button": "Test Button",
@@ -56,31 +56,6 @@
       "content": "This is a dialog",
       "description": "Dialog Description"
     }
-  },
-  "leftsidebar": {
-    "nav": {
-      "home": "Home",
-      "explore": "Explore",
-      "notifications": "Notifications",
-      "messages": "Messages",
-      "bookmarks": "Bookmarks",
-      "profile": "Profile",
-      "more": "More"
-    }
-  },
-  "rightsidebar": {
-    "whats-happening": {
-      "title": "What's happening",
-      "tweets": "Tweets"
-    },
-    "who-to-follow": {
-      "title": "Who to follow",
-      "follow": "Follow"
-    },
-    "show-more": "Show more"
-  },
-  "homepage": {
-    "tweets": "Tweets"
   },
   "root": {
     "hero": {
