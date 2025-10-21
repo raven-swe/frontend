@@ -8,7 +8,7 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-  <div class="text-muted-foreground text-md mt-3 flex w-full items-center justify-between">
+  <div class="text-muted-foreground text-md mt-1.5 flex w-full items-center justify-between">
     <label class="hover:text-brand-blue relative flex items-center justify-center gap-[1px]">
       <Button variant="tweet-icon-turquoise" size="icon-md">
         <Icon name="tabler:message-circle-2" size="1.2rem" />

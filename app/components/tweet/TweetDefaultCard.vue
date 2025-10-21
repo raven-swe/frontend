@@ -71,7 +71,7 @@ const contentSegments = computed<Segment[]>(() => {
 </script>
 
 <template>
-  <article class="border-b-border flex w-full max-w-[700px] gap-3 border-b-1 p-4">
+  <article class="border-b-border flex w-full max-w-[700px] gap-3 border-b-1 p-2">
     <Avatar
       :img="props.tweet.author.avatarUrl || '/default_profile.png'"
       size="sm"
