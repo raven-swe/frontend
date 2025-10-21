@@ -4,43 +4,34 @@ interface Props {
   media: TweetMedia[] | undefined;
 }
 const props = defineProps<Props>();
-const images = computed(() => (props.media ? props.media.filter((m) => m.type === 'IMAGE') : []));
+// const images = computed(() => (props.media ? props.media.filter((m) => m.type === 'IMAGE') : []));
 const gifs = computed(() => (props.media ? props.media.filter((m) => m.type === 'GIF') : []));
 const videos = computed(() => (props.media ? props.media.filter((m) => m.type === 'VIDEO') : []));
-const firstImage = computed(() => props.media?.find((m) => m.type === 'IMAGE'));
+// const firstImage = computed(() => props.media?.find((m) => m.type === 'IMAGE'));
 </script>
 
 <template>
   <div class="flex w-full flex-col items-center pt-2">
     <!-- Media (single image basic layout) -->
-    <div
-      v-if="images.length >= 1"
-      class="ring-border mt-3 max-w-[34rem] overflow-hidden rounded-2xl ring-1"
-    >
+    <div class="border-border mt-3 overflow-hidden rounded-xl border-1">
+      <!-- :alt="firstImage!.altText || 'Tweet media'" -->
       <NuxtImg
-        :src="firstImage!.url"
-        :alt="firstImage!.altText || 'Tweet media'"
+        src="/oklahoma-city-thunder-black-and-gold-niwgymcycoo5z0v3.jpg"
         class="h-auto w-full object-cover"
-        :width="firstImage!.width || 600"
-        :height="firstImage!.height || 400"
         format="webp"
       />
     </div>
     <div
       v-for="(gif, index) in gifs"
       :key="index"
-      class="ring-border mt-3 max-w-[34rem] overflow-hidden rounded-2xl ring-1"
+      class="border-border mt-3 overflow-hidden rounded-xl border-1"
     >
-      <img
-        :src="gif.url"
-        :class="`mx-auto w-[${gif.width || 600}px] h-[${gif.height || 400}px]`"
-        :alt="gif.altText || 'Tweet media'"
-      />
+      <img :src="gif.url" class="w-full" :alt="gif.altText || 'Tweet media'" />
     </div>
     <div
       v-for="(video, index) in videos"
       :key="index"
-      class="ring-border mt-3 max-w-[34rem] overflow-hidden rounded-2xl ring-1"
+      class="border-border mt-3 max-w-[34rem] overflow-hidden rounded-xl border-1"
     >
       <video
         controls
