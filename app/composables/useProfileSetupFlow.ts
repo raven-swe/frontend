@@ -1,24 +1,26 @@
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 
-type SetupStep = 'picture' | 'bio' | 'location' | 'complete';
+type SetupStep = 'picture' | 'header' | 'bio' | 'location' | 'complete';
 
 interface ProfileSetupData {
   profilePicture: string | null;
+  header: string | null;
   bio: string | null;
   location: string | null;
 }
 
 export const useProfileSetupFlow = () => {
-  const currentStep = ref<SetupStep>('picture');
-  const isFlowActive = ref(true);
+  const currentStep = useState<SetupStep>('profileSetup-currentStep', () => 'picture');
+  const isFlowActive = useState('profileSetup-isFlowActive', () => true);
 
-  const formData = ref<ProfileSetupData>({
+  const formData = useState<ProfileSetupData>('profileSetup-formData', () => ({
     profilePicture: null,
+    header: null,
     bio: '',
     location: '',
-  });
+  }));
 
-  const stepOrder: SetupStep[] = ['picture', 'bio', 'location', 'complete'];
+  const stepOrder: SetupStep[] = ['picture', 'header', 'bio', 'location', 'complete'];
 
   const startFlow = () => {
     isFlowActive.value = true;
@@ -34,6 +36,10 @@ export const useProfileSetupFlow = () => {
 
   const setProfilePicture = (image: string | null) => {
     formData.value.profilePicture = image;
+  };
+
+  const setHeader = (header: string | null) => {
+    formData.value.header = header;
   };
 
   const setBio = (bio: string | null) => {
@@ -52,6 +58,7 @@ export const useProfileSetupFlow = () => {
   const resetFlow = () => {
     formData.value = {
       profilePicture: null,
+      header: null,
       bio: '',
       location: '',
     };
@@ -61,6 +68,7 @@ export const useProfileSetupFlow = () => {
 
   const submitProfile = async () => {
     // API call to save all data
+    // eslint-disable-next-line no-console
     console.log('Final profile data:', formData.value);
 
     // After successful submission
@@ -71,6 +79,8 @@ export const useProfileSetupFlow = () => {
   const isProfilePictureDialogOpen = computed(
     () => isFlowActive.value && currentStep.value === 'picture',
   );
+
+  const isHeaderDialogOpen = computed(() => isFlowActive.value && currentStep.value === 'header');
 
   const isBioDialogOpen = computed(() => isFlowActive.value && currentStep.value === 'bio');
 
@@ -90,6 +100,7 @@ export const useProfileSetupFlow = () => {
 
     // Computed
     isProfilePictureDialogOpen,
+    isHeaderDialogOpen,
     isBioDialogOpen,
     isLocationDialogOpen,
     isConfirmationDialogOpen,
@@ -98,6 +109,7 @@ export const useProfileSetupFlow = () => {
     startFlow,
     nextStep,
     setProfilePicture,
+    setHeader,
     setBio,
     setLocation,
     closeFlow,

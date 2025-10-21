@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { useProfileSetupFlow } from '~/composables/useProfileSetupFlow';
 import ProfilePictureDialog from '~/components/profile/setup/ProfilePictureDialog.vue';
+import HeaderDialog from '~/components/profile/setup/HeaderDialog.vue';
 import LocationDialog from '~/components/profile/setup/LocationDialog.vue';
 import BioDialog from '~/components/profile/setup/BioDialog.vue';
 import ConfirmationDialog from '~/components/profile/setup/ConfirmationDialog.vue';
@@ -11,12 +12,13 @@ definePageMeta({
 
 const {
   isProfilePictureDialogOpen,
+  isHeaderDialogOpen,
   isBioDialogOpen,
   isLocationDialogOpen,
   isConfirmationDialogOpen,
-  startFlow,
   nextStep,
   setProfilePicture,
+  setHeader,
   setBio,
   setLocation,
   closeFlow,
@@ -25,6 +27,11 @@ const {
 
 const handleProfilePictureSubmit = (image: string | null) => {
   setProfilePicture(image);
+  nextStep();
+};
+
+const handleHeaderSubmit = (header: string | null) => {
+  setHeader(header);
   nextStep();
 };
 
@@ -50,15 +57,18 @@ const handleConfirmationSubmit = async () => {
 
 <template>
   <div>
-    <div class="flex flex-col items-start gap-4 p-8">
-      <UiButton variant="outline" size="sm" @click="startFlow">
-        {{ $t('profile.setup.setup-profile') }}
-      </UiButton>
-
+    <div>
       <!-- Profile Picture Dialog -->
       <ProfilePictureDialog
         :open="isProfilePictureDialogOpen"
         @submit="handleProfilePictureSubmit"
+        @update:open="handleDialogClose"
+      />
+
+      <!-- Header Dialog -->
+      <HeaderDialog
+        :open="isHeaderDialogOpen"
+        @submit="handleHeaderSubmit"
         @update:open="handleDialogClose"
       />
 
