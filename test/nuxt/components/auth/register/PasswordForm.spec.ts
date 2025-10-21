@@ -1,7 +1,6 @@
 import { mountSuspended } from '@nuxt/test-utils/runtime';
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-// import RegisterationInfoForm from '~/components/auth/register/RegisterationInfoForm.vue';
 import Dialog from '~/components/ui/dialog/Dialog.vue';
 import { createI18n } from 'vue-i18n';
 import messages from '~~/i18n/locales/en.json';
