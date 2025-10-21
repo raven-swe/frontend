@@ -18,6 +18,14 @@
   --popover-foreground: 222.2 84% 4.9%;
   --dialog-backdrop: rgba(91, 112, 131, 0.4);
   --oauth: #ffffff;
+  --toaster-bg-success: #dcfce7;
+  --toaster-text-success: #166534;
+  --toaster-bg-error: #fee2e2;
+  --toaster-text-error: #991b1b;
+  --toaster-bg-warning: #fef9c3;
+  --toaster-text-warning: #92400e;
+  --toaster-bg-info: #dbeafe;
+  --toaster-text-info: #1e3a8a;
 }
 
 .dark {
@@ -34,6 +42,14 @@
   --popover: 222.2 84% 4.9%;
   --popover-foreground: 210 40% 98%;
   --oauth: #ffffff;
+  --toaster-bg-success: #064e3b;
+  --toaster-text-success: #86efac;
+  --toaster-bg-error: #7f1d1d;
+  --toaster-text-error: #fecaca;
+  --toaster-bg-warning: #78350f;
+  --toaster-text-warning: #fcd34d;
+  --toaster-bg-info: #1e3a8a;
+  --toaster-text-info: #bfdbfe;
 }
 
 @theme inline {
@@ -54,6 +70,14 @@
   --animate-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   --color-dialog-backdrop: var(--dialog-backdrop);
   --color-oauth: var(--oauth);
+  --color-toaster-bg-success: var(--toaster-bg-success);
+  --color-toaster-text-success: var(--toaster-text-success);
+  --color-toaster-bg-error: var(--toaster-bg-error);
+  --color-toaster-text-error: var(--toaster-text-error);
+  --color-toaster-bg-warning: var(--toaster-bg-warning);
+  --color-toaster-text-warning: var(--toaster-text-warning);
+  --color-toaster-bg-info: var(--toaster-bg-info);
+  --color-toaster-text-info: var(--toaster-text-info);
 }
 
 @layer base {
