@@ -5,10 +5,8 @@ export default function useDateSelect(
   endYear = new Date().getFullYear(),
   initialDate?: Date,
 ) {
-  const selectedMonth = ref<number | undefined>(
-    initialDate ? initialDate.getMonth() + 1 : undefined,
-  );
-  const selectedDay = ref<number | undefined>(initialDate ? initialDate.getDate() + 1 : undefined);
+  const selectedMonth = ref<number | undefined>(initialDate ? initialDate.getMonth() : undefined);
+  const selectedDay = ref<number | undefined>(initialDate ? initialDate.getDate() : undefined);
   const selectedYear = ref<number | undefined>(initialDate ? initialDate.getFullYear() : undefined);
 
   const isLeapYear = (year: number) => year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);

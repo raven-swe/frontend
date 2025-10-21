@@ -18,7 +18,6 @@ const schema = yup.object({
     .date()
     .typeError($t('errors.AGE_RESTRICTION'))
     .required($t('errors.AGE_RESTRICTION'))
-    .max(today, $t('errors.AGE_RESTRICTION')) // no future dates
     .max(thirteenYearsAgo, $t('errors.AGE_RESTRICTION')), // at least 13 years old
 });
 const { errors, values, defineField, handleSubmit, isSubmitting, setFieldError, setFieldValue } =
@@ -95,7 +94,7 @@ watch([dateSelect.selectedDay, dateSelect.selectedMonth, dateSelect.selectedYear
   const month = dateSelect.selectedMonth.value;
   const year = dateSelect.selectedYear.value;
   if (day && month && year) {
-    const birthDate = new Date(Number(year), Number(month) - 1, Number(day));
+    const birthDate = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
     if (birthDate.getDate() === Number(day)) {
       setFieldValue('birthDate', birthDate);
     }
