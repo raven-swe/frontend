@@ -2,7 +2,6 @@
 import * as yup from 'yup';
 import { useForm } from 'vee-validate';
 import FieldInput from '~/components/ui/form/FieldInput.vue';
-import { DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '~/components/ui/dialog';
 import Button from '~/components/ui/Button.vue';
 
 const registerStore = useRegisterStore();
@@ -30,12 +29,12 @@ const [_password, passwordAttrs] = defineField('password');
 
 <template>
   <form class="flex h-full flex-col justify-between" @submit.prevent="onSubmit">
-    <DialogHeader class="py-6">
-      <DialogTitle class="text-4xl font-bold">{{ $t('register.password.title') }}</DialogTitle>
-      <DialogDescription>
+    <UiDialogHeader class="py-6">
+      <UiDialogTitle class="text-4xl font-bold">{{ $t('register.password.title') }}</UiDialogTitle>
+      <UiDialogDescription>
         {{ $t('register.password.description') }}
-      </DialogDescription>
-    </DialogHeader>
+      </UiDialogDescription>
+    </UiDialogHeader>
     <div class="flex flex-col gap-2">
       <FieldInput
         :placeholder="$t('register.password.label')"
@@ -44,7 +43,7 @@ const [_password, passwordAttrs] = defineField('password');
         v-bind="passwordAttrs"
       />
     </div>
-    <DialogFooter class="mt-auto flex flex-col gap-4">
+    <UiDialogFooter class="mt-auto flex flex-col gap-4">
       <p class="text-muted-foreground text-sm">
         {{ $t('register.password.disclaimer') }}
       </p>
@@ -55,6 +54,6 @@ const [_password, passwordAttrs] = defineField('password');
         class="w-full"
         >{{ $t('ui.next') }}</Button
       >
-    </DialogFooter>
+    </UiDialogFooter>
   </form>
 </template>

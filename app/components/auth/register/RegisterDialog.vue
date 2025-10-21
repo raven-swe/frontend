@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { Dialog, DialogContent } from '~/components/ui/dialog';
 import RegisterationInfoForm from './RegisterationInfoForm.vue';
 import Button from '~/components/ui/Button.vue';
 import OtpForm from './OtpForm.vue';
@@ -14,8 +13,8 @@ function handleOpenChange(val: boolean) {
 </script>
 
 <template>
-  <Dialog :open="registerStore.open" @update:open="handleOpenChange">
-    <DialogContent :hide-close-button="registerStore.step !== 0" header-class="ps-0">
+  <UiDialog :open="registerStore.open" @update:open="handleOpenChange">
+    <UiDialogContent :hide-close-button="registerStore.step !== 0" header-class="ps-0">
       <template #header>
         <Button
           v-if="registerStore.step !== 0"
@@ -32,6 +31,6 @@ function handleOpenChange(val: boolean) {
         <OtpForm v-if="registerStore.step === 1" />
         <PasswordForm v-if="registerStore.step === 2" />
       </div>
-    </DialogContent>
-  </Dialog>
+    </UiDialogContent>
+  </UiDialog>
 </template>

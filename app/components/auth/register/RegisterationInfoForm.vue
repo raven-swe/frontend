@@ -2,7 +2,6 @@
 import * as yup from 'yup';
 import { useForm } from 'vee-validate';
 import FieldInput from '~/components/ui/form/FieldInput.vue';
-import { DialogFooter, DialogHeader, DialogTitle } from '~/components/ui/dialog';
 import Button from '~/components/ui/Button.vue';
 import { useDebounceFn } from '@vueuse/core';
 import useDateSelect from '@/composables/useDateSelect';
@@ -93,9 +92,11 @@ watch(
 
 <template>
   <form class="flex h-full flex-col justify-between" @submit.prevent="onSubmit">
-    <DialogHeader class="py-6">
-      <DialogTitle class="text-4xl font-bold">{{ $t('register.register-info.title') }}</DialogTitle>
-    </DialogHeader>
+    <UiDialogHeader class="py-6">
+      <UiDialogTitle class="text-4xl font-bold">{{
+        $t('register.register-info.title')
+      }}</UiDialogTitle>
+    </UiDialogHeader>
     <div class="flex flex-col gap-4">
       <FieldInput placeholder="Name" type="text" name="name" v-bind="nameAttrs" />
       <FieldInput placeholder="Email" type="text" name="email" v-bind="emailAttrs" />
@@ -136,7 +137,7 @@ watch(
         </p>
       </div>
     </div>
-    <DialogFooter class="mt-auto">
+    <UiDialogFooter class="mt-auto">
       <Button
         type="submit"
         :disabled="Object.entries(errors).length > 0 || isSubmitting"
@@ -144,6 +145,6 @@ watch(
         class="w-full"
         >{{ $t('ui.next') }}</Button
       >
-    </DialogFooter>
+    </UiDialogFooter>
   </form>
 </template>
