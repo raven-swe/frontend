@@ -36,7 +36,12 @@ const modelValue = useVModel(props, 'modelValue', emits, {
       v-bind="$attrs"
       class="peer w-full min-w-0 appearance-none p-2 outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
     >
-      <option v-for="option in props.options" :key="option.value" :value="option.value">
+      <option
+        v-for="option in props.options"
+        :key="option.value"
+        :value="option.value"
+        class="text-foreground bg-background"
+      >
         {{ option.label }}
       </option>
     </select>
