@@ -1,4 +1,4 @@
-{
+`{
   "testing": {
     "welcome": "Welcome to Raven",
     "test-button": "Test Button",
@@ -15,6 +15,72 @@
       "tweet-not-found": "Tweet not found",
       "tweets-list": "Tweets List"
     }
+  },
+  "leftsidebar": {
+    "nav": {
+      "home": "Home",
+      "explore": "Explore",
+      "notifications": "Notifications",
+      "messages": "Messages",
+      "bookmarks": "Bookmarks",
+      "profile": "Profile",
+      "more": "More"
+    }
+  },
+  "rightsidebar": {
+    "whats-happening": {
+      "title": "What's happening",
+      "tweets": "Tweets"
+    },
+    "who-to-follow": {
+      "title": "Who to follow",
+      "follow": "Follow"
+    },
+    "show-more": "Show more"
+  },
+  "homepage": {
+    "tweets": "Tweets"
+  },
+  "profile": {
+    "tabs": {
+      "posts": "Posts",
+      "replies": "Replies",
+      "media": "Media",
+      "likes": "Likes"
+    }
+  },
+  "playground": {
+    "dialog": {
+      "title": "Create your account",
+      "open": "Open Dialog",
+      "content": "This is a dialog",
+      "description": "Dialog Description"
+    }
+  },
+  "leftsidebar": {
+    "nav": {
+      "home": "Home",
+      "explore": "Explore",
+      "notifications": "Notifications",
+      "messages": "Messages",
+      "bookmarks": "Bookmarks",
+      "profile": "Profile",
+      "more": "More"
+    }
+  },
+  "rightsidebar": {
+    "whats-happening": {
+      "title": "What's happening",
+      "tweets": "Tweets"
+    },
+    "who-to-follow": {
+      "title": "Who to follow",
+      "follow": "Follow"
+    },
+    "show-more": "Show more"
+  },
+  "homepage": {
+    "tweets": "Tweets"
   },
   "root": {
     "hero": {
@@ -38,6 +104,7 @@
   },
   "ui": {
     "close": "Close",
-    "next": "Next"
+    "next": "Next",
+    "loading": "Loading"
   }
 }
