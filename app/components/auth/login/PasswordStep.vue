@@ -93,11 +93,7 @@ const [_password, passwordAttrs] = defineField('password');
         ><p v-if="error" class="mt-3 text-red-500">{{ error }}</p></Transition
       >
     </UiDialogFooter>
-
-    <!-- <span v-if="loading" class="my-auto text-center">
-      {{ 'loading...' }}
-    </span> -->
-    <UiSpinner v-if="loading" class="my-auto text-center"></UiSpinner>
+    <UiSpinner v-if="loading" class="mx-auto my-auto"></UiSpinner>
   </form>
 </template>
 

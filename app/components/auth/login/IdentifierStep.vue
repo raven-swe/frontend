@@ -96,7 +96,7 @@ const [_identifier, identifierAttrs] = defineField('identifier');
       >
     </UiDialogFooter>
   </form>
-  <UiSpinner v-if="loading" class="my-auto text-center"></UiSpinner>
+  <UiSpinner v-if="loading" class="mx-auto my-auto"></UiSpinner>
 </template>
 
 <style scoped>
