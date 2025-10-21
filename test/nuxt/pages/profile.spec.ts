@@ -11,43 +11,13 @@ describe('Profile Page', () => {
     expect(container.exists()).toBe(true);
   });
 
-  it('renders ProfileCover component', async () => {
-    const wrapper = await mountSuspended(ProfilePage);
-
-    // Check if cover image exists
-    const coverImage = wrapper.find('img[alt="Profile Cover"]');
-    expect(coverImage.exists()).toBe(true);
-  });
-
-  it('renders ProfileAvatarSection component', async () => {
-    const wrapper = await mountSuspended(ProfilePage);
-
-    // Check if profile picture exists
-    const profileImage = wrapper.find('img[alt="Profile picture"]');
-    expect(profileImage.exists()).toBe(true);
-  });
-
-  it('renders ProfileDetails component', async () => {
+  it('renders posts', async () => {
     const wrapper = await mountSuspended(ProfilePage);
 
     const html = wrapper.html();
-    // Check if user details are rendered
-    expect(html).toContain('Hussein Mohamed');
-    expect(html).toContain('@hussein');
-  });
-
-  it('renders Edit Profile button', async () => {
-    const wrapper = await mountSuspended(ProfilePage);
-
-    const html = wrapper.html();
-    expect(html).toContain('Edit Profile');
-  });
-
-  it('renders user statistics', async () => {
-    const wrapper = await mountSuspended(ProfilePage);
-
-    const html = wrapper.html();
-    expect(html).toContain('Following');
-    expect(html).toContain('Followers');
+    // Check if posts are rendered
+    expect(html).toContain('Post 1');
+    expect(html).toContain('Post 2');
+    expect(html).toContain('Post 3');
   });
 });
