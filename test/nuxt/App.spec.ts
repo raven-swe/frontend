@@ -8,6 +8,15 @@ mockNuxtImport('useI18n', () => {
   });
 });
 
+mockNuxtImport('useHead', () => {
+  return (options) => {
+    if (options().htmlAttrs) {
+      document.documentElement.setAttribute('lang', options().htmlAttrs.lang);
+      document.documentElement.setAttribute('dir', options().htmlAttrs.dir);
+    }
+  };
+});
+
 describe('App.vue', () => {
   it('calls useHead with correct htmlAttrs', async () => {
     const { default: App } = await import('@/app.vue');
