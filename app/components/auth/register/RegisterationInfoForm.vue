@@ -54,27 +54,19 @@ const [_name, nameAttrs] = defineField('name');
 
 const emailExists = ref(false);
 
-const checkEmail = useDebounceFn(async (email: string | undefined) => {
-  if (!email) return;
-  try {
-    const res = await $fetch(`/api/auth/check-email?email=${encodeURIComponent(email)}`);
-    emailExists.value = !!res.data.exists;
-
-    if (emailExists.value) {
-      setFieldError('email', $t('errors.EMAIL_ALREADY_EXISTS'));
-    } else {
-      if (errors.value.email === $t('errors.EMAIL_ALREADY_EXISTS')) {
-        setFieldError('email', undefined);
-      }
-    }
-  } catch (err) {
-    console.error('Failed to check email', err);
-  }
+const checkEmail = useDebounceFn(async (email: string) => {
+  return await registerStore.checkEmailExists(email);
 }, 300);
 watch(
   () => values.email,
-  (email) => {
-    checkEmail(email);
+  async (email) => {
+    if (!email) return;
+    const exists = await checkEmail(email);
+    emailExists.value = exists;
+    if (exists) setFieldError('email', $t('errors.EMAIL_ALREADY_EXISTS'));
+    else if (!exists && errors.value.email === $t('errors.EMAIL_ALREADY_EXISTS')) {
+      setFieldError('email', undefined);
+    }
   },
 );
 
@@ -89,17 +81,17 @@ const dateSelect = useDateSelect(
   values.birthDate,
 );
 
-watch([dateSelect.selectedDay, dateSelect.selectedMonth, dateSelect.selectedYear], () => {
-  const day = dateSelect.selectedDay.value;
-  const month = dateSelect.selectedMonth.value;
-  const year = dateSelect.selectedYear.value;
-  if (day && month && year) {
-    const birthDate = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
-    if (birthDate.getDate() === Number(day)) {
-      setFieldValue('birthDate', birthDate);
+watch(
+  [dateSelect.selectedDay, dateSelect.selectedMonth, dateSelect.selectedYear],
+  ([day, month, year]) => {
+    if (day && month && year) {
+      const birthDate = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+      if (birthDate.getDate() === Number(day)) {
+        setFieldValue('birthDate', birthDate);
+      }
     }
-  }
-});
+  },
+);
 </script>
 
 <template>

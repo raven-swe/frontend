@@ -1,8 +1,4 @@
-type RegisterationInfo = {
-  name: string;
-  email: string;
-  birthDate: string;
-};
+import { registerationService, type RegisterationInfo } from '@/services/auth/registerationService';
 
 export const useRegisterStore = defineStore('register', () => {
   const step = ref(0);
@@ -31,14 +27,7 @@ export const useRegisterStore = defineStore('register', () => {
   const submitRegisterationInfo = async (data: RegisterationInfo) => {
     try {
       registerationInfo.value = data;
-      const response = await $fetch<ApiSuccessResponse<{ creationToken: string }>>(
-        '/api/auth/register/start',
-        {
-          method: 'POST',
-          body: data,
-        },
-      );
-      if (!response.success) throw new Error('API indicated failure');
+      const response = await registerationService.start(data);
       creationToken.value = response.data.creationToken;
       step.value = 1;
     } catch {
@@ -48,11 +37,7 @@ export const useRegisterStore = defineStore('register', () => {
 
   const submitOtp = async (otp: string): Promise<boolean> => {
     try {
-      const response = await $fetch<ApiResponseBase>('/api/auth/register/verify', {
-        method: 'POST',
-        body: { otp, creationToken: creationToken.value },
-      });
-      if (!response.success) throw new Error('API indicated failure');
+      await registerationService.verify(otp, creationToken.value);
       step.value = 2;
       return true;
     } catch {
@@ -62,10 +47,7 @@ export const useRegisterStore = defineStore('register', () => {
 
   const resendOtp = async () => {
     try {
-      await $fetch<ApiResponseBase>('/api/auth/register/resend-otp', {
-        method: 'POST',
-        body: { creationToken: creationToken.value },
-      });
+      await registerationService.resendOtp(creationToken.value);
     } catch {
       console.error('Failed to resend otp');
     }
@@ -73,14 +55,20 @@ export const useRegisterStore = defineStore('register', () => {
 
   const submitPassword = async (password: string) => {
     try {
-      await $fetch<ApiResponseBase>('/api/auth/register/complete', {
-        method: 'POST',
-        body: { password, creationToken: creationToken.value },
-      });
+      await registerationService.complete(password, creationToken.value);
       console.warn('account created, redirecting to home');
       navigateTo('/home');
     } catch {
       console.error('Failed to complete registeration');
+    }
+  };
+
+  const checkEmailExists = async (email: string): Promise<boolean> => {
+    try {
+      return registerationService.checkEmail(email);
+    } catch (err) {
+      console.error('Failed to check email', err);
+      return false;
     }
   };
 
@@ -100,5 +88,6 @@ export const useRegisterStore = defineStore('register', () => {
     previousStep,
     resendOtp,
     resetInitialData,
+    checkEmailExists,
   };
 });
