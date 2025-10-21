@@ -9,7 +9,6 @@ const registerStore = useRegisterStore();
 const schema = yup.object({
   password: yup
     .string()
-    .min(8, $t('errors.PASSWORD_TOO_SHORT'))
     .matches(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
       $t('errors.PASSWORD_INVALID'),
