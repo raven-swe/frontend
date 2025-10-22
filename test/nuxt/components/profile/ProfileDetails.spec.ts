@@ -2,95 +2,70 @@ import { describe, expect, it } from 'vitest';
 import { mountSuspended } from '@nuxt/test-utils/runtime';
 import ProfileDetails from '@/components/profile/ProfileDetails.vue';
 
-describe('ProfileDetails Component', () => {
-  it('renders the main container with correct classes', async () => {
-    const wrapper = await mountSuspended(ProfileDetails);
+const mockUserProfile = {
+  coverImg: '/cover.jpg',
+  profileImg: '/profile.jpg',
+  name: 'Hussein Mohamed',
+  username: 'hussein',
+  bio: 'football lover, software engineer, coffee addict.',
+  joinAt: 'july 2020',
+  following: 150,
+  followers: 50,
+};
 
-    const container = wrapper.find('.mt-2.flex.flex-col');
+describe('ProfileDetails Component', () => {
+  it('renders ProfileCover component', async () => {
+    const wrapper = await mountSuspended(ProfileDetails, {
+      props: { userProfile: mockUserProfile },
+    });
+
+    const coverImage = wrapper.find('img[alt="Profile Cover"]');
+    expect(coverImage.exists()).toBe(true);
+  });
+
+  it('renders ProfileAvatarSection component', async () => {
+    const wrapper = await mountSuspended(ProfileDetails, {
+      props: { userProfile: mockUserProfile },
+    });
+
+    const profileImage = wrapper.find('img[alt="Profile picture"]');
+    expect(profileImage.exists()).toBe(true);
+  });
+
+  it('renders ProfileInfo component', async () => {
+    const wrapper = await mountSuspended(ProfileDetails, {
+      props: { userProfile: mockUserProfile },
+    });
+
+    const container = wrapper.find('div.mt-2.flex.flex-col');
     expect(container.exists()).toBe(true);
   });
 
-  it('renders user name', async () => {
-    const wrapper = await mountSuspended(ProfileDetails);
+  it('passes correct coverImg prop to ProfileCover', async () => {
+    const wrapper = await mountSuspended(ProfileDetails, {
+      props: { userProfile: mockUserProfile },
+    });
 
-    const userName = wrapper.find('h2');
-    expect(userName.exists()).toBe(true);
-    expect(userName.text()).toBe('Hussein Mohamed');
+    const coverImage = wrapper.find('img[alt="Profile Cover"]');
+    expect(coverImage.attributes('src')).toContain('cover.jpg');
   });
 
-  it('applies correct styling to user name', async () => {
-    const wrapper = await mountSuspended(ProfileDetails);
+  it('passes correct profileImg prop to ProfileAvatarSection', async () => {
+    const wrapper = await mountSuspended(ProfileDetails, {
+      props: { userProfile: mockUserProfile },
+    });
 
-    const userName = wrapper.find('h2');
-    const classes = userName.classes();
-    expect(classes).toContain('text-foreground');
-    expect(classes).toContain('text-2xl');
-    expect(classes).toContain('font-bold');
+    const profileImage = wrapper.find('img[alt="Profile picture"]');
+    expect(profileImage.attributes('src')).toContain('profile.jpg');
   });
 
-  it('renders username handle', async () => {
-    const wrapper = await mountSuspended(ProfileDetails);
+  it('passes correct userProfile prop to ProfileInfo', async () => {
+    const wrapper = await mountSuspended(ProfileDetails, {
+      props: { userProfile: mockUserProfile },
+    });
 
     const html = wrapper.html();
-    expect(html).toContain('@hussein');
-  });
-
-  it('renders user bio', async () => {
-    const wrapper = await mountSuspended(ProfileDetails);
-
-    const html = wrapper.html();
-    expect(html).toContain('football lover, software engineer, coffee addict.');
-  });
-
-  it('renders join date with translated text', async () => {
-    const wrapper = await mountSuspended(ProfileDetails);
-
-    const html = wrapper.html();
-    expect(html).toContain('july 2020');
-    expect(html).toContain('Joined');
-  });
-
-  it('renders calendar icon for join date', async () => {
-    const wrapper = await mountSuspended(ProfileDetails);
-
-    const html = wrapper.html();
-    expect(html).toContain('ic:sharp-calendar-month');
-  });
-
-  it('renders following count', async () => {
-    const wrapper = await mountSuspended(ProfileDetails);
-
-    const html = wrapper.html();
-    expect(html).toContain('150');
-    expect(html).toContain('Following');
-  });
-
-  it('renders followers count', async () => {
-    const wrapper = await mountSuspended(ProfileDetails);
-
-    const html = wrapper.html();
-    expect(html).toContain('50');
-    expect(html).toContain('Followers');
-  });
-
-  it('has correct structure for statistics', async () => {
-    const wrapper = await mountSuspended(ProfileDetails);
-
-    const statsContainer = wrapper.find('.mt-4.flex.space-x-4');
-    expect(statsContainer.exists()).toBe(true);
-  });
-
-  it('applies muted foreground color to secondary text', async () => {
-    const wrapper = await mountSuspended(ProfileDetails);
-
-    const mutedElements = wrapper.findAll('.text-muted-foreground');
-    expect(mutedElements.length).toBeGreaterThan(0);
-  });
-
-  it('applies correct spacing to statistics labels', async () => {
-    const wrapper = await mountSuspended(ProfileDetails);
-
-    const statsSpans = wrapper.findAll('.text-muted-foreground.ms-1');
-    expect(statsSpans.length).toBe(2); // Following and Followers labels
+    expect(html).toContain(mockUserProfile.name);
+    expect(html).toContain(mockUserProfile.username);
   });
 });

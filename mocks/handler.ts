@@ -4,6 +4,7 @@ import { handlers as loginHandlers } from './handlers/login';
 import { handlers as tweetHandlers } from './handlers/tweet';
 import { handlers as passwordHandlers } from './handlers/password';
 import { handlers as profileHandlers } from './handlers/update-profile';
+import { userProfileHandlers } from './handlers/userProfile';
 // Import more handlers as needed
 
 export const handlers = [
@@ -13,5 +14,6 @@ export const handlers = [
   ...tweetHandlers,
   ...passwordHandlers,
   ...profileHandlers,
+  ...userProfileHandlers,
   // Add More handlers here
 ];

@@ -22,3 +22,13 @@ export type User = {
   phone: string;
   languageCode: string;
 };
+export interface UserProfile {
+  coverImg: string;
+  profileImg: string;
+  name: string;
+  username: string;
+  bio: string;
+  joinAt: string;
+  following: number;
+  followers: number;
+}

@@ -1,5 +1,3 @@
-import type { LeftSidebarTab } from '~/types/leftsidebar';
-
 export const SIDEBAR_TABS: LeftSidebarTab[] = [
   {
     label: 'home',
@@ -25,7 +23,7 @@ export const SIDEBAR_TABS: LeftSidebarTab[] = [
   {
     label: 'profile',
     icon: 'person',
-    route: '/profile',
+    route: '/profile/hussein',
   },
   {
     label: 'more',
