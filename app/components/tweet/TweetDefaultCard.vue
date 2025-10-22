@@ -98,8 +98,10 @@ const contentSegments = computed<Segment[]>(() => {
       <!-- Content -->
       <p class="mt-1 leading-relaxed break-words whitespace-pre-wrap">
         <template v-for="(seg, i) in contentSegments" :key="i">
-          <template v-if="seg.type === 'text'">{{ seg.text }}</template>
-          <NuxtLink v-else :to="seg.href" class="text-primary font-medium hover:underline">
+          <span v-if="seg.type === 'text'" class="inline">
+            {{ seg.text }}
+          </span>
+          <NuxtLink v-else :to="seg.href" class="text-primary inline font-medium hover:underline">
             {{ seg.text }}
           </NuxtLink>
         </template>
