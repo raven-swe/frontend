@@ -20,6 +20,8 @@ if (error.value) console.error(error.value);
         <TweetDefaultCard v-for="tweet in tweets" :key="tweet.id" :tweet="tweet" />
       </div>
     </div>
-    <h1 v-else>{{ $t('testing.tweets.tweet-not-found') }}</h1>
+    <div v-else data-testid="empty-state" class="text-muted-foreground mt-10 text-center">
+      <h1 class="text-xl font-semibold">{{ $t('testing.tweets.tweet-not-found') }}</h1>
+    </div>
   </div>
 </template>
