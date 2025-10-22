@@ -71,7 +71,7 @@ const [_password, passwordAttrs] = defineField('password');
         readonly
       />
       <UiFormFieldPassword name="password" v-bind="passwordAttrs" />
-      <p class="text-primary ms-1 mt-1 block text-sm">
+      <p class="text-primary ms-1 mt-1 block text-sm" data-testid="forgot-password-link">
         <NuxtLink to="/auth/forgot-password">
           {{ $t('root.auth.forget-password') }}
         </NuxtLink>
@@ -79,12 +79,12 @@ const [_password, passwordAttrs] = defineField('password');
     </div>
 
     <UiDialogFooter class="mt-40">
-      <UiButton class="mb-1 w-100" size="lg" type="submit">
+      <UiButton class="mb-1 w-100" size="lg" type="submit" data-testid="submit-button">
         {{ $t('root.auth.signin') }}
       </UiButton>
       <p class="mt-4 w-fit">
         {{ $t('root.auth.dont-have-account') }}
-        <NuxtLink to="/auth/signup" class="text-primary">
+        <NuxtLink to="/auth/signup" class="text-primary" data-testid="signup-link">
           {{ $t('root.auth.signup') }}
         </NuxtLink>
       </p>
