@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Avatar from '~/components/ui/Avatar.vue';
 import type { Tweet } from '~~/shared/types/tweets';
-import { relativeTime } from '~/utils/item';
+import { relativeTime } from '~/utils/index';
 import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
 interface Props {
