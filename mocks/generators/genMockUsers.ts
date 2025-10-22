@@ -3,6 +3,7 @@ import type { User } from '#shared/types/user';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -33,6 +34,11 @@ export function generateMockUser(): User {
 
 const totalMockUsers = 100;
 export const mockUsers: User[] = Array.from({ length: totalMockUsers }, generateMockUser);
-const stream = fs.createWriteStream(path.join(__dirname, '../data/mock-users.json'));
-stream.write(JSON.stringify(mockUsers, null, 2));
-stream.end();
+const outputDir = path.join(__dirname, '../data');
+if (!fs.existsSync(outputDir)) {
+  fs.mkdirSync(outputDir, { recursive: true });
+}
+
+const outputPath = path.join(outputDir, 'mock-users.json');
+fs.writeFileSync(outputPath, JSON.stringify(mockUsers, null, 2));
+console.log(`Mock users written to ${outputPath}`);
