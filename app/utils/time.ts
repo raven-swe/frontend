@@ -9,3 +9,15 @@ export const relativeTime = (iso: string) => {
   const months = Math.floor(diff / 2592000);
   return `${months}mo`;
 };
+
+export function formatDate(isoString: string): string {
+  const date = new Date(isoString);
+  return date.toLocaleString(undefined, {
+    weekday: 'short',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}

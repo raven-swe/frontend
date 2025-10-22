@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Avatar from '~/components/ui/Avatar.vue';
 import type { Tweet } from '~~/shared/types/tweets';
-import { relativeTime } from '~/utils/index';
+import { relativeTime, formatDate } from '~/utils/index';
 import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
 interface Props {
@@ -87,9 +87,12 @@ const contentSegments = computed<Segment[]>(() => {
         }}</span>
         <span class="text-muted-foreground" v-text="'@' + props.tweet.author.username" />
         <span class="text-muted-foreground">·</span>
-        <time :datetime="props.tweet.createdAt" class="text-muted-foreground">{{
-          relativeTime(props.tweet.createdAt)
-        }}</time>
+        <time
+          :title="formatDate(props.tweet.createdAt)"
+          :datetime="props.tweet.createdAt"
+          class="text-muted-foreground hover:cursor-pointer hover:underline"
+          >{{ relativeTime(props.tweet.createdAt) }}</time
+        >
       </div>
 
       <!-- Content -->
