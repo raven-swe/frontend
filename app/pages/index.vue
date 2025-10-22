@@ -1,7 +1,21 @@
 <script setup lang="ts">
 import Button from '~/components/ui/Button.vue';
+import { useGoogleAuth } from '~/composables/useGoogleAuth';
+
 definePageMeta({
   layout: false, // Disable layout for this page
+});
+
+const { initializeGoogleButton } = useGoogleAuth();
+
+onMounted(() => {
+  // Wait for Google script to load
+  const checkGoogle = setInterval(() => {
+    if (window.google) {
+      initializeGoogleButton('google-signin-btn');
+      clearInterval(checkGoogle);
+    }
+  }, 100);
 });
 </script>
 
@@ -23,9 +37,8 @@ definePageMeta({
               <Button id="github-signin" variant="outline" class="w-75">{{
                 $t('root.auth.github-signin')
               }}</Button>
-              <Button id="google-signin" variant="outline" class="w-75">{{
-                $t('root.auth.google-signin')
-              }}</Button>
+              <!-- Google's rendered button will appear here -->
+              <div id="google-signin-btn" class="flex justify-start"></div>
             </div>
             <div class="flex max-w-75 items-center justify-center gap-2 py-2">
               <div class="w-full border-b-1" />
