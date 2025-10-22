@@ -96,7 +96,7 @@ export const useProfileSetupFlow = () => {
         });
       }
 
-      console.log('Profile setup completed successfully!');
+      // console.log('Profile setup completed successfully!');
     } catch (error) {
       console.error('Failed to submit profile:', error);
     } finally {

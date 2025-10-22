@@ -26,8 +26,6 @@ export const handlers = [
     try {
       const body = (await request.json()) as UpdateProfileRequest;
 
-      // console.log('Mock: Updating profile with data:', body);
-
       // Update the mock user data with new values
       if (body.displayName !== undefined) {
         mockUserData.displayName = body.displayName;

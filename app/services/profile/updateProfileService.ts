@@ -3,8 +3,6 @@ import type { ApiSuccessResponse } from '~~/types/api';
 
 export const updateProfileService = () => {
   const updateProfile = async (profileData: UpdateProfileRequest): Promise<UserData> => {
-    console.log('Updating profile with data:', profileData);
-
     try {
       const response = await $fetch<ApiSuccessResponse<UserData>>('/api/me', {
         method: 'PATCH',

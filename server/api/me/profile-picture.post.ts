@@ -9,13 +9,14 @@ const API_URL = process.env.BACKEND_URL;
 
 export default defineEventHandler(async (event) => {
   try {
-    const body = await readBody<FormData>(event);
-
     const response = await $fetch<ApiSuccessResponse<{ success: boolean; message: string }>>(
       `${API_URL}/me/profile-picture`,
       {
         method: 'POST',
-        body,
+        body: event.node.req,
+        headers: {
+          'content-type': event.node.req.headers['content-type']!,
+        },
       },
     );
 
