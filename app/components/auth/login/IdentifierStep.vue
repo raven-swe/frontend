@@ -101,7 +101,9 @@ const [_identifier, identifierAttrs] = defineField('identifier');
       </UiButton>
       <p class="mt-6">
         {{ $t('root.auth.dont-have-account') }}
-        <NuxtLink to="/auth/signup" class="text-primary"> {{ $t('root.auth.signup') }} </NuxtLink>
+        <NuxtLink to="/auth/signup" class="text-primary" data-testid="signup-link">
+          {{ $t('root.auth.signup') }}
+        </NuxtLink>
       </p>
       <!-- <Transition name="fade"
         ><p v-if="error" class="mt-3 text-red-500">{{ error }}</p></Transition
