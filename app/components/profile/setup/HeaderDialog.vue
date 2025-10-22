@@ -6,7 +6,7 @@ const props = defineProps<{
 }>();
 
 interface Emits {
-  (e: 'submit', image: string | null): void;
+  (e: 'submit', image: File | null): void;
   (e: 'update:open', value: boolean): void;
 }
 const emit = defineEmits<Emits>();
@@ -18,6 +18,7 @@ const name = 'Habiba Ayman'; // TODO: actually fetch after auth is done
 
 const fileInputRef = ref<HTMLInputElement | null>(null);
 const selectedImage = ref<string | null>(null);
+const selectedFile = ref<File | null>(null);
 
 const actionButton = computed(() => {
   const hasImage = !!selectedImage.value;
@@ -36,6 +37,7 @@ const handleFileChange = (event: Event) => {
   const file = target.files?.[0];
 
   if (file && file.type.startsWith('image/')) {
+    selectedFile.value = file;
     const reader = new FileReader();
     reader.onload = (e) => {
       selectedImage.value = e.target?.result as string;
@@ -45,7 +47,7 @@ const handleFileChange = (event: Event) => {
 };
 
 const handleSubmit = () => {
-  emit('submit', selectedImage.value);
+  emit('submit', selectedFile.value);
 };
 
 const handleOpenChange = (value: boolean) => {
@@ -53,6 +55,7 @@ const handleOpenChange = (value: boolean) => {
   if (!value) {
     // Reset on close
     selectedImage.value = null;
+    selectedFile.value = null;
   }
 };
 </script>
@@ -104,7 +107,7 @@ const handleOpenChange = (value: boolean) => {
         <!-- Profile Section -->
         <div class="flex flex-col items-center gap-3 self-start px-10">
           <img
-            :src="formData.profilePicture || '/default_profile.png'"
+            :src="formData.avatarUrl || '/default_profile.png'"
             class="h-25 w-25 rounded-full object-cover"
           />
           <div>

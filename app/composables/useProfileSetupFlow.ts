@@ -1,10 +1,12 @@
 import { computed } from 'vue';
+import { updateProfileService } from '~/services/profile/updateProfileService';
 
 type SetupStep = 'picture' | 'header' | 'bio' | 'location' | 'complete';
 
 interface ProfileSetupData {
-  profilePicture: string | null;
-  header: string | null;
+  profilePicture: File | null;
+  avatarUrl: string | null;
+  header: File | null;
   bio: string | null;
   location: string | null;
 }
@@ -15,10 +17,13 @@ export const useProfileSetupFlow = () => {
 
   const formData = useState<ProfileSetupData>('profileSetup-formData', () => ({
     profilePicture: null,
+    avatarUrl: null,
     header: null,
     bio: '',
     location: '',
   }));
+
+  const { updateProfile, updateProfilePicture, updateHeaderImage } = updateProfileService();
 
   const stepOrder: SetupStep[] = ['picture', 'header', 'bio', 'location', 'complete'];
 
@@ -34,11 +39,15 @@ export const useProfileSetupFlow = () => {
     }
   };
 
-  const setProfilePicture = (image: string | null) => {
+  const setProfilePicture = (image: File | null) => {
     formData.value.profilePicture = image;
   };
 
-  const setHeader = (header: string | null) => {
+  const setAvatarUrl = (url: string | null) => {
+    formData.value.avatarUrl = url;
+  };
+
+  const setHeader = (header: File | null) => {
     formData.value.header = header;
   };
 
@@ -58,6 +67,7 @@ export const useProfileSetupFlow = () => {
   const resetFlow = () => {
     formData.value = {
       profilePicture: null,
+      avatarUrl: null,
       header: null,
       bio: '',
       location: '',
@@ -67,12 +77,32 @@ export const useProfileSetupFlow = () => {
   };
 
   const submitProfile = async () => {
-    // API call to save all data
-    // eslint-disable-next-line no-console
-    console.log('Final profile data:', formData.value);
+    try {
+      // Update profile picture if provided
+      if (formData.value.profilePicture) {
+        await updateProfilePicture(formData.value.profilePicture);
+      }
 
-    // After successful submission
-    resetFlow();
+      // Update header image if provided
+      if (formData.value.header) {
+        await updateHeaderImage(formData.value.header);
+      }
+
+      // Update bio and location
+      if (formData.value.bio || formData.value.location) {
+        await updateProfile({
+          bio: formData.value.bio || undefined,
+          location: formData.value.location || undefined,
+        });
+      }
+
+      console.log('Profile setup completed successfully!');
+    } catch (error) {
+      console.error('Failed to submit profile:', error);
+    } finally {
+      // After successful submission
+      resetFlow();
+    }
   };
 
   // Computed properties for checking which dialog should be open
@@ -109,6 +139,7 @@ export const useProfileSetupFlow = () => {
     startFlow,
     nextStep,
     setProfilePicture,
+    setAvatarUrl,
     setHeader,
     setBio,
     setLocation,

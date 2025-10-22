@@ -6,13 +6,14 @@ const props = defineProps<{
 }>();
 
 interface Emits {
-  (e: 'submit', image: string | null): void;
+  (e: 'submit', data: { file: File | null; dataUrl: string | null }): void;
   (e: 'update:open', value: boolean): void;
 }
 const emit = defineEmits<Emits>();
 
 const fileInputRef = ref<HTMLInputElement | null>(null);
 const selectedImage = ref<string | null>(null);
+const selectedFile = ref<File | null>(null);
 
 const actionButton = computed(() => {
   const hasImage = !!selectedImage.value;
@@ -31,6 +32,7 @@ const handleFileChange = (event: Event) => {
   const file = target.files?.[0];
 
   if (file && file.type.startsWith('image/')) {
+    selectedFile.value = file;
     const reader = new FileReader();
     reader.onload = (e) => {
       selectedImage.value = e.target?.result as string;
@@ -40,7 +42,10 @@ const handleFileChange = (event: Event) => {
 };
 
 const handleSubmit = () => {
-  emit('submit', selectedImage.value);
+  emit('submit', {
+    file: selectedFile.value,
+    dataUrl: selectedImage.value,
+  });
 };
 
 const handleOpenChange = (value: boolean) => {
@@ -48,6 +53,7 @@ const handleOpenChange = (value: boolean) => {
   if (!value) {
     // Reset on close
     selectedImage.value = null;
+    selectedFile.value = null;
   }
 };
 </script>

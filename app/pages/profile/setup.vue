@@ -18,6 +18,7 @@ const {
   isConfirmationDialogOpen,
   nextStep,
   setProfilePicture,
+  setAvatarUrl,
   setHeader,
   setBio,
   setLocation,
@@ -25,12 +26,13 @@ const {
   submitProfile,
 } = useProfileSetupFlow();
 
-const handleProfilePictureSubmit = (image: string | null) => {
-  setProfilePicture(image);
+const handleProfilePictureSubmit = (data: { file: File | null; dataUrl: string | null }) => {
+  setProfilePicture(data.file);
+  setAvatarUrl(data.dataUrl);
   nextStep();
 };
 
-const handleHeaderSubmit = (header: string | null) => {
+const handleHeaderSubmit = (header: File | null) => {
   setHeader(header);
   nextStep();
 };
