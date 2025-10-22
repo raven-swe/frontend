@@ -1,14 +1,14 @@
-import { serverApiFetch } from '~~/server/utils/api';
+import * as cookie from 'cookie';
 
 export default defineEventHandler(async (event) => {
-  const cookie = getHeader(event, 'cookie');
+  const clientCookie = getHeader(event, 'cookie');
   const response = await serverApiFetch.raw<ApiSuccessResponse<{ accessToken: string }>>(
     '/auth/refresh-token',
     {
       method: 'POST',
       credentials: 'include',
       headers: {
-        ...(cookie ? { cookie } : {}), // Forward client cookies
+        ...(clientCookie ? { cookie: clientCookie } : {}), // Forward client cookies
       },
     },
   );
@@ -17,5 +17,18 @@ export default defineEventHandler(async (event) => {
   cookies.forEach((cookie) => {
     appendHeader(event, 'set-cookie', cookie);
   });
+
+  if (response._data?.data.accessToken) {
+    appendHeader(
+      event,
+      'set-cookie',
+      cookie.serialize('access_token', response._data?.data.accessToken, {
+        path: '/',
+        maxAge: 60 * 5,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+      }),
+    );
+  }
   return response._data;
 });
