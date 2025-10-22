@@ -6,7 +6,7 @@ export default function useDateSelect(
   initialDate?: Date,
 ) {
   const selectedMonth = ref<number | undefined>(
-    initialDate ? initialDate.getMonth() - 1 : undefined,
+    initialDate ? initialDate.getMonth() + 1 : undefined,
   );
   const selectedDay = ref<number | undefined>(initialDate ? initialDate.getDate() : undefined);
   const selectedYear = ref<number | undefined>(initialDate ? initialDate.getFullYear() : undefined);
