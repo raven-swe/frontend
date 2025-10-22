@@ -47,41 +47,6 @@ export const handlers = [
     );
   }),
 
-  http.post(`${API_URL}/auth/refresh-token`, async ({ request }) => {
-    const { refreshToken } = (await request.json()) as { refreshToken: string };
-    if (!refreshToken) {
-      return HttpResponse.json(
-        { success: false, error: { message: 'No refresh token provided', code: 'NO_TOKEN' } },
-        { status: 400 },
-      );
-    }
-
-    try {
-      const decoded = jwt.verify(refreshToken, 'refresh_secret') as { username: string };
-      const user = mockUsers.find((u) => u.username === decoded.username);
-      if (!user) {
-        return HttpResponse.json(
-          { success: false, error: { message: 'User not found', code: 'USER_NOT_FOUND' } },
-          { status: 404 },
-        );
-      }
-
-      return HttpResponse.json(
-        {
-          success: true,
-          message: 'Token refreshed',
-          data: { accessToken: generateAuthToken(user) },
-        },
-        { status: 200 },
-      );
-    } catch {
-      return HttpResponse.json(
-        { success: false, error: { message: 'Invalid refresh token', code: 'INVALID_TOKEN' } },
-        { status: 401 },
-      );
-    }
-  }),
-
   http.post(`${API_URL}/auth/register/start`, async ({ request }) => {
     const body = (await request.json()) as
       | {
