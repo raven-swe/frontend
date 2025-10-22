@@ -52,6 +52,7 @@
     "@vue/test-utils": "^2.4.6",
     "@vueuse/core": "^13.9.0",
     "@vueuse/nuxt": "^13.9.0",
+    "cookie": "^1.0.2",
     "eslint": "^9.37.0",
     "eslint-plugin-regex": "^1.10.0",
     "happy-dom": "^19.0.2",
