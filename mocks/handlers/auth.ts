@@ -81,7 +81,6 @@ export const handlers = [
   }),
 
   http.get(`${API_URL}/auth/dummy-protected-resource`, ({ request }) => {
-    console.log(request.headers.get('Authorization'));
     const authHeader = request.headers.get('Authorization');
     const token = authHeader?.split(' ')[1];
     if (!authHeader || !token || !authHeader.startsWith('Bearer ')) {

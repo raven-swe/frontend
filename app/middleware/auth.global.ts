@@ -1,7 +1,5 @@
 import { apiFetch } from '~/api';
-import { isAuthenticated } from '~/services/auth/authService';
-import * as cookieUtil from 'cookie';
-import type { CookieOptions } from '#app';
+import { isAuthenticated, parseSetCookie } from '~/services/auth/authService';
 
 // Public routes that don’t require auth
 const publicRoutes = ['/', '/forget-password', '/playground/dummy-login'];
@@ -20,29 +18,18 @@ export default defineNuxtRouteMiddleware(async (to) => {
     // try to authenticate using refresh token
     try {
       if (import.meta.server) {
-        const event = useRequestEvent();
-        if (!event) throw new Error('No event in route middleware');
         const response = await $fetch.raw('/api/auth/refresh-token', {
           method: 'POST',
           credentials: 'include',
         });
-        const cookies = response.headers.getSetCookie?.();
-        cookies?.forEach((cookie) => {
-          const parsed = cookieUtil.parse(cookie, {
-            decode: (val) => val,
-          });
-          if (parsed.access_token) {
-            const access_token = useCookie('access_token', {
-              ...(parsed['Max-Age'] ? { maxAge: parseInt(parsed['Max-Age'], 10) } : {}),
-              ...(parsed.Expires ? { expires: new Date(parsed.Expires) } : {}),
-              ...(parsed.Path ? { path: parsed.Path } : {}),
-              ...(parsed.SameSite
-                ? { sameSite: parsed.SameSite as CookieOptions['sameSite'] }
-                : {}),
-            });
-            access_token.value = parsed.access_token;
+        const setCookies = response.headers.getSetCookie?.();
+        for (const rawCookie of setCookies) {
+          const { name, value, options } = parseSetCookie(rawCookie);
+          if (name === 'access_token' || name === 'refresh_token') {
+            const cookie = useCookie(name, options);
+            cookie.value = value;
           }
-        });
+        }
       } else if (import.meta.client) {
         await apiFetch('/api/auth/refresh-token', {
           method: 'POST',
