@@ -1,12 +1,13 @@
-export default defineEventHandler(async (_event) => {
+export default defineEventHandler(async (event) => {
   // This is a dummy protected resource that requires authentication
+  const headers = getHeaders(event);
   const response = await serverApiFetch<ApiSuccessResponse<{ data: string }>>(
     '/auth/dummy-protected-resource',
     {
       method: 'GET',
       credentials: 'include',
       headers: {
-        Authorization: `${_event.node.req.headers.authorization}`,
+        Authorization: headers['authorization'] || '',
       },
     },
   );
