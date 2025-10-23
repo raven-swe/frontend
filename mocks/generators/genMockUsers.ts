@@ -2,11 +2,11 @@ import { faker } from '@faker-js/faker';
 import type { User } from '#shared/types/user';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url'; // ✅ Add this
+import { fileURLToPath } from 'url';
 
-// ✅ Properly resolve __dirname for ESM
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 export function generateMockUser(): User {
   return {
     username: faker.internet.username(),
@@ -41,4 +41,4 @@ if (!fs.existsSync(outputDir)) {
 
 const outputPath = path.join(outputDir, 'mock-users.json');
 fs.writeFileSync(outputPath, JSON.stringify(mockUsers, null, 2));
-console.log(`✅ Mock users written to ${outputPath}`);
+console.log(`Mock users written to ${outputPath}`);

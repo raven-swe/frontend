@@ -63,7 +63,8 @@ input::placeholder {
 }
 /* style webkit autofill */
 input:-webkit-autofill {
-  -webkit-box-shadow: 0 0 0 30px var(--color-input) inset !important;
+  -webkit-box-shadow: 0 0 0 30px var(--color-input-autofill) inset !important;
   -webkit-text-fill-color: var(--color-foreground) !important;
+  color: var(--color-foreground);
 }
 </style>

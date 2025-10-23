@@ -35,7 +35,6 @@ export interface ApiValidationErrorResponse extends ApiResponseBase {
     message?: string;
     errors: {
       field: string;
-      code?: string;
       message?: string;
     }[];
   };

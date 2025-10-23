@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import { mkdirSync, writeFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import type { Tweet } from '../../types/tweets';
+import type { Tweet } from '../../shared/types/tweets';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
