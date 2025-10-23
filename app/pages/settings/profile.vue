@@ -73,7 +73,8 @@ const hasUnsavedChanges = computed(() => {
 });
 
 const handleSubmit = async () => {
-  handleDialogClose();
+  router.push('/profile'); // optimistically navigate away
+
   if (!hasUnsavedChanges.value) return;
 
   // send all the data to be updated
@@ -98,12 +99,12 @@ const handleSubmit = async () => {
 
 const handleDiscard = () => {
   openDiscardDialog.value = false;
-  router.push('/profile/');
+  router.push('/profile');
 };
 
 const handleDialogClose = () => {
   if (!hasUnsavedChanges.value) {
-    router.push('/profile/');
+    router.push('/profile');
     return;
   }
   openDiscardDialog.value = true;
