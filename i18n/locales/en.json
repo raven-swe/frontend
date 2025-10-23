@@ -60,6 +60,14 @@
       "location-desc": "Find accounts in the same location as you.",
       "click-to-save": "Click to save updates",
       "confirmation-dialog": "confirmation Dialog"
+    },
+    "edit": {
+      "edit-profile": "Edit profile",
+      "name": "Name",
+      "bio": "Bio",
+      "location": "Location",
+      "website": "Website",
+      "birth-date": "Birth date"
     }
   },
   "playground": {
