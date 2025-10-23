@@ -1,13 +1,21 @@
 <script setup lang="ts">
 import { useUserStore } from '@/stores/user';
+import { updateProfileService } from '~/services/profile/updateProfileService';
 
 definePageMeta({
   layout: 'profile',
 });
-const userStore = useUserStore().user;
+const route = useRoute();
+const router = useRouter();
 
-const fileInputRef = ref<HTMLInputElement | null>(null);
-const profileFileInputRef = ref<HTMLInputElement | null>(null);
+// Control dialog open state based on route
+const isDialogOpen = computed(() => route.path === '/settings/profile');
+
+const userStore = useUserStore().user;
+const { updateProfile, updateProfilePicture, updateHeaderImage } = updateProfileService();
+
+const bannerFileInput = ref<HTMLInputElement | null>(null);
+const profileFileInput = ref<HTMLInputElement | null>(null);
 
 // Initialize with existing user data
 const selectedImage = ref<string | null>(userStore.bannerUrl || null);
@@ -18,11 +26,11 @@ const location = ref<string>(userStore.location || '');
 const website = ref<string>(userStore.websiteUrl || '');
 
 const handleImageClick = () => {
-  fileInputRef.value?.click();
+  bannerFileInput.value?.click();
 };
 
 const handleProfileImageClick = () => {
-  profileFileInputRef.value?.click();
+  profileFileInput.value?.click();
 };
 
 const handleFileChange = (event: Event) => {
@@ -62,14 +70,36 @@ const hasUnsavedChanges = computed(() => {
   );
 });
 
-const handleSubmit = () => {
-  // send all the data to be updated
+const handleSubmit = async () => {
+  handleDialogClose();
   if (!hasUnsavedChanges.value) return;
+
+  // send all the data to be updated
+  if (bannerFileInput.value?.files?.[0]) {
+    console.log('updating banner image');
+    await updateHeaderImage(bannerFileInput.value.files[0]);
+  }
+
+  if (profileFileInput.value?.files?.[0]) {
+    await updateProfilePicture(profileFileInput.value.files[0]);
+  }
+
+  // at least one of the text fields has changed
+  await updateProfile({
+    displayName: name.value,
+    bio: bio.value,
+    location: location.value,
+    websiteUrl: website.value,
+  });
+};
+
+const handleDialogClose = () => {
+  router.push('/profile/');
 };
 </script>
 
 <template>
-  <UiDialog :open="true">
+  <UiDialog :open="isDialogOpen">
     <UiDialogContent
       header-class="flex items-center justify-between px-4"
       class="h-auto !w-[650px] !max-w-[650px] !p-0"
@@ -106,7 +136,7 @@ const handleSubmit = () => {
             <Icon name="lucide:camera" class="text-white" size="1.2rem" />
           </button>
           <input
-            ref="fileInputRef"
+            ref="bannerFileInput"
             type="file"
             accept="image/*"
             class="hidden"
@@ -130,7 +160,7 @@ const handleSubmit = () => {
               <Icon name="lucide:camera" class="text-white" size="1rem" />
             </button>
             <input
-              ref="profileFileInputRef"
+              ref="profileFileInput"
               type="file"
               accept="image/*"
               class="hidden"
