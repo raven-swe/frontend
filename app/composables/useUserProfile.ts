@@ -1,9 +1,11 @@
+import type { UserProfile } from '~~/shared/types/user';
+
 export const useUserProfile = (username: string) => {
   const {
     data: userProfile,
     error,
     pending,
-  } = useFetch<User>(`/api/profile/${username}`, {
+  } = useFetch<UserProfile>(`/api/profile/${username}`, {
     key: `user-profile-${username}`,
   });
   return {
