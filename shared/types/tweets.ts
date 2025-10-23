@@ -14,7 +14,7 @@ type TweetHashtag = {
   hashtag: string;
   startPosition: number;
 };
-type TweetMedia = {
+export type TweetMedia = {
   type: 'IMAGE' | 'VIDEO' | 'GIF';
   url: string;
   altText: string;

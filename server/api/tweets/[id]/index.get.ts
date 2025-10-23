@@ -1,5 +1,5 @@
 import { FetchError } from 'ofetch';
-import type { Tweet } from '~~/types/tweets';
+import type { Tweet } from '~~/shared/types/tweets';
 
 interface ApiError {
   message: string;
