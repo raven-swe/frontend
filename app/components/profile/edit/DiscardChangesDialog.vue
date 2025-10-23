@@ -37,7 +37,7 @@ const handleOpenChange = (value: boolean) => {
           {{ $t('profile.edit.discard-changes-desc') }}
         </UiDialogDescription>
       </UiDialogHeader>
-      <div class="flex flex-col gap-2 px-6 pb-6">
+      <div class="flex flex-col gap-2">
         <UiButton variant="destructive" class="w-full" size="lg" @click="handleDiscard">
           {{ $t('ui.discard') }}
         </UiButton>
