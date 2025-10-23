@@ -22,7 +22,7 @@ const { defineField, handleSubmit, resetForm, isSubmitting, meta } = useForm({
 
 const onSubmit = handleSubmit(async (values) => {
   try {
-    const success = await loginStore.checkIdentifierExists(values.identifier.trim());
+    const success = await loginStore.checkUserExists(values.identifier.trim());
     if (!success) {
       throw new Error($t('errors.USER_NOT_FOUND'));
     }
