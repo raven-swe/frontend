@@ -28,17 +28,17 @@ const handleOpenChange = (value: boolean) => {
 
 <template>
   <UiDialog :open="open" class="z-50" @update:open="handleOpenChange">
-    <UiDialogContent class="!h-auto !w-[320px] !max-w-[320px] !p-0">
-      <UiDialogHeader class="px-2 pt-0 pb-2">
+    <UiDialogContent class="!h-auto !w-[320px] !max-w-[320px] !p-0" :hide-close-button="true">
+      <UiDialogHeader class="p-2">
         <UiDialogTitle>
-          <h2 class="text-2xl font-bold">{{ $t('profile.edit.discard-changes') }}</h2>
+          <h2 class="text-xl font-bold">{{ $t('profile.edit.discard-changes') }}</h2>
         </UiDialogTitle>
         <UiDialogDescription class="text-muted-foreground text-start text-sm">
           {{ $t('profile.edit.discard-changes-desc') }}
         </UiDialogDescription>
       </UiDialogHeader>
 
-      <div class="flex flex-col gap-2 px-6 pb-6">
+      <div class="flex flex-col gap-2">
         <UiButton variant="destructive" class="w-full" size="lg" @click="handleDiscard">
           {{ $t('ui.discard') }}
         </UiButton>
