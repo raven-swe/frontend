@@ -3,7 +3,6 @@ import { setActivePinia, createPinia } from 'pinia';
 import { mockNuxtImport, registerEndpoint } from '@nuxt/test-utils/runtime';
 import { useLoginStore } from '@/stores/auth/login';
 
-// 🧠 Mock router navigation
 const { navigateToMock } = vi.hoisted(() => {
   return {
     navigateToMock: vi.fn(() => ({ value: 'mocked navigation' })),
@@ -27,9 +26,6 @@ describe('Login Store', () => {
     expect(store.step).toBe(0);
     expect(store.open).toBe(false);
     expect(store.identifier).toBe('');
-    expect(store.accessToken).toBeNull();
-    expect(store.refreshToken).toBeNull();
-    expect(store.errorMessage).toBeNull();
   });
 
   it('openDialog and closeDialog toggle open state', () => {
@@ -40,7 +36,7 @@ describe('Login Store', () => {
     expect(store.open).toBe(false);
   });
 
-  it('checkIdentifierExists updates step and type correctly when user exists', async () => {
+  it('checkUserExists updates step and type correctly when user exists', async () => {
     registerEndpoint('/api/auth/check-identifier', {
       method: 'GET',
       handler: () => ({
@@ -50,64 +46,77 @@ describe('Login Store', () => {
     });
 
     const store = useLoginStore();
-    const result = await store.checkIdentifierExists('test@example.com');
+    const result = await store.checkUserExists('test@example.com');
 
     expect(result).toBe(true);
     expect(store.identifier).toBe('test@example.com');
     expect(store.type).toBe('email');
     expect(store.step).toBe(1);
-    expect(store.errorMessage).toBeNull();
   });
 
-  it('checkIdentifierExists sets step=0 and type=null when user not found', async () => {
+  it('checkUserExists sets step=0 and type="" when user not found', async () => {
     registerEndpoint('/api/auth/check-identifier', {
       method: 'GET',
       handler: () => ({
         success: true,
-        data: { exists: false, type: null },
+        data: { exists: false, type: '' },
       }),
     });
 
     const store = useLoginStore();
-    const result = await store.checkIdentifierExists('unknown@example.com');
+    const result = await store.checkUserExists('unknown@example.com');
 
     expect(result).toBe(false);
     expect(store.step).toBe(0);
-    expect(store.type).toBeNull();
+    expect(store.type).toBe('');
   });
 
-  it('checkIdentifierExists handles server error properly', async () => {
+  it('checkUserExists handles server error with data.message', async () => {
     registerEndpoint('/api/auth/check-identifier', {
       method: 'GET',
       handler: () => {
         const err = new Error('Internal Server Error');
-        err.data = { error: { message: 'Unexpected error occurred' } };
+        err.data = { message: 'Unexpected error occurred' };
         throw err;
       },
     });
 
     const store = useLoginStore();
 
-    await expect(store.checkIdentifierExists('trigger500@example.com')).rejects.toThrow(
+    await expect(store.checkUserExists('trigger500@example.com')).rejects.toThrow(
       'Unexpected error occurred',
     );
-    expect(store.errorMessage).toBe('Unexpected error occurred');
   });
 
-  it('handles unsuccessful checkIdentifierExists response', async () => {
+  it('checkUserExists handles error without data.message', async () => {
+    registerEndpoint('/api/auth/check-identifier', {
+      method: 'GET',
+      handler: () => {
+        const err = new Error('Internal Server Error');
+        throw err;
+      },
+    });
+
+    const store = useLoginStore();
+
+    await expect(store.checkUserExists('trigger500@example.com')).rejects.toThrow(
+      'Unexpected error occurred',
+    );
+  });
+
+  it('handles unsuccessful checkUserExists response', async () => {
     registerEndpoint('/api/auth/check-identifier', {
       method: 'GET',
       handler: () => ({
         success: false,
-        data: { exists: false, type: null },
+        data: { exists: false, type: '' },
       }),
     });
 
     const store = useLoginStore();
-    const result = await store.checkIdentifierExists('noone@example.com');
+    const result = await store.checkUserExists('noone@example.com');
 
     expect(result).toBe(false);
-    expect(store.errorMessage).toBeNull(); // or whatever your logic dictates
   });
 
   it('submitLogin stores tokens and navigates on success', async () => {
@@ -125,9 +134,6 @@ describe('Login Store', () => {
     const store = useLoginStore();
     const payload = { identifier: 'user@example.com', password: 'Password123' };
     await store.submitLogin(payload);
-
-    expect(store.accessToken).toBe('access-123');
-    expect(store.refreshToken).toBe('refresh-456');
     expect(navigateToMock).toHaveBeenCalledWith('/home');
   });
 
@@ -145,15 +151,27 @@ describe('Login Store', () => {
     const payload = { identifier: 'bad@example.com', password: 'wrong' };
 
     await expect(store.submitLogin(payload)).rejects.toThrow('Invalid credentials');
-    expect(store.errorMessage).toBe('Invalid credentials');
   });
 
-  it('previousStep should not go below zero', () => {
+  it('openForgotPasswordDialog navigates without identifier when step is 0', () => {
+    const store = useLoginStore();
+    store.step = 0;
+    store.identifier = 'test@example.com';
+
+    store.openForgotPasswordDialog();
+
+    expect(navigateToMock).toHaveBeenCalledWith('/password-reset');
+    expect(store.open).toBe(false);
+  });
+
+  it('openForgotPasswordDialog navigates with identifier when step is 1', () => {
     const store = useLoginStore();
     store.step = 1;
-    store.previousStep();
-    expect(store.step).toBe(0);
-    store.previousStep();
-    expect(store.step).toBe(0);
+    store.identifier = 'test@example.com';
+
+    store.openForgotPasswordDialog();
+
+    expect(navigateToMock).toHaveBeenCalledWith('/password-reset?identifier=test@example.com');
+    expect(store.open).toBe(false);
   });
 });

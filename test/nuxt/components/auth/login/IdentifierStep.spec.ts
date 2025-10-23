@@ -106,7 +106,7 @@ describe('IdentifierStep.vue', () => {
   });
 
   it('successfully submits valid identifier', async () => {
-    vi.spyOn(loginStore, 'checkIdentifierExists').mockResolvedValue(true);
+    vi.spyOn(loginStore, 'checkUserExists').mockResolvedValue(true);
 
     const input = wrapper.find('input[name="identifier"]');
     await input.setValue('test@example.com');
@@ -122,11 +122,11 @@ describe('IdentifierStep.vue', () => {
     await nextTick();
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    expect(loginStore.checkIdentifierExists).toHaveBeenCalledWith('test@example.com');
+    expect(loginStore.checkUserExists).toHaveBeenCalledWith('test@example.com');
   });
 
   it('shows error when user is not found', async () => {
-    vi.spyOn(loginStore, 'checkIdentifierExists').mockResolvedValue(false);
+    vi.spyOn(loginStore, 'checkUserExists').mockResolvedValue(false);
 
     const input = wrapper.find('input[name="identifier"]');
     await input.setValue('notfound@example.com');
@@ -146,7 +146,7 @@ describe('IdentifierStep.vue', () => {
   });
 
   it('handles generic error during submission', async () => {
-    vi.spyOn(loginStore, 'checkIdentifierExists').mockRejectedValue(new Error('Network error'));
+    vi.spyOn(loginStore, 'checkUserExists').mockRejectedValue(new Error('Network error'));
 
     const input = wrapper.find('input[name="identifier"]');
     await input.setValue('test@example.com');
@@ -166,7 +166,7 @@ describe('IdentifierStep.vue', () => {
   });
 
   it('handles error without message', async () => {
-    vi.spyOn(loginStore, 'checkIdentifierExists').mockRejectedValue({});
+    vi.spyOn(loginStore, 'checkUserExists').mockRejectedValue({});
 
     const input = wrapper.find('input[name="identifier"]');
     await input.setValue('test@example.com');
@@ -195,7 +195,7 @@ describe('IdentifierStep.vue', () => {
   });
 
   it('trims whitespace from identifier before submission', async () => {
-    vi.spyOn(loginStore, 'checkIdentifierExists').mockResolvedValue(true);
+    vi.spyOn(loginStore, 'checkUserExists').mockResolvedValue(true);
 
     const input = wrapper.find('input[name="identifier"]');
     await input.setValue('  test@example.com  ');
@@ -211,7 +211,7 @@ describe('IdentifierStep.vue', () => {
     await nextTick();
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    expect(loginStore.checkIdentifierExists).toHaveBeenCalledWith('test@example.com');
+    expect(loginStore.checkUserExists).toHaveBeenCalledWith('test@example.com');
   });
 
   it('enables submit button when form is valid', async () => {
