@@ -15,6 +15,7 @@ RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
 
 # Copy the rest of the application code
 COPY . .
+RUN pnpm mock:gen:tweets
 
 # Build Nuxt (SSR)
 RUN pnpm build
