@@ -8,6 +8,19 @@ definePageMeta({
 
 const { initializeGoogleButton } = useGoogleAuth();
 
+const githubClientId = 'Ov23liEaroEKXCEZJXiK';
+const githubRedirectUri = 'http://localhost:5173/auth/callback/github';
+const githubScope = 'read:user user:email';
+
+function handleGithubSignIn() {
+  const params = new URLSearchParams({
+    client_id: githubClientId,
+    redirect_uri: githubRedirectUri,
+    scope: githubScope,
+  });
+  window.location.href = `https://github.com/login/oauth/authorize?${params.toString()}`;
+}
+
 onMounted(() => {
   // Wait for Google script to load
   const checkGoogle = setInterval(() => {
@@ -34,11 +47,15 @@ onMounted(() => {
         <main>
           <section>
             <div class="flex flex-col gap-4">
-              <Button id="github-signin" variant="outline" class="w-75">{{
-                $t('root.auth.github-signin')
-              }}</Button>
+              <Button id="github-signin" variant="outline" class="w-75" @click="handleGithubSignIn">
+                <Icon name="grommet-icons:github" />
+                {{ $t('root.auth.github-signin') }}</Button
+              >
               <!-- Google's rendered button will appear here -->
-              <div id="google-signin-btn" class="flex justify-start"></div>
+              <Button id="google-signin-btn" variant="outline" class="w-75">
+                <Icon name="material-icon-theme:google" />
+                {{ $t('root.auth.google-signin') }}</Button
+              >
             </div>
             <div class="flex max-w-75 items-center justify-center gap-2 py-2">
               <div class="w-full border-b-1" />

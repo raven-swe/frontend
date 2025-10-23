@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Tweet } from '~~/types/tweets';
+import type { Tweet } from '~~/shared/types/tweets';
 const tweets = ref<Tweet[]>([]);
 
 const { data: tweetsData, error } = useFetch<{ data: Tweet[] }>('/api/tweets');

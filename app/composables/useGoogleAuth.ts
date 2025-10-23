@@ -1,39 +1,32 @@
+import type { CodeClient } from '~~/shared/types/google';
+
 export const useGoogleAuth = () => {
   const config = useRuntimeConfig();
+  const router = useRouter();
+  let codeClient: CodeClient | null = null;
 
   const initializeGoogleButton = (elementId: string) => {
-    if (!window.google) {
-      console.error('Google Identity Services not loaded');
+    if (!window.google || !window.google.accounts?.oauth2) {
+      console.error('Google OAuth2 not loaded');
       return;
     }
 
-    window.google.accounts.id.initialize({
+    codeClient = window.google.accounts.oauth2.initCodeClient({
       client_id: config.public.googleClientId as string,
-      callback: handleCredentialResponse,
+      scope: 'openid email profile',
+      ux_mode: 'popup',
+      callback: handleCodeResponse,
     });
 
-    // Render the Google Sign-In button
-    window.google.accounts.id.renderButton(document.getElementById(elementId)!, {
-      theme: 'outline',
-      size: 'large',
-      text: 'continue_with',
-      width: 300,
-      shape: 'pill',
-    });
+    const btn = document.getElementById(elementId);
+    if (btn) {
+      btn.onclick = () => codeClient?.requestCode();
+    }
   };
 
-  const handleCredentialResponse = async (response: GoogleCredentialResponse) => {
+  const handleCodeResponse = async (response: { code: string }) => {
     try {
-      // Send the token to  backend
-      //   console.log('Google Credential Response:', response.credential);
-      const result = await $fetch(`${config.public.backendUrl}/api/auth/google`, {
-        method: 'POST',
-        body: { token: response.credential },
-      });
-
-      // Handle successful authentication (store token, redirect)
-      // navigateTo('/home');
-      return result;
+      await router.push(`/auth/callback/google?code=${response.code}`);
     } catch (error) {
       console.error('Authentication failed:', error);
       throw error;
