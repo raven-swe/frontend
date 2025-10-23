@@ -124,4 +124,28 @@ describe('GET /api/auth/check-identifier', () => {
       statusMessage: 'Boom',
     });
   });
+
+  it('uses default status 500 when FetchError has no status', async () => {
+    const { FetchError } = await import('ofetch');
+    // @ts-expect-error - Mock FetchError accepts 3 parameters
+    fetchMock.mockRejectedValueOnce(new FetchError('fail', undefined, undefined));
+
+    const handler = (await import('../../../../server/api/auth/check-identifier.get')).default;
+
+    await expect(handler(makeEvent({ identifier: 'test@example.com' }))).rejects.toMatchObject({
+      statusCode: 500,
+      statusMessage: 'Internal Server Error',
+    });
+  });
+
+  it('throws fallback 500 with default message for non-Error exceptions', async () => {
+    fetchMock.mockRejectedValueOnce('string error');
+
+    const handler = (await import('../../../../server/api/auth/check-identifier.get')).default;
+
+    await expect(handler(makeEvent({ identifier: 'test@example.com' }))).rejects.toMatchObject({
+      statusCode: 500,
+      statusMessage: 'Internal Server Error',
+    });
+  });
 });
