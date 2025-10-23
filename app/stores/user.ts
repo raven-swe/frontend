@@ -24,7 +24,7 @@ export const useUserStore = defineStore('user', {
       bannerUrl: 'https://i.ibb.co/Z1Yx04kS/dfghj.webp',
       location: 'San Francisco, CA',
       websiteUrl: 'https://johndoe.dev',
-      birthDate: '7-05-2004',
+      birthDate: '2004-05-07',
       joinedAt: '2020-03-15T10:30:00Z',
       email: 'https://github.com/',
       phone: '+1234567890',

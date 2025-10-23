@@ -2,6 +2,7 @@
 import { useUserStore } from '@/stores/user';
 import { updateProfileService } from '~/services/profile/updateProfileService';
 import DiscardChangesDialog from '~/components/profile/edit/DiscardChangesDialog.vue';
+import useDateSelect from '@/composables/useDateSelect';
 
 definePageMeta({
   layout: 'profile',
@@ -9,7 +10,7 @@ definePageMeta({
 const route = useRoute();
 const router = useRouter();
 
-// Control dialog open state based on route
+// Control dialog open state based on current route
 const isDialogOpen = computed(() => route.path === '/settings/profile');
 const openDiscardDialog = ref(false);
 
@@ -26,6 +27,28 @@ const name = ref<string>(userStore.displayName || '');
 const bio = ref<string>(userStore.bio || '');
 const location = ref<string>(userStore.location || '');
 const website = ref<string>(userStore.websiteUrl || '');
+
+// Add birth date handling
+const birthDate = ref<Date | undefined>(
+  userStore.birthDate ? new Date(userStore.birthDate) : undefined,
+);
+// Initialize date selector with existing birth date
+const dateSelect = useDateSelect(
+  new Date().getFullYear() - 100,
+  new Date().getFullYear(),
+  birthDate.value,
+);
+watch(
+  [dateSelect.selectedDay, dateSelect.selectedMonth, dateSelect.selectedYear],
+  ([day, month, year]) => {
+    if (day && month && year) {
+      const newBirthDate = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+      if (newBirthDate.getDate() === Number(day)) {
+        birthDate.value = newBirthDate;
+      }
+    }
+  },
+);
 
 const handleImageClick = () => {
   bannerFileInput.value?.click();
@@ -68,7 +91,12 @@ const hasUnsavedChanges = computed(() => {
     location.value !== userStore.location ||
     website.value !== userStore.websiteUrl ||
     selectedProfileImage.value !== userStore.avatarUrl ||
-    selectedImage.value !== userStore.bannerUrl
+    selectedImage.value !== userStore.bannerUrl ||
+    (birthDate.value &&
+      userStore.birthDate &&
+      birthDate.value.getTime() !== new Date(userStore.birthDate).getTime()) ||
+    (!birthDate.value && userStore.birthDate) ||
+    (birthDate.value && !userStore.birthDate)
   );
 });
 
@@ -88,12 +116,17 @@ const handleSubmit = async () => {
     // using the response, update the store with the new bannerUrl
   }
 
+  const formattedBirthDate = birthDate.value
+    ? birthDate.value.toISOString().split('T')[0]
+    : undefined;
+
   // at least one of the text fields has changed
   await updateProfile({
     displayName: name.value,
     bio: bio.value,
     location: location.value,
     websiteUrl: website.value,
+    birthDate: formattedBirthDate,
   });
 };
 
@@ -136,11 +169,6 @@ const handleDialogClose = () => {
         </template>
 
         <div class="flex h-full w-full flex-col">
-          <UiDialogHeader>
-            <UiDialogTitle />
-            <UiDialogDescription />
-          </UiDialogHeader>
-
           <!-- Header Image Section -->
           <div class="relative w-full">
             <div
@@ -220,7 +248,34 @@ const handleDialogClose = () => {
               class="mb-6 w-full"
               maxlength="100"
             />
-            <!-- date picker component should go here -->
+
+            <!-- Birth Date Section -->
+            <div class="mb-10">
+              <h3 class="mb-2 font-medium">{{ $t('profile.edit.birth-date') }}</h3>
+              <div class="flex gap-2">
+                <uiSelect
+                  v-model="dateSelect.selectedMonth.value"
+                  class="flex-1"
+                  :options="dateSelect.months.value"
+                  placeholder="Month"
+                  name="birth-month"
+                />
+                <uiSelect
+                  v-model="dateSelect.selectedDay.value"
+                  class="flex-1"
+                  :options="dateSelect.days.value"
+                  placeholder="Day"
+                  name="birth-day"
+                />
+                <uiSelect
+                  v-model="dateSelect.selectedYear.value"
+                  class="flex-1"
+                  :options="dateSelect.years.value"
+                  placeholder="Year"
+                  name="birth-year"
+                />
+              </div>
+            </div>
           </div>
         </div>
 

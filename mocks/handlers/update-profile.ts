@@ -9,8 +9,8 @@ const mockUserData: UserData = {
   username: 'johndoe',
   displayName: 'John Doe',
   bio: 'Software developer passionate about open source',
-  avatarUrl: 'https://ibb.co/rGzj2kS4',
-  bannerUrl: 'https://ibb.co/bR2Xkw8F',
+  avatarUrl: 'https://i.ibb.co/qMcSYBfk/image.jpg',
+  bannerUrl: 'https://i.ibb.co/Z1Yx04kS/dfghj.webp',
   location: 'San Francisco, CA',
   websiteUrl: 'https://johndoe.dev',
   birthDate: '1990-01-15',
@@ -38,6 +38,9 @@ export const handlers = [
       }
       if (body.websiteUrl !== undefined) {
         mockUserData.websiteUrl = body.websiteUrl;
+      }
+      if (body.birthDate !== undefined) {
+        mockUserData.birthDate = body.birthDate;
       }
 
       const response: ApiSuccessResponse<UserData> = {
