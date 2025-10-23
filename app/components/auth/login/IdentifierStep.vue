@@ -1,46 +1,34 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import * as yup from 'yup';
 import { useForm } from 'vee-validate';
 import { useLoginStore } from '~/stores/auth/login';
 import { showToaster } from '@/utils/showToaster';
 
 const loginStore = useLoginStore();
-const error = ref('');
 
 const schema = yup.object({
-  identifier: yup.string(),
+  identifier: yup.string().trim().required($t('errors.IDENTIFIER_REQUIRED')),
 });
 
-const { defineField, handleSubmit, resetForm } = useForm({
+const { defineField, handleSubmit, resetForm, isSubmitting, meta } = useForm({
   validationSchema: schema,
   initialValues: {
     identifier: '',
   },
-  validateOnMount: true,
+  validateOnMount: false,
+  validateOnChange: true,
+  validateOnBlur: false,
 });
 
 const onSubmit = handleSubmit(async (values) => {
-  error.value = '';
-
   try {
-    if (!values.identifier || values.identifier.trim() === '') {
-      throw new Error($t('errors.IDENTIFIER_REQUIRED'));
-    }
-    const success = await loginStore.checkIdentifierExists(values.identifier);
+    const success = await loginStore.checkIdentifierExists(values.identifier.trim());
     if (!success) {
       throw new Error($t('errors.USER_NOT_FOUND'));
     }
     resetForm({ values: { identifier: '' } });
   } catch (err: unknown) {
-    if (err instanceof Error) {
-      error.value = err.message || $t('errors.GENERIC_ERROR');
-      showToaster('error', error.value);
-    } else {
-      error.value = $t('errors.GENERIC_ERROR');
-      showToaster('error', error.value);
-    }
-    console.error('Identifier check error:', error.value);
+    showToaster('error', (err as Error).message || $t('errors.GENERIC_ERROR'));
   }
 });
 const [_identifier, identifierAttrs] = defineField('identifier');
@@ -77,8 +65,7 @@ const [_identifier, identifierAttrs] = defineField('identifier');
       <p class="py-2 text-center">{{ $t('root.auth.separator') }}</p>
       <section class="flex flex-col gap-4">
         <UiFormFieldInput
-          class="mb-4"
-          placeholder="email or username"
+          :placeholder="$t('root.auth.email-or-username')"
           type="text"
           name="identifier"
           v-bind="identifierAttrs"
@@ -86,8 +73,14 @@ const [_identifier, identifierAttrs] = defineField('identifier');
         ></UiFormFieldInput>
       </section>
     </div>
-    <UiDialogFooter>
-      <UiButton class="mb-1 w-75" size="lg" type="submit" data-testid="submit-button">
+    <UiDialogFooter class="absolute end-0 bottom-15 w-full">
+      <UiButton
+        class="mb-1 w-75"
+        size="lg"
+        type="submit"
+        data-testid="submit-button"
+        :disabled="!meta.valid || isSubmitting"
+      >
         {{ $t('ui.next') }}
       </UiButton>
       <UiButton
@@ -96,8 +89,9 @@ const [_identifier, identifierAttrs] = defineField('identifier');
         variant="outline"
         type="button"
         data-testid="forgot-password-button"
+        @click="loginStore.openForgotPasswordDialog"
       >
-        {{ $t('root.auth.forget-password') }}
+        {{ $t('root.auth.forgot-password') }}
       </UiButton>
       <p class="mt-6">
         {{ $t('root.auth.dont-have-account') }}
@@ -105,9 +99,6 @@ const [_identifier, identifierAttrs] = defineField('identifier');
           {{ $t('root.auth.signup') }}
         </NuxtLink>
       </p>
-      <!-- <Transition name="fade"
-        ><p v-if="error" class="mt-3 text-red-500">{{ error }}</p></Transition
-      > -->
     </UiDialogFooter>
   </form>
 </template>
