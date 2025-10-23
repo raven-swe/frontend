@@ -12,7 +12,8 @@
     "unfollow": "Unfollow",
     "subscribe": "Subscribe",
     "tweets": {
-      "tweet-not-found": "Tweet not found"
+      "tweet-not-found": "Tweet not found",
+      "tweets-list": "Tweets List"
     }
   },
   "leftsidebar": {

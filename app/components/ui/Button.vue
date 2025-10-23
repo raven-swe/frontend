@@ -19,8 +19,17 @@ const buttonVariants = cva(
           'bg-background hover:bg-foreground/10 focus-visible:bg-foreground/10 focus-visible:ring-ring',
 
         'ghost-primary':
-          'text-primary hover:bg-primary/10 focus-visible:bg-primary/10 focus-visible:ring-ring-primary',
-        link: 'bg-background underline-offset-4 hover:underline focus-visible:underline text-primary focus-visible:ring-black/0',
+          'hover:text-primary hover:bg-primary/10 focus-visible:bg-primary/10 focus-visible:ring-ring-primary text-primary',
+        'tweet-icon-blue':
+          'hover:bg-brand-blue/10 focus-visible:bg-brand-blue/10 focus-visible:ring-brand-blue',
+        'tweet-icon-red':
+          'hover:bg-brand-red/10 focus-visible:bg-brand-red/10 focus-visible:ring-brand-red',
+        'tweet-icon-turquoise':
+          'hover:bg-brand-turquoise/10 focus-visible:bg-brand-turquoise/10 focus-visible:ring-brand-turquoise',
+        'tweet-icon-red-active':
+          'hover:bg-brand-red/20 text-brand-red focus-visible:bg-brand-red/20 focus-visible:ring-ring-brand-red',
+        'tweet-icon-turquoise-active':
+          'hover:bg-brand-turquoise/20 text-brand-turquoise focus-visible:bg-brand-turquoise/20 focus-visible:ring-ring-brand-turquoise',
       },
       size: {
         xs: 'h-8 px-4 text-sm has-[>svg]:px-2.5 [&>svg]:size-4',
