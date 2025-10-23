@@ -1,10 +1,5 @@
 import { http, HttpResponse } from 'msw';
-
-const mockUsers = {
-  johndoe: { id: 'abc-123', name: 'John Doe', username: 'johndoe' },
-  janedoe: { id: 'xyz-456', name: 'Jane Doe', username: 'janedoe' },
-  ravenbot: { id: 'bot-001', name: 'Raven Bot', username: 'ravenbot' },
-};
+import mockUsers from '../data/mock-users.json' assert { type: 'json' };
 
 const API_URL = process.env.BACKEND_URL;
 
@@ -12,12 +7,18 @@ export const handlers = [
   http.get(`${API_URL}/user/:username`, ({ params }) => {
     const { username } = params;
 
-    const user = mockUsers[username as keyof typeof mockUsers];
-
+    const user = mockUsers.find((u) => u.username === username);
     if (!user) {
       return HttpResponse.json({ message: `User "${username}" not found` }, { status: 404 });
     }
 
-    return HttpResponse.json(user, { status: 200 });
+    return HttpResponse.json(
+      {
+        success: true,
+        message: 'User fetched successfully.',
+        data: user,
+      },
+      { status: 200 },
+    );
   }),
 ];
