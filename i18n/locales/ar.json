@@ -91,5 +91,17 @@
       "USER_NOT_FOUND": "لم يتم العثور على المستخدم",
       "INVALID_CREDENTIALS": "بيانات الاعتماد غير صالحة"
     }
+  },
+  "setting": {
+    "username": "اسم المستخدم",
+    "change-password": "تغيير كلمة المرور",
+    "email": "البريد الإلكتروني",
+    "date-of-birth": "تاريخ الميلاد",
+    "item-icon": "tabler:chevron-left",
+    "failed-to-load-user": ".فشل في تحميل بيانات المستخدم",
+    "change-username": "تغيير اسم المستخدم",
+    "back-button-icon": "material-symbols:arrow-forward",
+    "suggestions": "اقتراحات",
+    "save": "حفظ التغييرات"
   }
 }

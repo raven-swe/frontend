@@ -136,5 +136,17 @@
       "disclaimer": "By signing up, you agree to the Terms of Service and Privacy Policy, including Cookie Use. Raven may use your contact information, including your email address and phone number for purposes outlined in our Privacy Policy, like keeping your account secure and personalizing our services, including ads. Others will be able to find you by email or phone number, when provided, unless you choose otherwise here.",
       "label": "Password"
     }
+  },
+  "setting": {
+    "username": "Username",
+    "change-password": "Change Password",
+    "email": "Email",
+    "date-of-birth": "Date of Birth",
+    "item-icon": "tabler:chevron-right",
+    "failed-to-load-user": "Failed to load user data.",
+    "change-username": "Change username",
+    "back-button-icon": "material-symbols:arrow-back",
+    "suggestions": "Suggestions",
+    "save": "Save Changes"
   }
 }
