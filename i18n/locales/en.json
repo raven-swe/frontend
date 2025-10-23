@@ -126,7 +126,8 @@
     "EMAIL_ALREADY_EXISTS": "An account with this email already exists",
     "OTP_TOO_SHORT": "OTP must be 6 digits",
     "OTP_TOO_LONG": "OTP must be 6 digits",
-    "INVALID_OTP": "The OTP you entered is invalid"
+    "INVALID_OTP": "The OTP you entered is invalid",
+    "EMPTY_NAME": "Name can't be blank"
   },
   "register": {
     "register-info": {

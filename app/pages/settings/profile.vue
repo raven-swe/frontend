@@ -3,6 +3,7 @@ import { useUserStore } from '@/stores/user';
 import { updateProfileService } from '~/services/profile/updateProfileService';
 import DiscardChangesDialog from '~/components/profile/edit/DiscardChangesDialog.vue';
 import useDateSelect from '@/composables/useDateSelect';
+import { VisuallyHidden } from 'reka-ui';
 
 definePageMeta({
   layout: 'profile',
@@ -100,7 +101,13 @@ const hasUnsavedChanges = computed(() => {
   );
 });
 
+const isFormValid = computed(() => {
+  return name.value.trim() !== '';
+});
+
 const handleSubmit = async () => {
+  if (!isFormValid.value) return;
+
   router.push('/profile'); // optimistically navigate away
 
   if (!hasUnsavedChanges.value) return;
@@ -165,8 +172,15 @@ const handleDialogClose = () => {
             </UiButton>
             <h2 class="text-xl font-bold">{{ $t('profile.edit.edit-profile') }}</h2>
           </div>
-          <UiButton class="w-16" size="xs" @click="handleSubmit">{{ $t('ui.save') }}</UiButton>
+          <UiButton class="w-16" size="xs" :disabled="!isFormValid" @click="handleSubmit">
+            {{ $t('ui.save') }}
+          </UiButton>
         </template>
+        <UiDialogTitle>
+          <VisuallyHidden>
+            {{ $t('profile.edit.edit-profile') }}
+          </VisuallyHidden>
+        </UiDialogTitle>
 
         <div class="flex h-full w-full flex-col">
           <!-- Header Image Section -->
@@ -225,7 +239,20 @@ const handleDialogClose = () => {
 
           <!-- Inputs Section -->
           <div class="w-full px-4 pb-6">
-            <UiInput v-model="name" placeholder="Name" class="mb-6" />
+            <UiInput
+              v-model="name"
+              placeholder="Name"
+              :class="isFormValid ? 'mb-6' : 'mb-1'"
+              :aria-invalid="!isFormValid"
+            />
+            <p
+              v-if="!isFormValid"
+              class="text-destructive mb-6 text-sm"
+              role="alert"
+              aria-live="assertive"
+            >
+              {{ $t('errors.EMPTY_NAME') }}
+            </p>
             <uiInput
               v-model="bio"
               type="textarea"
