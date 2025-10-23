@@ -4,19 +4,6 @@ import { mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime';
 import ProfilePage from '~/pages/profile/index.vue';
 
 describe('ProfilePage', () => {
-  const createWrapper = async () =>
-    await mountSuspended(ProfilePage, {
-      global: {
-        stubs: { TweetDefaultCard: true },
-      },
-    });
-
-  it('renders the page', async () => {
-    const wrapper = await createWrapper();
-    await flushPromises();
-    expect(wrapper.exists()).toBe(true);
-  });
-
   it('renders empty state when no tweets are available', async () => {
     const wrapper = await mountSuspended(ProfilePage, {
       global: { stubs: { TweetDefaultCard: true } },
