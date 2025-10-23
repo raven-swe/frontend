@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { useCounterStore } from '@/stores/counter';
 import Button from '@/components/ui/Button.vue';
 import { ref } from 'vue';
-const counter = useCounterStore();
 const isHovered = ref(false);
+const counter = ref(0);
+function increment() {
+  counter.value += 1;
+}
 </script>
 
 <template>
@@ -14,13 +16,13 @@ const isHovered = ref(false);
     </div>
     <div class="p-8">
       <h1 class="p-4 text-2xl">
-        {{ $t('testing.welcome') + ` ${counter.count}` }}
+        {{ $t('testing.welcome') + ` ${counter}` }}
       </h1>
       <div class="flex flex-col gap-2">
-        <Button class="w-75" variant="default" @click="counter.increment">{{
+        <Button class="w-75" variant="default" @click="increment">{{
           $t('testing.test-button')
         }}</Button>
-        <Button class="w-75" variant="outline" @click="counter.increment">{{
+        <Button class="w-75" variant="outline" @click="increment">{{
           $t('testing.test-button')
         }}</Button>
         <Button variant="ghost-primary" size="icon-sm">

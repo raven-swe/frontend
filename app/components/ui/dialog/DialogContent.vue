@@ -44,7 +44,6 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
           </Button>
         </DialogClose>
         <div
-          v-if="$slots.header"
           :class="cn('flex h-8 w-full items-center ps-10 text-lg font-medium', props.headerClass)"
         >
           <slot name="header" />

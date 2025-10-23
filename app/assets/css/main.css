@@ -18,6 +18,7 @@
   --popover: 0 0% 100%;
   --popover-foreground: 222.2 84% 4.9%;
   --dialog-backdrop: rgba(91, 112, 131, 0.4);
+  --input-autofill: #e8f0fe;
   --oauth: #ffffff;
   --toaster-bg-success: #dcfce7;
   --toaster-text-success: #166534;
@@ -45,6 +46,7 @@
   --destructive: #82181a;
   --popover: 222.2 84% 4.9%;
   --popover-foreground: 210 40% 98%;
+  --input-autofill: #202939;
   --oauth: #ffffff;
   --toaster-bg-success: #064e3b;
   --toaster-text-success: #86efac;
@@ -76,6 +78,7 @@
   --color-brand-blue: var(--brand-blue);
   --color-brand-turquoise: var(--brand-turquoise);
   --color-brand-red: var(--brand-red);
+  --color-input-autofill: var(--input-autofill);
   --color-oauth: var(--oauth);
   --color-toaster-bg-success: var(--toaster-bg-success);
   --color-toaster-text-success: var(--toaster-text-success);
