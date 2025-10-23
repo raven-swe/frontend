@@ -120,16 +120,18 @@ const handleDialogClose = () => {
         :hide-close-button="true"
       >
         <template #header>
-          <Button
-            variant="ghost-default"
-            size="icon-xs"
-            class="hover:bg-muted-foreground/10 absolute start-4 top-3"
-            @click="handleDialogClose"
-          >
-            <Icon name="lucide:x" class="size-5" />
-            <span class="sr-only">{{ $t('ui.close') }}</span>
-          </Button>
-          <h2 class="text-xl font-bold">{{ $t('profile.edit.edit-profile') }}</h2>
+          <div class="flex gap-3">
+            <UiButton
+              variant="ghost-default"
+              size="icon-xs"
+              class="hover:bg-muted-foreground/10"
+              @click="handleDialogClose"
+            >
+              <Icon name="lucide:x" class="size-5" />
+              <span class="sr-only">{{ $t('ui.close') }}</span>
+            </UiButton>
+            <h2 class="text-xl font-bold">{{ $t('profile.edit.edit-profile') }}</h2>
+          </div>
           <UiButton class="w-16" size="xs" @click="handleSubmit">{{ $t('ui.save') }}</UiButton>
         </template>
 

@@ -44,7 +44,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
           </Button>
         </DialogClose>
         <div
-          :class="cn('flex h-8 w-full items-center ps-10 text-lg font-medium', props.headerClass)"
+          :class="cn('flex h-8 w-full items-center ps-2 text-lg font-medium', props.headerClass)"
         >
           <slot name="header" />
         </div>
