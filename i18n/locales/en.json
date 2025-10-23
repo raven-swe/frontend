@@ -67,7 +67,9 @@
       "bio": "Bio",
       "location": "Location",
       "website": "Website",
-      "birth-date": "Birth date"
+      "birth-date": "Birth date",
+      "discard-changes": "Discard changes?",
+      "discard-changes-desc": "This can't be undone and you'll lose your changes."
     }
   },
   "playground": {
@@ -108,7 +110,9 @@
     "next": "Next",
     "loading": "Loading",
     "skip-for-now": "Skip for now",
-    "save": "Save"
+    "save": "Save",
+    "cancel": "Cancel",
+    "discard": "Discard"
   },
   "errors": {
     "INVALID_EMAIL": "Please enter a valid email.",

@@ -76,12 +76,13 @@ const handleSubmit = async () => {
 
   // send all the data to be updated
   if (bannerFileInput.value?.files?.[0]) {
-    console.log('updating banner image');
     await updateHeaderImage(bannerFileInput.value.files[0]);
+    // using the response, update the store with the new avatarUrl
   }
 
   if (profileFileInput.value?.files?.[0]) {
     await updateProfilePicture(profileFileInput.value.files[0]);
+    // using the response, update the store with the new bannerUrl
   }
 
   // at least one of the text fields has changed
