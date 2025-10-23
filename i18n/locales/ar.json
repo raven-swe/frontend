@@ -40,6 +40,14 @@
   "homepage": {
     "tweets": "التغريدات"
   },
+  "profile": {
+    "tabs": {
+      "posts": "المنشورات",
+      "replies": "الردود",
+      "media": "الوسائط",
+      "likes": "الإعجابات"
+    }
+  },
   "playground": {
     "dialog": {
       "title": "إنشاء حسابك",
@@ -63,9 +71,25 @@
       "github-signup": "التسجيل عبر GitHub",
       "already-have-account": "هل لديك حساب بالفعل؟",
       "separator": "أو",
-      "forget-password": "نسيت كلمة المرور؟",
-      "dont-have-account": "ليس لديك حساب؟",
-      "email-not-found": "عذراً، لم نتمكن من العثور على حسابك."
+      "forgot-password": "نسيت كلمة المرور؟",
+      "dont-have-account": "لا تملك حسابًا؟",
+      "email-not-found": "عذرًا، لم نتمكن من العثور على حسابك.",
+      "find-your-account": "ابحث عن حسابك في ريفن",
+      "enter-identifier": "أدخل بريدك الإلكتروني أو اسم المستخدم المرتبط بحسابك لتغيير كلمة المرور.",
+      "we-sent-code": "لقد أرسلنا لك رمزًا",
+      "enter-otp": "تحقق من بريدك الإلكتروني للحصول على رمز التأكيد.",
+      "resend-code": "إعادة إرسال الرمز",
+      "choose-new-password": "اختار كلمة مرور جديدة",
+      "password-strength": "تأكد من أن كلمة المرور الجديدة تتكون من 8 أحرف أو أكثر. حاول تضمين أرقام وحروف وعلامات ترقيم لجعل كلمة المرور أقوى.",
+      "logout-warning": "ستتم تسجيل خروجك من جميع جلسات ريفن النشطة بعد تغيير كلمة المرور.",
+      "change-password": "تغيير كلمة المرور",
+      "email-or-username": "البريد الإلكتروني أو اسم المستخدم",
+      "email": "البريد الإلكتروني",
+      "username": "اسم المستخدم",
+      "password": "كلمة المرور",
+      "confirm-password": "تأكيد كلمة المرور",
+      "enter-your-code": "أدخل رمزك",
+      "enter-new-password": "أدخل كلمة مرور جديدة"
     },
     "footer": {
       "about": "حول",
