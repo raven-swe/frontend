@@ -1,20 +1,21 @@
 <script setup lang="ts">
+import { useUserStore } from '@/stores/user';
+
 definePageMeta({
   layout: 'profile',
 });
+const userStore = useUserStore().user;
 
 const fileInputRef = ref<HTMLInputElement | null>(null);
 const profileFileInputRef = ref<HTMLInputElement | null>(null);
 
-// Update with actual user data fetching logic afte user auth is done
-const selectedImage = ref<string | null>(null);
-const selectedProfileImage = ref<string | null>(null);
-const name = ref<string>('habibayman');
-const bio = ref<string>(
-  "Fourth year Computer Engineering student @ Cairo university\nI'm only here when the reels get boring on ig",
-);
-const location = ref<string>('Cairo, Egypt');
-const website = ref<string>('https://github.com/habibayman');
+// Initialize with existing user data
+const selectedImage = ref<string | null>(userStore.bannerUrl || null);
+const selectedProfileImage = ref<string | null>(userStore.avatarUrl || null);
+const name = ref<string>(userStore.displayName || '');
+const bio = ref<string>(userStore.bio || '');
+const location = ref<string>(userStore.location || '');
+const website = ref<string>(userStore.websiteUrl || '');
 
 const handleImageClick = () => {
   fileInputRef.value?.click();
@@ -50,8 +51,20 @@ const handleProfileFileChange = (event: Event) => {
   }
 };
 
+const hasUnsavedChanges = computed(() => {
+  return (
+    name.value !== userStore.displayName ||
+    bio.value !== userStore.bio ||
+    location.value !== userStore.location ||
+    website.value !== userStore.websiteUrl ||
+    selectedProfileImage.value !== userStore.avatarUrl ||
+    selectedImage.value !== userStore.bannerUrl
+  );
+});
+
 const handleSubmit = () => {
   // send all the data to be updated
+  if (!hasUnsavedChanges.value) return;
 };
 </script>
 
