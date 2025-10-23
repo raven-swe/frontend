@@ -39,14 +39,10 @@ const handleOpenChange = (value: boolean) => {
       </UiDialogHeader>
 
       <div class="flex flex-col gap-2 px-6 pb-6">
-        <UiButton
-          class="w-full bg-red-500 font-medium text-white hover:bg-red-600"
-          size="lg"
-          @click="handleDiscard"
-        >
+        <UiButton variant="destructive" class="w-full" size="lg" @click="handleDiscard">
           {{ $t('ui.discard') }}
         </UiButton>
-        <UiButton variant="outline" class="w-full font-medium" size="lg" @click="handleCancel">
+        <UiButton variant="outline" class="w-full" size="lg" @click="handleCancel">
           {{ $t('ui.cancel') }}
         </UiButton>
       </div>

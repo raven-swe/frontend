@@ -4,4 +4,5 @@ export type buttonVariants =
   | 'default'
   | 'outline-destructive'
   | 'ghost-default'
-  | 'ghost-primary';
+  | 'ghost-primary'
+  | 'destructive';
