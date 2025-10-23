@@ -93,7 +93,7 @@ function makeData() {
 function main() {
   const data = makeData();
   const outDir = path.resolve(__dirname, '../data');
-  const outFile = path.join(outDir, 'tweet.json');
+  const outFile = path.join(outDir, 'mock-tweets.json');
   mkdirSync(outDir, { recursive: true });
   writeFileSync(outFile, JSON.stringify(data, null, 2), 'utf-8');
 
