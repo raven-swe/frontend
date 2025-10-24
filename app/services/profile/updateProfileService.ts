@@ -55,9 +55,25 @@ export const updateProfileService = () => {
     }
   };
 
+  const removeHeaderImage = async (): Promise<{ success: boolean; message: string }> => {
+    try {
+      const response = await $fetch<ApiSuccessResponse<{ success: boolean; message: string }>>(
+        '/api/me/banner',
+        {
+          method: 'DELETE',
+        },
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Failed to remove header image:', error);
+      throw error;
+    }
+  };
+
   return {
     updateProfile,
     updateProfilePicture,
     updateHeaderImage,
+    removeHeaderImage,
   };
 };

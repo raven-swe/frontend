@@ -16,7 +16,8 @@ const isDialogOpen = computed(() => route.path === '/settings/profile');
 const openDiscardDialog = ref(false);
 
 const userStore = useUserStore().user;
-const { updateProfile, updateProfilePicture, updateHeaderImage } = updateProfileService();
+const { updateProfile, updateProfilePicture, updateHeaderImage, removeHeaderImage } =
+  updateProfileService();
 
 const bannerFileInput = ref<HTMLInputElement | null>(null);
 const profileFileInput = ref<HTMLInputElement | null>(null);
@@ -85,6 +86,13 @@ const handleProfileFileChange = (event: Event) => {
   }
 };
 
+const handleRemoveHeaderImage = () => {
+  selectedImage.value = null;
+  if (bannerFileInput.value) {
+    bannerFileInput.value.value = '';
+  }
+};
+
 const hasUnsavedChanges = computed(() => {
   return (
     name.value !== userStore.displayName ||
@@ -112,8 +120,10 @@ const handleSubmit = async () => {
 
   if (!hasUnsavedChanges.value) return;
 
-  // send all the data to be updated
-  if (bannerFileInput.value?.files?.[0]) {
+  // Sync updates
+  if (!selectedImage.value && userStore.bannerUrl) {
+    await removeHeaderImage();
+  } else if (bannerFileInput.value?.files?.[0]) {
     await updateHeaderImage(bannerFileInput.value.files[0]);
     // using the response, update the store with the new avatarUrl
   }
@@ -196,13 +206,23 @@ const handleDialogClose = () => {
               class="h-40 w-full cursor-pointer object-cover brightness-70 filter"
               @click="handleImageClick"
             />
-            <button
-              type="button"
-              class="bg-foreground/60 hover:bg-foreground/80 absolute start-1/2 top-1/2 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full transition-colors"
-              @click="handleImageClick"
-            >
-              <Icon name="lucide:camera" class="text-white" size="1.2rem" />
-            </button>
+            <div class="absolute start-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 gap-3">
+              <button
+                type="button"
+                class="bg-foreground/60 hover:bg-foreground/80 flex h-10 w-10 items-center justify-center rounded-full transition-colors"
+                @click="handleImageClick"
+              >
+                <Icon name="lucide:camera" class="text-white" size="1.2rem" />
+              </button>
+              <button
+                v-if="selectedImage"
+                type="button"
+                class="bg-foreground/60 hover:bg-foreground/80 flex h-10 w-10 items-center justify-center rounded-full transition-colors"
+                @click="handleRemoveHeaderImage"
+              >
+                <Icon name="lucide:x" class="text-white" size="1.2rem" />
+              </button>
+            </div>
             <input
               ref="bannerFileInput"
               type="file"
