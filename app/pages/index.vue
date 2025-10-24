@@ -38,9 +38,14 @@ definePageMeta({
               <span class="uppercase">{{ $t('root.auth.separator') }}</span>
               <div class="w-full border-b-1" />
             </div>
-            <Button id="signup" variant="default" class="w-75" @click="registerStore.openDialog">{{
-              $t('root.auth.signup')
-            }}</Button>
+            <Button
+              id="signup"
+              data-cy="signup-start-button"
+              variant="default"
+              class="w-75"
+              @click="registerStore.openDialog"
+              >{{ $t('root.auth.signup') }}</Button
+            >
             <p class="text-muted-foreground mt-4 max-w-75 text-xs">
               {{ $t('root.auth.signup-info') }}
             </p>

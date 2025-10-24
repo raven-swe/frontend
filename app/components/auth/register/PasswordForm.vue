@@ -28,7 +28,11 @@ const [_password, passwordAttrs] = defineField('password');
 </script>
 
 <template>
-  <form class="flex h-full flex-col justify-between" @submit.prevent="onSubmit">
+  <form
+    class="flex h-full flex-col justify-between"
+    data-cy="signup-password-form"
+    @submit.prevent="onSubmit"
+  >
     <UiDialogHeader class="py-6">
       <UiDialogTitle class="text-4xl font-bold">{{ $t('register.password.title') }}</UiDialogTitle>
       <UiDialogDescription>
@@ -39,6 +43,7 @@ const [_password, passwordAttrs] = defineField('password');
       <FieldInput
         :placeholder="$t('register.password.label')"
         type="password"
+        data-cy="signup-password"
         name="password"
         v-bind="passwordAttrs"
       />
@@ -52,6 +57,7 @@ const [_password, passwordAttrs] = defineField('password');
         :disabled="Object.entries(errors).length > 0 || isSubmitting"
         size="xl"
         class="w-full"
+        data-cy="signup-next-button"
         >{{ $t('ui.next') }}</Button
       >
     </UiDialogFooter>

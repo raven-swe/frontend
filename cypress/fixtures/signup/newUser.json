@@ -1,0 +1,10 @@
+{
+  "name": "Test User",
+  "email": "newuser@example.com",
+  "dob": {
+    "day": "10",
+    "month": "5",
+    "year": "1995"
+  },
+  "password": "SecurePass123!"
+}
