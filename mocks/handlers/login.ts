@@ -7,32 +7,39 @@ import type {
   ApiErrorResponse,
   ApiValidationErrorResponse,
 } from '#shared/types/api';
+import * as cookie from 'cookie';
 
 const mockUsers = rawUsers as User[];
 
 const API_URL = process.env.BACKEND_URL;
 
-// 🔑 Generate access token (5-minute expiry)
-const generateAuthToken = (user: User) => {
+const generateAuthToken = (username: string) => {
   const payload = {
-    username: user.username,
-    exp: Math.floor(Date.now() / 1000) + 60 * 5,
+    username,
   };
-  return jwt.sign(payload, 'secret');
+  return jwt.sign(payload, 'secret', { expiresIn: '1m' });
 };
 
-// 🔄 Generate refresh token (7-day expiry)
-const generateRefreshToken = (user: User) => {
+const generateRefreshToken = (username: string) => {
   const payload = {
-    username: user.username,
-    exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7,
+    username,
   };
-  return jwt.sign(payload, 'refresh_secret');
+  return jwt.sign(payload, 'refresh_secret', { expiresIn: '10m' });
+};
+
+const generateRefreshCookie = (token: string) => {
+  return cookie.serialize('refresh_token', token, {
+    httpOnly: true,
+    path: '/',
+    maxAge: 10 * 60, // make it 10 min for testing
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+  });
 };
 
 export const loginHandlers = [
   /**
-   * 📨 Check if identifier exists
+   * Check if identifier exists
    * GET /auth/check-identifier?identifier=<identifier>
    */
   http.get(`${API_URL}/auth/check-identifier`, ({ request }) => {
@@ -105,7 +112,7 @@ export const loginHandlers = [
   }),
 
   /**
-   * 🔐 User login
+   * User login
    * POST /auth/login
    */
   http.post(`${API_URL}/auth/login`, async ({ request }) => {
@@ -138,7 +145,7 @@ export const loginHandlers = [
 
     const { identifier, password } = body;
 
-    // 🧠 Find user by email or username
+    // Find user by email or username
     const user = mockUsers.find((u) => u.email === identifier || u.username === identifier);
 
     if (!user) {
@@ -154,7 +161,7 @@ export const loginHandlers = [
       );
     }
 
-    // 🧩 (Optional) Simulated password check
+    // (Optional) Simulated password check
     if (password !== 'Password123') {
       return HttpResponse.json(
         {
@@ -182,58 +189,19 @@ export const loginHandlers = [
       );
     }
 
-    // ✅ Success
-    return HttpResponse.json(
+    // Generate tokens
+    const authToken = generateAuthToken(user.username);
+    const refreshToken = generateRefreshToken(user.username);
+    const refreshTokenCookie = generateRefreshCookie(refreshToken);
+    // Success
+    return new HttpResponse(
+      JSON.stringify({ success: true, message: 'Authenticated', data: { accessToken: authToken } }),
       {
-        success: true,
-        message: 'Login successful',
-        data: {
-          accessToken: generateAuthToken(user),
-          refreshToken: generateRefreshToken(user),
+        headers: {
+          'set-cookie': refreshTokenCookie,
+          'Content-Type': 'application/json',
         },
-      } as ApiSuccessResponse<{ accessToken: string; refreshToken: string }>,
-      { status: 200 },
+      },
     );
-  }),
-
-  http.post(`${API_URL}/auth/refresh-token`, async ({ request }) => {
-    const { refreshToken } = (await request.json()) as { refreshToken: string };
-    if (!refreshToken) {
-      return HttpResponse.json(
-        { success: false, error: { message: 'No refresh token provided', code: 'NO_TOKEN' } },
-        { status: 400 },
-      );
-    }
-
-    try {
-      const decoded = jwt.verify(refreshToken, 'refresh_secret') as {
-        username: string;
-        exp: number;
-      };
-      if (decoded.exp * 1000 < Date.now()) {
-        throw new Error('Token expired');
-      }
-      const user = mockUsers.find((u) => u.username === decoded.username);
-      if (!user) {
-        return HttpResponse.json(
-          { success: false, error: { message: 'User not found', code: 'USER_NOT_FOUND' } },
-          { status: 404 },
-        );
-      }
-
-      return HttpResponse.json(
-        {
-          success: true,
-          message: 'Token refreshed',
-          data: { accessToken: generateAuthToken(user) },
-        },
-        { status: 200 },
-      );
-    } catch {
-      return HttpResponse.json(
-        { success: false, error: { message: 'Invalid refresh token', code: 'INVALID_TOKEN' } },
-        { status: 401 },
-      );
-    }
   }),
 ];

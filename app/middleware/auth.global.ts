@@ -2,7 +2,7 @@ import { apiFetch } from '~/api';
 import { isAuthenticated, parseSetCookie } from '~/services/auth/authService';
 
 // Public routes that don’t require auth
-const publicRoutes = ['/', '/forget-password', '/playground/dummy-login'];
+const publicRoutes = ['/', '/auth/forgot-password', '/playground/dummy-login'];
 
 export default defineNuxtRouteMiddleware(async (to) => {
   let isAuth = isAuthenticated();
