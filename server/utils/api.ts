@@ -7,6 +7,11 @@ export const serverApiFetch = ofetch.create({
   baseURL: API_URL,
   credentials: 'include',
 
+  onRequest({ options }) {
+    // Ensure cookies are included in server-side requests
+    options.headers.append('X-Client-Type', 'web');
+  },
+
   async onResponseError({ response }) {
     throw createError({
       statusCode: response.status || 500,
