@@ -1,0 +1,45 @@
+name: PR Checklist Comment
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+
+jobs:
+  checklist:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Find existing checklist comment
+        id: find-comment
+        uses: peter-evans/find-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: '## Testers Checklist'
+
+      - name: Create or update PR checklist comment
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          body: |
+            ## Testers Checklist
+
+            ### General
+            - [ ] Validation for every input
+            - [ ] Persistent try/catch blocks
+            - [ ] No lack of documentation
+            - [ ] Localization
+
+            ### Frontend
+            - [ ] Caching (if applicable)
+            - [ ] Responsiveness for all screens
+            - [ ] Loading indicators & skeleton loaders
+            - [ ] Optimistic loading (if applicable)
+
+          edit-mode: replace
