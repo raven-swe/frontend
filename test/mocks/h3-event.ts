@@ -10,6 +10,7 @@ export const createMockH3Event = (
   },
 ): H3Event => {
   const event = {
+    headers: new Map<string, string>(),
     node: {
       req: {
         headers: { 'content-type': 'application/json' },

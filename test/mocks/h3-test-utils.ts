@@ -14,6 +14,9 @@ export function useH3TestUtils() {
     }),
     getRouterParams: vi.fn((event: H3Event) => event.context?.params || {}),
     getQuery: vi.fn((event: H3Event) => event.context?.query || {}),
+    appendHeader: vi.fn((event: H3Event, name: string, value: string) => {
+      event.headers.set(name, value);
+    }),
   }));
 
   // Stub global functions to emulate Nuxt auto-imports
@@ -21,6 +24,7 @@ export function useH3TestUtils() {
   vi.stubGlobal('readBody', h3.readBody);
   vi.stubGlobal('getRouterParams', h3.getRouterParams);
   vi.stubGlobal('getQuery', h3.getQuery);
+  vi.stubGlobal('appendHeader', h3.appendHeader);
 
   return h3;
 }
