@@ -2,6 +2,11 @@
 import Button from '~/components/ui/Button.vue';
 import { useGoogleAuth } from '~/composables/useGoogleAuth';
 
+import { useLoginStore } from '~/stores/auth/login';
+
+const loginStore = useLoginStore();
+
+const registerStore = useRegisterStore();
 definePageMeta({
   layout: false, // Disable layout for this page
 });
@@ -45,6 +50,7 @@ onMounted(() => {
           <h2 class="mb-8 text-2xl font-semibold sm:text-[2rem]">{{ $t('root.hero.subtitle') }}</h2>
         </header>
         <main>
+          <AuthRegisterDialog />
           <section>
             <div class="flex flex-col gap-4">
               <Button id="github-signin" variant="outline" class="w-75" @click="handleGithubSignIn">
@@ -62,7 +68,9 @@ onMounted(() => {
               <span class="uppercase">{{ $t('root.auth.separator') }}</span>
               <div class="w-full border-b-1" />
             </div>
-            <Button id="signup" variant="default" class="w-75">{{ $t('root.auth.signup') }}</Button>
+            <Button id="signup" variant="default" class="w-75" @click="registerStore.openDialog">{{
+              $t('root.auth.signup')
+            }}</Button>
             <p class="text-muted-foreground mt-4 max-w-75 text-xs">
               {{ $t('root.auth.signup-info') }}
             </p>
@@ -71,9 +79,10 @@ onMounted(() => {
             <p class="font-semibold">
               {{ $t('root.auth.already-have-account') }}
             </p>
-            <Button id="signin" variant="outline" class="my-4 w-75" type="button">
+            <Button id="signin" variant="outline" class="my-4 w-75" @click="loginStore.openDialog">
               {{ $t('root.auth.signin') }}
             </Button>
+            <AuthLoginDialog />
           </section>
         </main>
       </section>

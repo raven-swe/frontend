@@ -19,7 +19,17 @@ const buttonVariants = cva(
           'bg-background hover:bg-foreground/10 focus-visible:bg-foreground/10 focus-visible:ring-ring',
 
         'ghost-primary':
-          'text-primary hover:bg-primary/10 focus-visible:bg-primary/10 focus-visible:ring-ring-primary',
+          'hover:text-primary hover:bg-primary/10 focus-visible:bg-primary/10 focus-visible:ring-ring-primary text-primary',
+        'tweet-icon-blue':
+          'hover:bg-brand-blue/10 focus-visible:bg-brand-blue/10 focus-visible:ring-brand-blue',
+        'tweet-icon-red':
+          'hover:bg-brand-red/10 focus-visible:bg-brand-red/10 focus-visible:ring-brand-red',
+        'tweet-icon-turquoise':
+          'hover:bg-brand-turquoise/10 focus-visible:bg-brand-turquoise/10 focus-visible:ring-brand-turquoise',
+        'tweet-icon-red-active':
+          'hover:bg-brand-red/20 text-brand-red focus-visible:bg-brand-red/20 focus-visible:ring-ring-brand-red',
+        'tweet-icon-turquoise-active':
+          'hover:bg-brand-turquoise/20 text-brand-turquoise focus-visible:bg-brand-turquoise/20 focus-visible:ring-ring-brand-turquoise',
       },
       size: {
         xs: 'h-8 px-4 text-sm has-[>svg]:px-2.5 [&>svg]:size-4',
@@ -28,6 +38,7 @@ const buttonVariants = cva(
         lg: 'h-10 px-4 py-2 text-base has-[>svg]:px-3 [&>svg]:size-5',
         xl: 'h-13 px-5 text-lg has-[>svg]:px-4 [&>svg]:size-5',
         '2xl': 'h-16.25 p-3 text-lg has-[>svg]:px-5 [&>svg]:size-6',
+        link: 'p-0 h-auto text-md rounded-sm',
 
         'icon-xs': 'size-8 flex items-center justify-center [&>svg]:size-4',
         'icon-sm': 'size-8.5 flex items-center justify-center [&>svg]:size-4',

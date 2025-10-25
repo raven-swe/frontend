@@ -1,20 +1,77 @@
 import { describe, it, expect } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { flushPromises } from '@vue/test-utils';
+import { mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime';
 import ProfilePage from '~/pages/profile/index.vue';
 
 describe('ProfilePage', () => {
-  const createWrapper = () => {
-    return mount(ProfilePage);
-  };
+  it('renders empty state when no tweets are available', async () => {
+    const wrapper = await mountSuspended(ProfilePage, {
+      global: { stubs: { TweetDefaultCard: true } },
+    });
 
-  it('renders the page', () => {
-    const wrapper = createWrapper();
-    expect(wrapper.exists()).toBe(true);
+    await flushPromises();
+
+    const heading = wrapper.find('h1');
+    expect(heading.exists()).toBe(true);
+    expect(heading.text()).toBe('Tweet not found');
   });
 
-  it('renders all posts', () => {
-    const wrapper = createWrapper();
-    const posts = wrapper.findAll('p');
-    expect(posts).toHaveLength(3);
+  it('renders TweetDefaultCard components when tweets exist', async () => {
+    const mockTweets = [
+      {
+        id: 'tweet-1',
+        content: 'First tweet',
+        createdAt: new Date().toISOString(),
+        author: {
+          username: 'testuser',
+          displayName: 'Test User',
+          avatarUrl: '/avatar.jpg',
+          isFollowing: false,
+          isFollower: false,
+        },
+        replyCount: 0,
+        retweetCount: 0,
+        likeCount: 0,
+        isLiked: false,
+        isRetweeted: false,
+        entities: { mentions: [], hashtags: [] },
+        media: [],
+      },
+      {
+        id: 'tweet-2',
+        content: 'Second tweet',
+        createdAt: new Date().toISOString(),
+        author: {
+          username: 'testuser',
+          displayName: 'Test User',
+          avatarUrl: '/avatar.jpg',
+          isFollowing: false,
+          isFollower: false,
+        },
+        replyCount: 0,
+        retweetCount: 0,
+        likeCount: 0,
+        isLiked: false,
+        isRetweeted: false,
+        entities: { mentions: [], hashtags: [] },
+        media: [],
+      },
+    ];
+
+    registerEndpoint('/api/tweets', () => ({
+      data: mockTweets,
+    }));
+
+    const wrapper = await mountSuspended(ProfilePage, {
+      global: { stubs: { TweetDefaultCard: true } },
+    });
+
+    await flushPromises();
+
+    const tweetCards = wrapper.findAllComponents({ name: 'TweetDefaultCard' });
+    expect(tweetCards.length).toBe(2);
+
+    const heading = wrapper.find('h1');
+    expect(heading.exists()).toBe(false);
   });
 });

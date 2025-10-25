@@ -1,39 +1,19 @@
 {
   "testing": {
-    "welcome": "Welcome to Raven",
-    "test-button": "Test Button",
-    "post": "Post",
-    "following": "Following",
-    "unfollow": "Unfollow",
-    "follow": "Follow",
-    "subscribe": "Subscribe",
     "user": {
       "name": "John Doe",
       "username": "johndoe"
     },
+    "welcome": "Welcome to Raven",
+    "test-button": "Test Button",
+    "post": "Post",
+    "follow": "Follow",
+    "following": "Following",
+    "unfollow": "Unfollow",
+    "subscribe": "Subscribe",
     "tweets": {
-      "tweet-not-found": "Tweet not found"
-    },
-    "complete-form": {
-      "birthdate-label": "Birth Date:",
-      "confirm": "Confirm"
-    }
-  },
-
-  "profile": {
-    "tabs": {
-      "posts": "Posts",
-      "replies": "Replies",
-      "media": "Media",
-      "likes": "Likes"
-    }
-  },
-  "playground": {
-    "dialog": {
-      "title": "Create your account",
-      "open": "Open Dialog",
-      "content": "This is a dialog",
-      "description": "Dialog Description"
+      "tweet-not-found": "Tweet not found",
+      "tweets-list": "Tweets List"
     }
   },
   "leftsidebar": {
@@ -61,6 +41,22 @@
   "homepage": {
     "tweets": "Tweets"
   },
+  "profile": {
+    "tabs": {
+      "posts": "Posts",
+      "replies": "Replies",
+      "media": "Media",
+      "likes": "Likes"
+    }
+  },
+  "playground": {
+    "dialog": {
+      "title": "Create your account",
+      "open": "Open Dialog",
+      "content": "This is a dialog",
+      "description": "Dialog Description"
+    }
+  },
   "root": {
     "hero": {
       "title": "Happening now",
@@ -70,10 +66,15 @@
       "signin": "Sign in",
       "signup": "Create account",
       "signup-info": "By signing up, you agree to the Terms of Service and Privacy Policy, including Cookie Use.",
-      "google-signin": "Google Sign in",
-      "github-signin": "GitHub Sign in",
+      "google-signin": "Sign in with Google",
+      "github-signin": "Sign in with GitHub",
+      "google-signup": "Sign up with Google",
+      "github-signup": "Sign up with GitHub",
       "already-have-account": "Already have an account?",
-      "separator": "or"
+      "separator": "or",
+      "forget-password": "Forgot password?",
+      "dont-have-account": "Don't have an account?",
+      "email-not-found": "Sorry, we could not find your account."
     },
     "footer": {
       "about": "About",
@@ -85,5 +86,55 @@
     "close": "Close",
     "next": "Next",
     "loading": "Loading"
+  },
+  "errors": {
+    "INVALID_EMAIL": "Please enter a valid email.",
+    "NAME_TOO_SHORT": "What's your name?",
+    "NAME_TOO_LONG": "Name must be at most 50 characters long",
+    "AGE_RESTRICTION": "You must be at least 13 years old",
+    "OTP_LENGTH": "OTP must be 6 digits",
+    "PASSWORD_MISMATCH": "Passwords do not match",
+    "PASSWORD_TOO_SHORT": "Password must be at least 8 characters long",
+    "PASSWORD_INVALID": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+    "EMAIL_ALREADY_EXISTS": "An account with this email already exists",
+    "OTP_TOO_SHORT": "OTP must be 6 digits",
+    "OTP_TOO_LONG": "OTP must be 6 digits",
+    "INVALID_OTP": "The OTP you entered is invalid"
+  },
+  "register": {
+    "register-info": {
+      "title": "Create your account",
+      "name": {
+        "label": "Name"
+      },
+      "email": {
+        "label": "Email"
+      },
+      "date-of-birth": {
+        "title": "Date of Birth",
+        "description": "This will not be shown publicly. Confirm your own age, even if this account is for a business, a pet, or something else.",
+        "month": {
+          "label": "Month"
+        },
+        "day": {
+          "label": "Day"
+        },
+        "year": {
+          "label": "Year"
+        }
+      }
+    },
+    "otp": {
+      "title": "We sent you a code",
+      "description": "Enter it below to verify {email}.",
+      "resend-code": "Resend code",
+      "label": "Verification Code"
+    },
+    "password": {
+      "title": "You'll need a password",
+      "description": "Make sure it's 8 characters or more.",
+      "disclaimer": "By signing up, you agree to the Terms of Service and Privacy Policy, including Cookie Use. Raven may use your contact information, including your email address and phone number for purposes outlined in our Privacy Policy, like keeping your account secure and personalizing our services, including ads. Others will be able to find you by email or phone number, when provided, unless you choose otherwise here.",
+      "label": "Password"
+    }
   }
 }
