@@ -1,9 +1,13 @@
 export type buttonVariants =
+  | 'default'
   | 'primary'
   | 'outline'
-  | 'default'
   | 'outline-destructive'
+  | 'destructive'
   | 'ghost-default'
   | 'ghost-primary'
-  | 'destructive'
-  | 'link';
+  | 'tweet-icon-blue'
+  | 'tweet-icon-red'
+  | 'tweet-icon-turquoise'
+  | 'tweet-icon-red-active'
+  | 'tweet-icon-turquoise-active';
