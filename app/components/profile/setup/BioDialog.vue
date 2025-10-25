@@ -26,10 +26,6 @@ const handleSubmit = () => {
 
 const handleOpenChange = (value: boolean) => {
   emit('update:open', value);
-  if (!value) {
-    // Reset on close
-    bio.value = '';
-  }
 };
 </script>
 
