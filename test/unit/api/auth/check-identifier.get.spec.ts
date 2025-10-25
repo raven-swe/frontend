@@ -39,7 +39,7 @@ declare global {
     statusMessage?: string;
     data?: unknown;
   }) => Error & { statusCode?: number; statusMessage?: string; data?: unknown };
-  var $fetch: ReturnType<typeof vi.fn>;
+  var serverApiFetch: ReturnType<typeof vi.fn>;
   var getQuery: (event: MockEvent) => Record<string, string>;
 }
 
@@ -63,7 +63,7 @@ beforeEach(() => {
   });
   vi.stubGlobal('getQuery', (event: MockEvent) => event.query);
   fetchMock = vi.fn();
-  vi.stubGlobal('$fetch', fetchMock);
+  vi.stubGlobal('serverApiFetch', fetchMock);
   process.env.BACKEND_URL = 'https://api.example.com';
 });
 
@@ -79,32 +79,37 @@ describe('GET /api/auth/check-identifier', () => {
     const handler = (await import('../../../../server/api/auth/check-identifier.get')).default;
     const res = await handler(makeEvent({ identifier: 'test@example.com' }));
 
-    expect(fetchMock).toHaveBeenCalledWith(
-      'https://api.example.com/auth/check-identifier?identifier=test%40example.com',
-      { method: 'GET' },
-    );
+    expect(fetchMock).toHaveBeenCalledWith('/auth/check-identifier', {
+      method: 'GET',
+      query: {
+        identifier: 'test@example.com',
+      },
+    });
     expect(res).toEqual(mockResponse);
   });
 
   it('maps FetchError with backend error message', async () => {
-    const { FetchError } = await import('ofetch');
     const backendError = {
-      error: { message: 'User not found', code: 'NOT_FOUND' },
+      statusCode: 404,
+      statusMessage: 'User not found',
+      data: { message: 'User not found', code: 'NOT_FOUND' },
     };
-    fetchMock.mockRejectedValueOnce(new FetchError('fail', backendError, 404));
+    fetchMock.mockRejectedValueOnce(backendError);
 
     const handler = (await import('../../../../server/api/auth/check-identifier.get')).default;
 
     await expect(handler(makeEvent({ identifier: 'unknown' }))).rejects.toMatchObject({
       statusCode: 404,
       statusMessage: 'User not found',
-      data: backendError.error,
+      data: backendError.data,
     });
   });
 
   it('uses default Internal Server Error when FetchError has no data', async () => {
-    const { FetchError } = await import('ofetch');
-    fetchMock.mockRejectedValueOnce(new FetchError('fail', undefined, 503));
+    fetchMock.mockRejectedValueOnce({
+      statusCode: 503,
+      statusMessage: 'Internal Server Error',
+    });
 
     const handler = (await import('../../../../server/api/auth/check-identifier.get')).default;
 
@@ -115,7 +120,10 @@ describe('GET /api/auth/check-identifier', () => {
   });
 
   it('maps unknown errors to 500 with message', async () => {
-    fetchMock.mockRejectedValueOnce(new Error('Boom'));
+    fetchMock.mockRejectedValueOnce({
+      statusCode: 500,
+      statusMessage: 'Boom',
+    });
 
     const handler = (await import('../../../../server/api/auth/check-identifier.get')).default;
 

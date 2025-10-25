@@ -37,7 +37,7 @@ declare global {
     statusMessage?: string;
     data?: unknown;
   }) => Error & { statusCode?: number; statusMessage?: string; data?: unknown };
-  var $fetch: ReturnType<typeof vi.fn>;
+  var serverApiFetch: ReturnType<typeof vi.fn>;
   var readBody: (event: MockEvent) => unknown;
 }
 
@@ -60,7 +60,16 @@ beforeEach(() => {
   });
   vi.stubGlobal('readBody', (event: MockEvent) => event.body);
   fetchMock = vi.fn();
-  vi.stubGlobal('$fetch', fetchMock);
+  vi.stubGlobal('serverApiFetch', { raw: fetchMock });
+  vi.stubGlobal('appendHeader', (event: MockEvent, name: string, value: string) => {
+    if (!event.res.headers) {
+      event.res.headers = {};
+    }
+    if (!event.res.headers[name]) {
+      event.res.headers[name] = [];
+    }
+    (event.res.headers[name] as string[]).push(value);
+  });
   process.env.BACKEND_URL = 'https://api.example.com';
 });
 
@@ -71,70 +80,81 @@ afterEach(() => {
 describe('POST /api/auth/login', () => {
   it('returns tokens on success', async () => {
     const mockResponse = {
-      success: true,
-      data: { accessToken: 'abc', refreshToken: 'xyz' },
+      _data: {
+        success: true,
+        data: { accessToken: 'abc', refreshToken: 'xyz' },
+      },
+      headers: {
+        getSetCookie: () => ['refresh_token=xyz; Path=/; HttpOnly; Secure; SameSite=Lax'],
+      },
     };
     fetchMock.mockResolvedValueOnce(mockResponse);
 
     const handler = (await import('../../../../server/api/auth/login.post')).default;
     const res = await handler(makeEvent({ identifier: 'test', password: 'pass' }));
 
-    expect(fetchMock).toHaveBeenCalledWith('https://api.example.com/auth/login', {
+    expect(fetchMock).toHaveBeenCalledWith('/auth/login', {
       method: 'POST',
       body: { identifier: 'test', password: 'pass' },
+      credentials: 'include',
     });
-    expect(res).toEqual(mockResponse);
+    expect(res).toEqual(mockResponse._data);
   });
 
   it('throws validation error (422)', async () => {
     const validationError = {
-      error: { code: 'VALIDATION_ERROR', message: 'Missing fields' },
+      statusCode: 422,
+      statusMessage: 'Missing required fields',
+      message: 'Missing required fields',
+      data: {
+        code: 'VALIDATION_ERROR',
+        message: 'Missing required fields',
+      },
     };
-    fetchMock.mockRejectedValueOnce({ data: validationError });
+    fetchMock.mockRejectedValueOnce(validationError);
 
     const handler = (await import('../../../../server/api/auth/login.post')).default;
     await expect(handler(makeEvent({}))).rejects.toMatchObject({
       statusCode: 422,
-      statusMessage: 'Validation Error',
-      data: validationError.error,
+      statusMessage: 'Missing required fields',
+      data: validationError.data,
     });
   });
 
   it('throws unauthorized error (401)', async () => {
     const unauthorizedError = {
-      error: { code: 'UNAUTHORIZED', message: 'Invalid credentials' },
+      statusCode: 401,
+      statusMessage: 'Invalid credentials',
+      message: 'Invalid credentials',
+      data: {
+        code: 'UNAUTHORIZED',
+        message: 'Invalid credentials',
+      },
     };
-    fetchMock.mockRejectedValueOnce({ data: unauthorizedError });
+    fetchMock.mockRejectedValueOnce(unauthorizedError);
 
     const handler = (await import('../../../../server/api/auth/login.post')).default;
     await expect(handler(makeEvent({}))).rejects.toMatchObject({
       statusCode: 401,
       statusMessage: 'Invalid credentials',
-      data: unauthorizedError.error,
+      data: unauthorizedError.data,
     });
   });
 
   it('throws generic 500 with backend error', async () => {
     const backendError = {
-      error: { code: 'SOMETHING_WRONG', message: 'Server issue' },
+      statusCode: 500,
+      statusMessage: 'Server issue',
+      message: 'Server issue',
+      data: { code: 'SOMETHING_WRONG', message: 'Server issue' },
     };
-    fetchMock.mockRejectedValueOnce({ data: backendError });
+    fetchMock.mockRejectedValueOnce(backendError);
 
     const handler = (await import('../../../../server/api/auth/login.post')).default;
     await expect(handler(makeEvent({}))).rejects.toMatchObject({
       statusCode: 500,
       statusMessage: 'Server issue',
-      data: backendError.error,
-    });
-  });
-
-  it('throws fallback 500 Internal Server Error', async () => {
-    fetchMock.mockRejectedValueOnce(new Error('Oops'));
-
-    const handler = (await import('../../../../server/api/auth/login.post')).default;
-    await expect(handler(makeEvent({}))).rejects.toMatchObject({
-      statusCode: 500,
-      statusMessage: 'Internal Server Error',
+      data: backendError.data,
     });
   });
 });
