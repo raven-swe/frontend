@@ -23,7 +23,7 @@ export const SIDEBAR_TABS: LeftSidebarTab[] = [
   {
     label: 'profile',
     icon: 'person',
-    route: '/profile/hussein',
+    route: '/profile',
   },
   {
     label: 'more',
