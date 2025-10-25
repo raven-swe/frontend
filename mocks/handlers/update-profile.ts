@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw';
-import type { UpdateProfileRequest, UserData } from '~~/types/shared';
-import type { ApiSuccessResponse } from '~~/types/api';
+import type { UpdateProfileRequest, UserData } from '~~/shared/types/shared';
+import type { ApiSuccessResponse } from '~~/shared/types/api';
 
 const API_URL = process.env.BACKEND_URL;
 
