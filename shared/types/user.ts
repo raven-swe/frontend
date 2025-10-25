@@ -23,12 +23,27 @@ export type User = {
   languageCode: string;
 };
 export interface UserProfile {
-  coverImg: string;
-  profileImg: string;
-  name: string;
   username: string;
-  bio: string;
-  joinAt: string;
-  following: number;
-  followers: number;
+  displayName: string;
+  bio: string | null;
+  bioEntities: {
+    mentions: {
+      username: string;
+      startPosition: number;
+    }[];
+    hashtags: {
+      hashtag: string;
+      startPosition: number;
+    }[];
+  };
+  avatarUrl: string;
+  bannerUrl: string;
+  location: string;
+  websiteUrl: string;
+  birthDate: string;
+  joinedAt: string;
+  followingCount: number;
+  followersCount: number;
+  mutualsCount: number;
+  mutualNames: string[];
 }
