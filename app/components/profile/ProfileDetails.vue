@@ -7,8 +7,8 @@ defineProps<{
 </script>
 <template>
   <div>
-    <ProfileCover :cover-img="userProfile.coverImg" />
-    <ProfileAvatarSection :profile-img="userProfile.profileImg" />
+    <ProfileCover :cover-img="userProfile.bannerUrl" />
+    <ProfileAvatarSection :profile-img="userProfile.avatarUrl" />
     <ProfileInfo :user-profile="userProfile" />
   </div>
 </template>

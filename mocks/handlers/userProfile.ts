@@ -2,31 +2,30 @@ import { http, HttpResponse } from 'msw';
 
 const mockUserInfos = {
   hussein: {
-    coverImg: '/cover.jpg',
-    profileImg: '/profile.jpg',
-    name: 'Hussein Mohamed',
     username: 'hussein',
+    displayName: 'Hussein Mohamed',
     bio: 'football lover, software engineer, coffee addict.',
-    joinAt: 'july 2020',
-    following: 150,
-    followers: 50,
-  },
-  johndoe: {
-    coverImg: '/cover.jpg',
-    profileImg: '/profile.jpg',
-    name: 'John Doe',
-    username: 'johndoe',
-    bio: 'Software engineer and coffee enthusiast. Love building things.',
-    joinAt: 'March 2021',
-    following: 245,
-    followers: 189,
+    bioEntities: {
+      mentions: [],
+      hashtags: [],
+    },
+    avatarUrl: 'https://i.ibb.co/vv6B8ML0/profile.jpg',
+    bannerUrl: 'https://i.ibb.co/bj3fhPfq/cover.jpg',
+    location: 'Cairo, Egypt',
+    websiteUrl: 'https://github.com/hussein',
+    birthDate: '1999-01-01',
+    joinedAt: '2020-07-01T00:00:00.000Z',
+    followingCount: 150,
+    followersCount: 200,
+    mutualsCount: 5,
+    mutualNames: [],
   },
 };
 
 const API_URL = process.env.BACKEND_URL;
 
 export const userProfileHandlers = [
-  http.get(`${API_URL}/profile/:username`, ({ params }) => {
+  http.get(`${API_URL}/users/:username/profile`, ({ params }) => {
     const { username } = params;
     const userInfo = mockUserInfos[username as keyof typeof mockUserInfos];
 

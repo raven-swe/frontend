@@ -5,7 +5,7 @@ export const useUserProfile = (username: string) => {
     data: userProfile,
     error,
     pending,
-  } = useFetch<UserProfile>(`/api/profile/${username}`, {
+  } = useFetch<UserProfile>(`/api/users/${username}/profile`, {
     key: `user-profile-${username}`,
   });
   return {

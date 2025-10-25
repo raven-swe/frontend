@@ -3,14 +3,23 @@ import { mountSuspended } from '@nuxt/test-utils/runtime';
 import ProfileDetails from '@/components/profile/ProfileDetails.vue';
 
 const mockUserProfile = {
-  coverImg: '/cover.jpg',
-  profileImg: '/profile.jpg',
-  name: 'Hussein Mohamed',
   username: 'hussein',
+  displayName: 'Hussein Mohamed',
   bio: 'football lover, software engineer, coffee addict.',
-  joinAt: 'july 2020',
-  following: 150,
-  followers: 50,
+  bioEntities: {
+    mentions: [],
+    hashtags: [],
+  },
+  avatarUrl: 'https://i.ibb.co/vv6B8ML0/profile.jpg',
+  bannerUrl: 'https://i.ibb.co/bj3fhPfq/cover.jpg',
+  location: 'Cairo, Egypt',
+  websiteUrl: 'https://github.com/hussein',
+  birthDate: '1999-01-01',
+  joinedAt: '2020-07-01T00:00:00.000Z',
+  followingCount: 150,
+  followersCount: 200,
+  mutualsCount: 5,
+  mutualNames: [],
 };
 
 describe('ProfileDetails Component', () => {
@@ -65,7 +74,7 @@ describe('ProfileDetails Component', () => {
     });
 
     const html = wrapper.html();
-    expect(html).toContain(mockUserProfile.name);
+    expect(html).toContain(mockUserProfile.displayName);
     expect(html).toContain(mockUserProfile.username);
   });
 });
