@@ -9,6 +9,7 @@ export function useOAuthComplete() {
   async function submit(creationToken: string, birthDate: string) {
     loading.value = true;
     error.value = null;
+
     try {
       result.value = await $fetch<OAuthCallbackResponse>('/api/oauth/complete', {
         method: 'POST',
