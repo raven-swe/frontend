@@ -1,7 +1,8 @@
 import * as cookie from 'cookie';
 import * as jwt from 'jsonwebtoken';
+import { defineWrappedResponseHandler } from '~~/server/utils/handler';
 
-export default defineEventHandler(async (event) => {
+export default defineWrappedResponseHandler(async (event) => {
   const body = await readBody(event);
   const response = await serverApiFetch.raw<ApiSuccessResponse<{ accessToken: string }>>(
     '/auth/register/complete',
