@@ -1,4 +1,5 @@
 import * as cookie from 'cookie';
+import * as jwt from 'jsonwebtoken';
 
 export default defineEventHandler(async (event) => {
   const clientCookie = getHeader(event, 'cookie');
@@ -19,12 +20,13 @@ export default defineEventHandler(async (event) => {
   });
 
   if (response._data?.data.accessToken) {
+    const accessTokenContent = jwt.decode(response._data.data.accessToken) as { exp: number };
     appendHeader(
       event,
       'set-cookie',
       cookie.serialize('access_token', response._data?.data.accessToken, {
         path: '/',
-        maxAge: 60 * 5,
+        maxAge: accessTokenContent.exp - Math.floor(Date.now() / 1000),
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
       }),
