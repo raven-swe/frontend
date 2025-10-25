@@ -1,20 +1,17 @@
-import { ofetch } from 'ofetch';
-import { createError } from 'h3';
+const API_URL = process.env.BACKEND_URL || 'https://example.com';
 
-const API_URL = process.env.BACKEND_URL;
-
-export const serverApiFetch = ofetch.create({
+export const serverApiFetch = $fetch.create({
   baseURL: API_URL,
   credentials: 'include',
 
   onRequest({ options }) {
-    // Ensure cookies are included in server-side requests
+    // Ensure the X-Client-Type header is set to web
     options.headers.append('X-Client-Type', 'web');
   },
 
   async onResponseError({ response }) {
     throw createError({
-      statusCode: response.status || 500,
+      statusCode: response.status,
       statusMessage: response._data?.error?.message || response._data?.message || 'Server Error',
       data: response._data?.error || response._data,
     });
