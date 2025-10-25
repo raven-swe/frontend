@@ -1,3 +1,4 @@
+import { $fetch } from 'ofetch';
 const API_URL = process.env.BACKEND_URL || 'https://example.com';
 
 export const serverApiFetch = $fetch.create({
