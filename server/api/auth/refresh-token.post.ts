@@ -1,7 +1,8 @@
 import * as cookie from 'cookie';
 import * as jwt from 'jsonwebtoken';
+import { defineWrappedResponseHandler } from '~~/server/utils/handler';
 
-export default defineEventHandler(async (event) => {
+export default defineWrappedResponseHandler(async (event) => {
   const clientCookie = getHeader(event, 'cookie');
   const response = await serverApiFetch.raw<ApiSuccessResponse<{ accessToken: string }>>(
     '/auth/refresh-token',
