@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import Button from '~/components/ui/Button.vue';
 import { useGoogleAuth } from '~/composables/useGoogleAuth';
-
 import { useLoginStore } from '~/stores/auth/login';
 
 const loginStore = useLoginStore();

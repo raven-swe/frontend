@@ -14,6 +14,10 @@
     "tweets": {
       "tweet-not-found": "Tweet not found",
       "tweets-list": "Tweets List"
+    },
+    "complete-form": {
+      "birthdate-label": "Birthdate",
+      "confirm": "Confirm"
     }
   },
   "leftsidebar": {
