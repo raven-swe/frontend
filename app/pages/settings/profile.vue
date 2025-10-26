@@ -191,6 +191,11 @@ const handleDialogClose = () => {
             {{ $t('profile.edit.edit-profile') }}
           </VisuallyHidden>
         </UiDialogTitle>
+        <UiDialogDescription>
+          <VisuallyHidden>
+            {{ $t('profile.edit.edit-profile') }}
+          </VisuallyHidden>
+        </UiDialogDescription>
 
         <div class="flex h-full w-full flex-col">
           <!-- Header Image Section -->
