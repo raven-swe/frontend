@@ -20,14 +20,10 @@ const handleCancel = () => {
   emit('cancel');
   emit('update:open', false);
 };
-
-const handleOpenChange = (value: boolean) => {
-  emit('update:open', value);
-};
 </script>
 
 <template>
-  <UiDialog :open="open" class="z-50" @update:open="handleOpenChange">
+  <UiDialog :open="open" class="z-50">
     <UiDialogContent class="!h-auto !w-[320px] !max-w-[320px] !p-0" :hide-close-button="true">
       <UiDialogHeader class="p-2">
         <UiDialogTitle>
