@@ -1,4 +1,4 @@
-export const relativeTime = (iso: string) => {
+export const relativeTimeFormat = (iso: string) => {
   const now = Date.now();
   const then = new Date(iso).getTime();
   const diff = Math.max(0, Math.floor((now - then) / 1000));
