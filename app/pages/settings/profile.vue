@@ -8,11 +8,8 @@ import { VisuallyHidden } from 'reka-ui';
 definePageMeta({
   layout: 'profile',
 });
-const route = useRoute();
 const router = useRouter();
 
-// Control dialog open state based on current route
-const isDialogOpen = computed(() => route.path === '/settings/profile');
 const openDiscardDialog = ref(false);
 
 const userStore = useUserStore().user;
@@ -163,7 +160,7 @@ const handleDialogClose = () => {
 
 <template>
   <div>
-    <UiDialog :open="isDialogOpen">
+    <UiDialog :open="true">
       <UiDialogContent
         header-class="flex items-center justify-between px-4"
         class="h-auto !w-[600px] !max-w-[600px]"

@@ -13,6 +13,7 @@ interface ProfileSetupData {
 
 export const useProfileSetupFlow = () => {
   const currentStep = useState<SetupStep>('profileSetup-currentStep', () => 'picture');
+  // this should be removed & replaced with re-routing
   const isFlowActive = useState('profileSetup-isFlowActive', () => true);
 
   const formData = useState<ProfileSetupData>('profileSetup-formData', () => ({

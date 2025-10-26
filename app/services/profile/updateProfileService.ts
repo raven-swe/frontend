@@ -1,5 +1,5 @@
-import type { UpdateProfileRequest, UserData } from '~~/types/shared';
-import type { ApiSuccessResponse } from '~~/types/api';
+import type { UpdateProfileRequest, UserData } from '~~/shared/types/shared';
+import type { ApiSuccessResponse } from '~~/shared/types/api';
 
 export const updateProfileService = () => {
   const updateProfile = async (profileData: UpdateProfileRequest): Promise<UserData> => {
