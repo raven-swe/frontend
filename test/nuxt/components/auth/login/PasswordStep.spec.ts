@@ -197,7 +197,7 @@ describe('PasswordStep.vue', () => {
 
   it('enables submit button when password is entered', async () => {
     const input = wrapper.find('input[name="password"]');
-    await input.setValue('password123');
+    await input.setValue('Password@123');
     await input.trigger('input');
     await input.trigger('blur');
 
@@ -212,7 +212,7 @@ describe('PasswordStep.vue', () => {
     vi.spyOn(loginStore, 'submitLogin').mockResolvedValue(undefined);
 
     const input = wrapper.find('input[name="password"]');
-    await input.setValue('password123');
+    await input.setValue('Password@123');
     await input.trigger('input');
     await input.trigger('blur');
 
@@ -227,7 +227,7 @@ describe('PasswordStep.vue', () => {
 
     expect(loginStore.submitLogin).toHaveBeenCalledWith({
       identifier: 'testuser',
-      password: 'password123',
+      password: 'Password@123',
     });
   });
 
@@ -255,7 +255,7 @@ describe('PasswordStep.vue', () => {
     vi.spyOn(loginStore, 'submitLogin').mockRejectedValue(new Error('Network error'));
 
     const input = wrapper.find('input[name="password"]');
-    await input.setValue('password123');
+    await input.setValue('Password@123');
     await input.trigger('input');
     await input.trigger('blur');
 
@@ -275,7 +275,7 @@ describe('PasswordStep.vue', () => {
     vi.spyOn(loginStore, 'submitLogin').mockRejectedValue({});
 
     const input = wrapper.find('input[name="password"]');
-    await input.setValue('password123');
+    await input.setValue('Password@123');
     await input.trigger('input');
     await input.trigger('blur');
 
@@ -295,7 +295,7 @@ describe('PasswordStep.vue', () => {
     vi.spyOn(loginStore, 'submitLogin').mockResolvedValue(undefined);
 
     const input = wrapper.find('input[name="password"]');
-    await input.setValue('  password123  ');
+    await input.setValue('  Password@123  ');
     await input.trigger('input');
     await input.trigger('blur');
 
@@ -310,7 +310,7 @@ describe('PasswordStep.vue', () => {
 
     expect(loginStore.submitLogin).toHaveBeenCalledWith({
       identifier: 'testuser',
-      password: 'password123',
+      password: 'Password@123',
     });
   });
 

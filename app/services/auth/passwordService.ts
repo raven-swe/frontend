@@ -39,12 +39,9 @@ export const passwordService = {
   },
 
   async resetPassword(data: ResetPasswordSchema) {
-    return await $fetch<ApiSuccessResponse<{ refreshToken: string; accessToken: string }>>(
-      '/api/auth/password/reset',
-      {
-        method: 'POST',
-        body: data,
-      },
-    );
+    return await $fetch<ApiSuccessResponse<{ accessToken: string }>>('/api/auth/password/reset', {
+      method: 'POST',
+      body: data,
+    });
   },
 };

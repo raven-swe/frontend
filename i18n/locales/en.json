@@ -66,31 +66,10 @@
       "signin": "Sign in",
       "signup": "Create account",
       "signup-info": "By signing up, you agree to the Terms of Service and Privacy Policy, including Cookie Use.",
-      "google-signin": "Sign in with Google",
-      "github-signin": "Sign in with GitHub",
       "google-signup": "Sign up with Google",
       "github-signup": "Sign up with GitHub",
       "already-have-account": "Already have an account?",
-      "separator": "or",
-      "forgot-password": "Forgot password?",
-      "dont-have-account": "Don't have an account?",
-      "email-not-found": "Sorry, we could not find your account.",
-      "find-your-account": "Find your Raven account",
-      "enter-identifier": "Enter your email or username associated with your account to change your password.",
-      "we-sent-code": "We sent you a code",
-      "enter-otp": "Check your email to get your confirmation code.",
-      "resend-code": "Resend code",
-      "choose-new-password": "Choose a new password",
-      "password-strength": "Make sure your new password is 8 characters or more. Try including numbers, letters, and punctuation marks for a stronger password.",
-      "logout-warning": "You will be logged out of all active Raven sessions after your password is changed.",
-      "change-password": "Change Password",
-      "email-or-username": "Email or username",
-      "email": "Email",
-      "username": "Username",
-      "password": "Password",
-      "confirm-password": "Confirm your Password",
-      "enter-your-code": "Enter your code",
-      "enter-new-password": "Enter a new password"
+      "separator": "or"
     },
     "footer": {
       "about": "About",
@@ -108,14 +87,17 @@
     "NAME_TOO_SHORT": "What's your name?",
     "NAME_TOO_LONG": "Name must be at most 50 characters long",
     "AGE_RESTRICTION": "You must be at least 13 years old",
-    "OTP_LENGTH": "OTP must be 6 digits",
     "PASSWORD_MISMATCH": "Passwords do not match",
     "PASSWORD_TOO_SHORT": "Password must be at least 8 characters long",
     "PASSWORD_INVALID": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
     "EMAIL_ALREADY_EXISTS": "An account with this email already exists",
-    "OTP_TOO_SHORT": "OTP must be 6 digits",
-    "OTP_TOO_LONG": "OTP must be 6 digits",
-    "INVALID_OTP": "The OTP you entered is invalid"
+    "OTP_MUST_6": "OTP must be exactly 6 digits",
+    "OTP_REQUIRED": "Please enter your OTP code",
+    "INVALID_OTP": "The OTP you entered is invalid",
+    "USER_NOT_FOUND": "User not found",
+    "IDENTIFIER_REQUIRED": "Please enter your email or username",
+    "PASSWORD_REQUIRED": "Please enter your password",
+    "GENERIC_ERROR": "Something went wrong. Please try again."
   },
   "register": {
     "register-info": {
@@ -151,6 +133,53 @@
       "description": "Make sure it's 8 characters or more.",
       "disclaimer": "By signing up, you agree to the Terms of Service and Privacy Policy, including Cookie Use. Raven may use your contact information, including your email address and phone number for purposes outlined in our Privacy Policy, like keeping your account secure and personalizing our services, including ads. Others will be able to find you by email or phone number, when provided, unless you choose otherwise here.",
       "label": "Password"
+    }
+  },
+  "login": {
+    "forgot-password": "Forgot password?",
+    "email-or-username": "Email or username",
+    "email": "Email",
+    "username": "Username",
+    "password": "Password",
+    "dont-have-account": "Don't have an account?",
+    "signup": "Sign up",
+    "identifier-step": {
+      "title": "Sign in to Raven",
+      "google-signin": "Sign in with Google",
+      "github-signin": "Sign in with GitHub"
+    },
+    "password-step": {
+      "title": "Enter your password",
+      "google-signin": "Sign in with Google",
+      "github-signin": "Sign in with GitHub",
+      "dont-have-account": "Don't have an account?",
+      "signin": "Sign in"
+    }
+  },
+  "forgot-password": {
+    "email-or-username": "Email or username",
+    "find-account": {
+      "title": "Find your Raven account",
+      "description": "Enter your email or username associated with your account to change your password.",
+      "identifier-label": "Email or username"
+    },
+    "otp": {
+      "title": "We sent you a code",
+      "description": "Check your email to get your confirmation code.",
+      "label": "Enter your code",
+      "resend-code": "Resend code"
+    },
+    "new-password": {
+      "title": "Choose a new password",
+      "description": "Make sure your new password is 8 characters or more. Try including numbers, letters, and punctuation marks for a stronger password.",
+      "warning": "You will be logged out of all active Raven sessions after your password is changed.",
+      "password": {
+        "label": "Password"
+      },
+      "confirm-password": {
+        "label": "Confirm your Password"
+      },
+      "change-password-button": "Change Password"
     }
   }
 }

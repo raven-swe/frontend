@@ -19,13 +19,6 @@ const generateAuthToken = (user: User) => {
   return jwt.sign(payload, 'secret', { expiresIn: '5m' });
 };
 
-const generateRefreshToken = (user: User) => {
-  const payload = {
-    username: user.username,
-  };
-  return jwt.sign(payload, 'refresh_secret', { expiresIn: '7d' });
-};
-
 export const handlers = [
   // GET /auth/check-identifier?identifier=<identifier>
   http.get(`${API_URL}/auth/check-identifier`, ({ request }) => {
@@ -39,7 +32,7 @@ export const handlers = [
           error: {
             code: 'VALIDATION_ERROR',
             message: 'Identifier is required',
-            errors: [{ field: 'identifier', message: 'Identifier is required' }],
+            errors: [{ field: 'identifier', code: 'REQUIRED', message: 'Identifier is required' }],
           },
         } as ApiValidationErrorResponse,
         { status: 422 },
@@ -89,8 +82,10 @@ export const handlers = [
             errors: [
               ...(body?.identifier
                 ? []
-                : [{ field: 'identifier', message: 'Identifier is required' }]),
-              ...(body?.password ? [] : [{ field: 'password', message: 'Password is required' }]),
+                : [{ field: 'identifier', code: 'REQUIRED', message: 'Identifier is required' }]),
+              ...(body?.password
+                ? []
+                : [{ field: 'password', code: 'REQUIRED', message: 'Password is required' }]),
             ],
           },
         } as ApiValidationErrorResponse,
@@ -115,7 +110,7 @@ export const handlers = [
       );
     }
 
-    if (password !== 'Password123') {
+    if (password !== 'Password@123') {
       return HttpResponse.json(
         {
           success: false,
@@ -134,9 +129,9 @@ export const handlers = [
         message: 'Login successful',
         data: {
           accessToken: generateAuthToken(user),
-          refreshToken: generateRefreshToken(user),
+          // refreshToken: generateRefreshToken(user),
         },
-      } as ApiSuccessResponse<{ accessToken: string; refreshToken: string }>,
+      } as ApiSuccessResponse<{ accessToken: string }>,
       { status: 200 },
     );
   }),

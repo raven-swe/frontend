@@ -7,17 +7,13 @@ import { showToaster } from '@/utils/showToaster';
 const passwordStore = usePasswordStore();
 
 const schema = yup.object({
-  identifier: yup.string().trim().min(1),
+  identifier: yup.string().trim().required($t('errors.IDENTIFIER_REQUIRED')),
 });
 
-const { defineField, handleSubmit, isSubmitting, meta, resetForm } = useForm<
-  yup.InferType<typeof schema>
->({
+const { defineField, handleSubmit, isSubmitting, meta } = useForm({
   validationSchema: schema,
   initialValues: { identifier: passwordStore.identifier },
   validateOnMount: false,
-  validateOnChange: true,
-  validateOnBlur: false,
 });
 
 const [_identifier, identifierAttrs] = defineField('identifier');
@@ -27,7 +23,6 @@ const onSubmit = handleSubmit(async (values) => {
       identifier: values.identifier.trim(),
       recaptchaToken: 'recaptchaToken',
     });
-    resetForm({ values: { identifier: '' } });
   } catch (err: unknown) {
     showToaster('error', (err as Error).message || $t('errors.GENERIC_ERROR'));
   }
@@ -38,10 +33,10 @@ const onSubmit = handleSubmit(async (values) => {
   <form @submit.prevent="onSubmit">
     <UiDialogHeader class="mt-3 w-fit px-8 py-4">
       <UiDialogTitle class="text-3xl font-bold">
-        {{ $t('root.auth.find-your-account') }}
+        {{ $t('forgot-password.find-account.title') }}
       </UiDialogTitle>
       <p class="text-muted-foreground mx-auto mt-2 text-sm">
-        {{ $t('root.auth.enter-identifier') }}
+        {{ $t('forgot-password.find-account.description') }}
       </p>
     </UiDialogHeader>
 
@@ -49,7 +44,7 @@ const onSubmit = handleSubmit(async (values) => {
       <section class="flex flex-col gap-4">
         <UiFormFieldInput
           class="mb-4"
-          :placeholder="$t('root.auth.email-or-username')"
+          :placeholder="$t('forgot-password.email-or-username')"
           type="text"
           name="identifier"
           :model-value="passwordStore.identifier"

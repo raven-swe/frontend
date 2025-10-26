@@ -9,9 +9,8 @@ export const useLoginStore = defineStore('login', () => {
   const open = ref(false);
   const identifier = ref('');
   const type = ref('');
-  const accessToken = ref('');
-  const refreshToken = ref('');
   const loading = ref(false);
+  const registerStore = useRegisterStore();
 
   const openDialog = () => {
     open.value = true;
@@ -27,11 +26,14 @@ export const useLoginStore = defineStore('login', () => {
     closeDialog();
   };
 
+  const openSignupDialog = () => {
+    closeDialog();
+    registerStore.openDialog();
+  };
+
   const resetData = () => {
     step.value = 0;
     identifier.value = '';
-    accessToken.value = '';
-    refreshToken.value = '';
     loading.value = false;
     type.value = '';
   };
@@ -61,9 +63,7 @@ export const useLoginStore = defineStore('login', () => {
   const submitLogin = async (data: LoginSchema) => {
     loading.value = true;
     try {
-      const response = await loginService.login(data);
-      sessionStorage.setItem('accessToken', response.data.accessToken);
-      sessionStorage.setItem('refreshToken', response.data.refreshToken);
+      await loginService.login(data);
       step.value = 0;
       open.value = false;
       showToaster('success', 'Login successful');
@@ -86,6 +86,7 @@ export const useLoginStore = defineStore('login', () => {
     openDialog,
     closeDialog,
     openForgotPasswordDialog,
+    openSignupDialog,
     checkUserExists,
     submitLogin,
   };

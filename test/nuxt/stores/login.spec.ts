@@ -126,13 +126,12 @@ describe('Login Store', () => {
         success: true,
         data: {
           accessToken: 'access-123',
-          refreshToken: 'refresh-456',
         },
       }),
     });
 
     const store = useLoginStore();
-    const payload = { identifier: 'user@example.com', password: 'Password123' };
+    const payload = { identifier: 'user@example.com', password: 'Password@123' };
     await store.submitLogin(payload);
     expect(navigateToMock).toHaveBeenCalledWith('/home');
   });

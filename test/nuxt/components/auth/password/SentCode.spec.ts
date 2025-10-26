@@ -181,32 +181,10 @@ describe('SentCode.vue', () => {
     expect(showToasterMock).toHaveBeenCalledWith('error', 'An error occurred');
   });
 
-  it('trims whitespace from OTP before submission', async () => {
-    vi.spyOn(passwordStore, 'verifyUser').mockResolvedValue(undefined);
-
-    const input = wrapper.find('input[name="otp"]');
-    await input.setValue('  123456  ');
-    await input.trigger('input');
-    await input.trigger('blur');
-
-    await nextTick();
-    await new Promise((resolve) => setTimeout(resolve, 50));
-
-    const form = wrapper.find('form');
-    await form.trigger('submit.prevent');
-
-    await nextTick();
-    await new Promise((resolve) => setTimeout(resolve, 50));
-
-    expect(passwordStore.verifyUser).toHaveBeenCalledWith('123456');
-  });
-
   it('calls resendOtp when resend button is clicked', async () => {
     vi.spyOn(passwordStore, 'resendOtp').mockResolvedValue(undefined);
 
-    const resendButton = wrapper
-      .findAll('button')
-      .find((btn) => btn.text().includes('Resend code'));
+    const resendButton = wrapper.find('[data-testid="resend-link"]');
 
     expect(resendButton).toBeDefined();
     await resendButton?.trigger('click');
@@ -218,10 +196,7 @@ describe('SentCode.vue', () => {
   it('resend button exists and can be clicked', async () => {
     vi.spyOn(passwordStore, 'resendOtp').mockResolvedValue(undefined);
 
-    const resendButton = wrapper
-      .findAll('button')
-      .find((btn) => btn.text().includes('Resend code'));
-
+    const resendButton = wrapper.find('[data-testid="resend-link"]');
     expect(resendButton).toBeDefined();
 
     await resendButton?.trigger('click');

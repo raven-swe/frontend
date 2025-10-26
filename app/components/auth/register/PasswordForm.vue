@@ -3,15 +3,13 @@ import * as yup from 'yup';
 import { useForm } from 'vee-validate';
 import FieldInput from '~/components/ui/form/FieldInput.vue';
 import Button from '~/components/ui/Button.vue';
+import { createPasswordSchema } from '~/schemas/auth';
 
 const registerStore = useRegisterStore();
+const { t } = useI18n();
+
 const schema = yup.object({
-  password: yup
-    .string()
-    .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-      $t('errors.PASSWORD_INVALID'),
-    ),
+  password: createPasswordSchema(t),
 });
 const { errors, defineField, handleSubmit, isSubmitting } = useForm({
   validationSchema: schema,

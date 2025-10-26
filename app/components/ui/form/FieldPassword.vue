@@ -2,7 +2,7 @@
 import { useField } from 'vee-validate';
 import { ref } from 'vue';
 
-const props = defineProps<{ name: string; placeholder?: string }>();
+const props = defineProps<{ name: string; placeholder: string }>();
 
 const { value, errorMessage } = useField<string>(() => props.name);
 

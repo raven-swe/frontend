@@ -44,7 +44,7 @@ export const handlers = [
           error: {
             code: 'VALIDATION_ERROR',
             message: 'Validation error',
-            errors: [{ field: 'identifier', message: 'Identifier is required' }],
+            errors: [{ field: 'identifier', code: 'REQUIRED', message: 'Identifier is required' }],
           },
         } as ApiValidationErrorResponse,
         { status: 422 },
@@ -95,9 +95,11 @@ export const handlers = [
             message: 'Validation error',
             errors: [
               ...(!body.confirmationToken
-                ? [{ field: 'confirmationToken', message: 'Token is required' }]
+                ? [{ field: 'confirmationToken', code: 'REQUIRED', message: 'Token is required' }]
                 : []),
-              ...(!body.otp ? [{ field: 'otp', message: 'OTP is required' }] : []),
+              ...(!body.otp
+                ? [{ field: 'otp', code: 'REQUIRED', message: 'OTP is required' }]
+                : []),
             ],
           },
         } as ApiValidationErrorResponse,
@@ -149,7 +151,9 @@ export const handlers = [
           error: {
             code: 'VALIDATION_ERROR',
             message: 'Validation error',
-            errors: [{ field: 'confirmationToken', message: 'Token is required' }],
+            errors: [
+              { field: 'confirmationToken', code: 'REQUIRED', message: 'Token is required' },
+            ],
           },
         } as ApiValidationErrorResponse,
         { status: 422 },
@@ -191,10 +195,10 @@ export const handlers = [
             message: 'Validation error',
             errors: [
               ...(!body.confirmationToken
-                ? [{ field: 'confirmationToken', message: 'Token is required' }]
+                ? [{ field: 'confirmationToken', code: 'REQUIRED', message: 'Token is required' }]
                 : []),
               ...(!body.newPassword
-                ? [{ field: 'newPassword', message: 'New password is required' }]
+                ? [{ field: 'newPassword', code: 'REQUIRED', message: 'New password is required' }]
                 : []),
             ],
           },

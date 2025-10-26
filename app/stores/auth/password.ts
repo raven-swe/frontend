@@ -22,6 +22,10 @@ export const usePasswordStore = defineStore('password', () => {
     open.value = true;
   }
 
+  const closeDialog = () => {
+    open.value = false;
+    router.push('/');
+  };
   const getIdentifierFromQuery = (): string => {
     const query = router.currentRoute.value.query;
     identifier.value = (query.identifier as string) ? (query.identifier as string) : '';
@@ -62,6 +66,7 @@ export const usePasswordStore = defineStore('password', () => {
   };
 
   const resendOtp = async () => {
+    loading.value = true;
     try {
       await passwordService.resendOtp(confirmationToken.value);
       step.value = 1;
@@ -70,6 +75,8 @@ export const usePasswordStore = defineStore('password', () => {
       const msg = error?.data?.message || 'Unexpected error occurred';
       console.error(msg);
       throw new Error(msg);
+    } finally {
+      loading.value = false;
     }
   };
 
@@ -80,9 +87,7 @@ export const usePasswordStore = defineStore('password', () => {
       newPassword: newPassword,
     };
     try {
-      const response = await passwordService.resetPassword(data);
-      sessionStorage.setItem('accessToken', response.data.accessToken);
-      sessionStorage.setItem('refreshToken', response.data.refreshToken);
+      await passwordService.resetPassword(data);
       step.value = 0;
       open.value = false;
       showToaster('success', 'Password reset successful');
@@ -101,7 +106,9 @@ export const usePasswordStore = defineStore('password', () => {
     open,
     identifier,
     loading,
+
     openDialog,
+    closeDialog,
     checkUserExists,
     verifyUser,
     resendOtp,

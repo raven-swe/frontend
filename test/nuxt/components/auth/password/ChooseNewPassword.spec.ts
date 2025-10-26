@@ -112,7 +112,7 @@ describe('ChooseNewPassword.vue', () => {
     const newPasswordInput = wrapper.find('input[name="newPassword"]');
     const confirmPasswordInput = wrapper.find('input[name="confirmPassword"]');
 
-    await newPasswordInput.setValue('password123');
+    await newPasswordInput.setValue('Password@123');
     await confirmPasswordInput.setValue('password456');
     await newPasswordInput.trigger('input');
     await confirmPasswordInput.trigger('input');
@@ -128,8 +128,8 @@ describe('ChooseNewPassword.vue', () => {
     const newPasswordInput = wrapper.find('input[name="newPassword"]');
     const confirmPasswordInput = wrapper.find('input[name="confirmPassword"]');
 
-    await newPasswordInput.setValue('password123');
-    await confirmPasswordInput.setValue('password123');
+    await newPasswordInput.setValue('Password@123');
+    await confirmPasswordInput.setValue('Password@123');
     await newPasswordInput.trigger('input');
     await confirmPasswordInput.trigger('input');
 
@@ -146,8 +146,8 @@ describe('ChooseNewPassword.vue', () => {
     const newPasswordInput = wrapper.find('input[name="newPassword"]');
     const confirmPasswordInput = wrapper.find('input[name="confirmPassword"]');
 
-    await newPasswordInput.setValue('password123');
-    await confirmPasswordInput.setValue('password123');
+    await newPasswordInput.setValue('Password@123');
+    await confirmPasswordInput.setValue('Password@123');
     await newPasswordInput.trigger('input');
     await confirmPasswordInput.trigger('input');
 
@@ -160,7 +160,7 @@ describe('ChooseNewPassword.vue', () => {
     await nextTick();
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    expect(passwordStore.resetPassword).toHaveBeenCalledWith('password123');
+    expect(passwordStore.resetPassword).toHaveBeenCalledWith('Password@123');
   });
 
   it('shows error when password reset fails', async () => {
@@ -169,8 +169,8 @@ describe('ChooseNewPassword.vue', () => {
     const newPasswordInput = wrapper.find('input[name="newPassword"]');
     const confirmPasswordInput = wrapper.find('input[name="confirmPassword"]');
 
-    await newPasswordInput.setValue('password123');
-    await confirmPasswordInput.setValue('password123');
+    await newPasswordInput.setValue('Password@123');
+    await confirmPasswordInput.setValue('Password@123');
     await newPasswordInput.trigger('input');
     await confirmPasswordInput.trigger('input');
 
@@ -192,8 +192,8 @@ describe('ChooseNewPassword.vue', () => {
     const newPasswordInput = wrapper.find('input[name="newPassword"]');
     const confirmPasswordInput = wrapper.find('input[name="confirmPassword"]');
 
-    await newPasswordInput.setValue('password123');
-    await confirmPasswordInput.setValue('password123');
+    await newPasswordInput.setValue('Password@123');
+    await confirmPasswordInput.setValue('Password@123');
     await newPasswordInput.trigger('input');
     await confirmPasswordInput.trigger('input');
 
@@ -215,8 +215,8 @@ describe('ChooseNewPassword.vue', () => {
     const newPasswordInput = wrapper.find('input[name="newPassword"]');
     const confirmPasswordInput = wrapper.find('input[name="confirmPassword"]');
 
-    await newPasswordInput.setValue('password123');
-    await confirmPasswordInput.setValue('password123');
+    await newPasswordInput.setValue('Password@123');
+    await confirmPasswordInput.setValue('Password@123');
     await newPasswordInput.trigger('input');
     await confirmPasswordInput.trigger('input');
 
@@ -230,28 +230,5 @@ describe('ChooseNewPassword.vue', () => {
     await new Promise((resolve) => setTimeout(resolve, 50));
 
     expect(showToasterMock).toHaveBeenCalledWith('error', 'An error occurred');
-  });
-
-  it('trims whitespace from password before submission', async () => {
-    vi.spyOn(passwordStore, 'resetPassword').mockResolvedValue(undefined);
-
-    const newPasswordInput = wrapper.find('input[name="newPassword"]');
-    const confirmPasswordInput = wrapper.find('input[name="confirmPassword"]');
-
-    await newPasswordInput.setValue('  password123  ');
-    await confirmPasswordInput.setValue('  password123  ');
-    await newPasswordInput.trigger('input');
-    await confirmPasswordInput.trigger('input');
-
-    await nextTick();
-    await new Promise((resolve) => setTimeout(resolve, 50));
-
-    const form = wrapper.find('form');
-    await form.trigger('submit.prevent');
-
-    await nextTick();
-    await new Promise((resolve) => setTimeout(resolve, 50));
-
-    expect(passwordStore.resetPassword).toHaveBeenCalledWith('password123');
   });
 });

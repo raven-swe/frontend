@@ -72,7 +72,7 @@ describe('POST /api/auth/login', () => {
   it('returns tokens on success', async () => {
     const mockResponse = {
       success: true,
-      data: { accessToken: 'abc', refreshToken: 'xyz' },
+      data: { accessToken: 'abc' },
     };
     fetchMock.mockResolvedValueOnce(mockResponse);
 

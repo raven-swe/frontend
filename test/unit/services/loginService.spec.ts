@@ -37,7 +37,7 @@ describe('loginService', () => {
   describe('login', () => {
     it('calls API with credentials and returns tokens', async () => {
       const mockResponse = {
-        data: { accessToken: 'access-123', refreshToken: 'refresh-456' },
+        data: { accessToken: 'access-123' },
       };
       const credentials = { identifier: 'user@test.com', password: 'Pass123!' };
       fetchMock.mockResolvedValue(mockResponse);
@@ -54,7 +54,7 @@ describe('loginService', () => {
 
     it('handles login with username', async () => {
       const mockResponse = {
-        data: { accessToken: 'access-abc', refreshToken: 'refresh-xyz' },
+        data: { accessToken: 'access-abc' },
       };
       const credentials = { identifier: 'username', password: 'SecurePass1!' };
       fetchMock.mockResolvedValue(mockResponse);

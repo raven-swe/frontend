@@ -15,12 +15,9 @@ export const loginService = {
   },
 
   async login(data: LoginSchema) {
-    return await $fetch<ApiSuccessResponse<{ refreshToken: string; accessToken: string }>>(
-      '/api/auth/login',
-      {
-        method: 'POST',
-        body: data,
-      },
-    );
+    return await $fetch<ApiSuccessResponse<{ accessToken: string }>>('/api/auth/login', {
+      method: 'POST',
+      body: data,
+    });
   },
 };

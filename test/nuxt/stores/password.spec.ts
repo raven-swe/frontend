@@ -156,7 +156,6 @@ describe('Password Store', () => {
       const store = await createStore();
       await store.checkUserExists({ identifier: 'x', recaptchaToken: 'y' });
       await store.resetPassword('Pass123!');
-      expect(sessionStorage.getItem('accessToken')).toBe('a');
       expect(showToasterMock).toHaveBeenCalledWith('success', 'Password reset successful');
       expect(routerMock.push).toHaveBeenCalledWith('/home');
     });
