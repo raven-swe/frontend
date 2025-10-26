@@ -1,7 +1,6 @@
 import { mountSuspended } from '@nuxt/test-utils/runtime';
-import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { createI18n } from 'vue-i18n';
-import { createPinia, setActivePinia } from 'pinia';
 import messages from '~~/i18n/locales/en.json';
 import Dialog from '@/components/ui/dialog/Dialog.vue';
 
@@ -16,10 +15,6 @@ const i18n = createI18n({
 });
 
 describe('BioDialog.vue', () => {
-  beforeAll(() => {
-    setActivePinia(createPinia());
-  });
-
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
@@ -44,7 +39,6 @@ describe('BioDialog.vue', () => {
       },
     );
 
-    await flushPromises();
     const content = document.querySelector('[data-slot="dialog-content"]');
     expect(content?.querySelector('textarea')).toBeTruthy();
     // we probably should agree on data-testids
@@ -67,8 +61,6 @@ describe('BioDialog.vue', () => {
         },
       },
     );
-
-    await flushPromises();
 
     // Set bio value directly on the component
     const bioDialog = wrapper.findComponent(BioDialog);
@@ -105,7 +97,6 @@ describe('BioDialog.vue', () => {
       },
     );
 
-    await flushPromises();
     const button = document.querySelector('.w-100') as HTMLButtonElement;
     expect(button?.textContent?.trim()).toBe(i18n.global.t('ui.skip-for-now'));
     expect(button?.className).toContain('outline');
@@ -125,8 +116,6 @@ describe('BioDialog.vue', () => {
         },
       },
     );
-
-    await flushPromises();
 
     // Set bio value
     const textarea = document.querySelector('textarea');
@@ -155,8 +144,6 @@ describe('BioDialog.vue', () => {
         },
       },
     );
-
-    await flushPromises();
 
     // Get the BioDialog component instance
     const bioDialog = wrapper.findComponent(BioDialog);
@@ -190,7 +177,6 @@ describe('BioDialog.vue', () => {
       },
     );
 
-    await flushPromises();
     const content = document.querySelector('[data-slot="dialog-content"]');
     const textarea = content?.querySelector('textarea') as HTMLTextAreaElement;
     expect(textarea.getAttribute('maxlength')).toBe('160');

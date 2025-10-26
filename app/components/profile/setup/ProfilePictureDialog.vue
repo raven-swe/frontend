@@ -31,7 +31,7 @@ const handleFileChange = (event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
 
-  if (file && file.type.startsWith('image/')) {
+  if (file) {
     selectedFile.value = file;
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -50,11 +50,6 @@ const handleSubmit = () => {
 
 const handleOpenChange = (value: boolean) => {
   emit('update:open', value);
-  if (!value) {
-    // Reset on close
-    selectedImage.value = null;
-    selectedFile.value = null;
-  }
 };
 </script>
 

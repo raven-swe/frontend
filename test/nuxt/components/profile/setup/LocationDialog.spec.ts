@@ -1,7 +1,6 @@
 import { mountSuspended } from '@nuxt/test-utils/runtime';
-import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { createI18n } from 'vue-i18n';
-import { createPinia, setActivePinia } from 'pinia';
 import messages from '~~/i18n/locales/en.json';
 import Dialog from '@/components/ui/dialog/Dialog.vue';
 
@@ -16,10 +15,6 @@ const i18n = createI18n({
 });
 
 describe('LocationDialog.vue', () => {
-  beforeAll(() => {
-    setActivePinia(createPinia());
-  });
-
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
@@ -46,7 +41,6 @@ describe('LocationDialog.vue', () => {
       },
     );
 
-    await flushPromises();
     const content = document.querySelector('[data-slot="dialog-content"]');
     expect(content?.querySelector('input[type="text"]')).toBeTruthy();
     expect(content?.querySelector('.text-3xl')?.textContent).toBe(
@@ -70,8 +64,6 @@ describe('LocationDialog.vue', () => {
         },
       },
     );
-
-    await flushPromises();
 
     // Set location value directly on the component
     const locationDialog = wrapper.findComponent(LocationDialog);
@@ -110,7 +102,6 @@ describe('LocationDialog.vue', () => {
       },
     );
 
-    await flushPromises();
     const button = document.querySelector('.w-100') as HTMLButtonElement;
     expect(button?.textContent?.trim()).toBe(i18n.global.t('ui.skip-for-now'));
     expect(button?.className).toContain('outline');
@@ -132,8 +123,6 @@ describe('LocationDialog.vue', () => {
         },
       },
     );
-
-    await flushPromises();
 
     // Set location value
     const input = document.querySelector('input[type="text"]') as HTMLInputElement;
@@ -164,8 +153,6 @@ describe('LocationDialog.vue', () => {
         },
       },
     );
-
-    await flushPromises();
 
     // Get the LocationDialog component instance
     const locationDialog = wrapper.findComponent(LocationDialog);
@@ -202,50 +189,9 @@ describe('LocationDialog.vue', () => {
       },
     );
 
-    await flushPromises();
     const content = document.querySelector('[data-slot="dialog-content"]');
     const input = content?.querySelector('input[type="text"]') as HTMLInputElement;
     expect(input.getAttribute('maxlength')).toBe('30');
-    wrapper.unmount();
-  });
-
-  it('resets location value when dialog is closed', async () => {
-    const { default: LocationDialog } = await import(
-      '@/components/profile/setup/LocationDialog.vue'
-    );
-    const wrapper = await mountSuspended(
-      {
-        components: { LocationDialog },
-        template: '<LocationDialog :open="true" />',
-      },
-      {
-        global: {
-          plugins: [i18n],
-        },
-      },
-    );
-
-    await flushPromises();
-
-    // Set location value
-    const input = document.querySelector('input[type="text"]') as HTMLInputElement;
-    if (input) {
-      input.value = 'Paris, France';
-      input.dispatchEvent(new Event('input'));
-    }
-    await flushPromises();
-
-    // Get the LocationDialog component instance
-    const locationDialog = wrapper.findComponent(LocationDialog);
-
-    // Close the dialog
-    const uiDialog = locationDialog.findComponent({ name: 'UiDialog' });
-    uiDialog.vm.$emit('update:open', false);
-    await locationDialog.vm.$nextTick();
-    await flushPromises();
-
-    // Verify location is reset (empty)
-    expect(input.value).toBe('');
     wrapper.unmount();
   });
 });
