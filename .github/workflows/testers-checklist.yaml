@@ -18,8 +18,8 @@ jobs:
         uses: peter-evans/find-comment@v4
         with:
           issue-number: ${{ github.event.pull_request.number }}
-          comment-author: 'github-actions[bot]'
-          body-includes: '## Testers Checklist'
+          comment-author: "github-actions[bot]"
+          body-includes: "## Testers Checklist"
 
       - name: Create or update PR checklist comment
         uses: peter-evans/create-or-update-comment@v5
@@ -41,5 +41,6 @@ jobs:
             - [ ] Responsiveness for all screens
             - [ ] Loading indicators & skeleton loaders
             - [ ] Optimistic loading (if applicable)
+            - [ ] No warnings in console
 
           edit-mode: replace
