@@ -47,6 +47,19 @@
       "replies": "Replies",
       "media": "Media",
       "likes": "Likes"
+    },
+    "setup": {
+      "setup-profile": "Set up profile",
+      "pick-profile-picture": "Pick a profile picture",
+      "profile-picture-desc": "Have a favorite selfie? Upload it now.",
+      "pick-header": "Pick a header",
+      "header-desc": "People who visit your profile will see it. Show your style.",
+      "enter-bio": "Describe yourself",
+      "bio-desc": "What makes you special? Don't think too hard, just have fun with it.",
+      "add-location": "Where do you live?",
+      "location-desc": "Find accounts in the same location as you.",
+      "click-to-save": "Click to save updates",
+      "confirmation-dialog": "confirmation Dialog"
     }
   },
   "playground": {
@@ -80,7 +93,9 @@
   "ui": {
     "close": "Close",
     "next": "Next",
-    "loading": "Loading"
+    "loading": "Loading",
+    "skip-for-now": "Skip for now",
+    "save": "Save"
   },
   "errors": {
     "INVALID_EMAIL": "Please enter a valid email.",
