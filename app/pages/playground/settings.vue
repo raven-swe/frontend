@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { User } from '~~/shared/types/user';
-import { birthDateFormat } from '#imports';
+import { formatBirthDate } from '~/utils/index';
 import SettingsItem from './settingsItem.vue';
 const user = ref<User | null>(null);
 
@@ -22,7 +22,7 @@ if (error.value) console.error(error.value);
     />
     <SettingsItem
       :title="$t('setting.date-of-birth')"
-      :subtitle="birthDateFormat(user.birthDate, $i18n.locale)"
+      :subtitle="formatBirthDate(user.birthDate, $i18n.locale)"
       to="/playground/settings/date-of-birth"
     />
     <SettingsItem
