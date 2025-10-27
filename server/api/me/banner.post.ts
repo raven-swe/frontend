@@ -3,7 +3,7 @@ import type {
   ApiSuccessResponse,
   ApiErrorResponse,
   ApiValidationErrorResponse,
-} from '~~/types/api';
+} from '~~/shared/types/api';
 
 const API_URL = process.env.BACKEND_URL;
 

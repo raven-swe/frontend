@@ -60,6 +60,16 @@
       "location-desc": "Find accounts in the same location as you.",
       "click-to-save": "Click to save updates",
       "confirmation-dialog": "confirmation Dialog"
+    },
+    "edit": {
+      "edit-profile": "Edit profile",
+      "name": "Name",
+      "bio": "Bio",
+      "location": "Location",
+      "website": "Website",
+      "birth-date": "Birth date",
+      "discard-changes": "Discard changes?",
+      "discard-changes-desc": "This can't be undone and you'll lose your changes."
     }
   },
   "playground": {
@@ -100,7 +110,9 @@
     "next": "Next",
     "loading": "Loading",
     "skip-for-now": "Skip for now",
-    "save": "Save"
+    "save": "Save",
+    "cancel": "Cancel",
+    "discard": "Discard"
   },
   "errors": {
     "INVALID_EMAIL": "Please enter a valid email.",
@@ -114,7 +126,8 @@
     "EMAIL_ALREADY_EXISTS": "An account with this email already exists",
     "OTP_TOO_SHORT": "OTP must be 6 digits",
     "OTP_TOO_LONG": "OTP must be 6 digits",
-    "INVALID_OTP": "The OTP you entered is invalid"
+    "INVALID_OTP": "The OTP you entered is invalid",
+    "EMPTY_NAME": "Name can't be blank"
   },
   "register": {
     "register-info": {
