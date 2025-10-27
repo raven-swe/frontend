@@ -19,11 +19,15 @@ onMounted(async () => {
       window.close();
     } else {
       try {
-        const result = await $fetch('/api/oauth/github/callback', {
-          method: 'POST',
-          body: { code },
-        });
-        if (result?.data?.creationToken) {
+        const result = await $fetch<ApiSuccessResponse<OAuthCallbackResponse>>(
+          '/api/oauth/github/callback',
+          {
+            method: 'POST',
+            body: { code },
+          },
+        );
+
+        if (result.success && 'creationToken' in result.data) {
           creationToken.value = result.data.creationToken;
           showForm.value = true;
         } else {
@@ -41,8 +45,5 @@ onMounted(async () => {
 <template>
   <div>
     <OAuthCompleteForm v-if="showForm && creationToken" :creation-token="creationToken" />
-    <div v-else>
-      <!-- Success or redirect handled in script -->
-    </div>
   </div>
 </template>

@@ -8,6 +8,9 @@ export default defineNuxtConfig({
     public: {
       googleClientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID || '',
       backendUrl: process.env.BACKEND_URL || '',
+      githubClientId: process.env.NUXT_PUBLIC_GITHUB_CLIENT_ID || '',
+      githubRedirectUri: process.env.NUXT_PUBLIC_GITHUB_REDIRECT_URI || '',
+      githubScope: process.env.NUXT_PUBLIC_GITHUB_SCOPE || '',
     },
   },
   devtools: {

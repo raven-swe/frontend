@@ -1,11 +1,11 @@
 import { FetchError } from 'ofetch';
-import type { OAuthTokenRequest, OAuthCallbackResponse } from '../../../../shared/types/oauth';
+import type { OAuthTokenRequest, OAuthCallbackResponse } from '~~/shared/types/oauth';
 
 interface ApiError {
   message: string;
 }
 
-export default defineEventHandler(async (event): Promise<OAuthCallbackResponse> => {
+export default defineEventHandler(async (event) => {
   const body = await readBody<OAuthTokenRequest>(event);
 
   const API_URL = process.env.BACKEND_URL;

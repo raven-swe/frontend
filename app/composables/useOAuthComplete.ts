@@ -1,9 +1,9 @@
 import { useRouter } from 'vue-router';
 import type { OAuthCallbackResponse } from '../../shared/types/oauth';
 export function useOAuthComplete() {
-  const loading = ref(false);
+  const loading = ref<boolean>(false);
   const error = ref<string | null>(null);
-  const result = ref<OAuthCallbackResponse>();
+  const result = ref<ApiSuccessResponse<OAuthCallbackResponse>>();
   const router = useRouter();
 
   async function submit(creationToken: string, birthDate: string) {
@@ -11,10 +11,13 @@ export function useOAuthComplete() {
     error.value = null;
 
     try {
-      result.value = await $fetch<OAuthCallbackResponse>('/api/oauth/complete', {
-        method: 'POST',
-        body: { creationToken, birthDate },
-      });
+      result.value = await $fetch<ApiSuccessResponse<OAuthCallbackResponse>>(
+        '/api/oauth/complete',
+        {
+          method: 'POST',
+          body: { creationToken, birthDate },
+        },
+      );
       if (result.value?.success) {
         await router.push('/home');
       }

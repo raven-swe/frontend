@@ -12,9 +12,11 @@ definePageMeta({
 
 const { initializeGoogleButton } = useGoogleAuth();
 
-const githubClientId = 'Ov23liEaroEKXCEZJXiK';
-const githubRedirectUri = 'http://localhost:5173/auth/callback/github';
-const githubScope = 'read:user user:email';
+const config = useRuntimeConfig();
+
+const githubClientId = config.public.githubClientId;
+const githubRedirectUri = config.public.githubRedirectUri;
+const githubScope = config.public.githubScope;
 
 function handleGithubSignIn() {
   const params = new URLSearchParams({
@@ -25,7 +27,7 @@ function handleGithubSignIn() {
   window.open(
     `https://github.com/login/oauth/authorize?${params.toString()}`,
     'github-oauth',
-    'width=500,height=600',
+    `width=500,height=600,top=${(screen.height - 600) / 2},left=${(screen.width - 500) / 2}`,
   );
 }
 

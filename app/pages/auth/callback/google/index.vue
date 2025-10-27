@@ -11,16 +11,18 @@ const showForm = ref(false);
 
 if (code) {
   try {
-    const result = await $fetch('/api/oauth/google/callback', {
-      method: 'POST',
-      body: { code },
-    });
-    if (result?.data?.creationToken) {
+    const result = await $fetch<ApiSuccessResponse<OAuthCallbackResponse>>(
+      '/api/oauth/google/callback',
+      {
+        method: 'POST',
+        body: { code },
+      },
+    );
+    if (result.success && 'creationToken' in result.data) {
       creationToken.value = result.data.creationToken;
       showForm.value = true;
     } else {
       // Handle accessToken/refreshToken as usual
-      // e.g. store tokens, redirect
       await router.push('/home');
     }
   } catch (error) {
@@ -32,8 +34,5 @@ if (code) {
 <template>
   <div>
     <OAuthCompleteForm v-if="showForm && creationToken" :creation-token="creationToken" />
-    <div v-else>
-      <!-- Success or redirect handled in script -->
-    </div>
   </div>
 </template>

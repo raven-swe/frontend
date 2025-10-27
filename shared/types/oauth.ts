@@ -7,12 +7,10 @@ export interface OAuthTokenRequest {
   birthDate: string;
 }
 
-export interface OAuthCallbackResponse {
-  success: boolean;
-  message: string;
-  data: {
-    creationToken?: string;
-    accessToken?: string;
-    refreshToken?: string;
-  };
-}
+export type OAuthCallbackResponse =
+  | {
+      accessToken: string;
+    }
+  | {
+      creationToken: string;
+    };
