@@ -1,0 +1,112 @@
+name: Build and Push Docker Image
+on:
+  pull_request:
+    branches: [dev, main]
+    types: [closed]
+
+jobs:
+  build-and-push:
+    if: github.event.pull_request.merged == true
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Extract repository name
+        id: repo
+        run: |
+          REPO_NAME=$(basename "${{ github.repository }}")
+          echo "repo_name=$REPO_NAME" >> $GITHUB_OUTPUT
+
+      - name: Determine bump type
+        id: bump
+        run: |
+          if [[ "${{ github.event.pull_request.base.ref }}" == "dev" ]]; then
+            echo "bump_type=minor" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event.pull_request.base.ref }}" == "main" ]]; then
+            echo "bump_type=major" >> $GITHUB_OUTPUT
+          else
+            echo "Unsupported base branch"
+            exit 1
+          fi
+
+      - name: Bump version and create tag
+        id: tag_version
+        uses: anothrNick/github-tag-action@1.75.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BUMP: ${{ steps.bump.outputs.bump_type }}
+          RELEASE_BRANCHES: main,dev
+          PRERELEASE: false
+          WITH_V: false
+
+      - name: Set image name and tag
+        id: image
+        run: |
+          REGISTRY="${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.repo.outputs.repo_name }}"
+          TAG="${{ steps.tag_version.outputs.new_tag }}"
+          LATEST_TAG=$([[ "${{ github.event.pull_request.base.ref }}" == "main" ]] && echo "latest" || echo "staging-latest")
+          DEPLOYMENT_URL=$([[ "${{ github.event.pull_request.base.ref }}" == "main" ]] && echo "https://raven.cmp27.space" || echo "https://staging.raven.cmp27.space")
+          DEPLOYMENT_TARGET=$([[ "${{ github.event.pull_request.base.ref }}" == "main" ]] && echo "Production" || echo "Staging")
+
+          echo "registry=$REGISTRY" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+          echo "deployment_url=$DEPLOYMENT_URL" >> $GITHUB_OUTPUT
+          echo "deployment_target=$DEPLOYMENT_TARGET" >> $GITHUB_OUTPUT
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        id: build-and-push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            "${{ steps.image.outputs.registry }}:${{ steps.image.outputs.tag }}"
+            "${{ steps.image.outputs.registry }}:${{ steps.image.outputs.latest_tag }}"
+
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Notify Discord Success
+        if: always() && steps.build-and-push.outcome == 'success'
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DEPLOYMENT_DISCORD_WEBHOOK }}
+        with:
+          args: |
+            ✅ **${{steps.image.outputs.deployment_target}} Version Updated Successfully**
+            [View Deployment](${{steps.image.outputs.deployment_url}}) - Note that It takes time to propagate, check deployment-updates channel.
+            Repository: `${{ steps.image.outputs.registry }}`
+            Version: `${{ steps.image.outputs.tag }}`
+            Branch: `${{ github.event.pull_request.base.ref }}`
+            Author: ${{ github.event.pull_request.user.login }}
+            PR: [${{ github.event.pull_request.title }}](${{ github.event.pull_request.html_url }})
+
+      - name: Notify Discord Failure
+        if: always() && steps.build-and-push.outcome != 'success'
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DEPLOYMENT_DISCORD_WEBHOOK }}
+        with:
+          args: |
+            ❌ **${{steps.image.outputs.deployment_target}} Version Update Failed**
+            Reason: Docker image build or push failed.
+            Repository: `${{ steps.image.outputs.registry }}`
+            Branch: `${{ github.event.pull_request.base.ref }}`
+            Author: ${{ github.event.pull_request.user.login }}
+            PR: [${{ github.event.pull_request.title }}](${{ github.event.pull_request.html_url }})
