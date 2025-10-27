@@ -22,7 +22,11 @@ function handleGithubSignIn() {
     redirect_uri: githubRedirectUri,
     scope: githubScope,
   });
-  window.location.href = `https://github.com/login/oauth/authorize?${params.toString()}`;
+  window.open(
+    `https://github.com/login/oauth/authorize?${params.toString()}`,
+    'github-oauth',
+    'width=500,height=600',
+  );
 }
 
 onMounted(() => {
@@ -33,6 +37,14 @@ onMounted(() => {
       clearInterval(checkGoogle);
     }
   }, 100);
+
+  // Listen for GitHub auth messages from popup
+  window.addEventListener('message', (event) => {
+    if (event.origin !== window.location.origin) return;
+    if (event.data.type === 'github-auth') {
+      navigateTo('/auth/callback/github?code=' + event.data.code);
+    }
+  });
 });
 </script>
 
@@ -56,7 +68,7 @@ onMounted(() => {
                 <Icon name="grommet-icons:github" />
                 {{ $t('root.auth.github-signin') }}</Button
               >
-              <!-- Google's rendered button will appear here -->
+
               <Button id="google-signin-btn" variant="outline" class="w-75">
                 <Icon name="material-icon-theme:google" />
                 {{ $t('root.auth.google-signin') }}</Button
