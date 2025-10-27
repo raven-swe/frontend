@@ -27,6 +27,10 @@ describe('profile', () => {
           NuxtLayout: {
             template: '<div data-nuxt-layout><slot /></div>',
           },
+          NuxtLink: {
+            template: '<a :href="to"><slot /></a>',
+            props: ['to'],
+          },
         },
       },
     });
@@ -91,6 +95,10 @@ describe('profile', () => {
         stubs: {
           NuxtLayout: {
             template: '<div data-nuxt-layout><slot /></div>',
+          },
+          NuxtLink: {
+            template: '<a :href="to"><slot /></a>',
+            props: ['to'],
           },
         },
       },

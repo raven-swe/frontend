@@ -1,17 +1,15 @@
 <template>
-  <div
-    class="hover:hover:bg-foreground/10 flex h-[53px] cursor-pointer items-center justify-center px-4 text-[15px] transition-colors"
+  <NuxtLink
+    :to="route"
+    class="hover:bg-foreground/10 relative flex h-[53px] cursor-pointer items-center justify-center px-4 text-[15px] transition-colors"
     :class="[isActive ? 'text-foreground font-bold' : 'text-muted-foreground font-medium']"
     aria-role="tab"
   >
-    <NuxtLink :to="route" class="relative flex h-full items-center">
+    <span class="relative flex flex-col items-center">
       {{ label }}
-      <div
-        v-if="isActive"
-        class="bg-primary absolute start-0 bottom-0 h-1 w-full rounded-b-md"
-      ></div>
-    </NuxtLink>
-  </div>
+      <div v-if="isActive" class="bg-primary absolute -bottom-[15px] h-1 w-full rounded-full"></div>
+    </span>
+  </NuxtLink>
 </template>
 
 <script setup lang="ts">
