@@ -32,7 +32,7 @@ describe('server/api/auth/register/start.post', () => {
       method: 'POST',
       body: { name: 'John Doe', email: 'john@example.com', birthDate: '2000-01-01' },
     });
-    const { response } = await startPostEventHander(event);
+    const response = await startPostEventHander(event);
     expect(response.status).toBe(200);
     expect(response.data).toEqual({
       success: true,

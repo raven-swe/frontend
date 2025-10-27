@@ -27,8 +27,6 @@ describe('Login Store', () => {
     expect(store.step).toBe(0);
     expect(store.open).toBe(false);
     expect(store.identifier).toBe('');
-    expect(store.accessToken).toBeNull();
-    expect(store.refreshToken).toBeNull();
     expect(store.errorMessage).toBeNull();
   });
 
@@ -126,8 +124,6 @@ describe('Login Store', () => {
     const payload = { identifier: 'user@example.com', password: 'Password123' };
     await store.submitLogin(payload);
 
-    expect(store.accessToken).toBe('access-123');
-    expect(store.refreshToken).toBe('refresh-456');
     expect(navigateToMock).toHaveBeenCalledWith('/home');
   });
 

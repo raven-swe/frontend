@@ -13,8 +13,6 @@ export const useLoginStore = defineStore('login', () => {
   const open = ref(false);
   const identifier = ref('');
   const type = ref<string | null>(null);
-  const accessToken = ref<string | null>(null);
-  const refreshToken = ref<string | null>(null);
   const errorMessage = ref<string | null>(null);
   const loading = ref(false);
 
@@ -30,8 +28,6 @@ export const useLoginStore = defineStore('login', () => {
   const resetForm = () => {
     step.value = 0;
     identifier.value = '';
-    accessToken.value = null;
-    refreshToken.value = null;
     errorMessage.value = null;
   };
 
@@ -75,17 +71,11 @@ export const useLoginStore = defineStore('login', () => {
     loading.value = true;
 
     try {
-      const response = await $fetch<
-        ApiSuccessResponse<{ accessToken: string; refreshToken: string }>
-      >('/api/auth/login', {
+      await $fetch<ApiSuccessResponse<{ accessToken: string }>>('/api/auth/login', {
         method: 'POST',
         body: data,
       });
 
-      accessToken.value = response.data.accessToken;
-      refreshToken.value = response.data.refreshToken;
-      sessionStorage.setItem('accessToken', response.data.accessToken);
-      sessionStorage.setItem('refreshToken', response.data.refreshToken);
       step.value = 0;
       open.value = false;
       showToaster('success', 'Login successful');
@@ -109,8 +99,6 @@ export const useLoginStore = defineStore('login', () => {
     open,
     identifier,
     type,
-    accessToken,
-    refreshToken,
     errorMessage,
     loading,
     openDialog,

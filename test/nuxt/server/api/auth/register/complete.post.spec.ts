@@ -31,7 +31,7 @@ describe('server/api/auth/register/complete.post', () => {
     const event = createMockH3Event({
       method: 'POST',
     });
-    const { response } = await completePostEventHandler(event);
+    const response = await completePostEventHandler(event);
     expect(h3.appendHeader).toHaveBeenCalledWith(
       event,
       'set-cookie',
@@ -67,7 +67,7 @@ describe('server/api/auth/register/complete.post', () => {
     const event = createMockH3Event({
       method: 'POST',
     });
-    const { response } = await completePostEventHandler(event);
+    const response = await completePostEventHandler(event);
     expect(h3.appendHeader).toHaveBeenCalledWith(
       event,
       'set-cookie',
@@ -99,7 +99,7 @@ describe('server/api/auth/register/complete.post', () => {
     const event = createMockH3Event({
       method: 'POST',
     });
-    const { response } = await completePostEventHandler(event);
+    const response = await completePostEventHandler(event);
     expect(h3.appendHeader).toHaveBeenCalledWith(
       event,
       'set-cookie',

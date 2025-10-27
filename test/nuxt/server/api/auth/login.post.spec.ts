@@ -31,7 +31,7 @@ describe('server/api/auth/login.post', () => {
     const event = createMockH3Event({
       method: 'POST',
     });
-    const { response } = await loginPostEventHandler(event);
+    const response = await loginPostEventHandler(event);
     expect(h3.appendHeader).toHaveBeenCalledWith(
       event,
       'set-cookie',
@@ -67,7 +67,7 @@ describe('server/api/auth/login.post', () => {
     const event = createMockH3Event({
       method: 'POST',
     });
-    const { response } = await loginPostEventHandler(event);
+    const response = await loginPostEventHandler(event);
     expect(h3.appendHeader).toHaveBeenCalledWith(
       event,
       'set-cookie',
@@ -99,7 +99,7 @@ describe('server/api/auth/login.post', () => {
     const event = createMockH3Event({
       method: 'POST',
     });
-    const { response } = await loginPostEventHandler(event);
+    const response = await loginPostEventHandler(event);
     expect(h3.appendHeader).toHaveBeenCalledWith(
       event,
       'set-cookie',

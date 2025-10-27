@@ -30,7 +30,7 @@ describe('server/api/auth/refresh-token.post', () => {
     const event = createMockH3Event({
       method: 'POST',
     });
-    const { response } = await refreshTokenEventHandler(event);
+    const response = await refreshTokenEventHandler(event);
     expect(h3.appendHeader).toHaveBeenCalledWith(
       event,
       'set-cookie',
@@ -66,7 +66,7 @@ describe('server/api/auth/refresh-token.post', () => {
     const event = createMockH3Event({
       method: 'POST',
     });
-    const { response } = await refreshTokenEventHandler(event);
+    const response = await refreshTokenEventHandler(event);
     expect(h3.appendHeader).toHaveBeenCalledWith(
       event,
       'set-cookie',
@@ -98,7 +98,7 @@ describe('server/api/auth/refresh-token.post', () => {
     const event = createMockH3Event({
       method: 'POST',
     });
-    const { response } = await refreshTokenEventHandler(event);
+    const response = await refreshTokenEventHandler(event);
     expect(h3.appendHeader).toHaveBeenCalledWith(
       event,
       'set-cookie',

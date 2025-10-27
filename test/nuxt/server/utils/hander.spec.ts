@@ -10,7 +10,7 @@ describe('defineWrappedResponseHandler', () => {
     const result = await wrapped(createMockH3Event({}));
 
     expect(handler).toHaveBeenCalled();
-    expect(result).toEqual({ response: { ok: true } });
+    expect(result).toEqual({ ok: true });
   });
 
   it('rethrows if handler throws an H3 error', async () => {

@@ -29,7 +29,7 @@ describe('server/api/auth/register/verify.post', () => {
       method: 'POST',
       body: { otp: '123456', creationToken: 'valid-creation-token' },
     });
-    const { response } = await verifyPostEventHander(event);
+    const response = await verifyPostEventHander(event);
     expect(response.status).toBe(200);
     expect(response.data).toEqual({
       success: true,
