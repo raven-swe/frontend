@@ -16,6 +16,20 @@ export default defineNuxtConfig({
       include: ['../shared/types/**/*.ts', '../mocks/**/*.ts', '../test/**/*.ts'],
     },
   },
+  runtimeConfig: {
+    public: {
+      siteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY || '',
+    },
+  },
+
+  app: {
+    head: {
+      link: [
+        { rel: 'preconnect', href: 'https://www.google.com' },
+        { rel: 'preconnect', href: 'https://www.gstatic.com', crossorigin: '' },
+      ],
+    },
+  },
   modules: [
     '@nuxt/eslint',
     '@nuxt/fonts',

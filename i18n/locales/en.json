@@ -125,7 +125,8 @@
     "IDENTIFIER_REQUIRED": "Please enter your email or username",
     "PASSWORD_REQUIRED": "Please enter your password",
     "GENERIC_ERROR": "Something went wrong. Please try again.",
-    "EMPTY_NAME": "Name can't be blank"
+    "EMPTY_NAME": "Name can't be blank",
+    "RECAPTCHA_REQUIRED": "Please complete the reCAPTCHA challenge"
   },
   "register": {
     "register-info": {
