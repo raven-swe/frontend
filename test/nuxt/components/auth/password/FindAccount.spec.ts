@@ -4,8 +4,8 @@ import { setActivePinia, createPinia } from 'pinia';
 import { mockNuxtImport } from '@nuxt/test-utils/runtime';
 import { createI18n } from 'vue-i18n';
 import { nextTick } from 'vue';
-import IdentifierStep from '@/components/auth/login/IdentifierStep.vue';
-import { useLoginStore } from '@/stores/auth/login';
+import FindAccount from '@/components/auth/password/FindAccount.vue';
+import { usePasswordStore } from '@/stores/auth/password';
 
 // Mock showToaster - must be hoisted
 const { showToasterMock } = vi.hoisted(() => {
@@ -28,6 +28,11 @@ const { navigateToMock } = vi.hoisted(() => {
 mockNuxtImport('useRouter', () => {
   return () => ({
     push: navigateToMock,
+    currentRoute: {
+      value: {
+        query: {},
+      },
+    },
   });
 });
 
@@ -37,32 +42,25 @@ const i18n = createI18n({
   locale: 'en',
   messages: {
     en: {
-      'errors.IDENTIFIER_REQUIRED': 'Identifier is required',
-      'errors.USER_NOT_FOUND': 'User not found',
       'errors.GENERIC_ERROR': 'An error occurred',
-      'Sign in to Raven': 'Sign in to Raven',
-      'root.auth.google-signin': 'Sign in with Google',
-      'root.auth.github-signin': 'Sign in with GitHub',
-      'root.auth.separator': 'or',
+      'root.auth.find-your-account': 'Find your account',
+      'root.auth.enter-identifier': 'Enter your email or username',
       'root.auth.email-or-username': 'Email or username',
       'ui.next': 'Next',
-      'root.auth.forgot-password': 'Forgot password?',
-      'root.auth.dont-have-account': "Don't have an account?",
-      'root.auth.signup': 'Sign up',
     },
   },
 });
 
-describe('IdentifierStep.vue', () => {
-  let wrapper: VueWrapper<InstanceType<typeof IdentifierStep>>;
-  let loginStore: ReturnType<typeof useLoginStore>;
+describe('FindAccount.vue', () => {
+  let wrapper: VueWrapper<InstanceType<typeof FindAccount>>;
+  let passwordStore: ReturnType<typeof usePasswordStore>;
 
   beforeEach(() => {
     setActivePinia(createPinia());
-    loginStore = useLoginStore();
+    passwordStore = usePasswordStore();
     vi.clearAllMocks();
 
-    wrapper = mount(IdentifierStep, {
+    wrapper = mount(FindAccount, {
       global: {
         plugins: [i18n],
         stubs: {
@@ -75,13 +73,6 @@ describe('IdentifierStep.vue', () => {
           UiDialogFooter: {
             template: '<div class="ui-dialog-footer"><slot /></div>',
           },
-          Icon: {
-            template: '<span class="icon" />',
-          },
-          NuxtLink: {
-            template: '<a :to="to"><slot /></a>',
-            props: ['to'],
-          },
         },
       },
     });
@@ -91,10 +82,6 @@ describe('IdentifierStep.vue', () => {
     expect(wrapper.exists()).toBe(true);
     expect(wrapper.find('[data-testid="identifier-input"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="submit-button"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="forgot-password-button"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="google-button"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="github-button"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="signup-link"]').exists()).toBe(true);
   });
 
   it('submit button is disabled when form is invalid', async () => {
@@ -105,8 +92,21 @@ describe('IdentifierStep.vue', () => {
     expect(submitButton.element.hasAttribute('disabled')).toBe(true);
   });
 
+  it('enables submit button when identifier is entered', async () => {
+    const input = wrapper.find('input[name="identifier"]');
+    await input.setValue('test@example.com');
+    await input.trigger('input');
+    await input.trigger('blur');
+
+    await nextTick();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    const submitButton = wrapper.find('[data-testid="submit-button"]');
+    expect(submitButton.element.hasAttribute('disabled')).toBe(false);
+  });
+
   it('successfully submits valid identifier', async () => {
-    vi.spyOn(loginStore, 'checkUserExists').mockResolvedValue(true);
+    vi.spyOn(passwordStore, 'checkUserExists').mockResolvedValue(undefined);
 
     const input = wrapper.find('input[name="identifier"]');
     await input.setValue('test@example.com');
@@ -122,11 +122,14 @@ describe('IdentifierStep.vue', () => {
     await nextTick();
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    expect(loginStore.checkUserExists).toHaveBeenCalledWith('test@example.com');
+    expect(passwordStore.checkUserExists).toHaveBeenCalledWith({
+      identifier: 'test@example.com',
+      recaptchaToken: 'recaptchaToken',
+    });
   });
 
   it('shows error when user is not found', async () => {
-    vi.spyOn(loginStore, 'checkUserExists').mockResolvedValue(false);
+    vi.spyOn(passwordStore, 'checkUserExists').mockRejectedValue(new Error('User not found'));
 
     const input = wrapper.find('input[name="identifier"]');
     await input.setValue('notfound@example.com');
@@ -146,7 +149,7 @@ describe('IdentifierStep.vue', () => {
   });
 
   it('handles generic error during submission', async () => {
-    vi.spyOn(loginStore, 'checkUserExists').mockRejectedValue(new Error('Network error'));
+    vi.spyOn(passwordStore, 'checkUserExists').mockRejectedValue(new Error('Network error'));
 
     const input = wrapper.find('input[name="identifier"]');
     await input.setValue('test@example.com');
@@ -166,7 +169,7 @@ describe('IdentifierStep.vue', () => {
   });
 
   it('handles error without message', async () => {
-    vi.spyOn(loginStore, 'checkUserExists').mockRejectedValue({});
+    vi.spyOn(passwordStore, 'checkUserExists').mockRejectedValue({});
 
     const input = wrapper.find('input[name="identifier"]');
     await input.setValue('test@example.com');
@@ -185,17 +188,8 @@ describe('IdentifierStep.vue', () => {
     expect(showToasterMock).toHaveBeenCalledWith('error', 'An error occurred');
   });
 
-  it('calls openForgotPasswordDialog when forgot password button is clicked', async () => {
-    const forgotPasswordButton = wrapper.find('[data-testid="forgot-password-button"]');
-    await forgotPasswordButton.trigger('click');
-    await nextTick();
-
-    // Check that router.push was called with the correct path
-    expect(navigateToMock).toHaveBeenCalledWith('/password-reset');
-  });
-
   it('trims whitespace from identifier before submission', async () => {
-    vi.spyOn(loginStore, 'checkUserExists').mockResolvedValue(true);
+    vi.spyOn(passwordStore, 'checkUserExists').mockResolvedValue(undefined);
 
     const input = wrapper.find('input[name="identifier"]');
     await input.setValue('  test@example.com  ');
@@ -211,19 +205,36 @@ describe('IdentifierStep.vue', () => {
     await nextTick();
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    expect(loginStore.checkUserExists).toHaveBeenCalledWith('test@example.com');
+    expect(passwordStore.checkUserExists).toHaveBeenCalledWith({
+      identifier: 'test@example.com',
+      recaptchaToken: 'recaptchaToken',
+    });
   });
 
-  it('enables submit button when form is valid', async () => {
-    const input = wrapper.find('input[name="identifier"]');
-    await input.setValue('test@example.com');
-    await input.trigger('input');
-    await input.trigger('blur');
+  it('displays identifier from store when provided', async () => {
+    passwordStore.identifier = 'existing@example.com';
+
+    // Remount with identifier
+    wrapper = mount(FindAccount, {
+      global: {
+        plugins: [i18n],
+        stubs: {
+          UiDialogHeader: {
+            template: '<div class="ui-dialog-header"><slot /></div>',
+          },
+          UiDialogTitle: {
+            template: '<h2 class="ui-dialog-title"><slot /></h2>',
+          },
+          UiDialogFooter: {
+            template: '<div class="ui-dialog-footer"><slot /></div>',
+          },
+        },
+      },
+    });
 
     await nextTick();
-    await new Promise((resolve) => setTimeout(resolve, 50));
 
-    const submitButton = wrapper.find('[data-testid="submit-button"]');
-    expect(submitButton.element.hasAttribute('disabled')).toBe(false);
+    const input = wrapper.find('input[name="identifier"]');
+    expect((input.element as HTMLInputElement).value).toBe('existing@example.com');
   });
 });

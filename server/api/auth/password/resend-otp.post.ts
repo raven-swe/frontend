@@ -1,5 +1,5 @@
 import type {
-  ApiSuccessResponse,
+  ApiResponseBase,
   ApiErrorResponse,
   ApiValidationErrorResponse,
 } from '#shared/types/api';
@@ -9,16 +9,12 @@ import { FetchError } from 'ofetch';
 const API_URL = process.env.BACKEND_URL;
 
 export default defineEventHandler(async (event) => {
-  // read search param here please
-  const query = getQuery(event);
-  const identifier = query.identifier as string;
+  const body = await readBody(event);
   try {
-    const response = await $fetch<ApiSuccessResponse<{ exists: boolean; type: string }>>(
-      `${API_URL}/auth/check-identifier?identifier=${encodeURIComponent(identifier)}`,
-      {
-        method: 'GET',
-      },
-    );
+    const response = await $fetch<ApiResponseBase>(`${API_URL}/auth/password/resend-otp`, {
+      method: 'POST',
+      body,
+    });
     return response;
   } catch (error) {
     if (error instanceof FetchError) {
@@ -31,6 +27,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
+    // Fallback for non-Fetch errors
     throw createError({
       statusCode: 500,
       statusMessage: error instanceof Error ? error.message : 'Internal Server Error',

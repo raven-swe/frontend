@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import * as yup from 'yup';
 import { useForm } from 'vee-validate';
 import { storeToRefs } from 'pinia';
@@ -8,45 +7,28 @@ import { showToaster } from '@/utils/showToaster';
 
 const loginStore = useLoginStore();
 const { identifier } = storeToRefs(loginStore);
-const error = ref('');
 
 const schema = yup.object({
-  password: yup.string(),
+  password: yup.string().trim().required($t('errors.PASSWORD_REQUIRED')),
 });
 
-const { defineField, handleSubmit, resetForm } = useForm({
+const { defineField, handleSubmit, isSubmitting, meta } = useForm({
   validationSchema: schema,
   initialValues: {
     password: '',
   },
-  validateOnMount: true,
+  validateOnMount: false,
 });
 
 const onSubmit = handleSubmit(async (values) => {
-  error.value = '';
-
   try {
-    if (!values.password || values.password.trim() === '') {
-      throw new Error($t('errors.PASSWORD_REQUIRED'));
-    }
-
     const submissionValues = {
       identifier: identifier.value,
-      password: values.password,
+      password: values.password.trim(),
     };
-
     await loginStore.submitLogin(submissionValues);
-
-    resetForm({ values: { password: '' } });
   } catch (err: unknown) {
-    if (err instanceof Error) {
-      error.value = err.message || $t('errors.GENERIC_ERROR');
-      showToaster('error', error.value);
-    } else {
-      error.value = $t('errors.GENERIC_ERROR');
-      showToaster('error', error.value);
-    }
-    console.error('Login error:', error.value);
+    showToaster('error', (err as Error).message || $t('errors.GENERIC_ERROR'));
   }
 });
 
@@ -55,42 +37,49 @@ const [_password, passwordAttrs] = defineField('password');
 
 <template>
   <form @submit.prevent="onSubmit">
-    <UiDialogHeader class="mt-3 px-8 py-4">
-      <UiDialogTitle class="mx-auto w-100 text-3xl font-bold">
-        {{ $t('Enter your password') }}
+    <UiDialogHeader class="mt-1 px-8 py-4">
+      <UiDialogTitle class="mx-auto w-100 text-start text-3xl font-bold">
+        {{ $t('login.password-step.title') }}
       </UiDialogTitle>
     </UiDialogHeader>
 
     <div class="mx-auto mt-6 w-100">
-      <UiFormFieldInput
-        class="input-readonly mb-7"
-        name="identifier"
-        type="text"
-        :model-value="identifier"
-        :placeholder="loginStore.type ? loginStore.type : ''"
-        readonly
-      />
-      <UiFormFieldPassword name="password" v-bind="passwordAttrs" />
-      <p class="text-primary ms-1 mt-1 block text-sm" data-testid="forgot-password-link">
-        <NuxtLink to="/auth/forgot-password">
-          {{ $t('root.auth.forget-password') }}
-        </NuxtLink>
+      <section class="flex flex-col gap-6">
+        <UiFormFieldInput
+          class="input-readonly"
+          name="identifier"
+          type="text"
+          :model-value="identifier"
+          :placeholder="
+            loginStore.type ? $t(`login.${loginStore.type}`) : $t('login.email-or-username')
+          "
+          readonly
+        />
+        <UiFormFieldPassword
+          name="password"
+          :placeholder="$t('login.password')"
+          v-bind="passwordAttrs"
+        />
+      </section>
+      <p
+        class="text-primary ms-1 mt-2 block w-fit cursor-pointer text-sm hover:underline"
+        data-testid="forgot-password-link"
+        @click="loginStore.openForgotPasswordDialog"
+      >
+        {{ $t('login.forgot-password') }}
       </p>
     </div>
 
-    <UiDialogFooter class="mt-40">
-      <UiButton class="mb-1 w-100" size="lg" type="submit" data-testid="submit-button">
-        {{ $t('root.auth.signin') }}
+    <UiDialogFooter class="absolute end-0 bottom-15 w-full">
+      <UiButton
+        class="mb-1 w-100"
+        size="lg"
+        type="submit"
+        data-testid="submit-button"
+        :disabled="!meta.valid || isSubmitting"
+      >
+        {{ $t('login.password-step.signin') }}
       </UiButton>
-      <p class="mt-4 w-fit">
-        {{ $t('root.auth.dont-have-account') }}
-        <NuxtLink to="/auth/signup" class="text-primary" data-testid="signup-link">
-          {{ $t('root.auth.signup') }}
-        </NuxtLink>
-      </p>
-      <!-- <Transition name="fade"
-        ><p v-if="error" class="mt-3 text-red-500">{{ error }}</p></Transition
-      > -->
     </UiDialogFooter>
   </form>
 </template>
