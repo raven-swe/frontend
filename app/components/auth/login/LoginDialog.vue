@@ -15,8 +15,14 @@ const handleDialogChange = (val: boolean) => {
   <UiDialog :open="loginStore.open" @update:open="handleDialogChange">
     <UiDialogContent class="pt-2">
       <UiSpinner v-if="loginStore.loading" class="mx-auto my-auto"></UiSpinner>
-      <AuthLoginIdentifierStep v-if="loginStore.step === 0" id="identifier-step-test" />
-      <AuthLoginPasswordStep v-if="loginStore.step === 1" id="password-step-test" />
+      <AuthLoginIdentifierStep
+        v-if="loginStore.step === 0 && !loginStore.loading"
+        id="identifier-step-test"
+      />
+      <AuthLoginPasswordStep
+        v-if="loginStore.step === 1 && !loginStore.loading"
+        id="password-step-test"
+      />
     </UiDialogContent>
   </UiDialog>
 </template>

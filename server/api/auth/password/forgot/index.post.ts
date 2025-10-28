@@ -9,14 +9,13 @@ import { FetchError } from 'ofetch';
 const API_URL = process.env.BACKEND_URL;
 
 export default defineEventHandler(async (event) => {
-  // read search param here please
-  const query = getQuery(event);
-  const identifier = query.identifier as string;
+  const body = await readBody(event);
   try {
-    const response = await $fetch<ApiSuccessResponse<{ exists: boolean; type: string }>>(
-      `${API_URL}/auth/check-identifier?identifier=${encodeURIComponent(identifier)}`,
+    const response = await $fetch<ApiSuccessResponse<{ confirmationToken: string }>>(
+      `${API_URL}/auth/password/forgot`,
       {
-        method: 'GET',
+        method: 'POST',
+        body,
       },
     );
     return response;
@@ -31,6 +30,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
+    // Fallback for non-Fetch errors
     throw createError({
       statusCode: 500,
       statusMessage: error instanceof Error ? error.message : 'Internal Server Error',
