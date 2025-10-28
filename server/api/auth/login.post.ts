@@ -13,14 +13,12 @@ export default defineEventHandler(async (event) => {
     const response = await $fetch<
       ApiSuccessResponse<{
         accessToken: string;
-        refreshToken: string;
       }>
     >(`${API_URL}/auth/login`, {
       method: 'POST',
       body,
     });
 
-    // ✅ Return the tokens on success
     return response;
   } catch (error) {
     const response = (error as { data?: unknown })?.data as
@@ -28,7 +26,6 @@ export default defineEventHandler(async (event) => {
       | ApiValidationErrorResponse
       | undefined;
 
-    // 🧠 Handle validation errors (422)
     if (response?.error?.code === 'VALIDATION_ERROR') {
       throw createError({
         statusCode: 422,
@@ -37,7 +34,6 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // 🔒 Handle unauthorized (401)
     if (response?.error?.code === 'UNAUTHORIZED') {
       throw createError({
         statusCode: 401,
@@ -46,7 +42,6 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // 🧨 Handle general errors
     if (response?.error) {
       throw createError({
         statusCode: 500,
@@ -55,7 +50,6 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // 🪲 Fallback error
     throw createError({
       statusCode: 500,
       statusMessage: 'Internal Server Error',

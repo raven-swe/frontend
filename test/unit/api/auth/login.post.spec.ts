@@ -72,7 +72,7 @@ describe('POST /api/auth/login', () => {
   it('returns tokens on success', async () => {
     const mockResponse = {
       success: true,
-      data: { accessToken: 'abc', refreshToken: 'xyz' },
+      data: { accessToken: 'abc' },
     };
     fetchMock.mockResolvedValueOnce(mockResponse);
 
@@ -125,6 +125,34 @@ describe('POST /api/auth/login', () => {
       statusCode: 500,
       statusMessage: 'Server issue',
       data: backendError.error,
+    });
+  });
+
+  it('throws generic 500 with default message when backend error has no message', async () => {
+    const backendError = {
+      error: { code: 'SOMETHING_WRONG' },
+    };
+    fetchMock.mockRejectedValueOnce({ data: backendError });
+
+    const handler = (await import('../../../../server/api/auth/login.post')).default;
+    await expect(handler(makeEvent({}))).rejects.toMatchObject({
+      statusCode: 500,
+      statusMessage: 'Internal Server Error',
+      data: backendError.error,
+    });
+  });
+
+  it('throws unauthorized with default message when error message is missing', async () => {
+    const unauthorizedError = {
+      error: { code: 'UNAUTHORIZED' },
+    };
+    fetchMock.mockRejectedValueOnce({ data: unauthorizedError });
+
+    const handler = (await import('../../../../server/api/auth/login.post')).default;
+    await expect(handler(makeEvent({}))).rejects.toMatchObject({
+      statusCode: 401,
+      statusMessage: 'Invalid credentials',
+      data: unauthorizedError.error,
     });
   });
 
