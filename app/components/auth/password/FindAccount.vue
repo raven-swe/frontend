@@ -32,10 +32,10 @@ const onSubmit = handleSubmit(async (values) => {
 <template>
   <form @submit.prevent="onSubmit">
     <UiDialogHeader class="mt-3 w-fit px-8 py-4">
-      <UiDialogTitle class="text-3xl font-bold">
+      <UiDialogTitle class="text-start text-3xl font-bold">
         {{ $t('forgot-password.find-account.title') }}
       </UiDialogTitle>
-      <p class="text-muted-foreground mx-auto mt-2 text-sm">
+      <p class="text-muted-foreground mx-auto mt-2 text-start text-sm">
         {{ $t('forgot-password.find-account.description') }}
       </p>
     </UiDialogHeader>

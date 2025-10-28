@@ -90,7 +90,6 @@ describe('PasswordStep.vue', () => {
     expect(wrapper.find('input[name="identifier"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="submit-button"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="forgot-password-link"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="signup-link"]').exists()).toBe(true);
   });
 
   it('displays the identifier from store', async () => {

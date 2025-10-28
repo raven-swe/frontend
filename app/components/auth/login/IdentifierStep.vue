@@ -33,12 +33,12 @@ const [_identifier, identifierAttrs] = defineField('identifier');
 
 <template>
   <form @submit.prevent="onSubmit">
-    <UiDialogHeader class="mt-3 px-8 py-4">
-      <UiDialogTitle class="mx-auto w-75 text-3xl font-bold">{{
+    <UiDialogHeader class="mt-1 px-8 py-4">
+      <UiDialogTitle class="mx-auto w-75 text-start text-3xl font-bold">{{
         $t('login.identifier-step.title')
       }}</UiDialogTitle>
     </UiDialogHeader>
-    <div class="mx-auto mt-7 w-75">
+    <div class="mx-auto mt-5 w-75">
       <section class="flex flex-col gap-4">
         <UiButton
           class="bg-oauth dark:hover:bg-oauth/80 hover:bg-oauth/110 border-foreground mb-1 border text-black"

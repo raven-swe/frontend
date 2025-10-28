@@ -37,8 +37,8 @@ const [_password, passwordAttrs] = defineField('password');
 
 <template>
   <form @submit.prevent="onSubmit">
-    <UiDialogHeader class="mt-3 px-8 py-4">
-      <UiDialogTitle class="mx-auto w-100 text-3xl font-bold">
+    <UiDialogHeader class="mt-1 px-8 py-4">
+      <UiDialogTitle class="mx-auto w-100 text-start text-3xl font-bold">
         {{ $t('login.password-step.title') }}
       </UiDialogTitle>
     </UiDialogHeader>
@@ -80,16 +80,6 @@ const [_password, passwordAttrs] = defineField('password');
       >
         {{ $t('login.password-step.signin') }}
       </UiButton>
-      <p class="mt-6">
-        {{ $t('login.dont-have-account') }}
-        <span
-          class="text-primary cursor-pointer hover:underline"
-          data-testid="signup-link"
-          @click="loginStore.openSignupDialog"
-        >
-          {{ $t('login.signup') }}
-        </span>
-      </p>
     </UiDialogFooter>
   </form>
 </template>
