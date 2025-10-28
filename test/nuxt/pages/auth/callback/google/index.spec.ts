@@ -1,18 +1,24 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mockNuxtImport } from '@nuxt/test-utils/runtime';
+import { mount } from '@vue/test-utils';
+import type { Component } from 'vue';
 
+// Mock useRoute to provide a test code
 mockNuxtImport('useRoute', () => {
   return () => ({
-    query: { code: 'test-code' },
+    query: { code: 'test-google-code' },
   });
 });
 
+// Mock useRouter to spy on push
+const pushMock = vi.fn();
 mockNuxtImport('useRouter', () => {
   return () => ({
-    push: vi.fn(),
+    push: pushMock,
   });
 });
 
+// Mock OAuthCompleteForm
 vi.mock('~/components/ui/OAuthCompleteForm.vue', () => ({
   default: {
     name: 'OAuthCompleteForm',
@@ -21,41 +27,58 @@ vi.mock('~/components/ui/OAuthCompleteForm.vue', () => ({
   },
 }));
 
+// Mock $fetch
+const fetchMock = vi.fn();
+vi.stubGlobal('$fetch', fetchMock);
+
 describe('Google Callback Page', () => {
-  beforeEach(() => {
+  let PageComponent: Component;
+  beforeEach(async () => {
     vi.clearAllMocks();
+    fetchMock.mockReset();
+    pushMock.mockReset();
+    PageComponent = (await import('../../../../../../app/pages/auth/callback/google/index.vue'))
+      .default;
   });
 
-  it('renders the component', () => {
-    expect(true).toBe(true);
+  it('should call $fetch and show form if creationToken is returned', async () => {
+    const originalOpener = window.opener;
+    window.opener = undefined;
+    fetchMock.mockResolvedValue({ success: true, data: { creationToken: 'abc123' } });
+
+    mount(PageComponent);
+    await new Promise((r) => setTimeout(r, 0));
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/oauth/google/callback',
+      expect.objectContaining({
+        method: 'POST',
+        body: { code: 'test-google-code' },
+      }),
+    );
+    expect(pushMock).not.toHaveBeenCalled();
+    window.opener = originalOpener;
   });
 
-  it('defines page meta with layout false', async () => {
-    expect(true).toBe(true);
+  it('should call router.push if accessToken is returned', async () => {
+    const originalOpener = window.opener;
+    window.opener = undefined;
+    fetchMock.mockResolvedValue({ success: true, data: { accessToken: 'token' } });
+
+    mount(PageComponent);
+    await new Promise((r) => setTimeout(r, 0));
+    expect(pushMock).toHaveBeenCalledWith('/home');
+    window.opener = originalOpener;
   });
 
-  it('has reactive refs for creationToken and showForm', async () => {
-    const { ref } = await import('vue');
-    const creationToken = ref(null);
-    const showForm = ref(false);
-
-    expect(creationToken.value).toBe(null);
-    expect(showForm.value).toBe(false);
-  });
-
-  it('updates creationToken when set', async () => {
-    const { ref } = await import('vue');
-    const creationToken = ref<string | null>(null);
-
-    creationToken.value = 'test-token';
-    expect(creationToken.value).toBe('test-token');
-  });
-
-  it('updates showForm when set', async () => {
-    const { ref } = await import('vue');
-    const showForm = ref(false);
-
-    showForm.value = true;
-    expect(showForm.value).toBe(true);
+  it('should handle fetch error gracefully', async () => {
+    const originalOpener = window.opener;
+    window.opener = undefined;
+    fetchMock.mockRejectedValue(new Error('fail'));
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    mount(PageComponent);
+    await new Promise((r) => setTimeout(r, 0));
+    expect(errorSpy).toHaveBeenCalledWith('Google authentication failed:', expect.any(Error));
+    errorSpy.mockRestore();
+    window.opener = originalOpener;
   });
 });

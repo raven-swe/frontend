@@ -1,173 +1,232 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mockNuxtImport } from '@nuxt/test-utils/runtime';
+import { mount } from '@vue/test-utils';
+import OAuthCompleteForm from '@/components/ui/OAuthCompleteForm.vue';
+import { vi, it, describe, beforeEach, expect } from 'vitest';
+import { createI18n } from 'vue-i18n';
+import { ref, type ComponentPublicInstance } from 'vue';
+
+let submitMock: ReturnType<typeof vi.fn>;
+
+// Mock navigateTo FIRST before any imports
+vi.stubGlobal('navigateTo', vi.fn());
 
 // Mock the composables
 vi.mock('~/composables/useOAuthComplete', () => ({
   useOAuthComplete: () => ({
-    loading: false,
-    submit: vi.fn(),
+    loading: ref(false),
+    submit: submitMock,
   }),
 }));
 
 vi.mock('@/composables/useDateSelect', () => ({
   default: vi.fn(() => ({
-    selectedDay: { value: null },
-    selectedMonth: { value: null },
-    selectedYear: { value: null },
-    days: { value: [] },
-    months: { value: [] },
-    years: { value: [] },
+    selectedDay: ref(''),
+    selectedMonth: ref(''),
+    selectedYear: ref(''),
+    days: ref(['1', '2', '3']),
+    months: ref(['1', '2', '3']),
+    years: ref(['2000', '2001', '2002']),
   })),
 }));
 
-// Mock UI components
-vi.mock('~/components/ui/Select.vue', () => ({
-  default: {
-    name: 'Select',
-    template: '<div></div>',
-    props: ['modelValue', 'options', 'placeholder', 'name', 'class'],
+const i18n = createI18n({
+  legacy: false,
+  globalInjection: true,
+  locale: 'en',
+  messages: {
+    en: {
+      'register.register-info.title': 'Register Info',
+      'register.register-info.date-of-birth.title': 'Date of Birth',
+      'register.register-info.date-of-birth.description': 'desc',
+      'errors.AGE_RESTRICTION': 'Too young',
+      'ui.next': 'Next',
+    },
   },
-}));
-
-vi.mock('./Button.vue', () => ({
-  default: {
-    name: 'Button',
-    template: '<button><slot /></button>',
-    props: ['disabled', 'size', 'class'],
-  },
-}));
-
-// Mock Dialog components
-vi.mock('~/components/ui/dialog', () => ({
-  UiDialog: {
-    name: 'UiDialog',
-    template: '<div><slot /></div>',
-    props: ['open'],
-  },
-  UiDialogContent: {
-    name: 'UiDialogContent',
-    template: '<div><slot /></div>',
-  },
-  UiDialogHeader: {
-    name: 'UiDialogHeader',
-    template: '<div><slot /></div>',
-    props: ['class'],
-  },
-  UiDialogTitle: {
-    name: 'UiDialogTitle',
-    template: '<div><slot /></div>',
-    props: ['class'],
-  },
-  UiDialogFooter: {
-    name: 'UiDialogFooter',
-    template: '<div><slot /></div>',
-    props: ['class'],
-  },
-}));
-
-mockNuxtImport('navigateTo', () => {
-  return vi.fn();
 });
 
-describe('OAuthCompleteForm Component', () => {
+describe('OAuthCompleteForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    submitMock = vi.fn();
   });
 
-  it('renders the component', () => {
-    expect(true).toBe(true);
-  });
-
-  it('accepts creationToken as prop', () => {
-    const creationToken = 'test-token-123';
-    expect(creationToken).toBe('test-token-123');
-  });
-
-  it('initializes birthDate ref as empty string', async () => {
-    const { ref } = await import('vue');
-    const birthDate = ref<string>('');
-
-    expect(birthDate.value).toBe('');
-  });
-
-  it('initializes openDialog ref as true', async () => {
-    const { ref } = await import('vue');
-    const openDialog = ref(true);
-
-    expect(openDialog.value).toBe(true);
-  });
-
-  it('initializes errors as empty object', async () => {
-    const { reactive } = await import('vue');
-    const errors = reactive<Record<string, string>>({});
-
-    expect(Object.keys(errors).length).toBe(0);
-  });
-
-  it('calculates thirteenYearsAgo date correctly', () => {
-    const today = new Date();
-    const thirteenYearsAgo = new Date(today.getFullYear() - 13, today.getMonth(), today.getDate());
-
-    const yearDiff = today.getFullYear() - thirteenYearsAgo.getFullYear();
-    expect(yearDiff).toBe(13);
-  });
-
-  it('can update birthDate value', async () => {
-    const { ref } = await import('vue');
-    const birthDate = ref<string>('');
-
-    birthDate.value = '2000-01-01';
-    expect(birthDate.value).toBe('2000-01-01');
-  });
-
-  it('can toggle openDialog value', async () => {
-    const { ref } = await import('vue');
-    const openDialog = ref(true);
-
-    openDialog.value = false;
-    expect(openDialog.value).toBe(false);
-  });
-
-  it('can add error to errors object', async () => {
-    const { reactive } = await import('vue');
-    const errors = reactive<Record<string, string>>({});
-
-    errors.birthDate = 'Age restriction error';
-    expect(errors.birthDate).toBe('Age restriction error');
-  });
-
-  it('can delete error from errors object', async () => {
-    const { reactive } = await import('vue');
-    const errors = reactive<Record<string, string>>({
-      birthDate: 'Some error',
+  it('renders dialog and form fields', () => {
+    const wrapper = mount(OAuthCompleteForm, {
+      props: { creationToken: 'token123' },
+      global: {
+        plugins: [i18n],
+        stubs: {
+          UiDialog: {
+            template: '<div data-test-id="oauth-complete-dialog"><slot /></div>',
+          },
+          UiDialogContent: {
+            template: '<div><slot /></div>',
+          },
+          UiDialogHeader: {
+            template: '<div><slot /></div>',
+          },
+          UiDialogTitle: {
+            template: '<div><slot /></div>',
+          },
+          UiDialogFooter: {
+            template: '<div><slot /></div>',
+          },
+          Select: {
+            template: '<select><slot /></select>',
+            props: ['modelValue', 'options', 'placeholder', 'name', 'class'],
+          },
+          Button: {
+            template: '<button :disabled="disabled"><slot /></button>',
+            props: ['disabled', 'size', 'class'],
+          },
+        },
+      },
     });
 
-    delete errors.birthDate;
-    expect(errors.birthDate).toBeUndefined();
+    expect(wrapper.html()).toContain('Register Info');
+    expect(wrapper.html()).toContain('Date of Birth');
+    expect(wrapper.find('[data-test-id="oauth-complete-dialog"]').exists()).toBe(true);
   });
 
-  it('formats date to ISO string correctly', () => {
-    const date = new Date(Date.UTC(2000, 0, 15));
-    const formattedDate = date.toISOString().split('T')[0];
+  it('disables button if no birthDate', () => {
+    const wrapper = mount(OAuthCompleteForm, {
+      props: { creationToken: 'token123' },
+      global: {
+        plugins: [i18n],
+        stubs: {
+          UiDialog: {
+            template: '<div><slot /></div>',
+          },
+          UiDialogContent: {
+            template: '<div><slot /></div>',
+          },
+          UiDialogHeader: {
+            template: '<div><slot /></div>',
+          },
+          UiDialogTitle: {
+            template: '<div><slot /></div>',
+          },
+          UiDialogFooter: {
+            template: '<div><slot /></div>',
+          },
+          Select: {
+            template: '<select><slot /></select>',
+          },
+          Button: {
+            template: '<button :disabled="disabled"><slot /></button>',
+            props: ['disabled', 'size', 'class'],
+          },
+        },
+      },
+    });
 
-    expect(formattedDate).toBe('2000-01-15');
+    const button = wrapper.find('button');
+    expect(button.exists()).toBe(true);
+    expect(button.attributes('disabled')).toBeDefined();
   });
 
-  it('validates date is after thirteenYearsAgo', () => {
+  it('shows error if under 13 years', async () => {
+    const wrapper = mount(OAuthCompleteForm, {
+      props: { creationToken: 'token123' },
+      global: {
+        plugins: [i18n],
+        stubs: {
+          UiDialog: {
+            template: '<div><slot /></div>',
+          },
+          UiDialogContent: {
+            template: '<div><slot /></div>',
+          },
+          UiDialogHeader: {
+            template: '<div><slot /></div>',
+          },
+          UiDialogTitle: {
+            template: '<div><slot /></div>',
+          },
+          UiDialogFooter: {
+            template: '<div><slot /></div>',
+          },
+          Select: {
+            template: '<select><slot /></select>',
+          },
+          Button: {
+            template: '<button><slot /></button>',
+          },
+        },
+      },
+    });
+
+    const vm = wrapper.vm as unknown as ComponentPublicInstance & {
+      dateSelect: {
+        selectedDay: { value: string };
+        selectedMonth: { value: string };
+        selectedYear: { value: string };
+      };
+    };
     const today = new Date();
-    const thirteenYearsAgo = new Date(today.getFullYear() - 13, today.getMonth(), today.getDate());
-    const testDate = new Date(today.getFullYear() - 10, today.getMonth(), today.getDate());
+    const recentYear = today.getFullYear() - 10;
 
-    const isAfter = testDate > thirteenYearsAgo;
-    expect(isAfter).toBe(true);
+    vm.dateSelect.selectedDay.value = '15';
+    vm.dateSelect.selectedMonth.value = '6';
+    vm.dateSelect.selectedYear.value = recentYear.toString();
+
+    await wrapper.vm.$nextTick();
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.find('[data-test-id="birth-date-error"]').exists()).toBe(true);
+    expect(wrapper.find('[data-test-id="birth-date-error"]').text()).toBe('Too young');
   });
 
-  it('validates date is before thirteenYearsAgo', () => {
-    const today = new Date();
-    const thirteenYearsAgo = new Date(today.getFullYear() - 13, today.getMonth(), today.getDate());
-    const testDate = new Date(today.getFullYear() - 20, today.getMonth(), today.getDate());
+  it('calls submit with correct values', async () => {
+    const wrapper = mount(OAuthCompleteForm, {
+      props: { creationToken: 'token123' },
+      global: {
+        plugins: [i18n],
+        stubs: {
+          UiDialog: {
+            template: '<div><slot /></div>',
+          },
+          UiDialogContent: {
+            template: '<div><slot /></div>',
+          },
+          UiDialogHeader: {
+            template: '<div><slot /></div>',
+          },
+          UiDialogTitle: {
+            template: '<div><slot /></div>',
+          },
+          UiDialogFooter: {
+            template: '<div><slot /></div>',
+          },
+          Select: {
+            template: '<select><slot /></select>',
+          },
+          Button: {
+            template: '<button :disabled="disabled" @click="$emit(\'click\')"><slot /></button>',
+            props: ['disabled', 'size', 'class'],
+            emits: ['click'],
+          },
+        },
+      },
+    });
 
-    const isAfter = testDate > thirteenYearsAgo;
-    expect(isAfter).toBe(false);
+    const vm = wrapper.vm as unknown as ComponentPublicInstance & {
+      dateSelect: {
+        selectedDay: { value: string };
+        selectedMonth: { value: string };
+        selectedYear: { value: string };
+      };
+    };
+    vm.dateSelect.selectedDay.value = '1';
+    vm.dateSelect.selectedMonth.value = '1';
+    vm.dateSelect.selectedYear.value = '2000';
+
+    await wrapper.vm.$nextTick();
+    await wrapper.vm.$nextTick();
+
+    const button = wrapper.find('button');
+    expect(button.exists()).toBe(true);
+    await button.trigger('click');
+
+    expect(submitMock).toHaveBeenCalledWith('token123', '2000-01-01');
   });
 });
