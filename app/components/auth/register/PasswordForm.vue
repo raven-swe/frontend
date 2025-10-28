@@ -19,7 +19,7 @@ const { errors, defineField, handleSubmit, isSubmitting } = useForm({
 });
 
 const onSubmit = handleSubmit(async (values) => {
-  await registerStore.submitPassword(values.password);
+  await registerStore.submitPassword(values.password.trim());
 });
 
 const [_password, passwordAttrs] = defineField('password');
