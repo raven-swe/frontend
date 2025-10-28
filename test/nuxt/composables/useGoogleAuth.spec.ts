@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { mockNuxtImport } from '@nuxt/test-utils/runtime';
 import { useGoogleAuth } from '../../../app/composables/useGoogleAuth';
-
+const GOOGLE_CLIENT_ID = process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID ?? '';
 // Mock router
 const mockRouterPush = vi.fn().mockResolvedValue(undefined);
 mockNuxtImport('useRouter', () => {
@@ -14,7 +14,7 @@ mockNuxtImport('useRouter', () => {
 mockNuxtImport('useRuntimeConfig', () => {
   return () => ({
     public: {
-      googleClientId: '870874259747-ipkr0uktka13almqjca0husfkvi318bm.apps.googleusercontent.com',
+      googleClientId: GOOGLE_CLIENT_ID,
     },
   });
 });
@@ -80,7 +80,7 @@ describe('useGoogleAuth', () => {
       initializeGoogleButton('test-button');
 
       expect(window.google?.accounts.oauth2?.initCodeClient).toHaveBeenCalledWith({
-        client_id: '870874259747-ipkr0uktka13almqjca0husfkvi318bm.apps.googleusercontent.com',
+        client_id: GOOGLE_CLIENT_ID,
         scope: 'openid email profile',
         ux_mode: 'popup',
         callback: expect.any(Function),
@@ -225,7 +225,7 @@ describe('useGoogleAuth', () => {
       // Step 2: Verify initialization
       expect(window.google?.accounts.oauth2?.initCodeClient).toHaveBeenCalledWith(
         expect.objectContaining({
-          client_id: '870874259747-ipkr0uktka13almqjca0husfkvi318bm.apps.googleusercontent.com',
+          client_id: GOOGLE_CLIENT_ID,
           scope: 'openid email profile',
           ux_mode: 'popup',
         }),
