@@ -3,6 +3,7 @@ export interface UpdateProfileRequest {
   bio?: string;
   location?: string;
   websiteUrl?: string;
+  birthDate?: string;
 }
 
 export interface UserData {

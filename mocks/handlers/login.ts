@@ -16,6 +16,7 @@ const API_URL = process.env.BACKEND_URL;
 const generateAuthToken = (username: string) => {
   const payload = {
     username,
+    exp: Math.floor(Date.now() / 1000) + 60 * 5,
   };
   return jwt.sign(payload, 'secret', { expiresIn: '1m' });
 };
@@ -37,11 +38,8 @@ const generateRefreshCookie = (token: string) => {
   });
 };
 
-export const loginHandlers = [
-  /**
-   * Check if identifier exists
-   * GET /auth/check-identifier?identifier=<identifier>
-   */
+export const handlers = [
+  // GET /auth/check-identifier?identifier=<identifier>
   http.get(`${API_URL}/auth/check-identifier`, ({ request }) => {
     const url = new URL(request.url);
     const identifier = url.searchParams.get('identifier');
@@ -60,31 +58,6 @@ export const loginHandlers = [
       );
     }
 
-    if (identifier === 'trigger500@example.com') {
-      return HttpResponse.json(
-        {
-          success: false,
-          error: {
-            code: 'INTERNAL_SERVER_ERROR',
-            message: 'Unexpected error occurred while checking identifier.',
-          },
-        } as ApiErrorResponse,
-        { status: 500 },
-      );
-    }
-
-    //if you want to test without generating mock users
-    if (identifier === 'test@example.com') {
-      return HttpResponse.json(
-        {
-          success: true,
-          message: 'User found',
-          data: { exists: true, type: 'email' },
-        } as ApiSuccessResponse<{ exists: boolean; type: string }>,
-        { status: 200 },
-      );
-    }
-
     const user = mockUsers.find((u) => u.email === identifier || u.username === identifier);
 
     if (!user) {
@@ -92,8 +65,8 @@ export const loginHandlers = [
         {
           success: true,
           message: 'User not found',
-          data: { exists: false, type: null },
-        } as ApiSuccessResponse<{ exists: boolean; type: string | null }>,
+          data: { exists: false, type: '' },
+        } as ApiSuccessResponse<{ exists: boolean; type: string }>,
         { status: 200 },
       );
     }
@@ -104,24 +77,20 @@ export const loginHandlers = [
         message: user ? 'User found' : 'User not found',
         data: {
           exists: !!user,
-          type: user ? (user.email === identifier ? 'email' : 'username') : null,
+          type: user ? (user.email === identifier ? 'email' : 'username') : '',
         },
-      } as ApiSuccessResponse<{ exists: boolean; type: string | null }>,
+      } as ApiSuccessResponse<{ exists: boolean; type: string }>,
       { status: 200 },
     );
   }),
 
-  /**
-   * User login
-   * POST /auth/login
-   */
+  // POST /auth/login
   http.post(`${API_URL}/auth/login`, async ({ request }) => {
     const body = (await request.json()) as {
       identifier?: string;
       password?: string;
     };
 
-    // 🧩 Validation
     if (!body?.identifier || !body?.password) {
       return HttpResponse.json(
         {
@@ -161,8 +130,7 @@ export const loginHandlers = [
       );
     }
 
-    // (Optional) Simulated password check
-    if (password !== 'Password123') {
+    if (password !== 'Password@123') {
       return HttpResponse.json(
         {
           success: false,
@@ -175,7 +143,7 @@ export const loginHandlers = [
       );
     }
 
-    // 🛑 Simulate server error for specific identifier
+    // Simulate server error for specific identifier
     if (body.identifier === 'trigger500@example.com') {
       return HttpResponse.json(
         {
@@ -189,7 +157,6 @@ export const loginHandlers = [
       );
     }
 
-    // Generate tokens
     const authToken = generateAuthToken(user.username);
     const refreshToken = generateRefreshToken(user.username);
     const refreshTokenCookie = generateRefreshCookie(refreshToken);

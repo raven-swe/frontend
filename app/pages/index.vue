@@ -27,10 +27,10 @@ definePageMeta({
           <section>
             <div class="flex flex-col gap-4">
               <Button id="github-signin" variant="outline" class="w-75">{{
-                $t('root.auth.github-signin')
+                $t('root.auth.github-signup')
               }}</Button>
               <Button id="google-signin" variant="outline" class="w-75">{{
-                $t('root.auth.google-signin')
+                $t('root.auth.google-signup')
               }}</Button>
             </div>
             <div class="flex max-w-75 items-center justify-center gap-2 py-2">
