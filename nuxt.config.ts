@@ -32,7 +32,7 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
   },
   i18n: {
-    strategy: 'prefix_and_default',
+    strategy: 'prefix',
     defaultLocale: 'en',
     locales: [
       { code: 'en', name: 'English', file: 'en.json' },
