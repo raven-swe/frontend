@@ -1,4 +1,5 @@
 export default function useRecaptcha() {
+  const { locale } = useI18n();
   const renderRecaptcha = ({
     elementId,
     callback,
@@ -16,7 +17,7 @@ export default function useRecaptcha() {
         callback,
         'expired-callback': expiredCallback,
         theme,
-        hl: document.documentElement.lang || 'en',
+        hl: locale.value ?? 'en',
       });
     };
 
