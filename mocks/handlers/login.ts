@@ -16,7 +16,6 @@ const API_URL = process.env.BACKEND_URL;
 const generateAuthToken = (username: string) => {
   const payload = {
     username,
-    exp: Math.floor(Date.now() / 1000) + 60 * 5,
   };
   return jwt.sign(payload, 'secret', { expiresIn: '1m' });
 };
