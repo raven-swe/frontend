@@ -3,8 +3,6 @@ import { showToaster } from '@/utils/showToaster';
 import { loginService, type LoginSchema } from '@/services/auth/loginService';
 
 export const useLoginStore = defineStore('login', () => {
-  const router = useRouter();
-
   const step = ref(0);
   const open = ref(false);
   const identifier = ref('');
@@ -22,7 +20,7 @@ export const useLoginStore = defineStore('login', () => {
   };
 
   const openForgotPasswordDialog = () => {
-    router.push(`/password-reset${step.value === 1 ? `?identifier=${identifier.value}` : ''}`);
+    navigateTo(`/password-reset${step.value === 1 ? `?identifier=${identifier.value}` : ''}`);
     closeDialog();
   };
 
@@ -64,11 +62,11 @@ export const useLoginStore = defineStore('login', () => {
     loading.value = true;
     try {
       await loginService.login(data);
-
-      closeDialog();
+      open.value = false;
       showToaster('success', 'Login successful');
-      router.push('/home');
+      navigateTo('/home');
     } catch (error) {
+      console.error('Login failed');
       const msg = error?.data?.message || error?.data?.error?.message || 'Invalid credentials';
       throw new Error(msg);
     } finally {

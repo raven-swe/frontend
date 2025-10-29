@@ -56,7 +56,8 @@ export const useRegisterStore = defineStore('register', () => {
   const submitPassword = async (password: string) => {
     try {
       await registerationService.complete(password, creationToken.value);
-      console.warn('account created, redirecting to home');
+      resetInitialData();
+      open.value = false;
       navigateTo('/home');
     } catch {
       console.error('Failed to complete registeration');
