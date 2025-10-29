@@ -14,7 +14,6 @@ const i18n = createI18n({
 describe('RegisterDialog Component', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
-    vi.unmock('@/stores/register');
     vi.resetModules();
     vi.resetAllMocks();
     document.body.innerHTML = '';
