@@ -65,8 +65,7 @@ export const useLoginStore = defineStore('login', () => {
     try {
       await loginService.login(data);
 
-      step.value = 0;
-      open.value = false;
+      closeDialog();
       showToaster('success', 'Login successful');
       router.push('/home');
     } catch (error) {

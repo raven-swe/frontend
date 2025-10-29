@@ -170,4 +170,37 @@ export const handlers = [
       },
     );
   }),
+
+  // POST /auth/logout
+  http.post(`${API_URL}/auth/logout`, ({ request }) => {
+    const cookies = cookie.parse(request.headers.get('cookie') || '');
+    if (!cookies['refresh_token']) {
+      return HttpResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'NOT_AUTHENTICATED',
+            message: 'No refresh token provided',
+          },
+        } as ApiErrorResponse,
+        { status: 401 },
+      );
+    }
+
+    // Clear the refresh token cookie
+    const clearCookie = cookie.serialize('refresh_token', '', {
+      httpOnly: true,
+      path: '/',
+      expires: new Date(0),
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+    });
+
+    return new HttpResponse(JSON.stringify({ success: true, message: 'Logged out successfully' }), {
+      headers: {
+        'set-cookie': clearCookie,
+        'Content-Type': 'application/json',
+      },
+    });
+  }),
 ];

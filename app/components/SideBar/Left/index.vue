@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { SIDEBAR_TABS } from '~/constants/leftsidebar';
+import { loginService } from '~/services/auth/loginService';
 </script>
 <template>
   <div class="flex h-screen flex-col items-center xl:items-start">
@@ -10,6 +11,9 @@ import { SIDEBAR_TABS } from '~/constants/leftsidebar';
     </div>
     <div class="mt-2 flex flex-col items-center space-y-3 xl:items-start">
       <SideBarLeftTab v-for="tab in SIDEBAR_TABS" :key="tab.label" :tab />
+      <UiButton variant="ghost-default" size="icon-xl" @click="loginService.logout()">
+        <Icon name="ic:outline-logout" size="24" />
+      </UiButton>
     </div>
   </div>
 </template>
