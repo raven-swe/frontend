@@ -1,4 +1,8 @@
+import { useI18n } from 'vue-i18n';
 export default function useRecaptcha() {
+  const {
+    public: { siteKey },
+  } = useRuntimeConfig();
   const { locale } = useI18n();
   const renderRecaptcha = ({
     elementId,
@@ -9,7 +13,6 @@ export default function useRecaptcha() {
     callback: (token: string) => void;
     expiredCallback?: () => void;
   }) => {
-    const siteKey = useRuntimeConfig().public.siteKey || '';
     const theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
     const render = () => {
       window?.grecaptcha?.render(elementId, {

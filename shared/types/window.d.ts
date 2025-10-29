@@ -2,8 +2,8 @@ export {};
 
 declare global {
   interface Window {
-    onRecaptchaLoad: () => void;
-    grecaptcha: {
+    onRecaptchaLoad?: () => void;
+    grecaptcha?: {
       render: (
         element: string | HTMLElement,
         options: {
