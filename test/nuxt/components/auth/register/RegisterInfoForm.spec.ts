@@ -24,6 +24,16 @@ describe('RegisterInfoForm.vue', () => {
   });
 
   it('fields render correctly', async () => {
+    const recaptchaRenderfn = vi.fn().mockImplementation(({ callback }) => {
+      // simulate token being returned immediately
+      callback('mock-recaptcha-token');
+    });
+
+    vi.doMock('@/composables/useRecaptcha', () => ({
+      default: () => ({
+        render: recaptchaRenderfn,
+      }),
+    }));
     const { default: RegisterationInfoForm } = await import(
       '@/components/auth/register/RegisterationInfoForm.vue'
     );
@@ -71,6 +81,15 @@ describe('RegisterInfoForm.vue', () => {
     }));
     vi.doMock('@/stores/register', () => ({
       useRegisterStore: () => store,
+    }));
+
+    vi.doMock('@/composables/useRecaptcha', () => ({
+      default: () => ({
+        render: vi.fn().mockImplementation(({ callback }) => {
+          // simulate token being returned immediately
+          callback('mock-recaptcha-token');
+        }),
+      }),
     }));
 
     const { default: RegisterationInfoForm } = await import(
@@ -127,6 +146,16 @@ describe('RegisterInfoForm.vue', () => {
     const { default: RegisterationInfoForm } = await import(
       '@/components/auth/register/RegisterationInfoForm.vue'
     );
+
+    vi.doMock('@/composables/useRecaptcha', () => ({
+      default: () => ({
+        render: vi.fn().mockImplementation(({ callback }) => {
+          // simulate token being returned immediately
+          callback('mock-recaptcha-token');
+        }),
+      }),
+    }));
+
     const wrapper = await mountSuspended(
       {
         components: { RegisterationInfoForm, Dialog },

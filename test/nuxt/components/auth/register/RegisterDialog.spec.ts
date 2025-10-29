@@ -30,6 +30,16 @@ describe('RegisterDialog Component', () => {
     vi.doMock('@/stores/register', () => ({
       useRegisterStore: () => store,
     }));
+
+    vi.doMock('@/composables/useRecaptcha', () => ({
+      default: () => ({
+        render: vi.fn().mockImplementation(({ callback }) => {
+          // simulate token being returned immediately
+          callback('mock-recaptcha-token');
+        }),
+      }),
+    }));
+
     const { default: RegisterDialogOpened } = await import(
       '@/components/auth/register/RegisterDialog.vue'
     );
