@@ -5,6 +5,7 @@ import FieldInput from '~/components/ui/form/FieldInput.vue';
 import Button from '~/components/ui/Button.vue';
 import { useDebounceFn } from '@vueuse/core';
 import useDateSelect from '@/composables/useDateSelect';
+import useRecaptcha from '@/composables/useRecaptcha';
 import Select from '~/components/ui/Select.vue';
 import { registerationService } from '~/services/auth/registerationService';
 
@@ -95,11 +96,11 @@ watch(
   },
 );
 
-const { $recaptcha } = useNuxtApp();
+const { render: renderRecaptcha } = useRecaptcha();
 
 onMounted(async () => {
   await nextTick();
-  $recaptcha.render({
+  renderRecaptcha({
     elementId: 'recaptcha-container',
     callback: (token: string) => {
       setFieldValue('recaptcha', token);
