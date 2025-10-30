@@ -6,7 +6,7 @@ export const useGoogleAuth = () => {
   let codeClient: CodeClient | null = null;
 
   const initializeGoogleButton = (elementId: string) => {
-    if (!window.google || !window.google.accounts?.oauth2) {
+    if (!window.google || !window.google.accounts?.oauth2 || !config.public.googleClientId) {
       console.error('Google OAuth2 not loaded');
       return;
     }
