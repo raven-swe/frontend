@@ -9,6 +9,6 @@
         loading="eager"
       />
     </div>
-    <UiButton variant="outline">{{ $t('profile.edit-profile') }}</UiButton>
+    <UiButton variant="outline">{{ $t('profile-info.edit-profile') }}</UiButton>
   </div>
 </template>
