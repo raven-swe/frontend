@@ -1,3 +1,5 @@
+import type { LeftSidebarTab } from '~~/shared/types/leftsidebar';
+
 export const SIDEBAR_TABS: LeftSidebarTab[] = [
   {
     label: 'home',

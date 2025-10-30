@@ -14,6 +14,10 @@
     "tweets": {
       "tweet-not-found": "Tweet not found",
       "tweets-list": "Tweets List"
+    },
+    "complete-form": {
+      "birthdate-label": "Birthdate",
+      "confirm": "Confirm"
     }
   },
   "leftsidebar": {
@@ -97,7 +101,9 @@
       "google-signup": "Sign up with Google",
       "github-signup": "Sign up with GitHub",
       "already-have-account": "Already have an account?",
-      "separator": "or"
+      "separator": "or",
+      "google-signin": "Sign in with Google",
+      "github-signin": "Sign in with GitHub"
     },
     "footer": {
       "about": "About",
