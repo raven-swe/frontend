@@ -11,6 +11,7 @@ export default defineNuxtConfig({
       githubClientId: process.env.NUXT_PUBLIC_GITHUB_CLIENT_ID || '',
       githubRedirectUri: process.env.NUXT_PUBLIC_GITHUB_REDIRECT_URI || '',
       githubScope: process.env.NUXT_PUBLIC_GITHUB_SCOPE || '',
+      siteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY || '',
     },
   },
   devtools: {
@@ -25,12 +26,6 @@ export default defineNuxtConfig({
       include: ['../shared/types/**/*.ts', '../mocks/**/*.ts', '../test/**/*.ts'],
     },
   },
-  runtimeConfig: {
-    public: {
-      siteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY || '',
-    },
-  },
-
   app: {
     head: {
       link: [

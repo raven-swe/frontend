@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { mockNuxtImport } from '@nuxt/test-utils/runtime';
 import { useGoogleAuth } from '../../../app/composables/useGoogleAuth';
-const GOOGLE_CLIENT_ID = process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID ?? '';
+const GOOGLE_CLIENT_ID = process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID ?? 'clientId123';
 // Mock router
 const mockRouterPush = vi.fn().mockResolvedValue(undefined);
 mockNuxtImport('useRouter', () => {
