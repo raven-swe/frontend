@@ -36,7 +36,7 @@ const { userProfile, error, loading } = useUserProfile(username.value);
           route="/profile/media"
           :is-active="$route.path === '/profile/media'"
         />
-        <Tabs
+        <Tab
           :label="$t('profile.tabs.likes')"
           route="/profile/likes"
           :is-active="$route.path === '/profile/likes'"
