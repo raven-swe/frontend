@@ -12,7 +12,7 @@ const mockUserInfos = {
     avatarUrl: 'https://i.ibb.co/vv6B8ML0/profile.jpg',
     bannerUrl: 'https://i.ibb.co/bj3fhPfq/cover.jpg',
     location: 'Cairo, Egypt',
-    websiteUrl: 'https://github.com/hussein',
+    websiteUrl: 'https://www.instagram.com/hussein_mohamed__1',
     birthDate: '1999-01-01',
     joinedAt: '2020-07-01T00:00:00.000Z',
     followingCount: 150,

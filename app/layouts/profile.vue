@@ -3,23 +3,31 @@ import ProfileDetails from '~/components/profile/ProfileDetails.vue';
 import Tabs from '@/components/ui/Tabs.vue';
 import Tab from '@/components/ui/Tab.vue';
 import Spinner from '~/components/ui/Spinner.vue';
+
 const route = useRoute();
 const username = computed(() => (route.params.username as string) || 'hussein');
 
-const { userProfile, error, loading } = useUserProfile(username.value);
+const userStore = useUserStore();
+
+onMounted(() => {
+  userStore.fetchUserProfile(username.value);
+});
 </script>
 
 <template>
   <NuxtLayout name="default">
     <!-- Profile header and tabs (sticky across all profile pages) -->
-    <div v-if="loading" class="flex justify-center p-4">
+    <div v-if="userStore.loading" class="flex justify-center p-4">
       <Spinner />
     </div>
-    <div v-else-if="error" class="text-destructive p-4">
-      {{ error.message }}
+
+    <div v-else-if="userStore.error" class="text-destructive p-4">
+      {{ userStore.error }}
     </div>
-    <template v-else-if="userProfile">
-      <ProfileDetails :user-profile="userProfile" />
+
+    <div v-else-if="userStore.user">
+      <ProfileDetails :user-profile="userStore.user" />
+
       <Tabs>
         <Tab
           :label="$t('profile.tabs.posts')"
@@ -45,6 +53,6 @@ const { userProfile, error, loading } = useUserProfile(username.value);
 
       <!-- Dynamic content from child tab pages -->
       <slot />
-    </template>
+    </div>
   </NuxtLayout>
 </template>

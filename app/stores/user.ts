@@ -16,36 +16,43 @@ interface User {
 
 export const useUserStore = defineStore('user', {
   state: () => ({
-    user: {
-      username: 'johndoe',
-      displayName: 'John Doe',
-      bio: `Fourth year Computer Engineering student @ Cairo university\nI'm only here when the reels get boring on ig`,
-      avatarUrl: 'https://i.ibb.co/qMcSYBfk/image.jpg',
-      bannerUrl: 'https://i.ibb.co/Z1Yx04kS/dfghj.webp',
-      location: 'San Francisco, CA',
-      websiteUrl: 'https://johndoe.dev',
-      birthDate: '2004-05-07',
-      joinedAt: '2020-03-15T10:30:00Z',
-      email: 'https://github.com/',
-      phone: '+1234567890',
-    } as User,
+    user: null as UserProfile | null,
+    loading: false,
+    error: null as string | null,
   }),
 
   getters: {
-    memberSince: (state) => new Date(state.user.joinedAt).getFullYear(),
+    memberSince: (state) => (state.user ? new Date(state.user.joinedAt).getFullYear() : null),
   },
 
   actions: {
-    updateUser(userData: Partial<User>) {
-      this.user = { ...this.user, ...userData };
+    async fetchUserProfile(username: string) {
+      this.loading = true;
+      this.error = null;
+
+      const { data, error } = await useFetch<UserProfile>(`/api/users/${username}/profile`, {
+        key: `user-profile-${username}`,
+      });
+
+      if (error.value) {
+        this.error = error.value.message;
+      } else if (data.value) {
+        this.user = data.value;
+      }
+
+      this.loading = false;
     },
 
-    setUser(userData: User) {
+    updateUser(userData: Partial<User>) {
+      if (this.user) this.user = { ...this.user, ...userData };
+    },
+
+    setUser(userData: UserProfile) {
       this.user = userData;
     },
 
     logout() {
-      // Reset to default/empty state if needed
+      this.user = null;
     },
   },
 });
