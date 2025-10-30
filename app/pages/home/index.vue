@@ -64,7 +64,11 @@ onMounted(async () => {
 <template>
   <div v-bind="containerProps" class="border-border mx-auto max-w-[700px] border-y">
     <div>
-      <TweetDefaultCard v-for="tweet in list" :key="tweet.data.id" :tweet="tweet.data" />
+      <TweetDefaultCard
+        v-for="tweet in list"
+        :key="(tweet as Tweet)?.data?.id ?? (tweet as Tweet)?.id"
+        :tweet="(tweet as Tweet)?.data ?? (tweet as Tweet)"
+      />
     </div>
 
     <div v-if="isLoading" class="text-muted-foreground py-4 text-center">
