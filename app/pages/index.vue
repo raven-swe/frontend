@@ -4,7 +4,6 @@ import { useGoogleAuth } from '~/composables/useGoogleAuth';
 import { useLoginStore } from '~/stores/auth/login';
 
 const loginStore = useLoginStore();
-
 const registerStore = useRegisterStore();
 definePageMeta({
   layout: false, // Disable layout for this page
@@ -64,6 +63,7 @@ onMounted(() => {
         </header>
         <main>
           <AuthRegisterDialog />
+          <AuthLoginDialog />
           <section>
             <div class="flex flex-col gap-4">
               <Button id="github-signin" variant="outline" class="w-75" @click="handleGithubSignIn">
@@ -95,7 +95,6 @@ onMounted(() => {
             <Button id="signin" variant="outline" class="my-4 w-75" @click="loginStore.openDialog">
               {{ $t('root.auth.signin') }}
             </Button>
-            <AuthLoginDialog />
           </section>
         </main>
       </section>

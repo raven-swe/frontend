@@ -25,10 +25,8 @@ const { navigateToMock } = vi.hoisted(() => {
   };
 });
 
-mockNuxtImport('useRouter', () => {
-  return () => ({
-    push: navigateToMock,
-  });
+mockNuxtImport('navigateTo', () => {
+  return navigateToMock;
 });
 
 // Create i18n instance

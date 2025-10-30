@@ -4,10 +4,8 @@ import { useLoginStore } from '~/stores/auth/login';
 const loginStore = useLoginStore();
 
 const handleDialogChange = (val: boolean) => {
+  if (!val) loginStore.closeDialog();
   loginStore.open = val;
-  if (!val) {
-    loginStore.closeDialog();
-  }
 };
 </script>
 
