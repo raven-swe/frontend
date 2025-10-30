@@ -4,6 +4,15 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   css: ['@/assets/css/main.css'],
+  runtimeConfig: {
+    public: {
+      googleClientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID || '',
+      backendUrl: process.env.BACKEND_URL || '',
+      githubClientId: process.env.NUXT_PUBLIC_GITHUB_CLIENT_ID || '',
+      githubRedirectUri: process.env.NUXT_PUBLIC_GITHUB_REDIRECT_URI || '',
+      githubScope: process.env.NUXT_PUBLIC_GITHUB_SCOPE || '',
+    },
+  },
   devtools: {
     enabled: true,
     timeline: {
