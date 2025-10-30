@@ -2,7 +2,12 @@ import { apiFetch } from '~/api';
 import { isAuthenticated, parseSetCookie } from '~/services/auth/authService';
 
 // Public routes that don’t require auth
-const publicRoutes = ['/', '/auth/forgot-password', '/playground/dummy-login'];
+const publicRoutePatterns: RegExp[] = [
+  /^\/$/, // root "/"
+  /^\/password-reset(?:\/.*)?$/, // "/reset-password" and subpaths
+  /^\/auth(?:\/.*)?$/, // "/auth/*"
+  /^\/profile(?:\/.*)?$/, // "/profile/*"
+];
 
 export default defineNuxtRouteMiddleware(async (to) => {
   let isAuth = isAuthenticated();
@@ -12,7 +17,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return navigateTo('/home');
   }
   // Allow if it's a public route
-  if (publicRoutes.includes(to.path)) return;
+  const isPublic = publicRoutePatterns.some((regex) => regex.test(to.path));
+  if (isPublic) return;
 
   if (!isAuth) {
     // try to authenticate using refresh token

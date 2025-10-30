@@ -3,6 +3,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 const fetchMock = vi.fn();
 vi.stubGlobal('$fetch', fetchMock);
 
+vi.mock('~/api', () => ({
+  apiFetch: fetchMock,
+}));
+
 describe('loginService', () => {
   beforeEach(() => {
     vi.clearAllMocks();

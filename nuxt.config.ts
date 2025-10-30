@@ -11,6 +11,7 @@ export default defineNuxtConfig({
       githubClientId: process.env.NUXT_PUBLIC_GITHUB_CLIENT_ID || '',
       githubRedirectUri: process.env.NUXT_PUBLIC_GITHUB_REDIRECT_URI || '',
       githubScope: process.env.NUXT_PUBLIC_GITHUB_SCOPE || '',
+      siteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY || '',
     },
   },
   devtools: {
@@ -23,6 +24,14 @@ export default defineNuxtConfig({
     strict: true,
     sharedTsConfig: {
       include: ['../shared/types/**/*.ts', '../mocks/**/*.ts', '../test/**/*.ts'],
+    },
+  },
+  app: {
+    head: {
+      link: [
+        { rel: 'preconnect', href: 'https://www.google.com' },
+        { rel: 'preconnect', href: 'https://www.gstatic.com', crossorigin: '' },
+      ],
     },
   },
   modules: [
