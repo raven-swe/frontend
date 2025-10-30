@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { SIDEBAR_TABS } from '~/constants/leftsidebar';
+const userStore = useUserStore();
 </script>
 <template>
   <div class="flex h-screen flex-col items-center xl:items-start">
@@ -9,7 +9,24 @@ import { SIDEBAR_TABS } from '~/constants/leftsidebar';
       </NuxtLink>
     </div>
     <div class="mt-2 flex flex-col items-center space-y-3 xl:items-start">
-      <SideBarLeftTab v-for="tab in SIDEBAR_TABS" :key="tab.label" :tab />
+      <SideBarLeftTab :tab="{ label: 'home', icon: 'home', route: '/home' }"></SideBarLeftTab>
+      <SideBarLeftTab
+        :tab="{ label: 'explore', icon: 'search', route: '/explore' }"
+      ></SideBarLeftTab>
+      <SideBarLeftTab
+        :tab="{ label: 'notifications', icon: 'notifications', route: '/notifications' }"
+      ></SideBarLeftTab>
+      <SideBarLeftTab
+        :tab="{ label: 'messages', icon: 'chat', route: '/messages' }"
+      ></SideBarLeftTab>
+      <SideBarLeftTab
+        :tab="{
+          label: 'profile',
+          icon: 'person',
+          route: `/profile/${userStore.user?.username || ''}`,
+        }"
+      ></SideBarLeftTab>
+      <SideBarLeftTab :tab="{ label: 'more', icon: 'more-horiz', route: '#' }"></SideBarLeftTab>
     </div>
   </div>
 </template>
