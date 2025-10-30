@@ -1,18 +1,5 @@
 import { defineStore } from 'pinia';
-
-export interface User {
-  username: string;
-  displayName: string;
-  bio: string;
-  avatarUrl: string;
-  bannerUrl: string;
-  location: string;
-  websiteUrl: string;
-  birthDate: string;
-  joinedAt: string;
-  email: string;
-  phone: string;
-}
+import type { User, UserProfile } from '~~/shared/types/user';
 
 export const useUserStore = defineStore('user', {
   state: () => ({
@@ -32,11 +19,17 @@ export const useUserStore = defineStore('user', {
       joinedAt: '2020-03-15T10:30:00Z',
       email: 'https://github.com/',
       phone: '+1234567890',
+      languageCode: 'en',
       followingCount: 0,
       followersCount: 0,
       mutualsCount: 0,
       mutualNames: [],
-    } as UserProfile,
+    } as User & {
+      followingCount: number;
+      followersCount: number;
+      mutualsCount: number;
+      mutualNames: string[];
+    },
     loading: false,
     error: null as string | null,
   }),
@@ -57,18 +50,19 @@ export const useUserStore = defineStore('user', {
       if (error.value) {
         this.error = error.value.message;
       } else if (data.value) {
-        this.user = data.value;
+        // Merge with existing user data to preserve email, phone, languageCode
+        this.user = { ...this.user, ...data.value };
       }
 
       this.loading = false;
     },
 
-    updateUser(userData: Partial<UserProfile>) {
+    updateUser(userData: Partial<User>) {
       if (this.user) this.user = { ...this.user, ...userData };
     },
 
-    setUser(userData: UserProfile) {
-      this.user = userData;
+    setUser(userData: User) {
+      this.user = { ...this.user, ...userData };
     },
 
     logout() {

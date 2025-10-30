@@ -1,17 +1,15 @@
 <script setup lang="ts">
-import type { User } from '~~/shared/types/user';
 import { birthDateFormat } from '#imports';
 import SettingsItem from './settingsItem.vue';
-const user = ref<User | null>(null);
+import { useUserStore } from '~/stores/user';
 
-const { data: userData, error } = await useFetch<{ data: User }>('/api/user/Danika80');
-user.value = userData.value?.data || null;
-if (error.value) console.error(error.value);
+const userStore = useUserStore();
+const user = computed(() => userStore.user);
 </script>
 <template>
   <div v-if="user" class="mt-10 flex flex-col gap-3 overflow-hidden">
     <SettingsItem
-      :title="$t('setting.username')"
+      :title="$t('setting.username.username')"
       :subtitle="`@${user.username}`"
       to="/playground/usernameEditor"
     />
