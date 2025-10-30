@@ -26,7 +26,6 @@
       "explore": "Explore",
       "notifications": "Notifications",
       "messages": "Messages",
-      "bookmarks": "Bookmarks",
       "profile": "Profile",
       "more": "More"
     }
@@ -46,6 +45,11 @@
     "tweets": "Tweets"
   },
   "profile": {
+    "not-logged-in": {
+      "title": "You're not logged in",
+      "description": "Please log in to view your profile and access all features.",
+      "take-me-home": "Take me there"
+    },
     "tabs": {
       "posts": "Posts",
       "replies": "Replies",
@@ -83,6 +87,12 @@
       "content": "This is a dialog",
       "description": "Dialog Description"
     }
+  },
+  "profile-info": {
+    "edit-profile": "Edit Profile",
+    "joined": "Joined",
+    "following": "Following",
+    "followers": "Followers"
   },
   "root": {
     "hero": {

@@ -35,6 +35,6 @@ describe('SideBar Right PreviewCard Item Component', () => {
     const wrapper = await mountSuspended(PreviewCardItem);
 
     const container = wrapper.find('div');
-    expect(container.classes()).toContain('hover:bg-background');
+    expect(container.classes()).toContain('hover:bg-foreground/10');
   });
 });
