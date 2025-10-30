@@ -72,6 +72,16 @@
       "discard-changes-desc": "This can't be undone and you'll lose your changes."
     }
   },
+  "home": {
+    "tabs": {
+      "for-you": "For You",
+      "following": "Following"
+    },
+    "messages": {
+      "loadingMore": "Loading more tweets...",
+      "noMoreTweets": "No more tweets"
+    }
+  },
   "playground": {
     "dialog": {
       "title": "Create your account",

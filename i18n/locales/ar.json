@@ -62,6 +62,16 @@
       "confirmation-dialog": "نافذة التأكيد"
     }
   },
+  "home": {
+    "tabs": {
+      "for-you": "لك",
+      "following": "متابعة"
+    },
+    "messages": {
+      "loadingMore": "جارٍ تحميل المزيد من التغريدات...",
+      "noMoreTweets": "لا توجد تغريدات أخرى"
+    }
+  },
   "playground": {
     "dialog": {
       "title": "إنشاء حسابك",
