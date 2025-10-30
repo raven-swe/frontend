@@ -1,4 +1,5 @@
 ignoredBuiltDependencies:
+  - msw
   - unrs-resolver
   - vue-demi
 
