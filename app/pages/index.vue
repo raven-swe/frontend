@@ -40,7 +40,7 @@ onMounted(() => {
   }, 100);
 
   // Listen for GitHub auth messages from popup
-  window.addEventListener('message', (event) => {
+  window?.addEventListener('message', (event) => {
     if (event.origin !== window.location.origin) return;
     if (event.data.type === 'github-auth') {
       navigateTo('/auth/callback/github?code=' + event.data.code);
