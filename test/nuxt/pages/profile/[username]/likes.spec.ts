@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
-import RepliePage from '~/pages/profile/replies.vue';
+import LikesPage from '~/pages/profile/[username]/likes.vue';
 
-describe('RepliePage', () => {
+describe('LikesPage', () => {
   const createWrapper = () => {
-    return mount(RepliePage);
+    return mount(LikesPage);
   };
 
   it('renders the page', () => {
@@ -12,7 +12,7 @@ describe('RepliePage', () => {
     expect(wrapper.exists()).toBe(true);
   });
 
-  it('renders all posts user replied to', () => {
+  it('renders all likes posts', () => {
     const wrapper = createWrapper();
     const posts = wrapper.findAll('p');
     expect(posts).toHaveLength(3);
