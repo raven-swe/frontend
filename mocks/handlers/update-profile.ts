@@ -174,4 +174,16 @@ export const handlers = [
 
     return HttpResponse.json(response, { status: 200 });
   }),
+
+  http.patch(`${API_URL}/me/username`, async () => {
+    mockUserData.username = '';
+
+    return HttpResponse.json(
+      {
+        success: true,
+        message: 'Username updated successfully',
+      },
+      { status: 200 },
+    );
+  }),
 ];
