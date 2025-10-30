@@ -12,29 +12,15 @@ const mockUsers = rawUsers as User[];
 
 const API_URL = process.env.BACKEND_URL;
 
-// 🔑 Generate access token (5-minute expiry)
 const generateAuthToken = (user: User) => {
   const payload = {
     username: user.username,
-    exp: Math.floor(Date.now() / 1000) + 60 * 5,
   };
-  return jwt.sign(payload, 'secret');
+  return jwt.sign(payload, 'secret', { expiresIn: '5m' });
 };
 
-// 🔄 Generate refresh token (7-day expiry)
-const generateRefreshToken = (user: User) => {
-  const payload = {
-    username: user.username,
-    exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7,
-  };
-  return jwt.sign(payload, 'refresh_secret');
-};
-
-export const loginHandlers = [
-  /**
-   * 📨 Check if identifier exists
-   * GET /auth/check-identifier?identifier=<identifier>
-   */
+export const handlers = [
+  // GET /auth/check-identifier?identifier=<identifier>
   http.get(`${API_URL}/auth/check-identifier`, ({ request }) => {
     const url = new URL(request.url);
     const identifier = url.searchParams.get('identifier');
@@ -53,31 +39,6 @@ export const loginHandlers = [
       );
     }
 
-    if (identifier === 'trigger500@example.com') {
-      return HttpResponse.json(
-        {
-          success: false,
-          error: {
-            code: 'INTERNAL_SERVER_ERROR',
-            message: 'Unexpected error occurred while checking identifier.',
-          },
-        } as ApiErrorResponse,
-        { status: 500 },
-      );
-    }
-
-    //if you want to test without generating mock users
-    if (identifier === 'test@example.com') {
-      return HttpResponse.json(
-        {
-          success: true,
-          message: 'User found',
-          data: { exists: true, type: 'email' },
-        } as ApiSuccessResponse<{ exists: boolean; type: string }>,
-        { status: 200 },
-      );
-    }
-
     const user = mockUsers.find((u) => u.email === identifier || u.username === identifier);
 
     if (!user) {
@@ -85,8 +46,8 @@ export const loginHandlers = [
         {
           success: true,
           message: 'User not found',
-          data: { exists: false, type: null },
-        } as ApiSuccessResponse<{ exists: boolean; type: string | null }>,
+          data: { exists: false, type: '' },
+        } as ApiSuccessResponse<{ exists: boolean; type: string }>,
         { status: 200 },
       );
     }
@@ -97,24 +58,20 @@ export const loginHandlers = [
         message: user ? 'User found' : 'User not found',
         data: {
           exists: !!user,
-          type: user ? (user.email === identifier ? 'email' : 'username') : null,
+          type: user ? (user.email === identifier ? 'email' : 'username') : '',
         },
-      } as ApiSuccessResponse<{ exists: boolean; type: string | null }>,
+      } as ApiSuccessResponse<{ exists: boolean; type: string }>,
       { status: 200 },
     );
   }),
 
-  /**
-   * 🔐 User login
-   * POST /auth/login
-   */
+  // POST /auth/login
   http.post(`${API_URL}/auth/login`, async ({ request }) => {
     const body = (await request.json()) as {
       identifier?: string;
       password?: string;
     };
 
-    // 🧩 Validation
     if (!body?.identifier || !body?.password) {
       return HttpResponse.json(
         {
@@ -138,7 +95,6 @@ export const loginHandlers = [
 
     const { identifier, password } = body;
 
-    // 🧠 Find user by email or username
     const user = mockUsers.find((u) => u.email === identifier || u.username === identifier);
 
     if (!user) {
@@ -154,8 +110,7 @@ export const loginHandlers = [
       );
     }
 
-    // 🧩 (Optional) Simulated password check
-    if (password !== 'Password123') {
+    if (password !== 'Password@123') {
       return HttpResponse.json(
         {
           success: false,
@@ -168,72 +123,16 @@ export const loginHandlers = [
       );
     }
 
-    // 🛑 Simulate server error for specific identifier
-    if (body.identifier === 'trigger500@example.com') {
-      return HttpResponse.json(
-        {
-          success: false,
-          error: {
-            code: 'INTERNAL_SERVER_ERROR',
-            message: 'Unexpected server error occurred while logging in.',
-          },
-        } as ApiErrorResponse,
-        { status: 500 },
-      );
-    }
-
-    // ✅ Success
     return HttpResponse.json(
       {
         success: true,
         message: 'Login successful',
         data: {
           accessToken: generateAuthToken(user),
-          refreshToken: generateRefreshToken(user),
+          // refreshToken: generateRefreshToken(user),
         },
-      } as ApiSuccessResponse<{ accessToken: string; refreshToken: string }>,
+      } as ApiSuccessResponse<{ accessToken: string }>,
       { status: 200 },
     );
-  }),
-
-  http.post(`${API_URL}/auth/refresh-token`, async ({ request }) => {
-    const { refreshToken } = (await request.json()) as { refreshToken: string };
-    if (!refreshToken) {
-      return HttpResponse.json(
-        { success: false, error: { message: 'No refresh token provided', code: 'NO_TOKEN' } },
-        { status: 400 },
-      );
-    }
-
-    try {
-      const decoded = jwt.verify(refreshToken, 'refresh_secret') as {
-        username: string;
-        exp: number;
-      };
-      if (decoded.exp * 1000 < Date.now()) {
-        throw new Error('Token expired');
-      }
-      const user = mockUsers.find((u) => u.username === decoded.username);
-      if (!user) {
-        return HttpResponse.json(
-          { success: false, error: { message: 'User not found', code: 'USER_NOT_FOUND' } },
-          { status: 404 },
-        );
-      }
-
-      return HttpResponse.json(
-        {
-          success: true,
-          message: 'Token refreshed',
-          data: { accessToken: generateAuthToken(user) },
-        },
-        { status: 200 },
-      );
-    } catch {
-      return HttpResponse.json(
-        { success: false, error: { message: 'Invalid refresh token', code: 'INVALID_TOKEN' } },
-        { status: 401 },
-      );
-    }
   }),
 ];

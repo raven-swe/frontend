@@ -14,6 +14,10 @@
     "tweets": {
       "tweet-not-found": "Tweet not found",
       "tweets-list": "Tweets List"
+    },
+    "complete-form": {
+      "birthdate-label": "Birthdate",
+      "confirm": "Confirm"
     }
   },
   "leftsidebar": {
@@ -60,6 +64,16 @@
       "location-desc": "Find accounts in the same location as you.",
       "click-to-save": "Click to save updates",
       "confirmation-dialog": "confirmation Dialog"
+    },
+    "edit": {
+      "edit-profile": "Edit profile",
+      "name": "Name",
+      "bio": "Bio",
+      "location": "Location",
+      "website": "Website",
+      "birth-date": "Birth date",
+      "discard-changes": "Discard changes?",
+      "discard-changes-desc": "This can't be undone and you'll lose your changes."
     }
   },
   "playground": {
@@ -79,15 +93,12 @@
       "signin": "Sign in",
       "signup": "Create account",
       "signup-info": "By signing up, you agree to the Terms of Service and Privacy Policy, including Cookie Use.",
-      "google-signin": "Sign in with Google",
-      "github-signin": "Sign in with GitHub",
       "google-signup": "Sign up with Google",
       "github-signup": "Sign up with GitHub",
       "already-have-account": "Already have an account?",
       "separator": "or",
-      "forget-password": "Forgot password?",
-      "dont-have-account": "Don't have an account?",
-      "email-not-found": "Sorry, we could not find your account."
+      "google-signin": "Sign in with Google",
+      "github-signin": "Sign in with GitHub"
     },
     "footer": {
       "about": "About",
@@ -100,21 +111,27 @@
     "next": "Next",
     "loading": "Loading",
     "skip-for-now": "Skip for now",
-    "save": "Save"
+    "save": "Save",
+    "cancel": "Cancel",
+    "discard": "Discard"
   },
   "errors": {
     "INVALID_EMAIL": "Please enter a valid email.",
     "NAME_TOO_SHORT": "What's your name?",
     "NAME_TOO_LONG": "Name must be at most 50 characters long",
     "AGE_RESTRICTION": "You must be at least 13 years old",
-    "OTP_LENGTH": "OTP must be 6 digits",
     "PASSWORD_MISMATCH": "Passwords do not match",
     "PASSWORD_TOO_SHORT": "Password must be at least 8 characters long",
     "PASSWORD_INVALID": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
     "EMAIL_ALREADY_EXISTS": "An account with this email already exists",
-    "OTP_TOO_SHORT": "OTP must be 6 digits",
-    "OTP_TOO_LONG": "OTP must be 6 digits",
-    "INVALID_OTP": "The OTP you entered is invalid"
+    "OTP_MUST_6": "OTP must be exactly 6 digits",
+    "OTP_REQUIRED": "Please enter your OTP code",
+    "INVALID_OTP": "The OTP you entered is invalid",
+    "USER_NOT_FOUND": "User not found",
+    "IDENTIFIER_REQUIRED": "Please enter your email or username",
+    "PASSWORD_REQUIRED": "Please enter your password",
+    "GENERIC_ERROR": "Something went wrong. Please try again.",
+    "EMPTY_NAME": "Name can't be blank"
   },
   "register": {
     "register-info": {
@@ -163,5 +180,52 @@
     "back-button-icon": "material-symbols:arrow-back",
     "suggestions": "Suggestions",
     "save": "Save Changes"
+  },
+  "login": {
+    "forgot-password": "Forgot password?",
+    "email-or-username": "Email or username",
+    "email": "Email",
+    "username": "Username",
+    "password": "Password",
+    "dont-have-account": "Don't have an account?",
+    "signup": "Sign up",
+    "identifier-step": {
+      "title": "Sign in to Raven",
+      "google-signin": "Sign in with Google",
+      "github-signin": "Sign in with GitHub"
+    },
+    "password-step": {
+      "title": "Enter your password",
+      "google-signin": "Sign in with Google",
+      "github-signin": "Sign in with GitHub",
+      "dont-have-account": "Don't have an account?",
+      "signin": "Sign in"
+    }
+  },
+  "forgot-password": {
+    "email-or-username": "Email or username",
+    "find-account": {
+      "title": "Find your Raven account",
+      "description": "Enter your email or username associated with your account to change your password.",
+      "identifier-label": "Email or username"
+    },
+    "otp": {
+      "title": "We sent you a code",
+      "description": "Check your email to get your confirmation code.",
+      "label": "Enter your code",
+      "resend-code": "Resend code"
+    },
+    "new-password": {
+      "title": "Choose a new password",
+      "description": "Make sure your new password is 8 characters or more. Try including numbers, letters, and punctuation marks for a stronger password.",
+      "warning": "You will be logged out of all active Raven sessions after your password is changed.",
+      "password": {
+        "label": "Password"
+      },
+      "confirm-password": {
+        "label": "Confirm your Password"
+      },
+      "change-password-button": "Change Password"
+    }
   }
 }

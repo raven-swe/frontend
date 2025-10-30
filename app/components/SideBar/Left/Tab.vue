@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { LeftSidebarTab } from '~/types/leftsidebar';
+import type { LeftSidebarTab } from '~~/shared/types/leftsidebar';
 
 const props = defineProps<{
   tab: LeftSidebarTab;
