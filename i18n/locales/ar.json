@@ -103,12 +103,24 @@
       "copyright": "© 2025 Raven Corp."
     }
   },
+  "tweet": {
+    "composer": {
+      "placeholder": "ما الذي يحدث؟",
+      "media": "الوسائط",
+      "gif": "GIF صور متحركة",
+      "emoji": "رموز ايموجي",
+      "profile-alt": "الصورة الرمزية لـ "
+    }
+  },
   "ui": {
     "close": "إغلاق",
     "next": "التالي",
     "loading": "جار التحميل",
     "skip-for-now": "تخطي الآن",
-    "save": "حفظ"
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "discard": "تجاهل",
+    "post": "نشر"
   },
   "errors": {
     "INVALID_EMAIL": "يرجى إدخال بريد إلكتروني صالح.",
