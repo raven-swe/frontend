@@ -180,16 +180,21 @@
     }
   },
   "setting": {
-    "username": "Username",
     "change-password": "Change Password",
     "email": "Email",
     "date-of-birth": "Date of Birth",
     "item-icon": "tabler:chevron-right",
     "failed-to-load-user": "Failed to load user data.",
-    "change-username": "Change username",
     "back-button-icon": "material-symbols:arrow-back",
-    "suggestions": "Suggestions",
-    "save": "Save Changes"
+    "username": {
+      "username-taken": "That username has been taken. Please choose another.",
+      "username-invalid": "Usernames can have letters, digits, and underscores, and must be 3-15 characters long.",
+      "username": "Username",
+      "suggestions": "Suggestions",
+      "change-username": "Change username",
+      "save": "Save Changes",
+      "error-saving": "An error occurred while saving the username. Please try again."
+    }
   },
   "login": {
     "forgot-password": "Forgot password?",

@@ -164,16 +164,21 @@
     }
   },
   "setting": {
-    "username": "اسم المستخدم",
     "change-password": "تغيير كلمة المرور",
     "email": "البريد الإلكتروني",
     "date-of-birth": "تاريخ الميلاد",
     "item-icon": "tabler:chevron-left",
     "failed-to-load-user": ".فشل في تحميل بيانات المستخدم",
-    "change-username": "تغيير اسم المستخدم",
     "back-button-icon": "material-symbols:arrow-forward",
-    "suggestions": "اقتراحات",
-    "save": "حفظ التغييرات"
+    "username": {
+      "username-taken": "هذا الاسم مستخدم بالفعل. يرجى اختيار اسم آخر.",
+      "username-invalid": "يمكن أن تحتوي أسماء المستخدمين على أحرف وأرقام وشرطات سفلية، ويجب أن تتكون من 3-15 حرفًا.",
+      "username": "اسم المستخدم",
+      "suggestions": "اقتراحات",
+      "change-username": "تغيير اسم المستخدم",
+      "save": "حفظ التغييرات",
+      "error-saving": "حدث خطأ أثناء حفظ اسم المستخدم. يرجى المحاولة مرة أخرى."
+    }
   },
   "login": {
     "forgot-password": "هل نسيت كلمة المرور؟",
