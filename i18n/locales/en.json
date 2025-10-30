@@ -45,6 +45,11 @@
     "tweets": "Tweets"
   },
   "profile": {
+    "not-logged-in": {
+      "title": "You're not logged in",
+      "description": "Please log in to view your profile and access all features.",
+      "take-me-home": "Take me there"
+    },
     "tabs": {
       "posts": "Posts",
       "replies": "Replies",

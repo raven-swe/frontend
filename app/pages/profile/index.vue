@@ -1,27 +1,29 @@
 <script setup lang="ts">
-import type { Tweet } from '~~/shared/types/tweets';
-import TweetDefaultCard from '../../components/tweet/TweetDefaultCard.vue';
+const { t } = useI18n();
+
 definePageMeta({
-  layout: 'profile',
+  layout: 'default',
 });
-
-const tweets = ref<Tweet[]>([]);
-
-const { data: tweetsData, error } = await useFetch<{ data: Tweet[] }>('/api/tweets');
-tweets.value = tweetsData.value?.data || [];
-
-if (error.value) console.error(error.value);
 </script>
 
 <template>
-  <div class="p-2">
-    <div v-if="tweets.length > 0" class="mb-4">
-      <div class="mt-4 flex w-full max-w-[700px] flex-col gap-4">
-        <TweetDefaultCard v-for="tweet in tweets" :key="tweet.id" :tweet="tweet" />
+  <div class="flex min-h-screen items-center justify-center p-6">
+    <div class="text-center">
+      <div class="mb-6">
+        <LogoRaven class="text-primary mx-auto h-16 w-16" />
       </div>
-    </div>
-    <div v-else data-testid="empty-state" class="text-muted-foreground mt-10 text-center">
-      <h1 class="text-xl font-semibold">{{ $t('testing.tweets.tweet-not-found') }}</h1>
+      <h1 class="mb-4 text-3xl font-bold">{{ t('profile.not-logged-in.title') }}</h1>
+      <p class="text-muted-foreground mb-8 text-lg">
+        {{ t('profile.not-logged-in.description') }}
+      </p>
+      <div class="space-y-3">
+        <NuxtLink
+          to="/"
+          class="bg-primary hover:bg-primary/90 inline-block rounded-full px-8 py-3 font-semibold text-white transition-colors"
+        >
+          {{ t('profile.not-logged-in.take-me-home') }}
+        </NuxtLink>
+      </div>
     </div>
   </div>
 </template>
