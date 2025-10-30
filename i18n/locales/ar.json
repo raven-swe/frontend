@@ -16,6 +16,14 @@
       "tweets-list": "قائمة التغريدات"
     }
   },
+  "playground": {
+    "dialog": {
+      "title": "إنشاء حسابك",
+      "open": "فتح النافذة",
+      "content": "هذه هى النافذة",
+      "description": "وصف النافذة"
+    }
+  },
   "leftsidebar": {
     "nav": {
       "home": "الرئيسية",
@@ -42,6 +50,11 @@
     "tweets": "التغريدات"
   },
   "profile": {
+    "not-logged-in": {
+      "title": "لم تقم بتسجيل الدخول",
+      "description": "يرجى تسجيل الدخول لعرض ملفك الشخصي والوصول إلى جميع الميزات.",
+      "take-me-home": "خذني إلى هناك"
+    },
     "tabs": {
       "posts": "المنشورات",
       "replies": "الردود",
@@ -62,13 +75,11 @@
       "confirmation-dialog": "نافذة التأكيد"
     }
   },
-  "playground": {
-    "dialog": {
-      "title": "إنشاء حسابك",
-      "open": "فتح النافذة",
-      "content": "هذه هى النافذة",
-      "description": "وصف النافذة"
-    }
+  "profile-info": {
+    "edit-profile": "تعديل الملف الشخصي",
+    "joined": "انضم في",
+    "following": "متابع",
+    "followers": "المتابعون"
   },
   "root": {
     "hero": {

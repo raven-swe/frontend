@@ -1,77 +1,69 @@
-import { describe, it, expect } from 'vitest';
-import { flushPromises } from '@vue/test-utils';
-import { mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime';
-import ProfilePage from '~/pages/profile/index.vue';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { mountSuspended } from '@nuxt/test-utils/runtime';
+import { createI18n } from 'vue-i18n';
+import messages from '~~/i18n/locales/en.json';
+
+const i18n = createI18n({
+  locale: 'en',
+  messages: { en: messages },
+});
 
 describe('ProfilePage', () => {
-  it('renders empty state when no tweets are available', async () => {
-    const wrapper = await mountSuspended(ProfilePage, {
-      global: { stubs: { TweetDefaultCard: true } },
-    });
+  beforeEach(() => {
+    vi.resetModules();
+    vi.clearAllMocks();
+  });
 
-    await flushPromises();
+  it('renders not logged in state', async () => {
+    const { default: ProfilePage } = await import('~/pages/profile/index.vue');
+
+    const wrapper = await mountSuspended(ProfilePage, {
+      global: {
+        plugins: [i18n],
+        stubs: {
+          NuxtLink: {
+            template: '<a :href="to"><slot /></a>',
+            props: ['to'],
+          },
+          LogoRaven: {
+            template: '<div class="logo-raven"></div>',
+          },
+        },
+      },
+    });
 
     const heading = wrapper.find('h1');
     expect(heading.exists()).toBe(true);
-    expect(heading.text()).toBe('Tweet not found');
+    expect(heading.text()).toBe("You're not logged in");
+
+    const description = wrapper.find('p');
+    expect(description.exists()).toBe(true);
+    expect(description.text()).toBe('Please log in to view your profile and access all features.');
+
+    const homeLink = wrapper.find('a[href="/"]');
+    expect(homeLink.exists()).toBe(true);
+    expect(homeLink.text()).toBe('Take me there');
   });
 
-  it('renders TweetDefaultCard components when tweets exist', async () => {
-    const mockTweets = [
-      {
-        id: 'tweet-1',
-        content: 'First tweet',
-        createdAt: new Date().toISOString(),
-        author: {
-          username: 'testuser',
-          displayName: 'Test User',
-          avatarUrl: '/avatar.jpg',
-          isFollowing: false,
-          isFollower: false,
-        },
-        replyCount: 0,
-        retweetCount: 0,
-        likeCount: 0,
-        isLiked: false,
-        isRetweeted: false,
-        entities: { mentions: [], hashtags: [] },
-        media: [],
-      },
-      {
-        id: 'tweet-2',
-        content: 'Second tweet',
-        createdAt: new Date().toISOString(),
-        author: {
-          username: 'testuser',
-          displayName: 'Test User',
-          avatarUrl: '/avatar.jpg',
-          isFollowing: false,
-          isFollower: false,
-        },
-        replyCount: 0,
-        retweetCount: 0,
-        likeCount: 0,
-        isLiked: false,
-        isRetweeted: false,
-        entities: { mentions: [], hashtags: [] },
-        media: [],
-      },
-    ];
-
-    registerEndpoint('/api/tweets', () => ({
-      data: mockTweets,
-    }));
+  it('renders logo component', async () => {
+    const { default: ProfilePage } = await import('~/pages/profile/index.vue');
 
     const wrapper = await mountSuspended(ProfilePage, {
-      global: { stubs: { TweetDefaultCard: true } },
+      global: {
+        plugins: [i18n],
+        stubs: {
+          NuxtLink: {
+            template: '<a :href="to"><slot /></a>',
+            props: ['to'],
+          },
+          LogoRaven: {
+            template: '<div class="logo-raven"></div>',
+          },
+        },
+      },
     });
 
-    await flushPromises();
-
-    const tweetCards = wrapper.findAllComponents({ name: 'TweetDefaultCard' });
-    expect(tweetCards.length).toBe(2);
-
-    const heading = wrapper.find('h1');
-    expect(heading.exists()).toBe(false);
+    const logo = wrapper.find('.logo-raven');
+    expect(logo.exists()).toBe(true);
   });
 });

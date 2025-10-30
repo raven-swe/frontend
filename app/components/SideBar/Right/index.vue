@@ -44,7 +44,7 @@ const whoToFollowItems = [
 </script>
 
 <template>
-  <div>
+  <div class="ms-4">
     <!-- preview Card -->
     <SideBarRightPreviewCard :title="$t('rightsidebar.whats-happening.title')">
       <div>

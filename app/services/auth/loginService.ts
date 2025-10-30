@@ -20,4 +20,12 @@ export const loginService = {
       body: data,
     });
   },
+
+  async logout() {
+    const response = await $fetch<ApiResponseBase>('/api/auth/logout', {
+      method: 'POST',
+    });
+    navigateTo('/');
+    return response;
+  },
 };

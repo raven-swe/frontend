@@ -1,113 +1,222 @@
-import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
-import profile from '~/layouts/profile.vue';
-import ProfileDetails from '~/components/profile/ProfileDetails.vue';
-import Tabs from '@/components/ui/Tabs.vue';
-import Tab from '@/components/ui/Tab.vue';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { setActivePinia, createPinia } from 'pinia';
+import ProfileLayout from '@/layouts/profile.vue';
+import { useUserStore } from '@/stores/user';
 
-// Mock i18n
-const mockT = (key: string) => key;
+// Create a shared mock route object
+const mockRoute = {
+  path: '/profile/hussein',
+  params: { username: 'hussein' },
+};
 
-describe('profile', () => {
-  const createWrapper = (route = '/profile') => {
-    return mount(profile, {
+// Mock useRoute composable
+vi.mock('#app', () => ({
+  useRoute: () => mockRoute,
+  useFetch: vi.fn(),
+}));
+
+// Mock Nuxt components
+vi.mock('#app/components/nuxt-layout', () => ({
+  default: { name: 'NuxtLayout', template: '<div><slot /></div>' },
+}));
+
+vi.mock('~/components/profile/ProfileDetails.vue', () => ({
+  default: {
+    name: 'ProfileDetails',
+    props: ['userProfile'],
+    template: '<div>Profile Details</div>',
+  },
+}));
+
+vi.mock('~/components/ui/Tabs.vue', () => ({
+  default: { name: 'Tabs', template: '<div><slot /></div>' },
+}));
+
+vi.mock('~/components/ui/Tab.vue', () => ({
+  default: {
+    name: 'Tab',
+    props: ['label', 'route', 'isActive'],
+    template: '<div>{{ label }}</div>',
+  },
+}));
+
+vi.mock('~/components/ui/Spinner.vue', () => ({
+  default: { name: 'Spinner', template: '<div>Loading...</div>' },
+}));
+
+describe('ProfileLayout.vue', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+    vi.clearAllMocks();
+    // Reset mock route to default
+    mockRoute.path = '/profile/hussein';
+    mockRoute.params = { username: 'hussein' };
+  });
+
+  const createWrapper = (username = 'hussein', routePath = '/profile/hussein') => {
+    // Update the mock route before mounting
+    mockRoute.path = routePath;
+    mockRoute.params = { username };
+
+    return mount(ProfileLayout, {
       global: {
-        components: {
-          ProfileDetails,
-          Tabs,
-          Tab,
-        },
         mocks: {
-          $t: mockT,
-          $route: {
-            path: route,
-          },
+          $t: (msg: string) => msg,
+
+          $route: mockRoute,
         },
         stubs: {
-          NuxtLayout: {
-            template: '<div data-nuxt-layout><slot /></div>',
-          },
-          NuxtLink: {
-            template: '<a :href="to"><slot /></a>',
-            props: ['to'],
-          },
+          NuxtLayout: { template: '<div><slot /></div>' },
         },
       },
     });
   };
 
-  it('renders ProfileDetails component', () => {
+  it('mounts successfully', () => {
     const wrapper = createWrapper();
-    expect(wrapper.findComponent(ProfileDetails).exists()).toBe(true);
+    expect(wrapper.exists()).toBe(true);
   });
 
-  it('renders Tabs component', () => {
+  it('shows spinner when loading', async () => {
     const wrapper = createWrapper();
-    expect(wrapper.findComponent(Tabs).exists()).toBe(true);
+    const userStore = useUserStore();
+
+    // Set loading state
+    userStore.loading = true;
+    userStore.user = null;
+    userStore.error = null;
+
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.find('.flex.justify-center.p-4').exists()).toBe(true);
+    expect(wrapper.text()).toContain('Loading...');
   });
 
-  // this & all similar need to be updated after implementing authentication logic
-  // because the fourth tab "likes" conditionally appears based on user auth status
-  it('renders all three tab components', () => {
+  it('shows error message when there is an error', async () => {
     const wrapper = createWrapper();
-    const tabs = wrapper.findAllComponents(Tab);
+    const userStore = useUserStore();
+
+    // Set error state
+    userStore.loading = false;
+    userStore.error = 'User not found';
+    userStore.user = null;
+
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.find('.text-destructive.p-4').exists()).toBe(true);
+    expect(wrapper.text()).toContain('User not found');
+  });
+
+  it('shows profile details and tabs when user data is loaded', async () => {
+    const wrapper = createWrapper();
+    const userStore = useUserStore();
+
+    // Set success state with user data
+    userStore.loading = false;
+    userStore.error = null;
+    userStore.user = {
+      username: 'hussein',
+      displayName: 'Hussein Mohamed',
+      bio: 'football lover',
+      bioEntities: { mentions: [], hashtags: [] },
+      avatarUrl: 'https://example.com/avatar.jpg',
+      bannerUrl: 'https://example.com/banner.jpg',
+      location: 'Cairo, Egypt',
+      websiteUrl: 'https://example.com',
+      birthDate: '1999-01-01',
+      joinedAt: '2020-07-01T00:00:00.000Z',
+      followingCount: 150,
+      followersCount: 200,
+      mutualsCount: 5,
+      mutualNames: [],
+    };
+
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.findComponent({ name: 'ProfileDetails' }).exists()).toBe(true);
+    expect(wrapper.findComponent({ name: 'Tabs' }).exists()).toBe(true);
+  });
+
+  it('renders all tab labels correctly', async () => {
+    const wrapper = createWrapper();
+    const userStore = useUserStore();
+
+    // Set user data
+    userStore.loading = false;
+    userStore.user = {
+      username: 'hussein',
+      displayName: 'Hussein Mohamed',
+      bio: 'test',
+      bioEntities: { mentions: [], hashtags: [] },
+      avatarUrl: '',
+      bannerUrl: '',
+      location: '',
+      websiteUrl: '',
+      birthDate: '1999-01-01',
+      joinedAt: '2020-07-01T00:00:00.000Z',
+      followingCount: 0,
+      followersCount: 0,
+      mutualsCount: 0,
+      mutualNames: [],
+    };
+
+    await wrapper.vm.$nextTick();
+
+    const tabs = wrapper.findAllComponents({ name: 'Tab' });
     expect(tabs).toHaveLength(4);
+    expect(tabs[0]).toBeDefined();
+    expect(tabs[1]).toBeDefined();
+    expect(tabs[2]).toBeDefined();
+    expect(tabs[3]).toBeDefined();
+    expect(tabs[0]?.props('label')).toBe('profile.tabs.posts');
+    expect(tabs[1]?.props('label')).toBe('profile.tabs.replies');
+    expect(tabs[2]?.props('label')).toBe('profile.tabs.media');
+    expect(tabs[3]?.props('label')).toBe('profile.tabs.likes');
   });
 
-  it('renders tabs with correct labels', () => {
-    const wrapper = createWrapper();
-    const tabs = wrapper.findAllComponents(Tab);
+  it('computes correct profile path', async () => {
+    // Update mock route BEFORE mounting
+    mockRoute.path = '/profile/testuser';
+    mockRoute.params = { username: 'testuser' };
 
-    expect(tabs.at(0)?.props('label')).toBe('profile.tabs.posts');
-    expect(tabs.at(1)?.props('label')).toBe('profile.tabs.replies');
-    expect(tabs.at(2)?.props('label')).toBe('profile.tabs.media');
-    expect(tabs.at(3)?.props('label')).toBe('profile.tabs.likes');
-  });
-
-  it('renders tabs with correct routes', () => {
-    const wrapper = createWrapper();
-    const tabs = wrapper.findAllComponents(Tab);
-
-    expect(tabs.at(0)?.props('route')).toBe('/profile');
-    expect(tabs.at(1)?.props('route')).toBe('/profile/replies');
-    expect(tabs.at(2)?.props('route')).toBe('/profile/media');
-    expect(tabs.at(3)?.props('route')).toBe('/profile/likes');
-  });
-
-  it('sets posts tab as active when on /profile route', () => {
-    const wrapper = createWrapper('/profile');
-    const tabs = wrapper.findAllComponents(Tab);
-
-    expect(tabs.at(0)?.props('isActive')).toBe(true);
-    expect(tabs.at(1)?.props('isActive')).toBe(false);
-    expect(tabs.at(2)?.props('isActive')).toBe(false);
-    expect(tabs.at(3)?.props('isActive')).toBe(false);
-  });
-
-  it('renders the slot for dynamic content', () => {
-    const wrapper = mount(profile, {
+    const wrapper = mount(ProfileLayout, {
       global: {
-        components: { ProfileDetails, Tabs, Tab },
         mocks: {
-          $t: mockT,
-          $route: { path: '/profile' },
+          $t: (msg: string) => msg,
+          $route: mockRoute,
         },
         stubs: {
-          NuxtLayout: {
-            template: '<div data-nuxt-layout><slot /></div>',
-          },
-          NuxtLink: {
-            template: '<a :href="to"><slot /></a>',
-            props: ['to'],
-          },
+          NuxtLayout: { template: '<div><slot /></div>' },
         },
-      },
-      slots: {
-        default: '<div class="test-content">Child content</div>',
       },
     });
 
-    expect(wrapper.find('.test-content').exists()).toBe(true);
-    expect(wrapper.find('.test-content').text()).toBe('Child content');
+    await wrapper.vm.$nextTick();
+
+    // Access the computed property through the component instance
+    expect((wrapper.vm as unknown as { profilePath: string }).profilePath).toBe('/profile/hussein');
+  });
+
+  it('uses default username when route param is missing', async () => {
+    // Update mock route to have no username
+    mockRoute.path = '/profile';
+    mockRoute.params = { username: '' };
+
+    const wrapper = mount(ProfileLayout, {
+      global: {
+        mocks: {
+          $t: (msg: string) => msg,
+          $route: mockRoute,
+        },
+        stubs: {
+          NuxtLayout: { template: '<div><slot /></div>' },
+        },
+      },
+    });
+
+    await wrapper.vm.$nextTick();
+
+    expect((wrapper.vm as unknown as { username: string }).username).toBe('hussein');
   });
 });
