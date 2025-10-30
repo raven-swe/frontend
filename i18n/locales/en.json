@@ -122,7 +122,7 @@
       "media": "Media",
       "gif": "GIF",
       "emoji": "Emoji",
-      "profile-alt": "Avatar of "
+      "profile-alt": "Avatar of {name}"
     }
   },
   "ui": {
