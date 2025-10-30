@@ -23,7 +23,7 @@ function handleGithubSignIn() {
     redirect_uri: githubRedirectUri,
     scope: githubScope,
   });
-  window.open(
+  window?.open(
     `https://github.com/login/oauth/authorize?${params.toString()}`,
     'github-oauth',
     `width=500,height=600,top=${(screen.height - 600) / 2},left=${(screen.width - 500) / 2}`,
@@ -33,7 +33,7 @@ function handleGithubSignIn() {
 onMounted(() => {
   // Wait for Google script to load
   const checkGoogle = setInterval(() => {
-    if (window.google) {
+    if (window?.google) {
       initializeGoogleButton('google-signin-btn');
       clearInterval(checkGoogle);
     }
@@ -41,7 +41,7 @@ onMounted(() => {
 
   // Listen for GitHub auth messages from popup
   window?.addEventListener('message', (event) => {
-    if (event.origin !== window.location.origin) return;
+    if (event.origin !== window?.location.origin) return;
     if (event.data.type === 'github-auth') {
       navigateTo('/auth/callback/github?code=' + event.data.code);
     }
