@@ -3,14 +3,20 @@ import { mountSuspended } from '@nuxt/test-utils/runtime';
 import ProfileInfo from '@/components/profile/ProfileInfo.vue';
 
 const mockUserProfile = {
-  coverImg: '/cover.jpg',
-  profileImg: '/profile.jpg',
-  name: 'Hussein Mohamed',
+  displayName: 'Hussein Mohamed',
   username: 'hussein',
   bio: 'football lover, software engineer, coffee addict.',
-  joinAt: 'july 2020',
-  following: 150,
-  followers: 50,
+  websiteUrl: 'https://www.example.com/averylongurlthatexceedsthirtycharacters',
+  joinedAt: '2020-07-01T00:00:00.000Z',
+  followingCount: 150,
+  followersCount: 50,
+  bioEntities: { mentions: [], hashtags: [] },
+  avatarUrl: 'https://i.ibb.co/vv6B8ML0/profile.jpg',
+  bannerUrl: 'https://i.ibb.co/bj3fhPfq/cover.jpg',
+  location: 'Cairo, Egypt',
+  birthDate: '1999-01-01',
+  mutualsCount: 0,
+  mutualNames: [],
 };
 
 describe('ProfileInfo', () => {
@@ -21,6 +27,17 @@ describe('ProfileInfo', () => {
 
     const container = wrapper.find('div.mt-2.flex.flex-col');
     expect(container.exists()).toBe(true);
+  });
+
+  it('renders website link and displayUrl correctly', async () => {
+    const wrapper = await mountSuspended(ProfileInfo, {
+      props: { userProfile: mockUserProfile },
+    });
+    const link = wrapper.find('a.text-brand-blue');
+    expect(link.exists()).toBe(true);
+    expect(link.attributes('href')).toBe(mockUserProfile.websiteUrl);
+    expect(link.text()).toContain('...');
+    expect(link.html()).toContain('ic:sharp-link');
   });
 
   it('renders user name in h2 element', async () => {
@@ -49,7 +66,7 @@ describe('ProfileInfo', () => {
     });
 
     const html = wrapper.html();
-    // Check if icon is rendered in the HTML
+
     expect(html).toContain('ic:sharp-calendar-month');
   });
 
@@ -72,5 +89,14 @@ describe('ProfileInfo', () => {
 
     const strongTags = wrapper.findAll('strong');
     expect(strongTags.length).toBe(2);
+  });
+
+  it('does not render website link if websiteUrl is missing', async () => {
+    const wrapper = await mountSuspended(ProfileInfo, {
+      props: { userProfile: { ...mockUserProfile, websiteUrl: '' } },
+    });
+    const link = wrapper.find('a.text-brand-blue');
+    expect(link.exists()).toBe(true);
+    expect(link.text().trim()).toBe('');
   });
 });

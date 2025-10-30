@@ -6,7 +6,7 @@ import Spinner from '~/components/ui/Spinner.vue';
 
 const route = useRoute();
 const username = computed(() => (route.params.username as string) || 'hussein');
-
+const profilePath = computed(() => `/profile/${username.value}`);
 const userStore = useUserStore();
 
 onMounted(() => {
@@ -31,23 +31,23 @@ onMounted(() => {
       <Tabs>
         <Tab
           :label="$t('profile.tabs.posts')"
-          route="/profile"
-          :is-active="$route.path === '/profile'"
+          :route="`${profilePath}`"
+          :is-active="$route.path === `${profilePath}`"
         />
         <Tab
           :label="$t('profile.tabs.replies')"
-          route="/profile/replies"
-          :is-active="$route.path === '/profile/replies'"
+          :route="`${profilePath}/replies`"
+          :is-active="$route.path === `${profilePath}/replies`"
         />
         <Tab
           :label="$t('profile.tabs.media')"
-          route="/profile/media"
-          :is-active="$route.path === '/profile/media'"
+          :route="`${profilePath}/media`"
+          :is-active="$route.path === `${profilePath}/media`"
         />
         <Tab
           :label="$t('profile.tabs.likes')"
-          route="/profile/likes"
-          :is-active="$route.path === '/profile/likes'"
+          :route="`${profilePath}/likes`"
+          :is-active="$route.path === `${profilePath}/likes`"
         />
       </Tabs>
 
