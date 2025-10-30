@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-interface User {
+export interface User {
   username: string;
   displayName: string;
   bio: string;
@@ -16,7 +16,25 @@ interface User {
 
 export const useUserStore = defineStore('user', {
   state: () => ({
-    user: null as UserProfile | null,
+    user: {
+      username: 'hussein',
+      displayName: '',
+      bio: null,
+      bioEntities: {
+        mentions: [],
+        hashtags: [],
+      },
+      avatarUrl: '',
+      bannerUrl: '',
+      location: '',
+      websiteUrl: '',
+      birthDate: '',
+      joinedAt: '',
+      followingCount: 0,
+      followersCount: 0,
+      mutualsCount: 0,
+      mutualNames: [],
+    } as UserProfile,
     loading: false,
     error: null as string | null,
   }),
@@ -43,7 +61,7 @@ export const useUserStore = defineStore('user', {
       this.loading = false;
     },
 
-    updateUser(userData: Partial<User>) {
+    updateUser(userData: Partial<UserProfile>) {
       if (this.user) this.user = { ...this.user, ...userData };
     },
 
@@ -52,7 +70,7 @@ export const useUserStore = defineStore('user', {
     },
 
     logout() {
-      this.user = null;
+      // this.user = null;
     },
   },
 });
