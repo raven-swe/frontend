@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @custom-variant dark (&:is(.dark *));
+
 :root {
   --background: #ffffff;
   --foreground: #0f1419;
@@ -43,7 +44,7 @@
   --brand-blue: #3b82f6;
   --brand-turquoise: #00b77a;
   --ring-primary: color-mix(in oklch, var(--primary) 60%, white);
-  --destructive: #82181a;
+  --destructive: #f4212e;
   --popover: 222.2 84% 4.9%;
   --popover-foreground: 210 40% 98%;
   --input-autofill: #202939;
@@ -94,9 +95,11 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
   button {
     @apply cursor-pointer select-none;
   }

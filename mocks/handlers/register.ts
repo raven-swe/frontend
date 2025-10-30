@@ -68,7 +68,7 @@ export const handlers = [
         }
       | undefined;
 
-    if (!body || !body.name || !body.email || !body.birthDate) {
+    if (!body || !body.name || !body.email || !body.birthDate || !body.recaptchaToken) {
       return HttpResponse.json(
         {
           success: false,
@@ -79,6 +79,7 @@ export const handlers = [
               { field: 'name', message: 'Name is required' },
               { field: 'email', message: 'Email is required' },
               { field: 'birthDate', message: 'Birth date is required' },
+              { field: 'recaptchaToken', message: 'Recaptcha token is required' },
             ],
           },
         } as ApiValidationErrorResponse,
