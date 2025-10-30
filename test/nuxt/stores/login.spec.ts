@@ -9,10 +9,8 @@ const { navigateToMock } = vi.hoisted(() => {
   };
 });
 
-mockNuxtImport('useRouter', () => {
-  return () => ({
-    push: navigateToMock,
-  });
+mockNuxtImport('navigateTo', () => {
+  return navigateToMock;
 });
 
 describe('Login Store', () => {

@@ -1,58 +1,36 @@
-import type {
-  ApiSuccessResponse,
-  ApiErrorResponse,
-  ApiValidationErrorResponse,
-} from '#shared/types/api';
+import * as cookie from 'cookie';
+import * as jwt from 'jsonwebtoken';
+import { defineWrappedResponseHandler } from '~~/server/utils/handler';
 
-const API_URL = process.env.BACKEND_URL;
-
-export default defineEventHandler(async (event) => {
+export default defineWrappedResponseHandler(async (event) => {
   const body = await readBody(event);
-
-  try {
-    const response = await $fetch<
-      ApiSuccessResponse<{
-        accessToken: string;
-      }>
-    >(`${API_URL}/auth/login`, {
+  const response = await serverApiFetch.raw<ApiSuccessResponse<{ accessToken: string }>>(
+    '/auth/login',
+    {
       method: 'POST',
       body,
-    });
+      credentials: 'include',
+    },
+  );
 
-    return response;
-  } catch (error) {
-    const response = (error as { data?: unknown })?.data as
-      | ApiErrorResponse
-      | ApiValidationErrorResponse
-      | undefined;
-
-    if (response?.error?.code === 'VALIDATION_ERROR') {
-      throw createError({
-        statusCode: 422,
-        statusMessage: 'Validation Error',
-        data: response.error,
-      });
-    }
-
-    if (response?.error?.code === 'UNAUTHORIZED') {
-      throw createError({
-        statusCode: 401,
-        statusMessage: response.error.message || 'Invalid credentials',
-        data: response.error,
-      });
-    }
-
-    if (response?.error) {
-      throw createError({
-        statusCode: 500,
-        statusMessage: response.error.message || 'Internal Server Error',
-        data: response.error,
-      });
-    }
-
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Internal Server Error',
-    });
+  const cookies = response.headers.getSetCookie?.();
+  cookies.forEach((cookie) => {
+    appendHeader(event, 'set-cookie', cookie);
+  });
+  if (response._data?.data.accessToken) {
+    const accessTokenContent = jwt.decode(response._data.data.accessToken) as { exp?: number };
+    appendHeader(
+      event,
+      'set-cookie',
+      cookie.serialize('access_token', response._data?.data.accessToken, {
+        path: '/',
+        maxAge: accessTokenContent?.exp
+          ? accessTokenContent.exp - Math.floor(Date.now() / 1000)
+          : 60 * 5, // Default to 5 minutes if exp is missing
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+      }),
+    );
   }
+  return response._data;
 });

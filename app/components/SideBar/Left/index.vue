@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { loginService } from '~/services/auth/loginService';
 const userStore = useUserStore();
 </script>
 <template>
@@ -27,6 +28,9 @@ const userStore = useUserStore();
         }"
       ></SideBarLeftTab>
       <SideBarLeftTab :tab="{ label: 'more', icon: 'more-horiz', route: '#' }"></SideBarLeftTab>
+      <UiButton variant="ghost-default" size="icon-xl" @click="loginService.logout()">
+        <Icon name="ic:outline-logout" size="24" />
+      </UiButton>
     </div>
   </div>
 </template>

@@ -3,13 +3,15 @@ import * as jwt from 'jsonwebtoken';
 import { defineWrappedResponseHandler } from '~~/server/utils/handler';
 
 export default defineWrappedResponseHandler(async (event) => {
-  const body = await readBody(event);
+  const clientCookie = getHeader(event, 'cookie');
   const response = await serverApiFetch.raw<ApiSuccessResponse<{ accessToken: string }>>(
-    '/auth/register/complete',
+    '/auth/refresh-token',
     {
       method: 'POST',
-      body,
       credentials: 'include',
+      headers: {
+        ...(clientCookie ? { cookie: clientCookie } : {}), // Forward client cookies
+      },
     },
   );
 
@@ -17,12 +19,13 @@ export default defineWrappedResponseHandler(async (event) => {
   cookies.forEach((cookie) => {
     appendHeader(event, 'set-cookie', cookie);
   });
+
   if (response._data?.data.accessToken) {
-    const accessTokenContent = jwt.decode(response._data.data.accessToken) as { exp?: number };
+    const accessTokenContent = jwt.decode(response._data.data.accessToken) as { exp: number };
     appendHeader(
       event,
       'set-cookie',
-      cookie.serialize('access_token', response._data!.data.accessToken, {
+      cookie.serialize('access_token', response._data?.data.accessToken, {
         path: '/',
         maxAge: accessTokenContent?.exp
           ? accessTokenContent.exp - Math.floor(Date.now() / 1000)
