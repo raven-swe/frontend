@@ -5,6 +5,7 @@ import FieldInput from '~/components/ui/form/FieldInput.vue';
 import Button from '~/components/ui/Button.vue';
 import { useDebounceFn } from '@vueuse/core';
 import useDateSelect from '@/composables/useDateSelect';
+import useRecaptcha from '@/composables/useRecaptcha';
 import Select from '~/components/ui/Select.vue';
 import { registerationService } from '~/services/auth/registerationService';
 
@@ -19,6 +20,10 @@ const schema = yup.object({
     .typeError($t('errors.AGE_RESTRICTION'))
     .required($t('errors.AGE_RESTRICTION'))
     .max(thirteenYearsAgo, $t('errors.AGE_RESTRICTION')), // at least 13 years old
+  recaptcha: yup
+    .string()
+    .required($t('errors.RECAPTCHA_REQUIRED'))
+    .min(1, $t('errors.RECAPTCHA_REQUIRED')),
 });
 const { errors, values, defineField, handleSubmit, isSubmitting, setFieldError, setFieldValue } =
   useForm<yup.InferType<typeof schema>>({
@@ -29,6 +34,7 @@ const { errors, values, defineField, handleSubmit, isSubmitting, setFieldError, 
       birthDate: registerStore.registerationInfo?.birthDate
         ? new Date(registerStore.registerationInfo.birthDate)
         : undefined,
+      recaptcha: undefined,
     },
   });
 
@@ -41,6 +47,7 @@ const onSubmit = handleSubmit(async (values) => {
     name: values.name,
     email: values.email,
     birthDate: formattedBirthDate,
+    recaptchaToken: values.recaptcha,
   };
   await registerStore.submitRegisterationInfo(vals);
 });
@@ -88,6 +95,21 @@ watch(
     }
   },
 );
+
+const { render: renderRecaptcha } = useRecaptcha();
+
+onMounted(async () => {
+  await nextTick();
+  renderRecaptcha({
+    elementId: 'recaptcha-container',
+    callback: (token: string) => {
+      setFieldValue('recaptcha', token);
+    },
+    expiredCallback: () => {
+      setFieldValue('recaptcha', '', true);
+    },
+  });
+});
 </script>
 
 <template>
@@ -136,6 +158,9 @@ watch(
           {{ errors.birthDate }}
         </p>
       </div>
+      <ClientOnly>
+        <div id="recaptcha-container" class="g-recaptcha"></div>
+      </ClientOnly>
     </div>
     <UiDialogFooter class="mt-auto">
       <Button
