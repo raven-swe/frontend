@@ -17,6 +17,9 @@ export default defineEventHandler(async (event) => {
         creationToken: body.creationToken,
         birthDate: body.birthDate,
       },
+      headers: {
+        'X-Client-Type': 'web',
+      },
     });
     return response;
   } catch (e) {
