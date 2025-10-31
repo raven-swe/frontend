@@ -75,6 +75,8 @@ jobs:
         with:
           context: .
           push: true
+          build-args: |
+            NUXT_PUBLIC_RECAPTCHA_SITE_KEY=${{ secrets.NUXT_PUBLIC_RECAPTCHA_SITE_KEY }}
           tags: |
             "${{ steps.image.outputs.registry }}:${{ steps.image.outputs.tag }}"
             "${{ steps.image.outputs.registry }}:${{ steps.image.outputs.latest_tag }}"
