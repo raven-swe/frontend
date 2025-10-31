@@ -133,7 +133,10 @@
   },
   "tweet": {
     "composer": {
-      "placeholder": "What's happening?",
+      "placeholder": {
+        "default": "What's happening?",
+        "reply": "Post Your Reply"
+      },
       "media": "Media",
       "gif": "GIF",
       "emoji": "Emoji",
@@ -148,7 +151,8 @@
     "save": "Save",
     "cancel": "Cancel",
     "discard": "Discard",
-    "post": "Post"
+    "post": "Post",
+    "reply": "Reply"
   },
   "errors": {
     "INVALID_EMAIL": "Please enter a valid email.",

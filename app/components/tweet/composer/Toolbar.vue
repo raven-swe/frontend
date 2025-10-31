@@ -8,6 +8,7 @@ interface Props {
   isOverLimit?: boolean;
   hasMedia?: boolean;
   canAddMedia?: boolean;
+  buttonText?: string;
 }
 
 interface Emits {
@@ -22,6 +23,7 @@ const props = withDefaults(defineProps<Props>(), {
   isOverLimit: false,
   hasMedia: false,
   canAddMedia: true,
+  buttonText: 'Post',
 });
 
 const emit = defineEmits<Emits>();
@@ -146,7 +148,7 @@ const handleFileSelect = (event: Event) => {
         :disabled="disabled || isOverLimit"
         @click="$emit('post')"
       >
-        {{ $t('ui.post') }}
+        {{ $t('ui.' + props.buttonText.toLowerCase()) }}
       </UiButton>
     </div>
 

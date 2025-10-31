@@ -133,7 +133,10 @@
   },
   "tweet": {
     "composer": {
-      "placeholder": "ما الذي يحدث؟",
+      "placeholder": {
+        "default": "ما الذي يحدث؟",
+        "reply": "انشر ردك"
+      },
       "media": "الوسائط",
       "gif": "GIF صور متحركة",
       "emoji": "رموز ايموجي",
@@ -148,7 +151,8 @@
     "save": "حفظ",
     "cancel": "إلغاء",
     "discard": "تجاهل",
-    "post": "المنشور"
+    "post": "نشر",
+    "reply": "رد"
   },
   "errors": {
     "INVALID_EMAIL": "يرجى إدخال بريد إلكتروني صالح.",

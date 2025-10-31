@@ -11,6 +11,14 @@ const tweetEditorRef = ref<InstanceType<typeof TweetEditor> | null>(null);
 const userStore = useUserStore();
 const media = ref<MediaItem[]>([]);
 
+interface Props {
+  placeholder?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  placeholder: 'default',
+});
+
 const MAX_LENGTH = 280;
 const MAX_MEDIA = 4;
 
@@ -76,7 +84,7 @@ const handleRemoveMedia = (id: string) => {
       <TweetEditor
         ref="tweetEditorRef"
         v-model="tweetContent"
-        :placeholder="$t('tweet.composer.placeholder')"
+        :placeholder="$t('tweet.composer.placeholder.' + props.placeholder)"
         :max-length="MAX_LENGTH"
       />
     </div>
@@ -92,6 +100,7 @@ const handleRemoveMedia = (id: string) => {
       :is-over-limit="isOverLimit"
       :has-media="media.length > 0"
       :can-add-media="media.length < MAX_MEDIA"
+      :button-text="props.placeholder === 'reply' ? 'Reply' : 'Post'"
       @post="handlePost"
       @add-media="handleAddMedia"
     />

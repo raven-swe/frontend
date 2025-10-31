@@ -85,9 +85,8 @@ function goBackToHome() {
       <TweetView :tweet="tweetData" />
     </div>
 
-    <div class="text-muted-foreground border-b-border mt-8 h-12 border-b-1 text-center">
-      {{ $t('Post your reply') }}
-    </div>
+    <TweetComposer placeholder="reply" />
+
     <div v-bind="containerProps">
       <TweetDefaultCard
         v-for="tweet in list"
