@@ -353,5 +353,8 @@
     "checkUser": {
       "error": "Failed to check user existence"
     }
+  },
+  "icons": {
+    "back-button-icon": "material-symbols:arrow-back"
   }
 }

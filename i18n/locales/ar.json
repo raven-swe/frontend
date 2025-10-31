@@ -95,16 +95,6 @@
       "noMoreTweets": "لا توجد تغريدات أخرى"
     }
   },
-  "home": {
-    "tabs": {
-      "for-you": "لك",
-      "following": "متابعة"
-    },
-    "messages": {
-      "loadingMore": "جارٍ تحميل المزيد من التغريدات...",
-      "noMoreTweets": "لا توجد تغريدات أخرى"
-    }
-  },
   "playground": {
     "dialog": {
       "title": "إنشاء حسابك",
@@ -158,7 +148,7 @@
     "save": "حفظ",
     "cancel": "إلغاء",
     "discard": "تجاهل",
-    "post": "نشر"
+    "post": "المنشور"
   },
   "errors": {
     "INVALID_EMAIL": "يرجى إدخال بريد إلكتروني صالح.",
@@ -361,5 +351,8 @@
     "checkUser": {
       "error": "فشل في التحقق من وجود المستخدم"
     }
+  },
+  "icons": {
+    "back-button-icon": "material-symbols:arrow-forward"
   }
 }
