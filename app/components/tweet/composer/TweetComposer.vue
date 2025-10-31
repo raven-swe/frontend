@@ -83,6 +83,8 @@ const handleRemoveMedia = (id: string) => {
 
     <MediaSlideshow :media="media" :max-media="MAX_MEDIA" @remove="handleRemoveMedia" />
 
+    <slot name="reposted-tweet" />
+
     <Toolbar
       :disabled="!tweetContent.trim() && media.length === 0"
       :character-count="characterCount"
