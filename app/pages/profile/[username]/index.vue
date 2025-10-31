@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Tweet } from '~~/shared/types/tweets';
 import TweetDefaultCard from '@/components/tweet/TweetDefaultCard.vue';
+const route = useRoute();
 definePageMeta({
   layout: 'profile',
 });
@@ -11,6 +12,12 @@ const { data: tweetsData, error } = await useFetch<{ data: Tweet[] }>('/api/twee
 tweets.value = tweetsData.value?.data || [];
 
 if (error.value) console.error(error.value);
+const username = computed(() => route.params.username);
+
+onMounted(() => {
+  if (!useUserStore().user.username || useUserStore().user.username !== username.value)
+    useUserStore().fetchUserProfile(username.value as string);
+});
 </script>
 
 <template>
