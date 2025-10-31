@@ -1,38 +1,36 @@
-import type {
-  ApiSuccessResponse,
-  ApiErrorResponse,
-  ApiValidationErrorResponse,
-} from '#shared/types/api';
+import * as cookie from 'cookie';
+import * as jwt from 'jsonwebtoken';
+import { defineWrappedResponseHandler } from '~~/server/utils/handler';
 
-import { FetchError } from 'ofetch';
-
-const API_URL = process.env.BACKEND_URL;
-
-export default defineEventHandler(async (event) => {
+export default defineWrappedResponseHandler(async (event) => {
   const body = await readBody(event);
-  try {
-    const response = await $fetch<
-      ApiSuccessResponse<{ accessToken: string; refreshToken: string }>
-    >(`${API_URL}/auth/register/complete`, {
+  const response = await serverApiFetch.raw<ApiSuccessResponse<{ accessToken: string }>>(
+    '/auth/register/complete',
+    {
       method: 'POST',
       body,
-    });
-    return response;
-  } catch (error) {
-    if (error instanceof FetchError) {
-      const fetchError = error as FetchError<ApiErrorResponse | ApiValidationErrorResponse>;
+      credentials: 'include',
+    },
+  );
 
-      throw createError({
-        statusCode: fetchError.status ?? 500,
-        statusMessage: fetchError.data?.error?.message ?? 'Internal Server Error',
-        data: fetchError.data?.error,
-      });
-    }
-
-    // Fallback for non-Fetch errors
-    throw createError({
-      statusCode: 500,
-      statusMessage: error instanceof Error ? error.message : 'Internal Server Error',
-    });
+  const cookies = response.headers.getSetCookie?.();
+  cookies.forEach((cookie) => {
+    appendHeader(event, 'set-cookie', cookie);
+  });
+  if (response._data?.data.accessToken) {
+    const accessTokenContent = jwt.decode(response._data.data.accessToken) as { exp?: number };
+    appendHeader(
+      event,
+      'set-cookie',
+      cookie.serialize('access_token', response._data!.data.accessToken, {
+        path: '/',
+        maxAge: accessTokenContent?.exp
+          ? accessTokenContent.exp - Math.floor(Date.now() / 1000)
+          : 60 * 5, // Default to 5 minutes if exp is missing
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+      }),
+    );
   }
+  return response._data;
 });

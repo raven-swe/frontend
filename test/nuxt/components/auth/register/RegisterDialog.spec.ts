@@ -14,7 +14,6 @@ const i18n = createI18n({
 describe('RegisterDialog Component', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
-    vi.unmock('@/stores/register');
     vi.resetModules();
     vi.resetAllMocks();
     document.body.innerHTML = '';
@@ -31,6 +30,16 @@ describe('RegisterDialog Component', () => {
     vi.doMock('@/stores/register', () => ({
       useRegisterStore: () => store,
     }));
+
+    vi.doMock('@/composables/useRecaptcha', () => ({
+      default: () => ({
+        render: vi.fn().mockImplementation(({ callback }) => {
+          // simulate token being returned immediately
+          callback('mock-recaptcha-token');
+        }),
+      }),
+    }));
+
     const { default: RegisterDialogOpened } = await import(
       '@/components/auth/register/RegisterDialog.vue'
     );

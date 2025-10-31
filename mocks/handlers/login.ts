@@ -7,16 +7,34 @@ import type {
   ApiErrorResponse,
   ApiValidationErrorResponse,
 } from '#shared/types/api';
+import * as cookie from 'cookie';
 
 const mockUsers = rawUsers as User[];
 
 const API_URL = process.env.BACKEND_URL;
 
-const generateAuthToken = (user: User) => {
+const generateAuthToken = (username: string) => {
   const payload = {
-    username: user.username,
+    username,
   };
-  return jwt.sign(payload, 'secret', { expiresIn: '5m' });
+  return jwt.sign(payload, 'secret', { expiresIn: '1m' });
+};
+
+const generateRefreshToken = (username: string) => {
+  const payload = {
+    username,
+  };
+  return jwt.sign(payload, 'refresh_secret', { expiresIn: '10m' });
+};
+
+const generateRefreshCookie = (token: string) => {
+  return cookie.serialize('refresh_token', token, {
+    httpOnly: true,
+    path: '/',
+    maxAge: 10 * 60, // make it 10 min for testing
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+  });
 };
 
 export const handlers = [
@@ -95,6 +113,7 @@ export const handlers = [
 
     const { identifier, password } = body;
 
+    // Find user by email or username
     const user = mockUsers.find((u) => u.email === identifier || u.username === identifier);
 
     if (!user) {
@@ -123,16 +142,65 @@ export const handlers = [
       );
     }
 
-    return HttpResponse.json(
+    // Simulate server error for specific identifier
+    if (body.identifier === 'trigger500@example.com') {
+      return HttpResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Unexpected server error occurred while logging in.',
+          },
+        } as ApiErrorResponse,
+        { status: 500 },
+      );
+    }
+
+    const authToken = generateAuthToken(user.username);
+    const refreshToken = generateRefreshToken(user.username);
+    const refreshTokenCookie = generateRefreshCookie(refreshToken);
+    // Success
+    return new HttpResponse(
+      JSON.stringify({ success: true, message: 'Authenticated', data: { accessToken: authToken } }),
       {
-        success: true,
-        message: 'Login successful',
-        data: {
-          accessToken: generateAuthToken(user),
-          // refreshToken: generateRefreshToken(user),
+        headers: {
+          'set-cookie': refreshTokenCookie,
+          'Content-Type': 'application/json',
         },
-      } as ApiSuccessResponse<{ accessToken: string }>,
-      { status: 200 },
+      },
     );
+  }),
+
+  // POST /auth/logout
+  http.post(`${API_URL}/auth/logout`, ({ request }) => {
+    const cookies = cookie.parse(request.headers.get('cookie') || '');
+    if (!cookies['refresh_token']) {
+      return HttpResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'NOT_AUTHENTICATED',
+            message: 'No refresh token provided',
+          },
+        } as ApiErrorResponse,
+        { status: 401 },
+      );
+    }
+
+    // Clear the refresh token cookie
+    const clearCookie = cookie.serialize('refresh_token', '', {
+      httpOnly: true,
+      path: '/',
+      expires: new Date(0),
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+    });
+
+    return new HttpResponse(JSON.stringify({ success: true, message: 'Logged out successfully' }), {
+      headers: {
+        'set-cookie': clearCookie,
+        'Content-Type': 'application/json',
+      },
+    });
   }),
 ];

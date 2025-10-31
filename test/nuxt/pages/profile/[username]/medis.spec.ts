@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
-import MediaPage from '~/pages/profile/media.vue';
+import MediaPage from '~/pages/profile/[username]/media.vue';
 
 describe('MediaPage', () => {
   const createWrapper = () => {

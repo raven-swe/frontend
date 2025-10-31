@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-interface User {
+export interface User {
   username: string;
   displayName: string;
   bio: string;
@@ -17,9 +17,13 @@ interface User {
 export const useUserStore = defineStore('user', {
   state: () => ({
     user: {
-      username: 'johndoe',
+      username: 'hussein',
       displayName: 'John Doe',
       bio: `Fourth year Computer Engineering student @ Cairo university\nI'm only here when the reels get boring on ig`,
+      bioEntities: {
+        mentions: [],
+        hashtags: [],
+      },
       avatarUrl: 'https://i.ibb.co/qMcSYBfk/image.jpg',
       bannerUrl: 'https://i.ibb.co/Z1Yx04kS/dfghj.webp',
       location: 'San Francisco, CA',
@@ -28,24 +32,47 @@ export const useUserStore = defineStore('user', {
       joinedAt: '2020-03-15T10:30:00Z',
       email: 'https://github.com/',
       phone: '+1234567890',
-    } as User,
+      followingCount: 0,
+      followersCount: 0,
+      mutualsCount: 0,
+      mutualNames: [],
+    } as UserProfile,
+    loading: false,
+    error: null as string | null,
   }),
 
   getters: {
-    memberSince: (state) => new Date(state.user.joinedAt).getFullYear(),
+    memberSince: (state) => (state.user ? new Date(state.user.joinedAt).getFullYear() : null),
   },
 
   actions: {
-    updateUser(userData: Partial<User>) {
-      this.user = { ...this.user, ...userData };
+    async fetchUserProfile(username: string) {
+      this.loading = true;
+      this.error = null;
+
+      const { data, error } = await useFetch<UserProfile>(`/api/users/${username}/profile`, {
+        key: `user-profile-${username}`,
+      });
+
+      if (error.value) {
+        this.error = error.value.message;
+      } else if (data.value) {
+        this.user = data.value;
+      }
+
+      this.loading = false;
     },
 
-    setUser(userData: User) {
+    updateUser(userData: Partial<UserProfile>) {
+      if (this.user) this.user = { ...this.user, ...userData };
+    },
+
+    setUser(userData: UserProfile) {
       this.user = userData;
     },
 
     logout() {
-      // Reset to default/empty state if needed
+      // this.user = null;
     },
   },
 });

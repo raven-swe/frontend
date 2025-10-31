@@ -2,6 +2,7 @@ export interface RegisterationInfo {
   name: string;
   email: string;
   birthDate: string;
+  recaptchaToken: string;
 }
 
 export const registerationService = {

@@ -1,3 +1,5 @@
+import { apiFetch } from '~/api';
+
 export interface LoginSchema {
   identifier: string;
   password: string;
@@ -19,5 +21,13 @@ export const loginService = {
       method: 'POST',
       body: data,
     });
+  },
+
+  async logout() {
+    const response = await apiFetch<ApiResponseBase>('/api/auth/logout', {
+      method: 'POST',
+    });
+    navigateTo('/');
+    return response;
   },
 };

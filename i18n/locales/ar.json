@@ -42,6 +42,11 @@
     "tweets": "التغريدات"
   },
   "profile": {
+    "not-logged-in": {
+      "title": "لم تقم بتسجيل الدخول",
+      "description": "يرجى تسجيل الدخول لعرض ملفك الشخصي والوصول إلى جميع الميزات.",
+      "take-me-home": "خذني إلى هناك"
+    },
     "tabs": {
       "posts": "المنشورات",
       "replies": "الردود",
@@ -80,6 +85,12 @@
       "description": "وصف النافذة"
     }
   },
+  "profile-info": {
+    "edit-profile": "تعديل الملف الشخصي",
+    "joined": "انضم في",
+    "following": "متابع",
+    "followers": "المتابعون"
+  },
   "root": {
     "hero": {
       "title": "يحدث الآن",
@@ -92,7 +103,9 @@
       "google-signup": "التسجيل عبر جوجل",
       "github-signup": "التسجيل عبر GitHub",
       "already-have-account": "هل لديك حساب بالفعل؟",
-      "separator": "أو"
+      "separator": "أو",
+      "google-signin": "تسجيل الدخول عبر جوجل",
+      "github-signin": "تسجيل الدخول عبر GitHub"
     },
     "footer": {
       "about": "حول",

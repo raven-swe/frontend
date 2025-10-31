@@ -1,6 +1,6 @@
 import { mountSuspended } from '@nuxt/test-utils/runtime';
 import { createPinia, setActivePinia } from 'pinia';
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 // import RegisterationInfoForm from '~/components/auth/register/RegisterationInfoForm.vue';
 import Dialog from '~/components/ui/dialog/Dialog.vue';
 import { createI18n } from 'vue-i18n';
@@ -17,16 +17,23 @@ const i18n = createI18n({
 });
 
 describe('RegisterInfoForm.vue', () => {
-  beforeAll(() => {
-    setActivePinia(createPinia());
-  });
-
   beforeEach(() => {
+    setActivePinia(createPinia());
     vi.resetModules();
     vi.clearAllMocks();
   });
 
   it('fields render correctly', async () => {
+    const recaptchaRenderfn = vi.fn().mockImplementation(({ callback }) => {
+      // simulate token being returned immediately
+      callback('mock-recaptcha-token');
+    });
+
+    vi.doMock('@/composables/useRecaptcha', () => ({
+      default: () => ({
+        render: recaptchaRenderfn,
+      }),
+    }));
     const { default: RegisterationInfoForm } = await import(
       '@/components/auth/register/RegisterationInfoForm.vue'
     );
@@ -74,6 +81,15 @@ describe('RegisterInfoForm.vue', () => {
     }));
     vi.doMock('@/stores/register', () => ({
       useRegisterStore: () => store,
+    }));
+
+    vi.doMock('@/composables/useRecaptcha', () => ({
+      default: () => ({
+        render: vi.fn().mockImplementation(({ callback }) => {
+          // simulate token being returned immediately
+          callback('mock-recaptcha-token');
+        }),
+      }),
     }));
 
     const { default: RegisterationInfoForm } = await import(
@@ -130,6 +146,16 @@ describe('RegisterInfoForm.vue', () => {
     const { default: RegisterationInfoForm } = await import(
       '@/components/auth/register/RegisterationInfoForm.vue'
     );
+
+    vi.doMock('@/composables/useRecaptcha', () => ({
+      default: () => ({
+        render: vi.fn().mockImplementation(({ callback }) => {
+          // simulate token being returned immediately
+          callback('mock-recaptcha-token');
+        }),
+      }),
+    }));
+
     const wrapper = await mountSuspended(
       {
         components: { RegisterationInfoForm, Dialog },
@@ -178,6 +204,15 @@ describe('RegisterInfoForm.vue', () => {
       useRegisterStore: () => store,
     }));
 
+    vi.doMock('@/composables/useRecaptcha', () => ({
+      default: () => ({
+        render: vi.fn().mockImplementation(({ callback }) => {
+          // simulate token being returned immediately
+          callback('mock-recaptcha-token');
+        }),
+      }),
+    }));
+
     const { default: RegisterationInfoForm } = await import(
       '@/components/auth/register/RegisterationInfoForm.vue'
     );
@@ -215,6 +250,7 @@ describe('RegisterInfoForm.vue', () => {
       name: 'John Doe',
       email: 'john.doe2@example.com',
       birthDate: '2005-05-04',
+      recaptchaToken: 'mock-recaptcha-token',
     });
   });
 });

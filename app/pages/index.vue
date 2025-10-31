@@ -1,12 +1,51 @@
 <script setup lang="ts">
 import Button from '~/components/ui/Button.vue';
+import { useGoogleAuth } from '~/composables/useGoogleAuth';
 import { useLoginStore } from '~/stores/auth/login';
 
 const loginStore = useLoginStore();
-
 const registerStore = useRegisterStore();
 definePageMeta({
   layout: false, // Disable layout for this page
+});
+
+const { initializeGoogleButton } = useGoogleAuth();
+
+const config = useRuntimeConfig();
+
+const githubClientId = config.public.githubClientId;
+const githubRedirectUri = config.public.githubRedirectUri;
+const githubScope = config.public.githubScope;
+
+function handleGithubSignIn() {
+  const params = new URLSearchParams({
+    client_id: githubClientId,
+    redirect_uri: githubRedirectUri,
+    scope: githubScope,
+  });
+  window?.open(
+    `https://github.com/login/oauth/authorize?${params.toString()}`,
+    'github-oauth',
+    `width=500,height=600,top=${(screen.height - 600) / 2},left=${(screen.width - 500) / 2}`,
+  );
+}
+
+onMounted(() => {
+  // Wait for Google script to load
+  const checkGoogle = setInterval(() => {
+    if (window?.google) {
+      initializeGoogleButton('google-signin-btn');
+      clearInterval(checkGoogle);
+    }
+  }, 100);
+
+  // Listen for GitHub auth messages from popup
+  window?.addEventListener('message', (event) => {
+    if (event.origin !== window?.location.origin) return;
+    if (event.data.type === 'github-auth') {
+      navigateTo('/auth/callback/github?code=' + event.data.code);
+    }
+  });
 });
 </script>
 
@@ -24,14 +63,18 @@ definePageMeta({
         </header>
         <main>
           <AuthRegisterDialog />
+          <AuthLoginDialog />
           <section>
             <div class="flex flex-col gap-4">
-              <Button id="github-signin" variant="outline" class="w-75">{{
-                $t('root.auth.github-signup')
-              }}</Button>
-              <Button id="google-signin" variant="outline" class="w-75">{{
-                $t('root.auth.google-signup')
-              }}</Button>
+              <Button id="github-signin" variant="outline" class="w-75" @click="handleGithubSignIn">
+                <Icon name="grommet-icons:github" />
+                {{ $t('root.auth.github-signin') }}</Button
+              >
+
+              <Button id="google-signin-btn" variant="outline" class="w-75">
+                <Icon name="material-icon-theme:google" />
+                {{ $t('root.auth.google-signin') }}</Button
+              >
             </div>
             <div class="flex max-w-75 items-center justify-center gap-2 py-2">
               <div class="w-full border-b-1" />
@@ -52,7 +95,6 @@ definePageMeta({
             <Button id="signin" variant="outline" class="my-4 w-75" @click="loginStore.openDialog">
               {{ $t('root.auth.signin') }}
             </Button>
-            <AuthLoginDialog />
           </section>
         </main>
       </section>
