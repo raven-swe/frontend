@@ -1,5 +1,5 @@
 import { FetchError } from 'ofetch';
-import type { UserProfile } from '~~/shared/types/user';
+import type { User } from '~~/shared/types/user';
 
 interface ApiError {
   message: string;
@@ -10,7 +10,7 @@ const API_URL = process.env.BACKEND_URL;
 export default defineEventHandler(async (event) => {
   const { username } = event.context.params as { username: string };
   try {
-    const user = await $fetch<UserProfile>(`${API_URL}/users/${username}/profile`);
+    const user = await $fetch<User>(`${API_URL}/users/${username}/profile`);
     return user;
   } catch (e) {
     if (e instanceof FetchError) {

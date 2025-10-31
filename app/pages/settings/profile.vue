@@ -116,7 +116,7 @@ const isFormValid = computed(() => {
 const handleSubmit = async () => {
   if (!isFormValid.value) return;
 
-  router.push('/profile'); // optimistically navigate away
+  router.push(`/profile/${userStore.username}`); // optimistically navigate away
 
   if (!hasUnsavedChanges.value) return;
 
@@ -145,16 +145,18 @@ const handleSubmit = async () => {
     websiteUrl: website.value,
     birthDate: formattedBirthDate,
   });
+
+  // refresh user store data
 };
 
 const handleDiscard = () => {
   openDiscardDialog.value = false;
-  router.push('/profile');
+  router.push(`/profile/${userStore.username}`);
 };
 
 const handleDialogClose = () => {
   if (!hasUnsavedChanges.value) {
-    router.push('/profile');
+    router.push(`/profile/${userStore.username}`);
     return;
   }
   openDiscardDialog.value = true;

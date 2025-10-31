@@ -1,19 +1,5 @@
 import { defineStore } from 'pinia';
 
-export interface User {
-  username: string;
-  displayName: string;
-  bio: string;
-  avatarUrl: string;
-  bannerUrl: string;
-  location: string;
-  websiteUrl: string;
-  birthDate: string;
-  joinedAt: string;
-  email: string;
-  phone: string;
-}
-
 export const useUserStore = defineStore('user', {
   state: () => ({
     user: {
@@ -36,7 +22,8 @@ export const useUserStore = defineStore('user', {
       followersCount: 0,
       mutualsCount: 0,
       mutualNames: [],
-    } as UserProfile,
+      languageCode: 'en',
+    } as User,
     loading: false,
     error: null as string | null,
   }),
@@ -50,7 +37,7 @@ export const useUserStore = defineStore('user', {
       this.loading = true;
       this.error = null;
 
-      const { data, error } = await useFetch<UserProfile>(`/api/users/${username}/profile`, {
+      const { data, error } = await useFetch<User>(`/api/users/${username}/profile`, {
         key: `user-profile-${username}`,
       });
 
@@ -63,11 +50,11 @@ export const useUserStore = defineStore('user', {
       this.loading = false;
     },
 
-    updateUser(userData: Partial<UserProfile>) {
+    updateUser(userData: Partial<User>) {
       if (this.user) this.user = { ...this.user, ...userData };
     },
 
-    setUser(userData: UserProfile) {
+    setUser(userData: User) {
       this.user = userData;
     },
 

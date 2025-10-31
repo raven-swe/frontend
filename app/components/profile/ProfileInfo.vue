@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import type { UserProfile } from '~~/shared/types/user';
+import type { User } from '~~/shared/types/user';
 import { formatMonthYear } from '~/utils/date';
 const props = defineProps<{
-  userProfile: UserProfile;
+  userProfile: User;
 }>();
 const displayUrl = computed(() => {
   if (props.userProfile.websiteUrl) {
