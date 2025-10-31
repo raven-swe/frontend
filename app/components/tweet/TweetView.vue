@@ -68,7 +68,7 @@ const contentSegments = computed<Segment[]>(() => {
 </script>
 
 <template>
-  <article class="border-b-border w-full max-w-[700px] gap-3 border-b-1 py-1">
+  <article class="border-b-border w-full max-w-[700px] gap-3 border-b-1 p-4">
     <div class="flex w-full items-center justify-between">
       <div class="flex">
         <Avatar

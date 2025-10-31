@@ -4,6 +4,7 @@ import type { Tweet } from '~~/shared/types/tweets';
 import { relativeTime, dataFormat } from '~/utils/index';
 import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
+import { useRouter } from 'vue-router';
 interface Props {
   tweet: Tweet;
 }
@@ -99,10 +100,23 @@ const contentSegments = computed<Segment[]>(() => {
   }
   return segments;
 });
+
+const router = useRouter();
+
+function goToTweet() {
+  // Navigate to the tweet detail page for this author/tweet id
+  const username = props.tweet.author.username;
+  const id = props.tweet.id;
+  router.push(`/profile/${username}/status/${id}`);
+}
 </script>
 
 <template>
-  <article class="border-b-border flex w-full max-w-[700px] gap-3 border-b-1 p-2">
+  <article
+    :id="'tweet-' + props.tweet.id"
+    class="border-b-border flex w-full max-w-[700px] cursor-pointer gap-3 border-b-1 p-2"
+    @click="goToTweet"
+  >
     <Avatar
       :img="props.tweet.author.avatarUrl || '/default_profile.png'"
       size="sm"
