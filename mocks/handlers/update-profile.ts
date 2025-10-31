@@ -20,6 +20,11 @@ const mockUserData: UserData = {
   languageCode: 'en',
 };
 
+interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
 export const handlers = [
   // Update profile PATCH request
   http.patch(`${API_URL}/me`, async ({ request }) => {
@@ -185,5 +190,69 @@ export const handlers = [
       },
       { status: 200 },
     );
+  }),
+
+  http.put(`${API_URL}/me/password`, async ({ request }) => {
+    try {
+      // eslint-disable-next-line no-console
+      console.log('Password change request received');
+      const body = await request.json();
+      // eslint-disable-next-line no-console
+      console.log('Request body:', body);
+
+      const { currentPassword, newPassword } = body as ChangePasswordRequest;
+
+      if (!currentPassword || !newPassword) {
+        // eslint-disable-next-line no-console
+        console.log('Validation error: missing fields');
+        return HttpResponse.json(
+          {
+            success: false,
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: 'Current password and new password are required',
+            },
+          },
+          { status: 400 },
+        );
+      }
+
+      if (currentPassword !== '123456789') {
+        // eslint-disable-next-line no-console
+        console.log('Invalid credentials: wrong password');
+        return HttpResponse.json(
+          {
+            success: false,
+            error: {
+              code: 'INVALID_CREDENTIALS',
+              message: 'Current password is incorrect',
+            },
+          },
+          { status: 422 },
+        );
+      }
+
+      // eslint-disable-next-line no-console
+      console.log('Password changed successfully');
+      return HttpResponse.json(
+        {
+          success: true,
+          message: 'Password changed successfully',
+        },
+        { status: 200 },
+      );
+    } catch (error) {
+      console.error('Error in password change handler:', error);
+      return HttpResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'INTERNAL_ERROR',
+            message: 'Failed to change password',
+          },
+        },
+        { status: 500 },
+      );
+    }
   }),
 ];
