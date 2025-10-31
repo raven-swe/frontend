@@ -9,6 +9,7 @@ const username = computed(() => route.params.username as string);
 const profilePath = computed(() => `/profile/${username.value}`);
 const userStore = useUserStore();
 
+// reactivity for profiles of other users too
 onMounted(() => {
   useUserStore().fetchUserProfile(username.value);
 });

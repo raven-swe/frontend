@@ -1,4 +1,9 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+// reactivity for user's own profile
+onMounted(() => {
+  useUserStore().fetchUserProfile();
+});
+</script>
 
 <template>
   <div>

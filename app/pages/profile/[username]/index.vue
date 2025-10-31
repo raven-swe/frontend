@@ -14,6 +14,7 @@ tweets.value = tweetsData.value?.data || [];
 if (error.value) console.error(error.value);
 const username = computed(() => route.params.username);
 
+// reactivity for profiles of mine & other users
 onMounted(() => {
   if (!useUserStore().user.username || useUserStore().user.username !== username.value)
     useUserStore().fetchUserProfile(username.value as string);
