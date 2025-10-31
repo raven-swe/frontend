@@ -25,7 +25,7 @@ const handlePost = () => {
     // eslint-disable-next-line no-console
     console.log({
       content: tweetContent.value,
-      media: files, // Now this is an array of File objects
+      media: files,
     });
 
     // Clean up blob URLs
@@ -38,6 +38,8 @@ const handlePost = () => {
 
 const handleAddMedia = (files: File[]) => {
   files.forEach((file) => {
+    if (media.value.length === MAX_MEDIA) return;
+
     const url = URL.createObjectURL(file);
     const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 

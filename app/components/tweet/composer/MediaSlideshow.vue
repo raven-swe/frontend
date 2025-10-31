@@ -84,7 +84,7 @@ const removeMedia = (id: string) => {
           :style="{ width: itemWidth }"
         >
           <!-- Media Item -->
-          <img :src="item.url" class="h-full w-full object-cover" />
+          <img :src="item.url" class="h-full object-cover" />
           <UiButton
             type="button"
             variant="ghost-default"
