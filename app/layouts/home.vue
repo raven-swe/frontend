@@ -13,12 +13,11 @@ import Tab from '@/components/ui/Tab.vue';
         :is-active="$route.path === '/home/following'"
       />
     </Tabs>
-    <div class="h-29">
-      <p class="py-10 text-center">{{ $t('add Post Space') }}</p>
-    </div>
-    <div class="h-12">
-      <p class="text-center">{{ $t('add Show More Space') }}</p>
-    </div>
+    <TweetComposer />
+
+    <!-- <div class="h-12">
+      <p class="text-center">{{ $t('show 70 more') }}</p>
+    </div> -->
 
     <!-- Dynamic content from child tab pages -->
     <slot />
