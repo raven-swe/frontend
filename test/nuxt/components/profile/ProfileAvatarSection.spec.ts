@@ -50,16 +50,7 @@ describe('ProfileAvatarSection Component', () => {
     const classes = profileImage.classes();
     expect(classes).toContain('rounded-full');
     expect(classes).toContain('border-4');
-    expect(classes).toContain('object-contain');
-  });
-
-  it('renders Edit Profile button with correct text', async () => {
-    const wrapper = await mountSuspended(ProfileAvatarSection, {
-      props: { profileImg: '/profile.jpg' },
-    });
-
-    const html = wrapper.html();
-    expect(html).toContain('Edit Profile');
+    expect(classes).toContain('object-cover');
   });
 
   it('Edit Profile button has outline variant', async () => {

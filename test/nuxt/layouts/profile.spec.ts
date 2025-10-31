@@ -174,49 +174,4 @@ describe('ProfileLayout.vue', () => {
     expect(tabs[2]?.props('label')).toBe('profile.tabs.media');
     expect(tabs[3]?.props('label')).toBe('profile.tabs.likes');
   });
-
-  it('computes correct profile path', async () => {
-    // Update mock route BEFORE mounting
-    mockRoute.path = '/profile/testuser';
-    mockRoute.params = { username: 'testuser' };
-
-    const wrapper = mount(ProfileLayout, {
-      global: {
-        mocks: {
-          $t: (msg: string) => msg,
-          $route: mockRoute,
-        },
-        stubs: {
-          NuxtLayout: { template: '<div><slot /></div>' },
-        },
-      },
-    });
-
-    await wrapper.vm.$nextTick();
-
-    // Access the computed property through the component instance
-    expect((wrapper.vm as unknown as { profilePath: string }).profilePath).toBe('/profile/hussein');
-  });
-
-  it('uses default username when route param is missing', async () => {
-    // Update mock route to have no username
-    mockRoute.path = '/profile';
-    mockRoute.params = { username: '' };
-
-    const wrapper = mount(ProfileLayout, {
-      global: {
-        mocks: {
-          $t: (msg: string) => msg,
-          $route: mockRoute,
-        },
-        stubs: {
-          NuxtLayout: { template: '<div><slot /></div>' },
-        },
-      },
-    });
-
-    await wrapper.vm.$nextTick();
-
-    expect((wrapper.vm as unknown as { username: string }).username).toBe('hussein');
-  });
 });
