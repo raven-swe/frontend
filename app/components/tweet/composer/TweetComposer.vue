@@ -4,13 +4,7 @@ import { useUserStore } from '@/stores/user';
 import TweetEditor from './TweetEditor.vue';
 import Toolbar from './Toolbar.vue';
 import MediaSlideshow from './MediaSlideshow.vue';
-import type { MediaType } from '~~/shared/types/shared';
-
-interface MediaItem {
-  id: string;
-  url: string;
-  type: MediaType;
-}
+import type { MediaItem } from '~~/shared/types/shared';
 
 const tweetContent = ref('');
 const tweetEditorRef = ref<InstanceType<typeof TweetEditor> | null>(null);
@@ -25,11 +19,17 @@ const isOverLimit = computed(() => characterCount.value > MAX_LENGTH);
 
 const handlePost = () => {
   if (tweetContent.value.trim() && !isOverLimit.value) {
+    // Extract files from media items
+    const files = media.value.map((item) => item.file);
+
     // eslint-disable-next-line no-console
     console.log({
       content: tweetContent.value,
-      media: media.value,
+      media: files, // Now this is an array of File objects
     });
+
+    // Clean up blob URLs
+    media.value.forEach((item) => URL.revokeObjectURL(item.url));
     tweetContent.value = '';
     media.value = [];
     tweetEditorRef.value?.resetHeight();
@@ -43,7 +43,8 @@ const handleAddMedia = (files: File[]) => {
 
     media.value.push({
       id,
-      url,
+      file,
+      url, // for display
       type: 'image',
     });
   });

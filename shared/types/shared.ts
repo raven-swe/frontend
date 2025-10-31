@@ -22,3 +22,10 @@ export interface UserData {
 }
 
 export type MediaType = 'image' | 'video' | 'gif';
+
+export type MediaItem = {
+  id: string;
+  file: File;
+  url: string;
+  type: MediaType;
+};

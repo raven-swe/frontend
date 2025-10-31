@@ -1,16 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import type { MediaType } from '~~/shared/types/shared';
-
-interface MediaItem {
-  id: string;
-  url: string;
-  type: MediaType;
-}
+import type { MediaItem } from '~~/shared/types/shared';
 
 interface Props {
   media?: MediaItem[];
-  maxMedia?: number;
 }
 
 interface Emits {
@@ -19,7 +12,6 @@ interface Emits {
 
 const props = withDefaults(defineProps<Props>(), {
   media: () => [],
-  maxMedia: 4,
 });
 
 const emit = defineEmits<Emits>();
@@ -36,7 +28,6 @@ const canNavigateRight = computed(() => {
   return currentIndex.value < props.media.length - 2;
 });
 
-// Calculate translate offset - each item is ~40% width with gaps
 const translateX = computed(() => {
   return -(currentIndex.value * 45); // 45% accounts for width + gap
 });
