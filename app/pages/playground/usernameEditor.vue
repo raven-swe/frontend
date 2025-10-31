@@ -35,14 +35,13 @@ const schema = yup.object({
     .matches(/^[a-zA-Z0-9_]+$/, $t('setting.username.username-invalid')),
 });
 
-const { errors, values, defineField, handleSubmit, isSubmitting, setFieldError } = useForm<
-  yup.InferType<typeof schema>
->({
-  validationSchema: schema,
-  initialValues: {
-    username: userStore.user?.username || '',
-  },
-});
+const { errors, values, defineField, handleSubmit, isSubmitting, setFieldError, setFieldValue } =
+  useForm<yup.InferType<typeof schema>>({
+    validationSchema: schema,
+    initialValues: {
+      username: userStore.user?.username || '',
+    },
+  });
 
 const [_username, usernameAttrs] = defineField('username');
 
@@ -142,7 +141,7 @@ const onSubmit = handleSubmit(async (values) => {
             :key="suggestion"
             type="button"
             class="text-primary cursor-pointer text-start hover:underline"
-            @click="values.username = suggestion"
+            @click="setFieldValue('username', suggestion)"
           >
             {{ suggestion }}
           </button>
