@@ -16,8 +16,7 @@
     "lint:check": "eslint . --ext .js,.ts,.vue",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "mock:gen:tweets": "tsx mocks/generators/genMockTweets.ts",
-    "mock:gen:users": "tsx mocks/generators/genMockUsers.ts"
+    "mock:gen": "tsx mocks/generators/genMockTweets.ts ; tsx mocks/generators/genMockUsers.ts"
   },
   "dependencies": {
     "@nuxt/eslint": "1.9.0",
