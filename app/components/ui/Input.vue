@@ -9,7 +9,7 @@ const props = defineProps<{
   class?: HTMLAttributes['class'];
   placeholder: string;
   maxlength?: number | string;
-  type?: 'text' | 'textarea' | 'number';
+  type?: 'text' | 'textarea' | 'number' | 'password';
   rows?: number;
 }>();
 

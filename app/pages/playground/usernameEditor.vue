@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue';
+import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import Input from '~/components/ui/Input.vue';
+import * as yup from 'yup';
+import { useForm } from 'vee-validate';
+import FieldInput from '~/components/ui/form/FieldInput.vue';
 import Button from '~/components/ui/Button.vue';
 import { useDebounceFn } from '@vueuse/core';
 import { useUserStore } from '~/stores/user';
@@ -10,12 +12,9 @@ import { apiFetch } from '~/api';
 const router = useRouter();
 const userStore = useUserStore();
 
-const username = ref(userStore.user?.username || '');
-const usernameError = ref('');
+const suggestions = ref<string[]>([]);
 const usernameExists = ref(false);
 const isChecking = ref(false);
-
-const suggestions = ref<string[]>([]);
 
 const { data } = await apiFetch<ApiSuccessResponse<{ suggestions: string[] }>>(
   '/api/settings/username/suggestions',
@@ -27,26 +26,28 @@ if (data.suggestions) {
   suggestions.value = data.suggestions;
 }
 
-const validateUsernameFormat = (username: string): string | null => {
-  if (!username) {
-    return 'Username is required';
-  }
+const schema = yup.object({
+  username: yup
+    .string()
+    .required($t('setting.username.username-required'))
+    .min(3, $t('setting.username.username-invalid'))
+    .max(15, $t('setting.username.username-invalid'))
+    .matches(/^[a-zA-Z0-9_]+$/, $t('setting.username.username-invalid')),
+});
 
-  const validPattern = /^[a-zA-Z0-9_]+$/;
-  if (username.length < 3 || username.length > 15 || !validPattern.test(username)) {
-    return $t('setting.username.username-invalid');
-  }
-  return null;
-};
+const { errors, values, defineField, handleSubmit, isSubmitting, setFieldError } = useForm<
+  yup.InferType<typeof schema>
+>({
+  validationSchema: schema,
+  initialValues: {
+    username: userStore.user?.username || '',
+  },
+});
+
+const [_username, usernameAttrs] = defineField('username');
 
 const checkUsernameAvailability = useDebounceFn(async (username: string) => {
-  if (!username) return;
-
-  const formatError = validateUsernameFormat(username);
-  if (formatError) {
-    usernameError.value = formatError;
-    return;
-  }
+  if (!username || errors.value.username) return;
 
   try {
     isChecking.value = true;
@@ -63,64 +64,56 @@ const checkUsernameAvailability = useDebounceFn(async (username: string) => {
     usernameExists.value = response.data.exists;
 
     if (response.data.exists) {
-      usernameError.value = $t('setting.username.username-taken');
-    } else {
-      usernameError.value = '';
+      setFieldError('username', $t('setting.username.username-taken'));
     }
   } catch (error) {
     console.error('Error checking username:', error);
-    usernameError.value = 'Error checking username availability';
+    setFieldError('username', $t('setting.username.error-checking'));
   } finally {
     isChecking.value = false;
   }
 }, 300);
 
-watch(username, (newUsername) => {
-  usernameError.value = '';
-  usernameExists.value = false;
+watch(
+  () => values.username,
+  (newUsername) => {
+    usernameExists.value = false;
 
-  if (!newUsername) {
-    usernameError.value = 'Username is required';
-    return;
+    if (!newUsername || errors.value.username) return;
+
+    checkUsernameAvailability(newUsername);
+  },
+);
+
+watch(errors, (errs) => {
+  if (!errs.username && usernameExists.value) {
+    setFieldError('username', $t('setting.username.username-taken'));
   }
-
-  const formatError = validateUsernameFormat(newUsername);
-  if (formatError) {
-    usernameError.value = formatError;
-    return;
-  }
-
-  checkUsernameAvailability(newUsername);
 });
 
-const isSaveDisabled = computed(() => {
-  return !!usernameError.value || isChecking.value || !username.value;
-});
-
-const saveUsername = async () => {
-  if (isSaveDisabled.value) return;
-
+const onSubmit = handleSubmit(async (values) => {
+  if (usernameExists.value) return;
   try {
-    await apiFetch('/api/settings/username', {
+    await apiFetch('/api/settings/username/update', {
       method: 'PATCH',
       query: {
-        newUsername: username.value,
+        newUsername: values.username,
       },
     });
 
     // Update the user store with the new username
-    userStore.updateUser({ username: username.value });
+    userStore.updateUser({ username: values.username });
 
     router.push('/playground/settings');
   } catch (error) {
     console.error('Error saving username:', error);
-    usernameError.value = $t('setting.username.error-saving');
+    setFieldError('username', $t('setting.username.error-saving'));
   }
-};
+});
 </script>
 
 <template>
-  <div class="flex min-h-screen flex-col">
+  <form class="flex min-h-screen flex-col" @submit.prevent="onSubmit">
     <div class="mb-4 flex items-center gap-4 p-4">
       <Icon
         :name="$t('setting.back-button-icon')"
@@ -134,16 +127,11 @@ const saveUsername = async () => {
 
     <div class="flex flex-1 flex-col">
       <div class="border-border border-b px-4 pb-8">
-        <div>
-          <Input
-            v-model="username"
-            :aria-invalid="!!usernameError"
-            :placeholder="$t('setting.username.username')"
-          />
-          <p v-if="usernameError" class="text-destructive text-md mt-1 ps-1">
-            {{ usernameError }}
-          </p>
-        </div>
+        <FieldInput
+          name="username"
+          :placeholder="$t('setting.username.username')"
+          v-bind="usernameAttrs"
+        />
       </div>
 
       <div class="border-border border-b px-4 py-8">
@@ -152,8 +140,9 @@ const saveUsername = async () => {
           <button
             v-for="suggestion in suggestions"
             :key="suggestion"
+            type="button"
             class="text-primary cursor-pointer text-start hover:underline"
-            @click="username = suggestion"
+            @click="values.username = suggestion"
           >
             {{ suggestion }}
           </button>
@@ -162,13 +151,17 @@ const saveUsername = async () => {
 
       <div class="flex justify-end px-4 py-8">
         <Button
-          :disabled="isSaveDisabled"
-          class="bg-primary hover:bg-primary/90 rounded-full px-6 py-2 font-bold disabled:opacity-50"
-          @click="saveUsername"
+          type="submit"
+          :disabled="
+            Object.entries(errors).length > 0 || isSubmitting || isChecking || usernameExists
+          "
+          variant="primary"
+          size="md"
+          class="w-fit"
         >
           {{ $t('setting.username.save') }}
         </Button>
       </div>
     </div>
-  </div>
+  </form>
 </template>

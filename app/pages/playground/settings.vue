@@ -21,11 +21,12 @@ const user = computed(() => userStore.user);
     <SettingsItem
       :title="$t('setting.date-of-birth')"
       :subtitle="birthDateFormat(user.birthDate, $i18n.locale)"
-      to="/playground/settings/date-of-birth"
+      to="/settings/profile"
     />
     <SettingsItem
       :title="$t('setting.change-password')"
-      to="/playground/settings/change-password"
+      to="/playground/changePasswordEditor"
+      subtitle="Change Your Password at any time"
     />
   </div>
   <div v-else class="p-4">
