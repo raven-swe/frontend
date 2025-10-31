@@ -2,8 +2,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { nextTick } from 'vue';
 
-const fetchMock = vi.fn();
-vi.stubGlobal('$fetch', fetchMock);
+const { apiFetchMock } = vi.hoisted(() => ({
+  apiFetchMock: vi.fn(),
+}));
+
+vi.mock('~/api', () => ({
+  apiFetch: apiFetchMock,
+}));
+
 vi.stubGlobal('definePageMeta', () => {});
 vi.stubGlobal('$t', (k: string) => k);
 
@@ -34,7 +40,7 @@ describe('Home page (unit)', () => {
       media: [],
     };
 
-    fetchMock.mockResolvedValue({
+    apiFetchMock.mockResolvedValue({
       data: {
         data: [mockTweet],
         pagination: { cursor: '0', nextCursor: null, hasNextPage: false },
@@ -53,14 +59,14 @@ describe('Home page (unit)', () => {
     await nextTick();
     await new Promise((r) => setTimeout(r, 0));
 
-    expect(fetchMock).toHaveBeenCalled();
+    expect(apiFetchMock).toHaveBeenCalled();
 
     const cards = wrapper.findAllComponents({ name: 'TweetDefaultCard' });
     expect(cards.length).toBeGreaterThanOrEqual(1);
   });
 
   it('handles empty response (no new tweets) without rendering items', async () => {
-    fetchMock.mockResolvedValue({
+    apiFetchMock.mockResolvedValue({
       data: { data: [], pagination: { cursor: null, nextCursor: null, hasNextPage: false } },
     });
 
@@ -76,7 +82,7 @@ describe('Home page (unit)', () => {
     await nextTick();
     await new Promise((r) => setTimeout(r, 0));
 
-    expect(fetchMock).toHaveBeenCalled();
+    expect(apiFetchMock).toHaveBeenCalled();
 
     const cards = wrapper.findAllComponents({ name: 'TweetDefaultCard' });
     expect(cards.length).toBe(0);
@@ -84,7 +90,7 @@ describe('Home page (unit)', () => {
 
   it('logs error and resets loading when fetch fails', async () => {
     const error = new Error('network');
-    fetchMock.mockRejectedValue(error);
+    apiFetchMock.mockRejectedValue(error);
 
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
@@ -100,7 +106,7 @@ describe('Home page (unit)', () => {
     await nextTick();
     await new Promise((r) => setTimeout(r, 0));
 
-    expect(fetchMock).toHaveBeenCalled();
+    expect(apiFetchMock).toHaveBeenCalled();
     expect(consoleSpy).toHaveBeenCalled();
 
     expect(wrapper.find('.text-muted-foreground').exists()).toBe(false);
@@ -109,14 +115,7 @@ describe('Home page (unit)', () => {
   });
 
   it('invokes the infinite-scroll handler provided to useInfiniteScroll', async () => {
-    vi.resetModules();
-
-    const fetchMock2 = vi.fn();
-    vi.stubGlobal('$fetch', fetchMock2);
-    vi.stubGlobal('definePageMeta', () => {});
-    vi.stubGlobal('$t', (k: string) => k);
-
-    vi.mock('@vueuse/core', () => {
+    vi.doMock('@vueuse/core', () => {
       return {
         useInfiniteScroll: (_el: unknown, cb: () => unknown) => {
           void cb();
@@ -125,7 +124,7 @@ describe('Home page (unit)', () => {
       };
     });
 
-    fetchMock2.mockResolvedValue({
+    apiFetchMock.mockResolvedValue({
       data: { data: [], pagination: { cursor: null, nextCursor: null, hasNextPage: false } },
     });
 
@@ -141,18 +140,11 @@ describe('Home page (unit)', () => {
     await nextTick();
     await new Promise((r) => setTimeout(r, 0));
 
-    expect(fetchMock2).toHaveBeenCalled();
+    expect(apiFetchMock).toHaveBeenCalled();
   });
 
   it('executes canLoadMore option from useInfiniteScroll to cover reactive check', async () => {
-    vi.resetModules();
-
-    const fetchMock3 = vi.fn();
-    vi.stubGlobal('$fetch', fetchMock3);
-    vi.stubGlobal('definePageMeta', () => {});
-    vi.stubGlobal('$t', (k: string) => k);
-
-    vi.mock('@vueuse/core', () => {
+    vi.doMock('@vueuse/core', () => {
       return {
         useInfiniteScroll: (
           _el: unknown,
@@ -167,7 +159,7 @@ describe('Home page (unit)', () => {
       };
     });
 
-    fetchMock3.mockResolvedValue({
+    apiFetchMock.mockResolvedValue({
       data: { data: [], pagination: { cursor: null, nextCursor: null, hasNextPage: false } },
     });
 
@@ -180,6 +172,6 @@ describe('Home page (unit)', () => {
     await nextTick();
     await new Promise((r) => setTimeout(r, 0));
 
-    expect(fetchMock3).toHaveBeenCalled();
+    expect(apiFetchMock).toHaveBeenCalled();
   });
 });

@@ -1,3 +1,4 @@
+import { apiFetch } from '~/api';
 import type { Tweet } from '~~/shared/types/tweets';
 export type timelineSchema = {
   limit: number;
@@ -10,7 +11,7 @@ export type Pagination = {
 };
 export const homeService = {
   async forYou(timeline: timelineSchema) {
-    return await $fetch<ApiSuccessResponse<{ data: Tweet[]; pagination: Pagination }>>(
+    return await apiFetch<ApiSuccessResponse<{ data: Tweet[]; pagination: Pagination }>>(
       '/api/timeline/for-you',
       {
         method: 'GET',
@@ -23,7 +24,7 @@ export const homeService = {
   },
 
   async following(timeline: timelineSchema) {
-    return await $fetch<ApiSuccessResponse<{ data: Tweet[]; pagination: Pagination }>>(
+    return await apiFetch<ApiSuccessResponse<{ data: Tweet[]; pagination: Pagination }>>(
       '/api/timeline/following',
       {
         method: 'GET',
