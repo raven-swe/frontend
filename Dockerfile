@@ -8,6 +8,10 @@ RUN corepack enable
 FROM base AS build
 ENV NODE_ENV=development
 
+ARG NUXT_PUBLIC_RECAPTCHA_SITE_KEY
+
+ENV NUXT_PUBLIC_RECAPTCHA_SITE_KEY=$NUXT_PUBLIC_RECAPTCHA_SITE_KEY
+
 # Install dependencies
 COPY package.json pnpm-lock.yaml ./
 RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
