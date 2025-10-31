@@ -190,11 +190,32 @@
     "username": {
       "username-taken": "That username has been taken. Please choose another.",
       "username-invalid": "Usernames can have letters, digits, and underscores, and must be 3-15 characters long.",
+      "username-required": "Username is required",
       "username": "Username",
       "suggestions": "Suggestions",
       "change-username": "Change username",
       "save": "Save Changes",
-      "error-saving": "An error occurred while saving the username. Please try again."
+      "error-saving": "An error occurred while saving the username. Please try again.",
+      "error-checking": "Error checking username availability. Please try again."
+    },
+    "password": {
+      "change-password": "Change your password",
+      "current-password": "Current password",
+      "new-password": "New password",
+      "confirm-password": "Confirm password",
+      "forgot-password": "Forgot password?",
+      "save": "Save",
+      "errors": {
+        "current-password-required": "Current password is required",
+        "new-password-required": "New password is required",
+        "password-too-short": "Password must be at least 8 characters long",
+        "password-invalid": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+        "confirm-password-required": "Please confirm your password",
+        "passwords-do-not-match": "Passwords do not match",
+        "error-saving": "An error occurred while saving the password. Please try again.",
+        "401": "You are not authorized to change the password",
+        "422": "Current password is incorrect"
+      }
     }
   },
   "login": {
