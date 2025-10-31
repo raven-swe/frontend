@@ -1,10 +1,10 @@
 import { FetchError } from 'ofetch';
-import type { UpdateProfileRequest, UserData } from '~~/types/shared';
+import type { UpdateProfileRequest, UserData } from '~~/shared/types/shared';
 import type {
   ApiSuccessResponse,
   ApiErrorResponse,
   ApiValidationErrorResponse,
-} from '~~/shared/types/api';
+} from '../../../shared/types/api';
 
 const API_URL = process.env.BACKEND_URL;
 

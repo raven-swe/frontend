@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 export const useUserStore = defineStore('user', {
   state: () => ({
     user: {
-      username: '',
+      username: 'Jackeline.Bailey',
       displayName: '',
       bio: ``,
       bioEntities: {
@@ -38,23 +38,28 @@ export const useUserStore = defineStore('user', {
       this.loading = true;
       this.error = null;
       const userToFetch = username || this.user.username;
+
       if (!userToFetch) {
         this.error = 'No username provided';
         this.loading = false;
         return;
       }
 
-      const { data, error } = await useFetch<User>(`/api/users/${userToFetch}/profile`, {
-        key: `user-profile-${userToFetch}`,
-      });
+      try {
+        const data = await $fetch<User>(`/api/users/${userToFetch}/profile`);
 
-      if (error.value) {
-        this.error = error.value.message;
-      } else if (data.value) {
-        this.user = data.value;
+        if (data) {
+          this.updateUser(data);
+          // console.log('Updated user in store:', this.user);
+        } else {
+          this.error = 'No user data received';
+        }
+      } catch {
+        // console.error('Error fetching user profile:', error);
+        this.error = 'Failed to fetch user profile';
+      } finally {
+        this.loading = false;
       }
-
-      this.loading = false;
     },
 
     updateUser(userData: Partial<User>) {

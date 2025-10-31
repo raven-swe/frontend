@@ -10,7 +10,7 @@ const profilePath = computed(() => `/profile/${username.value}`);
 const userStore = useUserStore();
 
 onMounted(() => {
-  userStore.fetchUserProfile(username.value);
+  useUserStore().fetchUserProfile(username.value);
 });
 </script>
 
