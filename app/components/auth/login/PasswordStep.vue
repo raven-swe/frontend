@@ -27,6 +27,10 @@ const onSubmit = handleSubmit(async (values) => {
       password: values.password.trim(),
     };
     await loginStore.submitLogin(submissionValues);
+    // update user store after successful login
+    const userStore = useUserStore();
+    // this should be replaced with a call to POST /me
+    userStore.updateUser({ username: 'Jackson.Mertz9' });
   } catch (err: unknown) {
     showToaster('error', (err as Error).message || $t('errors.GENERIC_ERROR'));
   }

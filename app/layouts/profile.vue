@@ -5,7 +5,7 @@ import Tab from '@/components/ui/Tab.vue';
 import Spinner from '~/components/ui/Spinner.vue';
 
 const route = useRoute();
-const username = computed(() => (route.params.username as string) || 'hussein');
+const username = computed(() => route.params.username as string);
 const profilePath = computed(() => `/profile/${username.value}`);
 const userStore = useUserStore();
 

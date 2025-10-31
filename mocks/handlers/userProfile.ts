@@ -1,26 +1,14 @@
 import { http, HttpResponse } from 'msw';
+import rawUsers from '../data/mock-users.json' assert { type: 'json' };
+import type { User } from '#shared/types/user';
 
-const mockUserInfos = {
-  hussein: {
-    username: 'hussein',
-    displayName: 'Hussein Mohamed',
-    bio: 'football lover, software engineer, coffee addict.',
-    bioEntities: {
-      mentions: [],
-      hashtags: [],
-    },
-    avatarUrl: 'https://i.ibb.co/vv6B8ML0/profile.jpg',
-    bannerUrl: 'https://i.ibb.co/bj3fhPfq/cover.jpg',
-    location: 'Cairo, Egypt',
-    websiteUrl: 'https://www.instagram.com/hussein_mohamed__1',
-    birthDate: '1999-01-01',
-    joinedAt: '2020-07-01T00:00:00.000Z',
-    followingCount: 150,
-    followersCount: 200,
-    mutualsCount: 5,
-    mutualNames: [],
-  },
-};
+const mockUsers = rawUsers as User[];
+
+// Create a mapping of username to user info for easy lookup
+const mockUserInfos: Record<string, User> = {};
+mockUsers.forEach((user) => {
+  mockUserInfos[user.username] = user;
+});
 
 const API_URL = process.env.BACKEND_URL;
 
