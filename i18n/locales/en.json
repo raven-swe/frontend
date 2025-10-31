@@ -116,6 +116,15 @@
       "copyright": "© 2025 Raven Corp."
     }
   },
+  "tweet": {
+    "composer": {
+      "placeholder": "What's happening?",
+      "media": "Media",
+      "gif": "GIF",
+      "emoji": "Emoji",
+      "profile-alt": "Avatar of {name}"
+    }
+  },
   "ui": {
     "close": "Close",
     "next": "Next",
@@ -123,7 +132,8 @@
     "skip-for-now": "Skip for now",
     "save": "Save",
     "cancel": "Cancel",
-    "discard": "Discard"
+    "discard": "Discard",
+    "post": "Post"
   },
   "errors": {
     "INVALID_EMAIL": "Please enter a valid email.",
