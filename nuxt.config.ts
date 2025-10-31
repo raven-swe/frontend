@@ -12,6 +12,7 @@ export default defineNuxtConfig({
       githubRedirectUri: process.env.NUXT_PUBLIC_GITHUB_REDIRECT_URI || '',
       githubScope: process.env.NUXT_PUBLIC_GITHUB_SCOPE || '',
       siteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY || '',
+      baseUrl: process.env.NUXT_PUBLIC_BASE_URL || 'http://localhost:5173',
     },
   },
   devtools: {
