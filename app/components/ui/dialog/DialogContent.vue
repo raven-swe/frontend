@@ -36,7 +36,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
       @escape-key-down="(e) => e.preventDefault()"
       @interact-outside="(e) => e.preventDefault()"
     >
-      <div class="relative flex h-13 flex-row items-center justify-start gap-2 p-2">
+      <div class="relative flex h-auto flex-shrink-0 flex-row items-center justify-start gap-2 p-2">
         <DialogClose v-if="!hideCloseButton" data-slot="dialog-close" as-child>
           <Button variant="ghost-default" size="icon-xs" class="absolute inset-2">
             <Icon name="lucide:x" class="size-5" />
@@ -44,13 +44,13 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
           </Button>
         </DialogClose>
         <div
-          :class="cn('flex h-8 w-full items-center ps-10 text-lg font-medium', props.headerClass)"
+          :class="cn('flex h-8 w-full items-center ps-2 text-lg font-medium', props.headerClass)"
         >
           <slot name="header" />
         </div>
       </div>
 
-      <div class="flex h-full w-full flex-col gap-4 px-6 pb-6">
+      <div class="flex min-h-0 w-full flex-1 flex-col gap-4 overflow-y-auto px-6 pb-6">
         <slot />
       </div>
     </DialogContent>

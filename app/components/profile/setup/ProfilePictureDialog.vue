@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { buttonVariants } from '~~/types/ui';
+import type { buttonVariants } from '~~/shared/types/ui';
 
 const props = defineProps<{
   open: boolean;

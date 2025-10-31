@@ -78,14 +78,14 @@ describe('PasswordForm.vue', () => {
     await flushPromises();
     let errorMessage = wrapper.find('[data-test-id="otp-error"]');
     expect(errorMessage.exists()).toBe(true);
-    expect(errorMessage.text()).toBe(i18n.global.t('errors.OTP_TOO_SHORT'));
+    expect(errorMessage.text()).toBe(i18n.global.t('errors.OTP_MUST_6'));
 
     await otpField.setValue('1234567890');
     await otpField.trigger('blur');
     await flushPromises();
     errorMessage = wrapper.find('[data-test-id="otp-error"]');
     expect(errorMessage.exists()).toBe(true);
-    expect(errorMessage.text()).toBe(i18n.global.t('errors.OTP_TOO_LONG'));
+    expect(errorMessage.text()).toBe(i18n.global.t('errors.OTP_MUST_6'));
 
     // Second: valid
     await otpField.setValue('123456');

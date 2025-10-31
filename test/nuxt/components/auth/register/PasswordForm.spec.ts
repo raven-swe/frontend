@@ -82,7 +82,7 @@ describe('PasswordForm.vue', () => {
     expect(errorMessage.text()).toBe(i18n.global.t('errors.PASSWORD_INVALID'));
 
     // Second: valid
-    await passwordField.setValue('ValidPassword123!');
+    await passwordField.setValue('ValidPassword@123!');
     await passwordField.trigger('blur');
     await flushPromises();
     errorMessage = wrapper.find('[data-test-id="password-error"]');
@@ -117,10 +117,10 @@ describe('PasswordForm.vue', () => {
     const form = wrapper.find('form');
     const passwordField = wrapper.find('input[name="password"]');
     expect(passwordField.exists()).toBe(true);
-    await passwordField.setValue('ValidPassword123!');
+    await passwordField.setValue('ValidPassword@123!');
     await passwordField.trigger('blur');
     await form.trigger('submit');
     await flushPromises();
-    expect(store.submitPassword).toHaveBeenCalledWith('ValidPassword123!');
+    expect(store.submitPassword).toHaveBeenCalledWith('ValidPassword@123!');
   });
 });
