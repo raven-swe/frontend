@@ -64,12 +64,12 @@ const handleFileSelect = (event: Event) => {
 </script>
 
 <template>
-  <div class="border-border ms-[60px] flex items-center justify-between border-t pt-1.5">
+  <div class="toolbar border-border ms-[60px] flex items-center justify-between border-t pt-1.5">
     <div class="flex gap-2">
       <UiButton
         variant="tweet-icon-blue"
         :title="$t('tweet.composer.media')"
-        class="text-brand-blue"
+        class="media-btn text-brand-blue"
         size="icon-md"
         :disabled="!canAddMedia"
         @click="handleMediaClick"
@@ -140,7 +140,12 @@ const handleFileSelect = (event: Event) => {
         </div>
       </div>
 
-      <UiButton size="md" :disabled="disabled || isOverLimit" @click="$emit('post')">
+      <UiButton
+        class="post-button"
+        size="md"
+        :disabled="disabled || isOverLimit"
+        @click="$emit('post')"
+      >
         {{ $t('ui.post') }}
       </UiButton>
     </div>
