@@ -20,6 +20,9 @@ export default defineEventHandler(async (event) => {
         body: {
           providerToken: body.code,
         },
+        headers: {
+          'X-Client-Type': 'web',
+        },
       },
     );
     return response;
