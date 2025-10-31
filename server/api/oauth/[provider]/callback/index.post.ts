@@ -7,7 +7,7 @@ interface ApiError {
 }
 
 export default defineEventHandler(async (event) => {
-  const provider = event.context.params as { provider: string };
+  const { provider } = event.context.params as { provider: string };
   const body = await readBody<OAuthCallbackRequest>(event);
 
   const API_URL = process.env.BACKEND_URL;
