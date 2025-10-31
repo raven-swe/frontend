@@ -1,8 +1,14 @@
 <script lang="ts" setup>
-// reactivity for user's own profile
-onMounted(() => {
-  useUserStore().fetchUserProfile();
-});
+import { meService } from '~/services/me/meService';
+
+const { data, error } = await useAsyncData('layout-data', () => meService.fetchProfile());
+const userStore = await useUserStore();
+if (error.value) {
+  userStore.error = error.value.message;
+} else if (data.value && data.value.success) {
+  userStore.setUser(data.value.data);
+  userStore.error = null;
+}
 </script>
 
 <template>

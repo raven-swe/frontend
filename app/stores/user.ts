@@ -34,40 +34,16 @@ export const useUserStore = defineStore('user', {
   },
 
   actions: {
-    async fetchUserProfile(username?: string) {
-      this.loading = true;
-      this.error = null;
-      const userToFetch = username || this.user.username;
-
-      if (!userToFetch) {
-        this.error = 'No username provided';
-        this.loading = false;
-        return;
-      }
-
-      try {
-        const data = await $fetch<User>(`/api/users/${userToFetch}/profile`);
-
-        if (data) {
-          this.updateUser(data);
-          // console.log('Updated user in store:', this.user);
-        } else {
-          this.error = 'No user data received';
-        }
-      } catch {
-        // console.error('Error fetching user profile:', error);
-        this.error = 'Failed to fetch user profile';
-      } finally {
-        this.loading = false;
-      }
-    },
-
     updateUser(userData: Partial<User>) {
       if (this.user) this.user = { ...this.user, ...userData };
     },
 
     setUser(userData: User) {
       this.user = userData;
+    },
+
+    isCurrentUser(username: string): boolean {
+      return this.user?.username === username;
     },
 
     logout() {

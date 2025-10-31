@@ -5,7 +5,7 @@ import type { User } from '#shared/types/user';
 const mockUsers = rawUsers as User[];
 
 const exampleUser: User = {
-  username: 'Jackeline.Bailey',
+  username: 'ravencmp123',
   displayName: 'Madelyn6',
   bio: 'Quo solio verecundia cetera testimonium ater apto vaco.',
   bioEntities: {
@@ -34,18 +34,31 @@ mockUsers.forEach((user) => {
 
 const API_URL = process.env.BACKEND_URL;
 
-export const userProfileHandlers = [
+export const handlers = [
   http.get(`${API_URL}/users/:username/profile`, ({ params }) => {
-    const { username } = params;
-    const userInfo = mockUserInfos[username as keyof typeof mockUserInfos];
+    const username = params.username as string;
+    const user = mockUserInfos[username];
 
-    if (!userInfo) {
+    if (user) {
       return HttpResponse.json(
-        { message: `User profile for "${username}" not found` },
+        {
+          success: true,
+          message: 'User profile fetched successfully',
+          data: user,
+        },
+        { status: 200 },
+      );
+    } else {
+      return HttpResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'USER_NOT_FOUND',
+            message: 'The requested user does not exist',
+          },
+        },
         { status: 404 },
       );
     }
-
-    return HttpResponse.json(userInfo, { status: 200 });
   }),
 ];

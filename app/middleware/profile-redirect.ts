@@ -1,8 +1,6 @@
 export default defineNuxtRouteMiddleware(async (to) => {
   if (to.path === '/profile' || to.path === '/profile/') {
     const userStore = useUserStore();
-    // Get username from store
-    await userStore.fetchUserProfile();
     const username = userStore.user?.username;
 
     if (username) {
