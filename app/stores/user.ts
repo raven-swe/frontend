@@ -34,12 +34,18 @@ export const useUserStore = defineStore('user', {
   },
 
   actions: {
-    async fetchUserProfile(username: string) {
+    async fetchUserProfile(username?: string) {
       this.loading = true;
       this.error = null;
+      const userToFetch = username || this.user.username;
+      if (!userToFetch) {
+        this.error = 'No username provided';
+        this.loading = false;
+        return;
+      }
 
-      const { data, error } = await useFetch<User>(`/api/users/${username}/profile`, {
-        key: `user-profile-${username}`,
+      const { data, error } = await useFetch<User>(`/api/users/${userToFetch}/profile`, {
+        key: `user-profile-${userToFetch}`,
       });
 
       if (error.value) {
@@ -60,7 +66,28 @@ export const useUserStore = defineStore('user', {
     },
 
     logout() {
-      // this.user = null;
+      this.user = {
+        username: '',
+        displayName: '',
+        bio: ``,
+        bioEntities: {
+          mentions: [],
+          hashtags: [],
+        },
+        avatarUrl: '',
+        bannerUrl: '',
+        location: '',
+        websiteUrl: '',
+        birthDate: '2004-05-07',
+        joinedAt: '2020-03-15T10:30:00Z',
+        email: 'https://github.com/',
+        phone: '+1234567890',
+        followingCount: 0,
+        followersCount: 0,
+        mutualsCount: 0,
+        mutualNames: [],
+        languageCode: 'en',
+      } as User;
     },
   },
 });
