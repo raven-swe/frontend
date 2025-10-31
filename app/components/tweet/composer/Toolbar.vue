@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 interface Props {
   disabled?: boolean;
   characterCount?: number;
   maxLength?: number;
   isOverLimit?: boolean;
+  hasMedia?: boolean;
+  canAddMedia?: boolean;
 }
 
 interface Emits {
   (e: 'post'): void;
+  (e: 'add-media', files: File[]): void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -17,9 +20,13 @@ const props = withDefaults(defineProps<Props>(), {
   characterCount: 0,
   maxLength: 280,
   isOverLimit: false,
+  hasMedia: false,
+  canAddMedia: true,
 });
 
-defineEmits<Emits>();
+const emit = defineEmits<Emits>();
+
+const fileInputRef = ref<HTMLInputElement | null>(null);
 
 const progress = computed(() => Math.min(props.characterCount / props.maxLength, 1));
 const circumference = 2 * Math.PI * 10; // radius = 10
@@ -34,6 +41,26 @@ const progressColor = computed(() => {
 
 const showCounter = computed(() => props.characterCount > props.maxLength * 0.85);
 const remainingChars = computed(() => props.maxLength - props.characterCount);
+
+const handleMediaClick = () => {
+  if (props.canAddMedia) {
+    fileInputRef.value?.click();
+  }
+};
+
+const handleFileSelect = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const files = Array.from(target.files || []);
+
+  if (files.length > 0) {
+    emit('add-media', files);
+  }
+
+  // Reset input
+  if (target) {
+    target.value = '';
+  }
+};
 </script>
 
 <template>
@@ -44,6 +71,8 @@ const remainingChars = computed(() => props.maxLength - props.characterCount);
         :title="$t('tweet.composer.media')"
         class="text-brand-blue"
         size="icon-md"
+        :disabled="!canAddMedia"
+        @click="handleMediaClick"
       >
         <Icon name="heroicons:photo" size="20" />
       </UiButton>
@@ -115,5 +144,15 @@ const remainingChars = computed(() => props.maxLength - props.characterCount);
         {{ $t('ui.post') }}
       </UiButton>
     </div>
+
+    <!-- Hidden File Input -->
+    <input
+      ref="fileInputRef"
+      type="file"
+      accept="image/*"
+      multiple
+      class="hidden"
+      @change="handleFileSelect"
+    />
   </div>
 </template>

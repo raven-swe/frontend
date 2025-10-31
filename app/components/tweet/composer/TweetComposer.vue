@@ -3,12 +3,22 @@ import { ref, computed } from 'vue';
 import { useUserStore } from '@/stores/user';
 import TweetEditor from './TweetEditor.vue';
 import Toolbar from './Toolbar.vue';
+import MediaSlideshow from './MediaSlideshow.vue';
+import type { MediaType } from '~~/shared/types/shared';
+
+interface MediaItem {
+  id: string;
+  url: string;
+  type: MediaType;
+}
 
 const tweetContent = ref('');
 const tweetEditorRef = ref<InstanceType<typeof TweetEditor> | null>(null);
 const userStore = useUserStore();
+const media = ref<MediaItem[]>([]);
 
 const MAX_LENGTH = 280;
+const MAX_MEDIA = 4;
 
 const characterCount = computed(() => tweetContent.value.length);
 const isOverLimit = computed(() => characterCount.value > MAX_LENGTH);
@@ -16,9 +26,36 @@ const isOverLimit = computed(() => characterCount.value > MAX_LENGTH);
 const handlePost = () => {
   if (tweetContent.value.trim() && !isOverLimit.value) {
     // eslint-disable-next-line no-console
-    console.log(tweetContent.value);
+    console.log({
+      content: tweetContent.value,
+      media: media.value,
+    });
     tweetContent.value = '';
+    media.value = [];
     tweetEditorRef.value?.resetHeight();
+  }
+};
+
+const handleAddMedia = (files: File[]) => {
+  files.forEach((file) => {
+    const url = URL.createObjectURL(file);
+    const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+    media.value.push({
+      id,
+      url,
+      type: 'image',
+    });
+  });
+};
+
+const handleRemoveMedia = (id: string) => {
+  const index = media.value.findIndex((m) => m.id === id);
+
+  if (index !== -1 && index < media.value.length && media.value[index]) {
+    // Revoke the blob URL to free memory
+    URL.revokeObjectURL(media.value[index].url);
+    media.value.splice(index, 1);
   }
 };
 </script>
@@ -41,12 +78,17 @@ const handlePost = () => {
       />
     </div>
 
+    <MediaSlideshow :media="media" :max-media="MAX_MEDIA" @remove="handleRemoveMedia" />
+
     <Toolbar
-      :disabled="!tweetContent.trim()"
+      :disabled="!tweetContent.trim() && media.length === 0"
       :character-count="characterCount"
       :max-length="MAX_LENGTH"
       :is-over-limit="isOverLimit"
+      :has-media="media.length > 0"
+      :can-add-media="media.length < MAX_MEDIA"
       @post="handlePost"
+      @add-media="handleAddMedia"
     />
   </div>
 </template>
