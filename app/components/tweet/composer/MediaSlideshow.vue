@@ -80,7 +80,7 @@ const removeMedia = (id: string) => {
         <div
           v-for="item in media"
           :key="item.id"
-          class="relative aspect-[25/28] flex-shrink-0 overflow-hidden bg-gray-100"
+          class="bg-background/50 relative aspect-[25/28] flex-shrink-0 overflow-hidden"
           :style="{ width: itemWidth }"
         >
           <!-- Media Item -->
@@ -89,10 +89,10 @@ const removeMedia = (id: string) => {
             type="button"
             variant="ghost-default"
             size="icon-sm"
-            class="absolute start-2 top-2 z-10 bg-black/75 hover:bg-black/90"
+            class="bg-foreground/75 hover:bg-foreground/90 absolute start-2 top-2 z-10"
             @click="removeMedia(item.id)"
           >
-            <Icon name="heroicons:x-mark" size="16" class="text-white" />
+            <Icon name="heroicons:x-mark" size="16" class="text-background" />
           </UiButton>
         </div>
       </div>
@@ -105,10 +105,10 @@ const removeMedia = (id: string) => {
         type="button"
         variant="ghost-default"
         size="icon-md"
-        class="absolute start-2 top-1/2 z-10 -translate-y-1/2 bg-black/75 hover:bg-black/98"
+        class="bg-foreground/75 hover:bg-foreground/98 absolute start-2 top-1/2 z-10 -translate-y-1/2"
         @click="navigateLeft"
       >
-        <Icon name="heroicons:chevron-left" size="20" class="text-white" />
+        <Icon name="heroicons:chevron-left" size="20" class="text-background" />
       </UiButton>
 
       <UiButton
@@ -116,10 +116,10 @@ const removeMedia = (id: string) => {
         type="button"
         variant="ghost-default"
         size="icon-md"
-        class="absolute end-2 top-1/2 z-10 -translate-y-1/2 bg-black/75 hover:bg-black/98"
+        class="bg-foreground/75 hover:bg-foreground/98 absolute end-2 top-1/2 z-10 -translate-y-1/2"
         @click="navigateRight"
       >
-        <Icon name="heroicons:chevron-right" size="20" class="text-white" />
+        <Icon name="heroicons:chevron-right" size="20" class="text-background" />
       </UiButton>
     </template>
   </div>
