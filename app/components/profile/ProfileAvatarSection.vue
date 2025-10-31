@@ -13,6 +13,10 @@ defineProps<{
         loading="eager"
       />
     </div>
-    <UiButton variant="outline">{{ $t('profile-info.edit-profile') }}</UiButton>
+    <UiButton variant="outline">
+      <NuxtLink to="/settings/profile">
+        {{ $t('profile-info.edit-profile') }}
+      </NuxtLink>
+    </UiButton>
   </div>
 </template>
