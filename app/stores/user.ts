@@ -30,6 +30,7 @@ export const useUserStore = defineStore('user', {
 
   getters: {
     memberSince: (state) => (state.user ? new Date(state.user.joinedAt).getFullYear() : null),
+    isProfileSetup: (state) => !!(state.user && state.user.avatarUrl),
   },
 
   actions: {

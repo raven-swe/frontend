@@ -2,6 +2,7 @@
 defineProps<{
   profileImg: string;
 }>();
+const userStore = useUserStore();
 </script>
 <template>
   <div class="mx-4 flex flex-wrap items-center justify-between gap-4">
@@ -9,11 +10,16 @@ defineProps<{
       <NuxtImg
         :src="profileImg"
         alt="Profile picture"
-        class="-mt-16 size-34 rounded-full border-4 object-contain"
+        class="-mt-16 size-34 rounded-full border-4 object-cover"
         loading="eager"
       />
     </div>
-    <UiButton variant="outline">
+    <UiButton v-if="!userStore.isProfileSetup" variant="outline">
+      <NuxtLink to="/profile/setup">
+        {{ $t('profile.setup.setup-profile') }}
+      </NuxtLink>
+    </UiButton>
+    <UiButton v-else variant="outline">
       <NuxtLink to="/settings/profile">
         {{ $t('profile-info.edit-profile') }}
       </NuxtLink>
