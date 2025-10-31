@@ -8,6 +8,7 @@ useHead(() => ({
   htmlAttrs: {
     lang: locale.value,
     dir: localeProperties.value.dir,
+    class: 'dark',
   },
 }));
 </script>
