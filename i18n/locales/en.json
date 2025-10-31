@@ -18,6 +18,10 @@
     "complete-form": {
       "birthdate-label": "Birthdate",
       "confirm": "Confirm"
+    },
+    "settings": {
+      "title": "Settings",
+      "account": "Account"
     }
   },
   "leftsidebar": {
