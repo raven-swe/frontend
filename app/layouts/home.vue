@@ -6,7 +6,11 @@ import Tab from '@/components/ui/Tab.vue';
 <template>
   <NuxtLayout name="default">
     <Tabs>
-      <Tab :label="$t('home.tabs.for-you')" route="/home" :is-active="$route.path === '/home'" />
+      <Tab
+        :label="$t('home.tabs.for-you')"
+        route="/home/for-you"
+        :is-active="$route.path === '/home/for-you'"
+      />
       <Tab
         :label="$t('home.tabs.following')"
         route="/home/following"
