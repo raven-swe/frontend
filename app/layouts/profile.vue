@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import ProfileDetails from '~/components/profile/ProfileDetails.vue';
+import ProfileDetailsSkeleton from '~/components/profile/skeletons/ProfileDetailsSkeleton.vue';
 import Tabs from '@/components/ui/Tabs.vue';
 import Tab from '@/components/ui/Tab.vue';
-import Spinner from '~/components/ui/Spinner.vue';
 import { apiFetch } from '~/api';
 import { useQuery } from '@tanstack/vue-query';
 
@@ -34,9 +34,8 @@ const isUserNotFound = computed(() => {
 
 <template>
   <NuxtLayout name="default">
-    <!-- Loading spinner -->
-    <div v-if="isLoading" class="flex justify-center p-4">
-      <Spinner />
+    <div v-if="isLoading">
+      <ProfileDetailsSkeleton />
     </div>
 
     <!-- User not found -->
