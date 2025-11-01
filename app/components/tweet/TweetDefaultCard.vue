@@ -132,9 +132,9 @@ const contentSegments = computed<Segment[]>(() => {
           <span v-if="seg.type === 'text'" class="inline">
             {{ seg.text }}
           </span>
-          <span v-else :to="seg.href" class="text-primary inline font-medium hover:underline">
+          <a v-else :href="seg.href" class="text-primary inline font-medium hover:underline">
             {{ seg.text }}
-          </span>
+          </a>
         </template>
       </p>
 

@@ -10,6 +10,9 @@ export const relativeTimeFormat = (iso: string) => {
   return `${months}mo`;
 };
 
+// Backwards-compatible named export expected by tests and some imports
+export { relativeTimeFormat as relativeTime };
+
 export function formatDate(isoString: string): string {
   const date = new Date(isoString);
   return date.toLocaleString(undefined, {

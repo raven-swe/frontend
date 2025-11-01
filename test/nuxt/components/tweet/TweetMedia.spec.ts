@@ -58,8 +58,8 @@ describe('TweetMedia.vue', () => {
     const gifs = wrapper.findAll('img');
     // 2 GIF <img>, the static cover is NuxtImg (stubbed), not counted here
     expect(gifs).toHaveLength(2);
-    expect(gifs[0].attributes('src')).toBe('/gif-1.gif');
-    expect(gifs[0].attributes('alt')).toBe('gif-1');
+    expect(gifs[0]!.attributes('src')).toBe('/gif-1.gif');
+    expect(gifs[0]!.attributes('alt')).toBe('gif-1');
   });
 
   it('renders VIDEOS from media with controls and src', async () => {
@@ -70,9 +70,9 @@ describe('TweetMedia.vue', () => {
     });
     const videos = wrapper.findAll('video');
     expect(videos).toHaveLength(1);
-    expect(videos[0].attributes('src')).toBe('/video-1.mp4');
+    expect(videos[0]!.attributes('src')).toBe('/video-1.mp4');
     // controls is a boolean attribute; Vue Test Utils exposes presence via "controls" key
-    expect('controls' in videos[0].attributes()).toBe(true);
+    expect('controls' in videos[0]!.attributes()).toBe(true);
   });
 
   it('falls back to default alt text for GIF when altText is empty', async () => {
@@ -83,7 +83,7 @@ describe('TweetMedia.vue', () => {
     });
     const gifs = wrapper.findAll('img');
     expect(gifs).toHaveLength(1);
-    expect(gifs[0].attributes('alt')).toBe('Tweet media');
+    expect(gifs[0]!.attributes('alt')).toBe('Tweet media');
   });
 
   it('falls back to default alt text for VIDEO when altText is empty and keeps sizing classes', async () => {
@@ -94,10 +94,10 @@ describe('TweetMedia.vue', () => {
     });
     const videos = wrapper.findAll('video');
     expect(videos).toHaveLength(1);
-    expect(videos[0].attributes('alt')).toBe('Tweet media');
+    expect(videos[0]!.attributes('alt')).toBe('Tweet media');
     // also assert classes from template (coverage for lines 29-40 region)
-    expect(videos[0].classes()).toContain('mx-auto');
-    expect(videos[0].classes()).toContain('w-80');
+    expect(videos[0]!.classes()).toContain('mx-auto');
+    expect(videos[0]!.classes()).toContain('w-80');
   });
 
   it('ignores IMAGE media in loops (only static cover present)', async () => {

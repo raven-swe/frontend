@@ -47,7 +47,7 @@ describe('TweetActionButtons', () => {
     expect(wrapper.text()).toContain('20');
 
     // Share button variant
-    const shareButton = buttons[3];
+    const shareButton = buttons[3]!;
     expect(shareButton.props('variant')).toBe('tweet-icon-blue');
     expect(shareButton.props('size')).toBe('icon-md');
   });
@@ -61,14 +61,14 @@ describe('TweetActionButtons', () => {
 
     const buttons = wrapper.findAllComponents(Button);
 
-    // Retweet button should be active style when NOT retweeted (per component logic)
-    expect(buttons[1].props('variant')).toBe('tweet-icon-turquoise-active');
+    // Retweet button should be non-active style when NOT retweeted
+    expect(buttons[1]!.props('variant')).toBe('tweet-icon-turquoise');
 
     // Like button should be non-active style and outline heart icon
-    expect(buttons[2].props('variant')).toBe('tweet-icon-red');
+    expect(buttons[2]!.props('variant')).toBe('tweet-icon-red');
 
     // Like label should NOT include text-brand-red class
-    const likeLabel = wrapper.findAll('label')[2];
+    const likeLabel = wrapper.findAll('label')[2]!;
     expect(likeLabel.classes()).not.toContain('text-brand-red');
 
     // Icon name for like (stubbed)
@@ -84,12 +84,12 @@ describe('TweetActionButtons', () => {
 
     const buttons = wrapper.findAllComponents(Button);
 
-    // Retweet button should be non-active variant when retweeted=true (per component template)
-    expect(buttons[1].props('variant')).toBe('tweet-icon-turquoise');
+    // Retweet button should be active variant when retweeted=true (per component template)
+    expect(buttons[1]!.props('variant')).toBe('tweet-icon-turquoise-active');
 
     // Like button should be active variant & label colored
-    expect(buttons[2].props('variant')).toBe('tweet-icon-red-active');
-    const likeLabel = wrapper.findAll('label')[2];
+    expect(buttons[2]!.props('variant')).toBe('tweet-icon-red-active');
+    const likeLabel = wrapper.findAll('label')[2]!;
     expect(likeLabel.classes()).toContain('text-brand-red');
 
     // Icon name for liked (stubbed)

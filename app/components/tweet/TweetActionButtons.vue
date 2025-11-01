@@ -8,6 +8,7 @@ import {
   undoRetweetTweet,
 } from '~/services/tweet/actionButtonsService';
 import { showToaster } from '~/utils/showToaster';
+import { buildTweetLink } from '~/utils/tweetLink';
 
 interface Props {
   tweet: Tweet;
@@ -77,8 +78,7 @@ const handleUndoRetweet = async () => {
 
 const handleShare = async () => {
   try {
-    const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    const link = `${origin}/${props.tweet.author.username}/status/${props.tweet.id}`;
+    const link = buildTweetLink(props.tweet.author.username, props.tweet.id);
     await navigator.clipboard.writeText(link);
     showToaster('success', 'Link copied to clipboard');
   } catch (err) {
