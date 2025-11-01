@@ -75,7 +75,7 @@ const handleOpenChange = (value: boolean) => {
       <div class="mx-2 flex flex-grow items-center justify-center">
         <div class="relative">
           <img
-            :src="selectedImage || 'https://i.ibb.co/R498JgFW/img.webp'"
+            :src="selectedImage || 'https://cdn.raven.cmp27.space/default_avatar.png'"
             class="h-40 w-40 cursor-pointer rounded-full object-cover brightness-70 filter"
           />
           <button

@@ -247,7 +247,7 @@ const handleDialogClose = () => {
           <div class="relative z-10 -mt-12 mb-6 flex flex-col items-center gap-3 self-start px-3">
             <div class="relative">
               <img
-                :src="selectedProfileImage || 'https://i.ibb.co/R498JgFW/img.webp'"
+                :src="selectedProfileImage || 'https://cdn.raven.cmp27.space/default_avatar.png'"
                 class="h-30 w-30 cursor-pointer rounded-full border-3 border-white object-cover"
                 @click="handleProfileImageClick"
               />
