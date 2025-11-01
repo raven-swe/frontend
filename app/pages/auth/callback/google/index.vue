@@ -21,7 +21,9 @@ onMounted(async () => {
           '/api/oauth/google/callback',
           {
             method: 'POST',
-            body: { code },
+            body: {
+              providerToken: code,
+            },
             headers: {
               'X-Client-Type': 'web',
             },
