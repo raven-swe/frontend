@@ -25,7 +25,7 @@ function handleGithubSignIn() {
     scope: githubScope,
   });
   window?.open(
-    `https://github.com/login/oauth/select_account?${params.toString()}`,
+    `https://github.com/login/oauth/authorize?${params.toString()}`,
     'github-oauth',
     `width=500,height=600,top=${(screen.height - 600) / 2},left=${(screen.width - 500) / 2}`,
   );
@@ -34,23 +34,17 @@ function handleGithubSignIn() {
 function handleGoogleSignIn() {
   const params = new URLSearchParams({
     client_id: googleClientId,
-    scope: googleScope,
     redirect_uri: googleRedirectUri,
-    prompt: 'consent',
-    access_type: 'offline',
     response_type: 'code',
-    include_granted_scopes: 'true',
-    enable_granular_consent: 'true',
-    service: 'lso',
-    o2v: '2',
-    flowName: 'GeneralOAuthFlow',
+    scope: googleScope,
   });
   window?.open(
-    `https://accounts.google.com/o/oauth2/v2/auth/oauthchooseaccount?gsiwebsdk=3&${params.toString()}`,
+    `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`,
     'google-oauth',
     `width=500,height=600,top=${(screen.height - 600) / 2},left=${(screen.width - 500) / 2}`,
   );
 }
+//  &response_type=code&scope=openid%20email%20profile
 
 onMounted(() => {
   // Listen for GitHub auth messages from popup
