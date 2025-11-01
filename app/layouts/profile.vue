@@ -9,12 +9,9 @@ const route = useRoute();
 const username = computed(() => route.params.username as string);
 const profilePath = computed(() => `/profile/${username.value}`);
 
-const { data } = useAsyncData(
+const { data } = await useAsyncData(
   'profile-layout-data',
   async () => await apiFetch<ApiSuccessResponse<User>>(`/api/users/${username.value}/profile`),
-  {
-    lazy: true,
-  },
 );
 
 const user = data.value?.data || null;
