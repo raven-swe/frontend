@@ -12,9 +12,18 @@ const tweets = ref<Tweet[]>([]);
 const cursor = ref<string | null>(null);
 const hasNextPage = ref(true);
 const isLoading = ref(false);
+const tweetData = ref<Tweet | null>(null);
 
 const tweetid = route.params.tweetid as string;
-const { data: tweetData } = await $fetch<{ data: Tweet }>(`/api/tweets/${tweetid}`);
+
+async function loadMainTweet() {
+  try {
+    const resp = await $fetch<{ data: Tweet }>(`/api/tweets/${tweetid}`);
+    tweetData.value = resp.data;
+  } catch (err) {
+    console.error('Failed to load main tweet', err);
+  }
+}
 
 async function loadTweets() {
   isLoading.value = true;
@@ -63,6 +72,7 @@ useInfiniteScroll(
 );
 
 onMounted(() => {
+  loadMainTweet();
   loadTweets();
 });
 
@@ -88,12 +98,13 @@ function goBackToHome() {
     <TweetComposer placeholder="reply" />
 
     <div v-bind="containerProps">
-      <TweetDefaultCard
-        v-for="tweet in list"
-        :key="(tweet as Tweet)?.data?.id ?? (tweet as Tweet)?.id"
-        :tweet="(tweet as Tweet)?.data ?? (tweet as Tweet)"
-      />
-      <div v-if="tweets.length === 0">{{ $t('tweets.no-replies') }}</div>
+      <TweetDefaultCard v-for="{ data } in list" :key="data.id" :tweet="data" />
+      <div
+        v-if="tweets.length === 0"
+        class="text-muted-foreground border-b-border mt-8 h-12 border-b-1 text-center"
+      >
+        {{ $t('tweet.no-replies') }}
+      </div>
     </div>
   </div>
 </template>

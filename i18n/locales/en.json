@@ -141,7 +141,8 @@
       "gif": "GIF",
       "emoji": "Emoji",
       "profile-alt": "Avatar of {name}"
-    }
+    },
+    "no-replies": "No replies yet"
   },
   "ui": {
     "close": "Close",
