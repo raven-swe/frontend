@@ -214,6 +214,7 @@ export const handlers = [
         languageCode: 'en',
       };
       mockUsers.push(newUser);
+      console.log('\n\n\nNew user registered:', newUser);
 
       const refreshToken = generateRefreshToken(newUser.username);
       const authToken = generateAuthToken(newUser.username);

@@ -37,6 +37,7 @@ const API_URL = process.env.BACKEND_URL;
 export const handlers = [
   http.get(`${API_URL}/users/:username/profile`, ({ params }) => {
     const username = params.username as string;
+    console.log('\n\nMock handler accessed for username:', username);
     const user = mockUserInfos[username];
 
     if (user) {
