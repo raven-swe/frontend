@@ -142,7 +142,9 @@
     "PASSWORD_REQUIRED": "Please enter your password",
     "GENERIC_ERROR": "Something went wrong. Please try again.",
     "EMPTY_NAME": "Name can't be blank",
-    "RECAPTCHA_REQUIRED": "Please complete the reCAPTCHA challenge"
+    "RECAPTCHA_REQUIRED": "Please complete the reCAPTCHA challenge",
+    "ACCOUNT_NOT_FOUND": "This account doesn't \nexist",
+    "TRY_SEARCHING": "Try searching for another one"
   },
   "register": {
     "register-info": {

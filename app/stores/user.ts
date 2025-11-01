@@ -26,7 +26,6 @@ export const useUserStore = defineStore('user', {
     } as User,
     loading: false,
     error: null as string | null,
-    // profileViewedUsername: null as string | null,
   }),
 
   getters: {

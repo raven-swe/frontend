@@ -125,7 +125,9 @@
     "USER_NOT_FOUND": "لم يتم العثور على المستخدم",
     "IDENTIFIER_REQUIRED": "يرجى إدخال بريدك الإلكتروني أو اسم المستخدم",
     "PASSWORD_REQUIRED": "يرجى إدخال كلمة المرور الخاصة بك",
-    "GENERIC_ERROR": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+    "GENERIC_ERROR": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+    "ACCOUNT_NOT_FOUND": "هذا الحساب غير موجود",
+    "TRY_SEARCHING": "حاول البحث عن حساب آخر"
   },
   "register": {
     "register-info": {
