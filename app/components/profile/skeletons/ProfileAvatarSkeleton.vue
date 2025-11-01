@@ -9,6 +9,6 @@ const { isCurrentUser } = useIsCurrentUser();
         class="border-background bg-muted-foreground/50 -mt-16 size-34 animate-pulse rounded-full border-4"
       />
     </div>
-    <div v-if="isCurrentUser" class="bg-foreground/50 h-9 w-28 animate-pulse rounded-md" />
+    <div v-if="isCurrentUser" class="bg-muted-foreground/50 h-9 w-28 animate-pulse rounded-md" />
   </div>
 </template>
