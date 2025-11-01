@@ -166,4 +166,36 @@ export const handlers = [
       { status: 200 },
     );
   }),
+
+  // GET /timeline/following
+  http.get(`${API_URL}/timeline/following`, ({ request }) => {
+    const url = new URL(request.url);
+    const cursor = url.searchParams.get('cursor') || null;
+    const limit = Number(url.searchParams.get('limit') || '20');
+
+    const allTweets = Array.from(tweets.values());
+    const startIndex = cursor ? Math.max(0, Number(cursor)) : 0;
+    const paginatedTweets = allTweets.slice(startIndex, startIndex + limit);
+    const nextIndex = startIndex + paginatedTweets.length;
+    const nextCursor = nextIndex < allTweets.length ? String(nextIndex) : null;
+
+    return HttpResponse.json(
+      {
+        success: true,
+        message: 'Timeline fetched successfully.',
+        data: {
+          data: paginatedTweets,
+          pagination: {
+            cursor: String(startIndex),
+            nextCursor,
+            hasNextPage: !!nextCursor,
+          },
+        },
+      } as ApiSuccessResponse<{
+        data: Tweet[];
+        pagination: { cursor: string; nextCursor: string | null; hasNextPage: boolean };
+      }>,
+      { status: 200 },
+    );
+  }),
 ];
