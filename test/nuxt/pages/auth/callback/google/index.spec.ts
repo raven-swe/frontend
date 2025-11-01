@@ -52,7 +52,7 @@ describe('Google Callback Page', () => {
       '/api/oauth/google/callback',
       expect.objectContaining({
         method: 'POST',
-        body: { code: 'test-google-code' },
+        body: { providerToken: 'test-google-code' },
       }),
     );
     expect(pushMock).not.toHaveBeenCalled();
