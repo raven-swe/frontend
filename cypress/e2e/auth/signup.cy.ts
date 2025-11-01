@@ -2,14 +2,13 @@
 
 import type { ExtendedAUTWindow } from '../../types/ExtendedAUTWindow';
 
-// TODO: remove all intercepts and use real backend once available
 // TODO: test resend OTP functionality
-// TODO: test CAPTCHA integration once available
-// TODO: test internal server errors and network failures handling
 
 describe('Signup Flow', () => {
   beforeEach(() => {
     cy.visit('/');
+    cy.mockRecaptcha(); // Mock reCAPTCHA before tests
+    // cy.window().its('grecaptcha', { timeout: 10000 }).should('have.property', 'render');
     cy.window().should((win: ExtendedAUTWindow) =>
       expect(win.useNuxtApp().isHydrating).to.eq(false),
     ); // Wait for hydration
@@ -84,21 +83,10 @@ describe('Signup Flow', () => {
 
   describe('Email Availability', () => {
     it('should show error when email already exists', () => {
-      cy.intercept('GET', '/api/auth/check-email*', {
-        statusCode: 200,
-        body: {
-          success: true,
-          data: {
-            exists: true,
-          },
-        },
-      }).as('checkEmailRequest');
-
-      cy.fixture('signup/existingUser.json').then((user) => {
+      cy.fixture('auth/existingUser.json').then((user) => {
         cy.get('input[data-cy="signup-name"]').type(user.name);
         cy.get('input[data-cy="signup-email"]').type(user.email);
       });
-      cy.wait('@checkEmailRequest');
 
       // Should show email exists error
       cy.get('input[data-cy="signup-email"]').should('have.attr', 'aria-invalid', 'true');
@@ -106,213 +94,114 @@ describe('Signup Flow', () => {
     });
 
     it('should allow signup with new email', () => {
-      cy.intercept('GET', '/api/auth/check-email*', {
-        statusCode: 200,
-        body: {
-          success: true,
-          data: {
-            exists: false,
-          },
-        },
-      }).as('checkEmailRequest');
+      const user = {
+        name: 'New User',
+        email: 'newuser' + Date.now() + '@example.com',
+        dob: { day: '15', month: '6', year: '1995' },
+      };
 
-      cy.fixture('signup/newUser.json').then((user) => {
-        cy.get('input[data-cy="signup-name"]').type(user.name);
-        cy.get('input[data-cy="signup-email"]').type(user.email);
+      cy.get('input[data-cy="signup-name"]').type(user.name);
+      cy.get('input[data-cy="signup-email"]').type(user.email);
 
-        cy.wait('@checkEmailRequest').then((interception) => {
-          expect(interception.response.statusCode).to.eq(200);
-          expect(interception.response.body.data.exists).to.equal(false);
-        });
+      cy.get('select[data-cy="signup-dob-month"]').select(user.dob.month);
+      cy.get('select[data-cy="signup-dob-day"]').select(user.dob.day);
+      cy.get('select[data-cy="signup-dob-year"]').select(user.dob.year);
 
-        cy.get('select[data-cy="signup-dob-month"]').select(user.dob.month);
-        cy.get('select[data-cy="signup-dob-day"]').select(user.dob.day);
-        cy.get('select[data-cy="signup-dob-year"]').select(user.dob.year);
-
-        cy.get('button[data-cy="signup-next-button"]').should('not.be.disabled');
-      });
+      cy.get('button[data-cy="signup-next-button"]').should('not.be.disabled');
     });
   });
 
   describe('Complete Signup Flow', () => {
-    it('should successfully complete signup with valid data', () => {
-      cy.intercept('GET', '/api/auth/check-email*', {
-        statusCode: 200,
-        body: {
-          success: true,
-          data: {
-            exists: false,
-          },
-        },
-      }).as('checkEmailRequest');
+    it('should complete signup successfully', () => {
+      const user = {
+        name: 'Amr Samy',
+        email: 'amrsamy' + Date.now() + '@example.com',
+        dob: { day: '10', month: '5', year: '1998' },
+        password: 'TestPass123!',
+      };
 
-      cy.intercept('POST', '/api/auth/register/start', {
-        statusCode: 200,
-        body: {
-          success: true,
-          data: {
-            creationToken: 'test-token-123',
-          },
-        },
-      }).as('startRegistration');
+      // Step 1: Fill registration info
+      cy.get('input[data-cy="signup-name"]').type(user.name);
+      cy.get('input[data-cy="signup-email"]').type(user.email);
 
-      cy.intercept('POST', '/api/auth/register/verify', {
-        statusCode: 200,
-        body: {
-          success: true,
-        },
-      }).as('verifyOtp');
+      cy.get('select[data-cy="signup-dob-month"]').select(user.dob.month);
+      cy.get('select[data-cy="signup-dob-day"]').select(user.dob.day);
+      cy.get('select[data-cy="signup-dob-year"]').select(user.dob.year);
+      cy.get('button[data-cy="signup-next-button"]').click();
 
-      cy.intercept('POST', '/api/auth/register/complete', {
-        statusCode: 200,
-        body: {
-          success: true,
-          data: {
-            accessToken: 'final-access-token-456',
-            refreshToken: 'final-refresh-token-789',
-          },
-        },
-      }).as('completeRegistration');
+      // Step 2: Enter OTP
+      // TODO: Handle OTP retrieval dynamically
+      cy.get('[data-cy="signup-otp-form"]').should('be.visible');
+      cy.get('input[data-cy="signup-otp"]').type('123456');
+      cy.get('button[data-cy="signup-next-button"]').click();
 
-      cy.fixture('signup/newUser.json').then((user) => {
-        // Step 1: Fill registration info
-        cy.get('input[data-cy="signup-name"]').type(user.name);
-        cy.get('input[data-cy="signup-email"]').type(user.email);
-        cy.wait('@checkEmailRequest');
+      // Step 3: Set Password
+      cy.get('[data-cy="signup-password-form"]').should('be.visible');
+      cy.get('input[data-cy="signup-password"]').type(user.password);
+      cy.get('button[data-cy="signup-next-button"]').click();
 
-        cy.get('select[data-cy="signup-dob-month"]').select(user.dob.month);
-        cy.get('select[data-cy="signup-dob-day"]').select(user.dob.day);
-        cy.get('select[data-cy="signup-dob-year"]').select(user.dob.year);
-        cy.get('button[data-cy="signup-next-button"]').click();
-
-        cy.wait('@startRegistration');
-
-        // Step 2: Enter OTP
-        // TODO: Handle OTP retrieval dynamically
-        cy.get('[data-cy="signup-otp-form"]').should('be.visible');
-        cy.get('input[data-cy="signup-otp"]').type('123456');
-        cy.get('button[data-cy="signup-next-button"]').click();
-
-        cy.wait('@verifyOtp');
-
-        // Step 3: Set Password
-        cy.get('[data-cy="signup-password-form"]').should('be.visible');
-        cy.get('input[data-cy="signup-password"]').type(user.password);
-        cy.get('button[data-cy="signup-next-button"]').click();
-
-        cy.wait('@completeRegistration');
-
-        // Verify successful signup
-        cy.url().should('include', '/home');
-      });
+      // Verify successful signup
+      cy.url().should('include', '/home');
     });
 
     it('should handle invalid OTP', () => {
-      cy.intercept('GET', '/api/auth/check-email*', {
-        statusCode: 200,
-        body: {
-          success: true,
-          data: {
-            exists: false,
-          },
-        },
-      }).as('checkEmailRequest');
+      const user = {
+        name: 'Nora Ali',
+        email: 'noraali' + Date.now() + '@example.com',
+        dob: { day: '22', month: '8', year: '1992' },
+      };
+      // Fill registration info
+      cy.get('input[data-cy="signup-name"]').type(user.name);
+      cy.get('input[data-cy="signup-email"]').type(user.email);
 
-      cy.intercept('POST', '/api/auth/register/start', {
-        statusCode: 200,
-        body: {
-          success: true,
-          data: {
-            creationToken: 'test-token-123',
-          },
-        },
-      }).as('startRegistration');
+      cy.get('select[data-cy="signup-dob-month"]').select(user.dob.month);
+      cy.get('select[data-cy="signup-dob-day"]').select(user.dob.day);
+      cy.get('select[data-cy="signup-dob-year"]').select(user.dob.year);
+      cy.get('button[data-cy="signup-next-button"]').click();
 
-      cy.intercept('POST', '/api/auth/register/verify', {
-        statusCode: 400,
-        body: {
-          success: false,
-          error: 'Invalid OTP',
-        },
-      }).as('verifyOtp');
+      // Enter invalid OTP
+      cy.get('[data-cy="signup-otp-form"]').should('be.visible');
+      cy.get('input[data-cy="signup-otp"]').type('000000');
+      cy.get('button[data-cy="signup-next-button"]').click();
 
-      cy.fixture('signup/newUser.json').then((user) => {
-        // Fill registration info
-        cy.get('input[data-cy="signup-name"]').type(user.name);
-        cy.get('input[data-cy="signup-email"]').type(user.email);
-        cy.wait('@checkEmailRequest');
-
-        cy.get('select[data-cy="signup-dob-month"]').select(user.dob.month);
-        cy.get('select[data-cy="signup-dob-day"]').select(user.dob.day);
-        cy.get('select[data-cy="signup-dob-year"]').select(user.dob.year);
-        cy.get('button[data-cy="signup-next-button"]').click();
-
-        cy.wait('@startRegistration');
-
-        // Enter invalid OTP
-        cy.get('[data-cy="signup-otp-form"]').should('be.visible');
-        cy.get('input[data-cy="signup-otp"]').type('000000');
-        cy.get('button[data-cy="signup-next-button"]').click();
-
-        cy.wait('@verifyOtp');
-
-        // Should show error and stay on OTP page
-        cy.get('[data-cy="signup-otp-form"]').should('be.visible');
-        cy.get('[data-test-id="otp-error"]').should('be.visible');
-        cy.get('button[data-cy="signup-next-button"]').should('be.disabled');
-      });
+      // Should show error and stay on OTP page
+      cy.get('[data-cy="signup-otp-form"]').should('be.visible');
+      cy.get('[data-test-id="otp-error"]').should('be.visible');
+      cy.get('button[data-cy="signup-next-button"]').should('be.disabled');
     });
   });
 
   describe('Navigation', () => {
     it('should allow going back from OTP step', () => {
-      cy.intercept('GET', '/api/auth/check-email*', {
-        statusCode: 200,
-        body: {
-          data: {
-            exists: false,
-          },
-        },
-      }).as('checkEmailRequest');
+      const user = {
+        name: 'Youssef Adel',
+        email: 'youssefadel' + Date.now() + '@example.com',
+        dob: { day: '4', month: '12', year: '2000' },
+      };
+      // Fill and submit registration info
+      cy.get('input[data-cy="signup-name"]').type(user.name);
+      cy.get('input[data-cy="signup-email"]').type(user.email);
 
-      cy.intercept('POST', '/api/auth/register/start', {
-        statusCode: 200,
-        body: {
-          data: {
-            creationToken: 'test-token-123',
-          },
-        },
-      }).as('startRegistration');
+      cy.get('select[data-cy="signup-dob-month"]').select(user.dob.month);
+      cy.get('select[data-cy="signup-dob-day"]').select(user.dob.day);
+      cy.get('select[data-cy="signup-dob-year"]').select(user.dob.year);
+      cy.get('button[data-cy="signup-next-button"]').click();
 
-      cy.fixture('signup/newUser.json').then((user) => {
-        // Fill and submit registration info
-        cy.get('input[data-cy="signup-name"]').type(user.name);
-        cy.get('input[data-cy="signup-email"]').type(user.email);
-        cy.wait('@checkEmailRequest');
+      // Should be on OTP step
+      cy.get('[data-cy="signup-otp-form"]').should('be.visible');
 
-        cy.get('select[data-cy="signup-dob-month"]').select(user.dob.month);
-        cy.get('select[data-cy="signup-dob-day"]').select(user.dob.day);
-        cy.get('select[data-cy="signup-dob-year"]').select(user.dob.year);
-        cy.get('button[data-cy="signup-next-button"]').click();
+      // Go back
+      cy.get('[data-test-id="back-button"]').click();
 
-        cy.wait('@startRegistration');
-
-        // Should be on OTP step
-        cy.get('[data-cy="signup-otp-form"]').should('be.visible');
-
-        // Go back
-        cy.get('[data-test-id="back-button"]').click();
-
-        // Should be back on info form
-        cy.get('[data-cy="signup-info-form"]').should('be.visible');
-        // Data should be preserved
-        cy.get('input[data-cy="signup-email"]').should('have.value', user.email);
-        cy.get('input[data-cy="signup-name"]').should('have.value', user.name);
-        // DOB selections should be preserved
-        cy.get('select[data-cy="signup-dob-month"]').should('have.value', user.dob.month);
-        cy.get('select[data-cy="signup-dob-day"]').should('have.value', user.dob.day);
-        cy.get('select[data-cy="signup-dob-year"]').should('have.value', user.dob.year);
-      });
+      // Should be back on info form
+      cy.get('[data-cy="signup-info-form"]').should('be.visible');
+      // Data should be preserved
+      cy.get('input[data-cy="signup-email"]').should('have.value', user.email);
+      cy.get('input[data-cy="signup-name"]').should('have.value', user.name);
+      // DOB selections should be preserved
+      cy.get('select[data-cy="signup-dob-month"]').should('have.value', user.dob.month);
+      cy.get('select[data-cy="signup-dob-day"]').should('have.value', user.dob.day);
+      cy.get('select[data-cy="signup-dob-year"]').should('have.value', user.dob.year);
     });
   });
 });
