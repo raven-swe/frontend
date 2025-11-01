@@ -1,15 +1,14 @@
 <script lang="ts" setup>
-import * as yup from 'yup';
 import { useForm } from 'vee-validate';
 import FieldInput from '~/components/ui/form/FieldInput.vue';
 import Button from '~/components/ui/Button.vue';
+import { createOtpSchema } from '~/schemas/auth';
 
 const registerStore = useRegisterStore();
-const schema = yup.object({
-  otp: yup.string().min(6, $t('errors.OTP_TOO_SHORT')).max(6, $t('errors.OTP_TOO_LONG')),
-});
+const { t } = useI18n();
+
 const { errors, defineField, handleSubmit, isSubmitting, setErrors } = useForm({
-  validationSchema: schema,
+  validationSchema: createOtpSchema(t),
   initialValues: {
     otp: '',
   },
@@ -18,7 +17,7 @@ const { errors, defineField, handleSubmit, isSubmitting, setErrors } = useForm({
 const onSubmit = handleSubmit(async (values) => {
   const success = await registerStore.submitOtp(values.otp);
   if (!success) {
-    setErrors({ otp: $t('errors.INVALID_OTP') });
+    setErrors({ otp: t('errors.INVALID_OTP') });
   } else {
     setErrors({ otp: undefined });
   }

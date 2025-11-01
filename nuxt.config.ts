@@ -4,6 +4,18 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   css: ['@/assets/css/main.css'],
+  runtimeConfig: {
+    public: {
+      googleClientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID || '',
+      backendUrl: process.env.BACKEND_URL || '',
+      githubClientId: process.env.NUXT_PUBLIC_GITHUB_CLIENT_ID || '',
+      githubRedirectUri: process.env.NUXT_PUBLIC_GITHUB_REDIRECT_URI || '',
+      githubScope: process.env.NUXT_PUBLIC_GITHUB_SCOPE || '',
+      googleRedirectUri: process.env.NUXT_PUBLIC_GOOGLE_REDIRECT_URI || '',
+      googleScope: process.env.NUXT_PUBLIC_GOOGLE_SCOPE || '',
+      siteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY || '',
+    },
+  },
   devtools: {
     enabled: true,
     timeline: {
@@ -16,6 +28,14 @@ export default defineNuxtConfig({
       include: ['../shared/types/**/*.ts', '../mocks/**/*.ts', '../test/**/*.ts'],
     },
   },
+  app: {
+    head: {
+      link: [
+        { rel: 'preconnect', href: 'https://www.google.com' },
+        { rel: 'preconnect', href: 'https://www.gstatic.com', crossorigin: '' },
+      ],
+    },
+  },
   modules: [
     '@nuxt/eslint',
     '@nuxt/fonts',
@@ -26,7 +46,7 @@ export default defineNuxtConfig({
     '@nuxt/test-utils/module',
     '@vueuse/nuxt',
     '@pinia/nuxt',
-    '@nuxt/image',
+    '@nuxt/image-edge',
   ],
   vite: {
     plugins: [tailwindcss()],
