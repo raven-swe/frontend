@@ -141,7 +141,7 @@
     "NAME_TOO_LONG": "Name must be at most 50 characters long",
     "AGE_RESTRICTION": "You must be at least 13 years old",
     "PASSWORD_MISMATCH": "Passwords do not match",
-    "PASSWORD_TOO_SHORT": "Password must be at least 8 characters long",
+    "PASSWORD_TOO_SHORT": "Password must be at least 10 characters long",
     "PASSWORD_INVALID": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
     "EMAIL_ALREADY_EXISTS": "An account with this email already exists",
     "OTP_MUST_6": "OTP must be exactly 6 digits",
@@ -185,7 +185,7 @@
     },
     "password": {
       "title": "You'll need a password",
-      "description": "Make sure it's 8 characters or more.",
+      "description": "Make sure it's 10 characters or more.",
       "disclaimer": "By signing up, you agree to the Terms of Service and Privacy Policy, including Cookie Use. Raven may use your contact information, including your email address and phone number for purposes outlined in our Privacy Policy, like keeping your account secure and personalizing our services, including ads. Others will be able to find you by email or phone number, when provided, unless you choose otherwise here.",
       "label": "Password"
     }
