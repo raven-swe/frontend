@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { birthDateFormat } from '#imports';
-import SettingsItem from './settingsItem.vue';
+import SettingsItem from '../settingsItem.vue';
 import { useUserStore } from '~/stores/user';
 
 const userStore = useUserStore();
@@ -14,7 +14,7 @@ const user = computed(() => userStore.user);
       to="/playground/usernameEditor"
     />
     <SettingsItem
-      :title="$t('setting.email')"
+      :title="$t('setting.change-email.label')"
       :subtitle="`${user.email}`"
       to="/playground/settings/email"
     />

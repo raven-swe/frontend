@@ -194,10 +194,8 @@ export const handlers = [
 
   http.put(`${API_URL}/me/password`, async ({ request }) => {
     try {
-      // eslint-disable-next-line no-console
       console.log('Password change request received');
       const body = await request.json();
-      // eslint-disable-next-line no-console
       console.log('Request body:', body);
 
       const { currentPassword, newPassword } = body as ChangePasswordRequest;
@@ -249,6 +247,124 @@ export const handlers = [
           error: {
             code: 'INTERNAL_ERROR',
             message: 'Failed to change password',
+          },
+        },
+        { status: 500 },
+      );
+    }
+  }),
+
+  http.put(`${API_URL}/me/email`, async ({ request }) => {
+    try {
+      const body = (await request.json()) as { newEmail: string };
+      if (!body.newEmail || !body.newEmail.includes('@')) {
+        return HttpResponse.json(
+          {
+            success: false,
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: 'A valid new email is required',
+            },
+          },
+          { status: 400 },
+        );
+      }
+      return HttpResponse.json(
+        {
+          success: true,
+          message: 'Email updated successfully',
+          data: {
+            confirmationToken: 'mock-confirmation-token-12345',
+          },
+        },
+        { status: 200 },
+      );
+    } catch (error) {
+      console.error('Error in email update handler:', error);
+      return HttpResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'INTERNAL_ERROR',
+            message: 'Failed to update email',
+          },
+        },
+        { status: 500 },
+      );
+    }
+  }),
+
+  http.post(`${API_URL}/me/email/verify`, async ({ request }) => {
+    try {
+      const body = (await request.json()) as { otp: string; confirmationToken: string };
+      if (body.otp === '123456' && body.confirmationToken === 'mock-confirmation-token-12345') {
+        mockUserData.email = 'new-email@example.com';
+        return HttpResponse.json(
+          {
+            success: true,
+            message: 'Email verified and updated successfully',
+          },
+          { status: 200 },
+        );
+      } else {
+        return HttpResponse.json(
+          {
+            success: false,
+            error: {
+              code: 'INVALID_OTP',
+              message: 'The provided OTP is incorrect',
+            },
+          },
+          { status: 422 },
+        );
+      }
+    } catch (error) {
+      console.error('Error in email verification handler:', error);
+      return HttpResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'INTERNAL_ERROR',
+            message: 'Failed to verify email',
+          },
+        },
+        { status: 500 },
+      );
+    }
+  }),
+
+  http.post(`${API_URL}/me/email/resend-otp`, async ({ request }) => {
+    console.log('Resend OTP request received');
+    try {
+      const body = (await request.json()) as { confirmationToken: string };
+      if (body.confirmationToken === 'mock-confirmation-token-12345') {
+        return HttpResponse.json(
+          {
+            success: true,
+            message: 'OTP resent successfully',
+          },
+          { status: 200 },
+        );
+      } else {
+        return HttpResponse.json(
+          {
+            success: false,
+            error: {
+              code: 'INVALID_TOKEN',
+              message: 'The provided confirmation token is invalid',
+            },
+          },
+          { status: 422 },
+        );
+      }
+    } catch (error) {
+      console.error('Error in resend OTP handler:', error);
+      return HttpResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'INTERNAL_ERROR',
+            message: 'Failed to resend OTP',
           },
         },
         { status: 500 },
