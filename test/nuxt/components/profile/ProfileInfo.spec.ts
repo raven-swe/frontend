@@ -143,8 +143,8 @@ describe('ProfileInfo', () => {
 
     const strongTags = wrapper.findAll('strong');
     expect(strongTags.length).toBe(2);
-    expect(strongTags[0].text()).toBe('150');
-    expect(strongTags[1].text()).toBe('50');
+    expect(strongTags[0]?.text()).toBe('150');
+    expect(strongTags[1]?.text()).toBe('50');
   });
 
   it('renders statistics with proper labels', async () => {
