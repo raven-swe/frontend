@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { meService } from '~/services/me/meService';
 
-const { data, error } = await useAsyncData('layout-data', () => meService.fetchProfile(), {
+const { data, error } = useAsyncData('layout-data', () => meService.fetchProfile(), {
   lazy: true,
 });
 const userStore = useUserStore();

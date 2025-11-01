@@ -8,10 +8,8 @@ import { apiFetch } from '~/api';
 const route = useRoute();
 const username = computed(() => route.params.username as string);
 const profilePath = computed(() => `/profile/${username.value}`);
-const userStore = useUserStore();
-const isCurrentUser = computed(() => userStore.isCurrentUser(username.value));
 
-const { data } = await useAsyncData(
+const { data } = useAsyncData(
   'profile-layout-data',
   async () => await apiFetch<ApiSuccessResponse<User>>(`/api/users/${username.value}/profile`),
   {
@@ -19,7 +17,7 @@ const { data } = await useAsyncData(
   },
 );
 
-const user = computed(() => (isCurrentUser.value ? userStore.user : data.value?.data));
+const user = data.value?.data || null;
 </script>
 
 <template>
