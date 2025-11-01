@@ -94,7 +94,7 @@ const onSubmit = handleSubmit(async (values) => {
   if (usernameExists.value) return;
   try {
     await apiFetch('/api/settings/username/update', {
-      method: 'PATCH',
+      method: 'POST',
       query: {
         newUsername: values.username,
       },

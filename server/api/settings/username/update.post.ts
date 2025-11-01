@@ -5,7 +5,7 @@ export default defineWrappedResponseHandler(async (event) => {
   const response = await serverApiFetch<ApiSuccessResponse<{ exists: boolean; type: string }>>(
     '/me/username',
     {
-      method: 'PATCH',
+      method: 'POST',
       query: {
         newUsername: query.newUsername,
       },
