@@ -6,10 +6,10 @@ definePageMeta({
 
 const tweets = ref<Tweet[]>([]);
 
-const { data: tweetsData, error } = await useFetch<{ data: Tweet[] }>('/api/tweets');
-tweets.value = tweetsData.value?.data || [];
+// const { data: tweetsData, error } = await useFetch<{ data: Tweet[] }>('/api/tweets');
+// tweets.value = tweetsData.value?.data || [];
 
-if (error.value) console.error(error.value);
+// if (error.value) console.error(error.value);
 </script>
 
 <template>

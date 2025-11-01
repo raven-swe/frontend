@@ -26,11 +26,17 @@ export const useUserStore = defineStore('user', {
     } as User,
     loading: false,
     error: null as string | null,
+    // profileViewedUsername: null as string | null,
   }),
 
   getters: {
     memberSince: (state) => (state.user ? new Date(state.user.joinedAt).getFullYear() : null),
     isProfileSetup: (state) => !!(state.user && state.user.avatarUrl),
+    isCurrentUser: (state) => {
+      return (username: string): boolean => {
+        return state.user?.username === username;
+      };
+    },
   },
 
   actions: {
@@ -40,10 +46,6 @@ export const useUserStore = defineStore('user', {
 
     setUser(userData: User) {
       this.user = userData;
-    },
-
-    isCurrentUser(username: string): boolean {
-      return this.user?.username === username;
     },
 
     logout() {

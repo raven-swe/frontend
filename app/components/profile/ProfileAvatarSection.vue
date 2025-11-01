@@ -1,8 +1,12 @@
 <script lang="ts" setup>
+import { useIsCurrentUser } from '@/composables/useIsCurrentUser';
+
 defineProps<{
   profileImg: string;
 }>();
 const userStore = useUserStore();
+
+const { isCurrentUser } = useIsCurrentUser();
 </script>
 <template>
   <div class="mx-4 flex flex-wrap items-center justify-between gap-4">
@@ -14,12 +18,12 @@ const userStore = useUserStore();
         loading="eager"
       />
     </div>
-    <UiButton v-if="!userStore.isProfileSetup" variant="outline">
+    <UiButton v-if="!userStore.isProfileSetup && isCurrentUser" variant="outline">
       <NuxtLink to="/profile/setup">
         {{ $t('profile.setup.setup-profile') }}
       </NuxtLink>
     </UiButton>
-    <UiButton v-else variant="outline">
+    <UiButton v-else-if="isCurrentUser" variant="outline">
       <NuxtLink to="/settings/profile">
         {{ $t('profile-info.edit-profile') }}
       </NuxtLink>

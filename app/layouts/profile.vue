@@ -20,6 +20,7 @@ const { data, isLoading } = useQuery<ApiSuccessResponse<User>>({
   staleTime: 1000 * 60 * 5, // optional: 5min cache
 });
 const user = computed(() => (data.value && data.value.success ? data.value.data : null));
+const { isCurrentUser } = useIsCurrentUser();
 </script>
 
 <template>
@@ -48,6 +49,7 @@ const user = computed(() => (data.value && data.value.success ? data.value.data 
         :is-active="$route.path === `${profilePath}/media`"
       />
       <Tab
+        v-if="isCurrentUser"
         :label="$t('profile.tabs.likes')"
         :route="`${profilePath}/likes`"
         :is-active="$route.path === `${profilePath}/likes`"
