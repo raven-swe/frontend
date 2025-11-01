@@ -14,7 +14,7 @@ const { isCurrentUser } = useIsCurrentUser();
       <NuxtImg
         :src="profileImg"
         alt="Profile picture"
-        class="-mt-16 size-34 rounded-full border-4 object-cover"
+        class="z-20 -mt-16 size-34 rounded-full border-4 object-cover"
         loading="eager"
       />
     </div>

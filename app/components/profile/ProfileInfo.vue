@@ -10,6 +10,8 @@ const displayUrl = computed(() => {
     return cleanedUrl.length > 30 ? cleanedUrl.slice(0, 29) + '...' : cleanedUrl;
   }
   return '';
+
+  console.log(props.userProfile.bio);
 });
 </script>
 <template>
@@ -17,7 +19,7 @@ const displayUrl = computed(() => {
     <div class="px-4">
       <h2 class="text-foreground text-2xl font-bold">{{ userProfile.displayName }}</h2>
       <p class="text-muted-foreground">{{ userProfile.username }}</p>
-      <p class="text-muted-foreground mt-2">{{ userProfile.bio }}</p>
+      <p class="text-muted-foreground mt-2 whitespace-pre-line">{{ userProfile.bio }}</p>
       <div class="mt-2 flex flex-wrap">
         <a
           :href="userProfile.websiteUrl"
