@@ -44,7 +44,6 @@ function handleGoogleSignIn() {
     `width=500,height=600,top=${(screen.height - 600) / 2},left=${(screen.width - 500) / 2}`,
   );
 }
-//  &response_type=code&scope=openid%20email%20profile
 
 onMounted(() => {
   // Listen for GitHub auth messages from popup
