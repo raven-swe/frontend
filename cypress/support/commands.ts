@@ -1,4 +1,7 @@
 /// <reference types="cypress" />
+
+import type { CaptchaParams, ExtendedAUTWindow } from '../types/ExtendedAUTWindow';
+
 // ***********************************************
 // This example commands.ts shows you how to
 // create various custom commands and overwrite
@@ -8,7 +11,28 @@
 // commands please read more here:
 // https://on.cypress.io/custom-commands
 // ***********************************************
-//
+
+// Mock reCAPTCHA for testing
+Cypress.Commands.add('mockRecaptcha', () => {
+  cy.window().then((win: ExtendedAUTWindow) => {
+    win.grecaptcha = {
+      render: (container: string | HTMLElement, params: CaptchaParams) => {
+        // Simulate successful reCAPTCHA validation
+        if (params.callback) {
+          // Call the callback immediately with a mock token
+          setTimeout(() => params.callback('mock-recaptcha-token'), 100);
+        }
+        return 'mock-widget-id';
+      },
+      reset: () => {},
+      getResponse: () => 'mock-recaptcha-token',
+    };
+
+    // Dispatch the event that the reCAPTCHA script has loaded
+    win.dispatchEvent(new Event('recaptcha-script-loaded'));
+  });
+});
+
 //
 // -- This is a parent command --
 // Cypress.Commands.add('login', (email, password) => { ... })
@@ -24,14 +48,5 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
-//
-// declare global {
-//   namespace Cypress {
-//     interface Chainable {
-//       login(email: string, password: string): Chainable<void>
-//       drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>
-//     }
-//   }
-// }
+
+export {};
