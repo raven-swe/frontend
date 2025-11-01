@@ -6,7 +6,7 @@ import { handlers as passwordHandlers } from './handlers/password';
 import { handlers as profileHandlers } from './handlers/update-profile';
 import { handlers as authHandlers } from './handlers/auth';
 import { handlers as otherUserHandlers } from './handlers/other-user';
-// Import more handlers as needed
+// // Import more handlers as needed
 
 export const handlers = [
   ...registerHandlers,
