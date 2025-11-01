@@ -188,6 +188,7 @@
       "confirm-password": "تأكيد كلمة المرور",
       "forgot-password": "هل نسيت كلمة المرور؟",
       "save": "حفظ",
+      "password-invalid-length": "يجب أن تتكون كلمة المرور من 10 أحرف على الأقل",
       "errors": {
         "current-password-required": "كلمة المرور الحالية مطلوبة",
         "new-password-required": "كلمة المرور الجديدة مطلوبة",

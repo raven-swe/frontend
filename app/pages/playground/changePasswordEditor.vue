@@ -16,6 +16,7 @@ const schema = yup.object({
   newPassword: yup
     .string()
     .required($t('setting.password.errors.new-password-required'))
+    .min(10, $t('setting.password.errors.password-invalid-length'))
     .matches(
       /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).*$/,
       $t('setting.password.errors.password-invalid'),

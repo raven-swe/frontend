@@ -205,6 +205,7 @@
       "confirm-password": "Confirm password",
       "forgot-password": "Forgot password?",
       "save": "Save",
+      "password-invalid-length": "Password must be at least 10 characters long",
       "errors": {
         "current-password-required": "Current password is required",
         "new-password-required": "New password is required",
