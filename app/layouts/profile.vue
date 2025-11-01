@@ -14,6 +14,9 @@ const isCurrentUser = computed(() => userStore.isCurrentUser(username.value));
 const { data } = await useAsyncData(
   'profile-layout-data',
   async () => await apiFetch<ApiSuccessResponse<User>>(`/api/users/${username.value}/profile`),
+  {
+    lazy: true,
+  },
 );
 
 const user = computed(() => (isCurrentUser.value ? userStore.user : data.value?.data));

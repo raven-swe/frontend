@@ -5,9 +5,9 @@ import DiscardChangesDialog from '~/components/profile/edit/DiscardChangesDialog
 import useDateSelect from '@/composables/useDateSelect';
 import { VisuallyHidden } from 'reka-ui';
 
-definePageMeta({
-  layout: 'profile',
-});
+// definePageMeta({
+//   layout: 'profile',
+// });
 const route = useRoute();
 const router = useRouter();
 

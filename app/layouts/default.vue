@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import { meService } from '~/services/me/meService';
 
-const { data, error } = await useAsyncData('layout-data', () => meService.fetchProfile());
+const { data, error } = await useAsyncData('layout-data', () => meService.fetchProfile(), {
+  lazy: true,
+});
 const userStore = useUserStore();
 if (error.value) {
   userStore.error = error.value.message;
