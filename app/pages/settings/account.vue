@@ -4,9 +4,7 @@ definePageMeta({
 });
 </script>
 <template>
-  <div class="border-brand-blue">
-    <h2 class="text-xl font-bold">
-      {{ $t('testing.settings.account') }}
-    </h2>
+  <div class="p-4 text-2xl font-bold">
+    {{ $t('testing.settings.account') }}
   </div>
 </template>
