@@ -200,7 +200,6 @@ export const handlers = [
       const decoded = jwt.verify(accessToken, 'refresh_secret') as { username: string };
       // search for user by username in mockUsers
       const user = mockUserInfos[decoded.username];
-      console.log('\n\nFetched user for /me:', decoded.username);
       if (!user) throw new Error('User not found');
 
       const response: ApiSuccessResponse<User> = {
