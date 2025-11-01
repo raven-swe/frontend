@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import OAuthCompleteForm from '~/components/ui/OAuthCompleteForm.vue';
 definePageMeta({
   layout: false, // Disable layout for this page
@@ -9,26 +9,37 @@ const code = route.query.code as string;
 const creationToken = ref<string | null>(null);
 const showForm = ref(false);
 
-if (code) {
-  try {
-    const result = await $fetch<ApiSuccessResponse<OAuthCallbackResponse>>(
-      '/api/oauth/google/callback',
-      {
-        method: 'POST',
-        body: { code },
-      },
-    );
-    if (result.success && 'creationToken' in result.data) {
-      creationToken.value = result.data.creationToken;
-      showForm.value = true;
+onMounted(async () => {
+  if (code) {
+    if (window.opener) {
+      // Post code to parent window and close popup
+      window.opener.postMessage({ type: 'google-auth', code }, window.location.origin);
+      window.close();
     } else {
-      // Handle accessToken/refreshToken as usual
-      await router.push('/home');
+      try {
+        const result = await $fetch<ApiSuccessResponse<OAuthCallbackResponse>>(
+          '/api/oauth/google/callback',
+          {
+            method: 'POST',
+            body: { code },
+            headers: {
+              'X-Client-Type': 'web',
+            },
+          },
+        );
+        if (result.success && 'creationToken' in result.data) {
+          creationToken.value = result.data.creationToken;
+          showForm.value = true;
+        } else {
+          // Handle accessToken/refreshToken as usual
+          await router.push('/home');
+        }
+      } catch (error) {
+        console.error('Google authentication failed:', error);
+      }
     }
-  } catch (error) {
-    console.error('Google authentication failed:', error);
   }
-}
+});
 </script>
 
 <template>
