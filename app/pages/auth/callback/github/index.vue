@@ -24,6 +24,9 @@ onMounted(async () => {
           {
             method: 'POST',
             body: { code },
+            headers: {
+              'X-Client-Type': 'web',
+            },
           },
         );
 
