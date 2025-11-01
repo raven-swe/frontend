@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 export const useUserStore = defineStore('user', {
   state: () => ({
     user: {
-      username: 'Jackeline.Bailey',
+      username: '',
       displayName: '',
       bio: ``,
       bioEntities: {
@@ -14,15 +14,15 @@ export const useUserStore = defineStore('user', {
       bannerUrl: '',
       location: '',
       websiteUrl: '',
-      birthDate: '2004-05-07',
-      joinedAt: '2020-03-15T10:30:00Z',
-      email: 'https://github.com/',
-      phone: '+1234567890',
+      birthDate: '',
+      joinedAt: '',
+      email: '',
+      phone: '',
       followingCount: 0,
       followersCount: 0,
       mutualsCount: 0,
       mutualNames: [],
-      languageCode: 'en',
+      languageCode: '',
     } as User,
     loading: false,
     error: null as string | null,
