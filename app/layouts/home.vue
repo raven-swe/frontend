@@ -15,11 +15,6 @@ import Tab from '@/components/ui/Tab.vue';
     </Tabs>
     <TweetComposer />
 
-    <!-- <div class="h-12">
-      <p class="text-center">{{ $t('show 70 more') }}</p>
-    </div> -->
-
-    <!-- Dynamic content from child tab pages -->
     <slot />
   </NuxtLayout>
 </template>
