@@ -73,11 +73,19 @@ describe('PasswordForm.vue', () => {
       },
     );
     const passwordField = wrapper.find('input[name="password"]');
-    // First: invalid
+    // First: invalid length
     await passwordField.setValue('');
     await passwordField.trigger('blur');
     await flushPromises();
     let errorMessage = wrapper.find('[data-test-id="password-error"]');
+    expect(errorMessage.exists()).toBe(true);
+    expect(errorMessage.text()).toBe(i18n.global.t('errors.PASSWORD_TOO_SHORT'));
+
+    // Invalid: does not meet complexity
+    await passwordField.setValue('1234567890');
+    await passwordField.trigger('blur');
+    await flushPromises();
+    errorMessage = wrapper.find('[data-test-id="password-error"]');
     expect(errorMessage.exists()).toBe(true);
     expect(errorMessage.text()).toBe(i18n.global.t('errors.PASSWORD_INVALID'));
 
