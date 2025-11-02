@@ -62,6 +62,9 @@ export const useProfileSetupFlow = () => {
   const closeFlow = () => {
     isFlowActive.value = false;
     currentStep.value = 'picture';
+    // nav to profile page
+    const userStore = useUserStore();
+    navigateTo(`/profile/${userStore.user.username}`);
   };
 
   const resetFlow = () => {

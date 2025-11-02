@@ -1,8 +1,11 @@
 import { mount } from '@vue/test-utils';
+import { ref } from 'vue';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
+import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query';
 import ProfileLayout from '@/layouts/profile.vue';
-import { useUserStore } from '@/stores/user';
+import type { ApiSuccessResponse } from '~~/shared/types/api';
+import type { User } from '~~/shared/types/user';
 
 // Create a shared mock route object
 const mockRoute = {
@@ -14,6 +17,32 @@ const mockRoute = {
 vi.mock('#app', () => ({
   useRoute: () => mockRoute,
   useFetch: vi.fn(),
+}));
+
+// Mock Vue Query composables
+const mockQueryData = {
+  data: ref<ApiSuccessResponse<User> | null>(null),
+  isLoading: ref(false),
+  isError: ref(false),
+  error: ref<{ data?: { code?: string }; statusCode?: number } | null>(null),
+};
+
+vi.mock('@tanstack/vue-query', async () => {
+  const actual = await vi.importActual('@tanstack/vue-query');
+  return {
+    ...actual,
+    useQuery: vi.fn(() => mockQueryData),
+  };
+});
+
+// Mock API function
+vi.mock('~/api', () => ({
+  apiFetch: vi.fn(),
+}));
+
+// Mock composables
+vi.mock('~/composables/useIsCurrentUser', () => ({
+  useIsCurrentUser: () => ({ isCurrentUser: ref(false) }),
 }));
 
 // Mock Nuxt components
@@ -29,6 +58,13 @@ vi.mock('~/components/profile/ProfileDetails.vue', () => ({
   },
 }));
 
+vi.mock('~/components/profile/skeletons/ProfileDetailsSkeleton.vue', () => ({
+  default: {
+    name: 'ProfileDetailsSkeleton',
+    template: '<div>Loading skeleton...</div>',
+  },
+}));
+
 vi.mock('~/components/ui/Tabs.vue', () => ({
   default: { name: 'Tabs', template: '<div><slot /></div>' },
 }));
@@ -41,17 +77,29 @@ vi.mock('~/components/ui/Tab.vue', () => ({
   },
 }));
 
-vi.mock('~/components/ui/Spinner.vue', () => ({
-  default: { name: 'Spinner', template: '<div>Loading...</div>' },
-}));
-
 describe('ProfileLayout.vue', () => {
+  let queryClient: QueryClient;
+
   beforeEach(() => {
     setActivePinia(createPinia());
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    });
     vi.clearAllMocks();
+
     // Reset mock route to default
     mockRoute.path = '/profile/hussein';
     mockRoute.params = { username: 'hussein' };
+
+    // Reset mock query data
+    mockQueryData.data.value = null;
+    mockQueryData.isLoading.value = false;
+    mockQueryData.isError.value = false;
+    mockQueryData.error.value = null;
   });
 
   const createWrapper = (username = 'hussein', routePath = '/profile/hussein') => {
@@ -61,9 +109,9 @@ describe('ProfileLayout.vue', () => {
 
     return mount(ProfileLayout, {
       global: {
+        plugins: [[VueQueryPlugin, { queryClient }]],
         mocks: {
           $t: (msg: string) => msg,
-
           $route: mockRoute,
         },
         stubs: {
@@ -78,47 +126,38 @@ describe('ProfileLayout.vue', () => {
     expect(wrapper.exists()).toBe(true);
   });
 
-  it('shows spinner when loading', async () => {
+  it('shows skeleton when loading', async () => {
+    mockQueryData.isLoading.value = true;
+
     const wrapper = createWrapper();
-    const userStore = useUserStore();
-
-    // Set loading state
-    userStore.loading = true;
-    userStore.user = null;
-    userStore.error = null;
-
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.find('.flex.justify-center.p-4').exists()).toBe(true);
-    expect(wrapper.text()).toContain('Loading...');
+    expect(wrapper.findComponent({ name: 'ProfileDetailsSkeleton' }).exists()).toBe(true);
   });
 
-  it('shows error message when there is an error', async () => {
+  it('shows error message when user not found', async () => {
+    mockQueryData.isError.value = true;
+
+    mockQueryData.error.value = {
+      data: { code: 'USER_NOT_FOUND' },
+      statusCode: 404,
+    };
+
     const wrapper = createWrapper();
-    const userStore = useUserStore();
-
-    // Set error state
-    userStore.loading = false;
-    userStore.error = 'User not found';
-    userStore.user = null;
-
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.find('.text-destructive.p-4').exists()).toBe(true);
-    expect(wrapper.text()).toContain('User not found');
+    expect(wrapper.text()).toContain('errors.ACCOUNT_NOT_FOUND');
+    expect(wrapper.text()).toContain('errors.TRY_SEARCHING');
   });
 
   it('shows profile details and tabs when user data is loaded', async () => {
-    const wrapper = createWrapper();
-    const userStore = useUserStore();
-
-    // Set success state with user data
-    userStore.loading = false;
-    userStore.error = null;
-    userStore.user = {
+    const mockUser: User = {
       username: 'hussein',
       displayName: 'Hussein Mohamed',
       bio: 'football lover',
+      email: '',
+      phone: '',
+      languageCode: 'en',
       bioEntities: { mentions: [], hashtags: [] },
       avatarUrl: 'https://example.com/avatar.jpg',
       bannerUrl: 'https://example.com/banner.jpg',
@@ -129,25 +168,25 @@ describe('ProfileLayout.vue', () => {
       followingCount: 150,
       followersCount: 200,
       mutualsCount: 5,
-      mutualNames: [],
     };
 
+    mockQueryData.data.value = { success: true, data: mockUser };
+
+    const wrapper = createWrapper();
     await wrapper.vm.$nextTick();
 
     expect(wrapper.findComponent({ name: 'ProfileDetails' }).exists()).toBe(true);
     expect(wrapper.findComponent({ name: 'Tabs' }).exists()).toBe(true);
   });
 
-  it('renders all tab labels correctly', async () => {
-    const wrapper = createWrapper();
-    const userStore = useUserStore();
-
-    // Set user data
-    userStore.loading = false;
-    userStore.user = {
+  it('renders correct number of tabs for non-current user', async () => {
+    const mockUser: User = {
       username: 'hussein',
       displayName: 'Hussein Mohamed',
       bio: 'test',
+      email: '',
+      phone: '',
+      languageCode: 'en',
       bioEntities: { mentions: [], hashtags: [] },
       avatarUrl: '',
       bannerUrl: '',
@@ -158,65 +197,18 @@ describe('ProfileLayout.vue', () => {
       followingCount: 0,
       followersCount: 0,
       mutualsCount: 0,
-      mutualNames: [],
     };
 
+    mockQueryData.data.value = { success: true, data: mockUser };
+
+    const wrapper = createWrapper();
     await wrapper.vm.$nextTick();
 
     const tabs = wrapper.findAllComponents({ name: 'Tab' });
-    expect(tabs).toHaveLength(4);
-    expect(tabs[0]).toBeDefined();
-    expect(tabs[1]).toBeDefined();
-    expect(tabs[2]).toBeDefined();
-    expect(tabs[3]).toBeDefined();
+    // Should have 3 tabs for non-current user (posts, replies, media)
+    expect(tabs).toHaveLength(3);
     expect(tabs[0]?.props('label')).toBe('profile.tabs.posts');
     expect(tabs[1]?.props('label')).toBe('profile.tabs.replies');
     expect(tabs[2]?.props('label')).toBe('profile.tabs.media');
-    expect(tabs[3]?.props('label')).toBe('profile.tabs.likes');
-  });
-
-  it('computes correct profile path', async () => {
-    // Update mock route BEFORE mounting
-    mockRoute.path = '/profile/testuser';
-    mockRoute.params = { username: 'testuser' };
-
-    const wrapper = mount(ProfileLayout, {
-      global: {
-        mocks: {
-          $t: (msg: string) => msg,
-          $route: mockRoute,
-        },
-        stubs: {
-          NuxtLayout: { template: '<div><slot /></div>' },
-        },
-      },
-    });
-
-    await wrapper.vm.$nextTick();
-
-    // Access the computed property through the component instance
-    expect((wrapper.vm as unknown as { profilePath: string }).profilePath).toBe('/profile/hussein');
-  });
-
-  it('uses default username when route param is missing', async () => {
-    // Update mock route to have no username
-    mockRoute.path = '/profile';
-    mockRoute.params = { username: '' };
-
-    const wrapper = mount(ProfileLayout, {
-      global: {
-        mocks: {
-          $t: (msg: string) => msg,
-          $route: mockRoute,
-        },
-        stubs: {
-          NuxtLayout: { template: '<div><slot /></div>' },
-        },
-      },
-    });
-
-    await wrapper.vm.$nextTick();
-
-    expect((wrapper.vm as unknown as { username: string }).username).toBe('hussein');
   });
 });

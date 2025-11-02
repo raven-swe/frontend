@@ -16,7 +16,7 @@ export const defineWrappedResponseHandler = <T extends EventHandlerRequest, D>(
       throw createError({
         statusCode: 500,
         statusMessage: 'Internal Server Error',
-        data: (err as Error)?.message || { message: 'An unexpected error occurred' },
+        data: { message: (err as Error)?.message ?? 'An unexpected error occurred' },
       });
     }
   });

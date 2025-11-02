@@ -25,6 +25,12 @@ export function useH3TestUtils() {
       const cookieString = `${name}=; Path=${options?.path || '/'}; Expires=Thu, 01 Jan 1970 00:00:00 GMT`;
       event.headers.set('Set-Cookie', cookieString);
     }),
+    getValidatedRouterParams: vi.fn(
+      (event: H3Event, validateFn: (params: Record<string, string>) => Promise<void>) => {
+        const params = event.context?.params || {};
+        return validateFn(params);
+      },
+    ),
   }));
 
   // Stub global functions to emulate Nuxt auto-imports
@@ -35,6 +41,7 @@ export function useH3TestUtils() {
   vi.stubGlobal('getHeader', h3.getHeader);
   vi.stubGlobal('appendHeader', h3.appendHeader);
   vi.stubGlobal('deleteCookie', h3.deleteCookie);
+  vi.stubGlobal('getValidatedRouterParams', h3.getValidatedRouterParams);
 
   return h3;
 }
