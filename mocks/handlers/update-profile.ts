@@ -122,7 +122,7 @@ export const handlers = [
   http.post(`${API_URL}/me/banner`, async ({ request }) => {
     try {
       const formData = await request.formData();
-      const file = formData.get('bannerImage') as File;
+      const file = formData.get('banner') as File;
 
       if (!file) {
         return HttpResponse.json(
