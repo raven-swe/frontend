@@ -164,7 +164,13 @@
     "EMPTY_NAME": "Name can't be blank",
     "RECAPTCHA_REQUIRED": "Please complete the reCAPTCHA challenge",
     "ACCOUNT_NOT_FOUND": "This account doesn't \nexist",
-    "TRY_SEARCHING": "Try searching for another one"
+    "TRY_SEARCHING": "Try searching for another one",
+    "OTP_RESEND_LIMIT_EXCEEDED": "OTP resend limit reached. Please try again in {seconds}.",
+    "otp": {
+      "INVALID_TOKEN": "The OTP you entered is invalid",
+      "ISLENGTH": "OTP must be exactly 6 digits",
+      "IS_EMPTY": "Please enter your OTP code"
+    }
   },
   "register": {
     "register-info": {
