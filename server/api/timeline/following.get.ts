@@ -3,13 +3,11 @@ import type { timelineSchema } from '~~/app/services/home/homeService';
 import { defineWrappedResponseHandler } from '~~/server/utils/handler';
 export default defineWrappedResponseHandler(async (event) => {
   const query = getQuery<{ timeline: timelineSchema }>(event);
-  const authHeader = getHeader(event, 'authorization');
+  const authHeader = getHeader(event, 'Authorization');
   const response = await serverApiFetch<ApiSuccessResponse<Tweet[]>>('/timeline/following', {
     method: 'GET',
     query: query,
-    headers: {
-      Authorization: authHeader,
-    },
+    headers: { Authorization: authHeader || '' },
   });
   return response;
 });
