@@ -16,14 +16,6 @@
       "tweets-list": "قائمة التغريدات"
     }
   },
-  "playground": {
-    "dialog": {
-      "title": "إنشاء حسابك",
-      "open": "فتح النافذة",
-      "content": "هذه هى النافذة",
-      "description": "وصف النافذة"
-    }
-  },
   "leftsidebar": {
     "nav": {
       "home": "الرئيسية",
@@ -73,6 +65,24 @@
       "location-desc": "ابحث عن حسابات في نفس موقعك.",
       "click-to-save": "انقر لحفظ التحديثات",
       "confirmation-dialog": "نافذة التأكيد"
+    }
+  },
+  "home": {
+    "tabs": {
+      "for-you": "لك",
+      "following": "متابعة"
+    },
+    "messages": {
+      "loadingMore": "جارٍ تحميل المزيد من التغريدات...",
+      "noMoreTweets": "لا توجد تغريدات أخرى"
+    }
+  },
+  "playground": {
+    "dialog": {
+      "title": "إنشاء حسابك",
+      "open": "فتح النافذة",
+      "content": "هذه هى النافذة",
+      "description": "وصف النافذة"
     }
   },
   "profile-info": {
