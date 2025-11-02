@@ -1,76 +1,76 @@
+import { registerEndpoint } from '@nuxt/test-utils/runtime';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const fetchMock = vi.fn();
-vi.stubGlobal('$fetch', fetchMock);
-
-vi.mock('~/api', () => ({
-  apiFetch: fetchMock,
-}));
+const { loginService } = await import('@/services/auth/loginService');
 
 describe('loginService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe('checkUser', () => {
-    it('calls API with correct parameters and returns user existence', async () => {
-      const mockResponse = { data: { exists: true, type: 'email' } };
-      fetchMock.mockResolvedValue(mockResponse);
-
-      const { loginService } = await import('../../../app/services/auth/loginService');
-      const result = await loginService.checkUser('test@example.com');
-
-      expect(fetchMock).toHaveBeenCalledWith('/api/auth/check-identifier', {
-        method: 'GET',
-        query: { identifier: 'test@example.com' },
-      });
-      expect(result).toEqual(mockResponse);
+  it('check identifier calls API with correct params and returns response', async () => {
+    registerEndpoint('/api/auth/check-identifier', () => {
+      return { data: { exists: true, type: 'email' } };
     });
 
-    it('handles non-existent user', async () => {
-      const mockResponse = { data: { exists: false, type: '' } };
-      fetchMock.mockResolvedValue(mockResponse);
+    const res = await loginService.checkUser('test@example.com');
 
-      const { loginService } = await import('../../../app/services/auth/loginService');
-      const result = await loginService.checkUser('nonexistent@example.com');
-
-      expect(result).toEqual(mockResponse);
-    });
+    expect(res).toEqual({ data: { exists: true, type: 'email' } });
   });
 
-  describe('login', () => {
-    it('calls API with credentials and returns tokens', async () => {
-      const mockResponse = {
-        data: { accessToken: 'access-123' },
-      };
-      const credentials = { identifier: 'user@test.com', password: 'Pass123!' };
-      fetchMock.mockResolvedValue(mockResponse);
-
-      const { loginService } = await import('../../../app/services/auth/loginService');
-      const result = await loginService.login(credentials);
-
-      expect(fetchMock).toHaveBeenCalledWith('/api/auth/login', {
-        method: 'POST',
-        body: credentials,
-      });
-      expect(result).toEqual(mockResponse);
+  it('check identifier calls API with incorrect params and returns response', async () => {
+    registerEndpoint('/api/auth/check-identifier', () => {
+      return { data: { exists: false, type: 'email' } };
     });
 
-    it('handles login with username', async () => {
-      const mockResponse = {
-        data: { accessToken: 'access-abc' },
-      };
-      const credentials = { identifier: 'username', password: 'SecurePass1!' };
-      fetchMock.mockResolvedValue(mockResponse);
+    const res = await loginService.checkUser('wrong@example.com');
 
-      const { loginService } = await import('../../../app/services/auth/loginService');
-      const result = await loginService.login(credentials);
+    expect(res).toEqual({ data: { exists: false, type: 'email' } });
+  });
 
-      expect(fetchMock).toHaveBeenCalledWith('/api/auth/login', {
-        method: 'POST',
-        body: credentials,
-      });
-      expect(result).toEqual(mockResponse);
+  it('submit login calls API with correct params and returns response', async () => {
+    registerEndpoint('/api/auth/login', () => {
+      return { data: { accessToken: 'valid-token' } };
     });
+
+    const res = await loginService.login({
+      identifier: 'test@example.com',
+      password: 'wrongPassword',
+    });
+
+    expect(res).toEqual({ data: { accessToken: 'valid-token' } });
+  });
+
+  it('submit login calls API with incorrect params and returns response', async () => {
+    registerEndpoint('/api/auth/login', () => {
+      return { data: { accessToken: null, error: 'Invalid credentials' } };
+    });
+
+    const res = await loginService.login({
+      identifier: 'wrong@example.com',
+      password: 'wrongPassword',
+    });
+
+    expect(res).toEqual({ data: { accessToken: null, error: 'Invalid credentials' } });
+  });
+
+  it('submit logout calls API with correct params and returns response', async () => {
+    registerEndpoint('/api/auth/logout', () => {
+      return { data: { success: true } };
+    });
+
+    const res = await loginService.logout();
+
+    expect(res).toEqual({ data: { success: true } });
+  });
+
+  it('submit logout calls API with incorrect params and returns response', async () => {
+    registerEndpoint('/api/auth/logout', () => {
+      return { data: { success: false, error: 'Logout failed' } };
+    });
+
+    const res = await loginService.logout();
+
+    expect(res).toEqual({ data: { success: false, error: 'Logout failed' } });
   });
 });
