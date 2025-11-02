@@ -14,7 +14,7 @@ export const serverApiFetch = $fetch.create({
     throw createError({
       statusCode: response.status,
       statusMessage: response._data?.error?.message || response._data?.message || 'Server Error',
-      data: response._data?.error || response._data,
+      data: response._data,
     });
   },
 });
