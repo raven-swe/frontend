@@ -13,7 +13,7 @@ const router = useRouter();
 const isDialogOpen = computed(() => route.path === '/settings/profile');
 const openDiscardDialog = ref(false);
 
-const userStore = useUserStore(); // use the store instance, not the plain user object
+const userStore = useUserStore();
 const { updateProfile, updateProfilePicture, updateHeaderImage, removeHeaderImage } =
   updateProfileService();
 
@@ -32,12 +32,14 @@ const website = ref<string>(userStore.user.websiteUrl || '');
 const birthDate = ref<Date | undefined>(
   userStore.user.birthDate ? new Date(userStore.user.birthDate) : undefined,
 );
+
 // Initialize date selector with existing birth date
 const dateSelect = useDateSelect(
   new Date().getFullYear() - 100,
   new Date().getFullYear(),
   birthDate.value,
 );
+
 watch(
   [dateSelect.selectedDay, dateSelect.selectedMonth, dateSelect.selectedYear],
   ([day, month, year]) => {
@@ -91,20 +93,34 @@ const handleRemoveHeaderImage = () => {
   }
 };
 
+// Normalize empty values to null
+const normalize = (v: unknown): string | null =>
+  v === undefined || v === null || v === '' ? null : String(v);
+
 const hasUnsavedChanges = computed(() => {
-  return (
-    name.value !== userStore.user.displayName ||
-    bio.value !== userStore.user.bio ||
-    location.value !== userStore.user.location ||
-    website.value !== userStore.user.websiteUrl ||
-    selectedProfileImage.value !== userStore.user.avatarUrl ||
-    selectedImage.value !== userStore.user.bannerUrl ||
-    (birthDate.value &&
-      userStore.user.birthDate &&
-      birthDate.value.getTime() !== new Date(userStore.user.birthDate).getTime()) ||
-    (!birthDate.value && userStore.user.birthDate) ||
-    (birthDate.value && !userStore.user.birthDate)
-  );
+  // Check if new files are selected
+  if (profileFileInput.value?.files?.[0] || bannerFileInput.value?.files?.[0]) {
+    return true;
+  }
+
+  // Check text fields
+  if (normalize(name.value) !== normalize(userStore.user.displayName)) return true;
+  if (normalize(bio.value) !== normalize(userStore.user.bio)) return true;
+  if (normalize(location.value) !== normalize(userStore.user.location)) return true;
+  if (normalize(website.value) !== normalize(userStore.user.websiteUrl)) return true;
+
+  // Check images (only if no new file is selected)
+  if (normalize(selectedProfileImage.value) !== normalize(userStore.user.avatarUrl)) return true;
+  if (normalize(selectedImage.value) !== normalize(userStore.user.bannerUrl)) return true;
+
+  // Check birth date
+  const currentBirthDate = birthDate.value ? birthDate.value.toISOString().split('T')[0] : null;
+  const originalBirthDate = userStore.user.birthDate
+    ? new Date(userStore.user.birthDate).toISOString().split('T')[0]
+    : null;
+  if (currentBirthDate !== originalBirthDate) return true;
+
+  return false;
 });
 
 const isFormValid = computed(() => {
@@ -137,9 +153,9 @@ const handleSubmit = async () => {
 
   await updateProfile({
     displayName: name.value,
-    bio: bio.value,
-    location: location.value,
-    websiteUrl: website.value,
+    bio: normalize(bio.value),
+    location: normalize(location.value),
+    websiteUrl: normalize(website.value),
     birthDate: formattedBirthDate,
   });
 
@@ -149,7 +165,6 @@ const handleSubmit = async () => {
 };
 
 const handleDiscard = () => {
-  openDiscardDialog.value = false;
   router.push(`/profile/${userStore.user.username}`);
 };
 

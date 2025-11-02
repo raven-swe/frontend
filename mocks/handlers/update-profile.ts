@@ -36,21 +36,7 @@ export const handlers = [
       const body = (await request.json()) as UpdateProfileRequest;
 
       // Update the mock user data with new values
-      if (body.displayName !== undefined) {
-        mockUserData.displayName = body.displayName;
-      }
-      if (body.bio !== undefined) {
-        mockUserData.bio = body.bio;
-      }
-      if (body.location !== undefined) {
-        mockUserData.location = body.location;
-      }
-      if (body.websiteUrl !== undefined) {
-        mockUserData.websiteUrl = body.websiteUrl;
-      }
-      if (body.birthDate !== undefined) {
-        mockUserData.birthDate = body.birthDate;
-      }
+      Object.assign(mockUserData, body);
 
       const response: ApiSuccessResponse<UserData> = {
         success: true,
