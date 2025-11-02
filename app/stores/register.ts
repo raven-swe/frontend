@@ -8,6 +8,7 @@ export const useRegisterStore = defineStore('register', () => {
     name: '',
     email: '',
     birthDate: '',
+    recaptchaToken: '',
   });
 
   const openDialog = () => {
@@ -21,6 +22,7 @@ export const useRegisterStore = defineStore('register', () => {
       name: '',
       email: '',
       birthDate: '',
+      recaptchaToken: '',
     };
   };
 
