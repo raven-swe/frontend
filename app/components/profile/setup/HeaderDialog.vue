@@ -98,7 +98,7 @@ const handleOpenChange = (value: boolean) => {
           <input
             ref="fileInputRef"
             type="file"
-            accept="image/*"
+            accept="image/png,image/jpg,image/jpeg"
             class="hidden"
             @change="handleFileChange"
           />

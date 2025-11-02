@@ -4,10 +4,8 @@ import { updateProfileService } from '~/services/profile/updateProfileService';
 import DiscardChangesDialog from '~/components/profile/edit/DiscardChangesDialog.vue';
 import useDateSelect from '@/composables/useDateSelect';
 import { VisuallyHidden } from 'reka-ui';
+import { useQueryClient } from '@tanstack/vue-query';
 
-// definePageMeta({
-//   layout: 'profile',
-// });
 const route = useRoute();
 const router = useRouter();
 
@@ -15,7 +13,7 @@ const router = useRouter();
 const isDialogOpen = computed(() => route.path === '/settings/profile');
 const openDiscardDialog = ref(false);
 
-const userStore = useUserStore().user;
+const userStore = useUserStore(); // use the store instance, not the plain user object
 const { updateProfile, updateProfilePicture, updateHeaderImage, removeHeaderImage } =
   updateProfileService();
 
@@ -23,16 +21,16 @@ const bannerFileInput = ref<HTMLInputElement | null>(null);
 const profileFileInput = ref<HTMLInputElement | null>(null);
 
 // Initialize with existing user data
-const selectedImage = ref<string | null>(userStore.bannerUrl || null);
-const selectedProfileImage = ref<string | null>(userStore.avatarUrl || null);
-const name = ref<string>(userStore.displayName || '');
-const bio = ref<string>(userStore.bio || '');
-const location = ref<string>(userStore.location || '');
-const website = ref<string>(userStore.websiteUrl || '');
+const selectedImage = ref<string | null>(userStore.user.bannerUrl || null);
+const selectedProfileImage = ref<string | null>(userStore.user.avatarUrl || null);
+const name = ref<string>(userStore.user.displayName || '');
+const bio = ref<string>(userStore.user.bio || '');
+const location = ref<string>(userStore.user.location || '');
+const website = ref<string>(userStore.user.websiteUrl || '');
 
 // Add birth date handling
 const birthDate = ref<Date | undefined>(
-  userStore.birthDate ? new Date(userStore.birthDate) : undefined,
+  userStore.user.birthDate ? new Date(userStore.user.birthDate) : undefined,
 );
 // Initialize date selector with existing birth date
 const dateSelect = useDateSelect(
@@ -95,17 +93,17 @@ const handleRemoveHeaderImage = () => {
 
 const hasUnsavedChanges = computed(() => {
   return (
-    name.value !== userStore.displayName ||
-    bio.value !== userStore.bio ||
-    location.value !== userStore.location ||
-    website.value !== userStore.websiteUrl ||
-    selectedProfileImage.value !== userStore.avatarUrl ||
-    selectedImage.value !== userStore.bannerUrl ||
+    name.value !== userStore.user.displayName ||
+    bio.value !== userStore.user.bio ||
+    location.value !== userStore.user.location ||
+    website.value !== userStore.user.websiteUrl ||
+    selectedProfileImage.value !== userStore.user.avatarUrl ||
+    selectedImage.value !== userStore.user.bannerUrl ||
     (birthDate.value &&
-      userStore.birthDate &&
-      birthDate.value.getTime() !== new Date(userStore.birthDate).getTime()) ||
-    (!birthDate.value && userStore.birthDate) ||
-    (birthDate.value && !userStore.birthDate)
+      userStore.user.birthDate &&
+      birthDate.value.getTime() !== new Date(userStore.user.birthDate).getTime()) ||
+    (!birthDate.value && userStore.user.birthDate) ||
+    (birthDate.value && !userStore.user.birthDate)
   );
 });
 
@@ -113,31 +111,30 @@ const isFormValid = computed(() => {
   return name.value.trim() !== '';
 });
 
+const queryClient = useQueryClient();
 const handleSubmit = async () => {
   if (!isFormValid.value) return;
-
-  router.push(`/profile/${userStore.username}`); // optimistically navigate away
-
   if (!hasUnsavedChanges.value) return;
 
-  // Sync updates
-  if (!selectedImage.value && userStore.bannerUrl) {
+  // optimistic navigation
+  router.push(`/profile/${userStore.user.username}`);
+  await nextTick(); // allow DOM and route to update
+
+  // Handle uploads and updates
+  if (!selectedImage.value && userStore.user.bannerUrl) {
     await removeHeaderImage();
   } else if (bannerFileInput.value?.files?.[0]) {
     await updateHeaderImage(bannerFileInput.value.files[0]);
-    // using the response, update the store with the new avatarUrl
   }
 
   if (profileFileInput.value?.files?.[0]) {
     await updateProfilePicture(profileFileInput.value.files[0]);
-    // using the response, update the store with the new bannerUrl
   }
 
   const formattedBirthDate = birthDate.value
     ? birthDate.value.toISOString().split('T')[0]
     : undefined;
 
-  // at least one of the text fields has changed
   await updateProfile({
     displayName: name.value,
     bio: bio.value,
@@ -146,26 +143,19 @@ const handleSubmit = async () => {
     birthDate: formattedBirthDate,
   });
 
-  // refresh user store data
-  useUserStore().updateUser({
-    displayName: name.value,
-    bio: bio.value,
-    location: location.value,
-    websiteUrl: website.value,
-    birthDate: formattedBirthDate,
-    avatarUrl: selectedProfileImage.value || userStore.avatarUrl,
-    bannerUrl: selectedImage.value || userStore.bannerUrl,
-  });
+  // refresh data
+  queryClient.invalidateQueries({ queryKey: ['layout-data'] });
+  queryClient.invalidateQueries({ queryKey: ['profile', userStore.user.username] });
 };
 
 const handleDiscard = () => {
   openDiscardDialog.value = false;
-  router.push(`/profile/${userStore.username}`);
+  router.push(`/profile/${userStore.user.username}`);
 };
 
 const handleDialogClose = () => {
   if (!hasUnsavedChanges.value) {
-    router.push(`/profile/${userStore.username}`);
+    router.push(`/profile/${userStore.user.username}`);
     return;
   }
   openDiscardDialog.value = true;
@@ -237,7 +227,7 @@ const handleDialogClose = () => {
             <input
               ref="bannerFileInput"
               type="file"
-              accept="image/*"
+              accept="image/png,image/jpg,image/jpeg"
               class="hidden"
               @change="handleFileChange"
             />
@@ -261,7 +251,7 @@ const handleDialogClose = () => {
               <input
                 ref="profileFileInput"
                 type="file"
-                accept="image/*"
+                accept="image/png,image/jpg,image/jpeg"
                 class="hidden"
                 @change="handleProfileFileChange"
               />
