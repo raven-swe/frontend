@@ -19,7 +19,7 @@ const { isCurrentUser } = useIsCurrentUser();
       />
     </div>
     <UiButton v-if="!userStore.isProfileSetup && isCurrentUser" variant="outline">
-      <NuxtLink to="/profile/setup">
+      <NuxtLink to="/setup/profile">
         {{ $t('profile.setup.setup-profile') }}
       </NuxtLink>
     </UiButton>

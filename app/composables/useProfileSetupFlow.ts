@@ -1,5 +1,6 @@
 import { computed } from 'vue';
 import { updateProfileService } from '~/services/profile/updateProfileService';
+import { useQueryClient } from '@tanstack/vue-query';
 
 type SetupStep = 'picture' | 'header' | 'bio' | 'location' | 'complete';
 
@@ -14,6 +15,8 @@ interface ProfileSetupData {
 export const useProfileSetupFlow = () => {
   const currentStep = useState<SetupStep>('profileSetup-currentStep', () => 'picture');
   const isFlowActive = useState('profileSetup-isFlowActive', () => true);
+  const queryClient = useQueryClient();
+  const userStore = useUserStore();
 
   const formData = useState<ProfileSetupData>('profileSetup-formData', () => ({
     profilePicture: null,
@@ -105,6 +108,9 @@ export const useProfileSetupFlow = () => {
     } finally {
       // After successful submission
       resetFlow();
+      // refresh data
+      queryClient.invalidateQueries({ queryKey: ['layout-data'] });
+      queryClient.invalidateQueries({ queryKey: ['profile', userStore.user.username] });
     }
   };
 

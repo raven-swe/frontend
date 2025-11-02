@@ -109,7 +109,7 @@ describe('ProfileAvatarSection Component', () => {
     const button = wrapper.find('button');
     expect(button.exists()).toBe(true);
 
-    const link = wrapper.find('a[href="/profile/setup"]');
+    const link = wrapper.find('a[href="/setup/profile"]');
     expect(link.exists()).toBe(true);
     expect(link.text()).toContain('Set up profile');
   });
