@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { Tweet } from '~~/shared/types/tweets';
-import TweetDefaultCard from '@/components/tweet/TweetDefaultCard.vue';
 definePageMeta({
   layout: 'profile',
 });

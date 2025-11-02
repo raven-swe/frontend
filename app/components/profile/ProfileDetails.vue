@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import type { UserProfile } from '~~/shared/types/user';
+import type { User } from '~~/shared/types/user';
 
 defineProps<{
-  userProfile: UserProfile;
+  userProfile: User;
 }>();
 </script>
 <template>

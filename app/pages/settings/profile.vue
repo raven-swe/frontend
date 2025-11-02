@@ -5,9 +5,9 @@ import DiscardChangesDialog from '~/components/profile/edit/DiscardChangesDialog
 import useDateSelect from '@/composables/useDateSelect';
 import { VisuallyHidden } from 'reka-ui';
 
-definePageMeta({
-  layout: 'profile',
-});
+// definePageMeta({
+//   layout: 'profile',
+// });
 const route = useRoute();
 const router = useRouter();
 
@@ -116,7 +116,7 @@ const isFormValid = computed(() => {
 const handleSubmit = async () => {
   if (!isFormValid.value) return;
 
-  router.push('/profile'); // optimistically navigate away
+  router.push(`/profile/${userStore.username}`); // optimistically navigate away
 
   if (!hasUnsavedChanges.value) return;
 
@@ -145,16 +145,27 @@ const handleSubmit = async () => {
     websiteUrl: website.value,
     birthDate: formattedBirthDate,
   });
+
+  // refresh user store data
+  useUserStore().updateUser({
+    displayName: name.value,
+    bio: bio.value,
+    location: location.value,
+    websiteUrl: website.value,
+    birthDate: formattedBirthDate,
+    avatarUrl: selectedProfileImage.value || userStore.avatarUrl,
+    bannerUrl: selectedImage.value || userStore.bannerUrl,
+  });
 };
 
 const handleDiscard = () => {
   openDiscardDialog.value = false;
-  router.push('/profile');
+  router.push(`/profile/${userStore.username}`);
 };
 
 const handleDialogClose = () => {
   if (!hasUnsavedChanges.value) {
-    router.push('/profile');
+    router.push(`/profile/${userStore.username}`);
     return;
   }
   openDiscardDialog.value = true;
@@ -236,7 +247,7 @@ const handleDialogClose = () => {
           <div class="relative z-10 -mt-12 mb-6 flex flex-col items-center gap-3 self-start px-3">
             <div class="relative">
               <img
-                :src="selectedProfileImage || '/default_profile.png'"
+                :src="selectedProfileImage || 'https://cdn.raven.cmp27.space/default_avatar.png'"
                 class="h-30 w-30 cursor-pointer rounded-full border-3 border-white object-cover"
                 @click="handleProfileImageClick"
               />
