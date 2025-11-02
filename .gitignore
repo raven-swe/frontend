@@ -33,3 +33,7 @@ logs
 # ignore mock data folder
 /mocks/data/*
 !/mocks/data/.gitkeep
+
+# Cypress screenshots and videos
+cypress/screenshots
+cypress/videos
