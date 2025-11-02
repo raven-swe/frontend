@@ -13,6 +13,7 @@ const config = useRuntimeConfig();
 const githubClientId = config.public.githubClientId;
 const githubRedirectUri = config.public.githubRedirectUri;
 const githubScope = config.public.githubScope;
+const baseUrl = config.public.baseUrl;
 
 const googleClientId = config.public.googleClientId;
 const googleRedirectUri = config.public.googleRedirectUri;
@@ -23,6 +24,11 @@ function handleGithubSignIn() {
     client_id: githubClientId,
     redirect_uri: githubRedirectUri,
     scope: githubScope,
+    state: btoa(
+      JSON.stringify({
+        redirect: `${baseUrl}/auth/callback/github`,
+      }),
+    ),
   });
   window?.open(
     `https://github.com/login/oauth/authorize?${params.toString()}`,

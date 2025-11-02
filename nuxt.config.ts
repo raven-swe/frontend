@@ -14,6 +14,7 @@ export default defineNuxtConfig({
       googleRedirectUri: process.env.NUXT_PUBLIC_GOOGLE_REDIRECT_URI || '',
       googleScope: process.env.NUXT_PUBLIC_GOOGLE_SCOPE || '',
       siteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY || '',
+      baseUrl: process.env.NUXT_PUBLIC_BASE_URL || 'http://localhost:5173',
     },
   },
   devtools: {
