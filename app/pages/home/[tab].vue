@@ -19,6 +19,8 @@ const hasNextPage = ref(true);
 const isLoading = ref(false);
 
 async function loadTweets(reset = false) {
+  if (isLoading.value || (!reset && !hasNextPage.value)) return;
+
   if (reset) {
     tweets.value = [];
     cursor.value = null;
@@ -30,6 +32,7 @@ async function loadTweets(reset = false) {
   try {
     const fetchTweets =
       route.params.tab === 'following' ? homeService.following : homeService.forYou;
+
     const resp = await fetchTweets({
       limit: 10,
       cursor: cursor.value ?? null,
@@ -40,7 +43,7 @@ async function loadTweets(reset = false) {
     const pagination = body?.pagination;
 
     if (newTweets.length) {
-      tweets.value.push(...newTweets);
+      tweets.value = [...tweets.value, ...newTweets];
       cursor.value = pagination?.nextCursor ?? null;
       hasNextPage.value = pagination?.hasNextPage ?? false;
     } else {
