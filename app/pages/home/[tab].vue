@@ -4,7 +4,8 @@ import { useRoute } from 'vue-router';
 import { useInfiniteScroll, useVirtualList } from '@vueuse/core';
 import TweetDefaultCard from '~/components/tweet/TweetDefaultCard.vue';
 import type { Tweet } from '~~/shared/types/tweets';
-import { homeService, type Pagination } from '~/services/home/homeService';
+import { homeService } from '~/services/home/homeService';
+import type { ApiSuccessResponse } from '~~/shared/types/apiResponses';
 
 definePageMeta({
   layout: 'home',
@@ -34,16 +35,16 @@ async function loadTweets(reset = false) {
       cursor: cursor.value ?? null,
     });
 
-    // Canonical response shape: ApiSuccessResponse<{ data: Tweet[]; pagination: Pagination }>
-    const body = resp as { data?: { data?: Tweet[]; pagination?: Pagination } } | undefined;
-    const data = body?.data;
-    const newTweets = data?.data ?? [];
-    const pagination = data?.pagination;
+    const body = resp as ApiSuccessResponse<Tweet[]>;
+    const newTweets = body.data ?? [];
+    const pagination = body?.pagination;
 
     if (newTweets.length) {
       tweets.value.push(...newTweets);
       cursor.value = pagination?.nextCursor ?? null;
       hasNextPage.value = pagination?.hasNextPage ?? false;
+    } else {
+      hasNextPage.value = false;
     }
   } catch (err) {
     console.error('Failed to load tweets', err);
@@ -52,7 +53,7 @@ async function loadTweets(reset = false) {
   }
 }
 
-const { list, containerProps } = useVirtualList(tweets.value, {
+const { list, containerProps } = useVirtualList(tweets, {
   itemHeight: 120,
 });
 
@@ -78,11 +79,7 @@ watch(
 <template>
   <div v-bind="containerProps" class="border-border mx-auto max-w-[700px] border-y">
     <div>
-      <TweetDefaultCard
-        v-for="tweet in list"
-        :key="(tweet as Tweet)?.data?.id ?? (tweet as Tweet)?.id"
-        :tweet="(tweet as Tweet)?.data ?? (tweet as Tweet)"
-      />
+      <TweetDefaultCard v-for="{ data: tweet } in list" :key="tweet.id" :tweet="tweet" />
     </div>
 
     <div v-if="isLoading" class="text-muted-foreground py-4 text-center">
