@@ -13,11 +13,12 @@ const emit = defineEmits<Emits>();
 
 // Get user/form data
 const { formData } = useProfileSetupFlow();
-const username = 'Habibayman_'; // TODO: actually fetch after auth is done
-const name = 'Habiba Ayman'; // TODO: actually fetch after auth is done
+const userStore = useUserStore();
+const username = computed(() => userStore.user?.username || '');
+const name = computed(() => userStore.user?.displayName || '');
 
 const fileInputRef = ref<HTMLInputElement | null>(null);
-const selectedImage = ref<string | null>(null);
+const selectedImage = ref<string | null>(userStore.user.bannerUrl || '');
 const selectedFile = ref<File | null>(null);
 
 const actionButton = computed(() => {
@@ -58,6 +59,17 @@ const handleOpenChange = (value: boolean) => {
     selectedFile.value = null;
   }
 };
+
+watch(
+  () => userStore.user.bannerUrl,
+  (newVal) => {
+    // only sync if user hasn’t picked a new one locally
+    if (!selectedFile.value) {
+      selectedImage.value = newVal || '';
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <template>

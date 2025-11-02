@@ -30,7 +30,9 @@ export const useProfileSetupFlow = () => {
 
   const stepOrder: SetupStep[] = ['picture', 'header', 'bio', 'location', 'complete'];
 
-  const startFlow = () => {
+  const startFlow = async () => {
+    await queryClient.refetchQueries({ queryKey: ['layout-data'], exact: true });
+
     isFlowActive.value = true;
     currentStep.value = 'picture';
   };
