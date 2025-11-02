@@ -33,6 +33,13 @@ Cypress.Commands.add('mockRecaptcha', () => {
   });
 });
 
+// Get OTP from test endpoint
+Cypress.Commands.add('getOTP', (identifier: string, type: 'registration' | 'password-reset') => {
+  return cy
+    .request(`${Cypress.env('API_URL')}/test/otp?identifier=${identifier}&type=${type}`)
+    .its('body.data.otp');
+});
+
 //
 // -- This is a parent command --
 // Cypress.Commands.add('login', (email, password) => { ... })

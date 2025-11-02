@@ -1,8 +1,7 @@
 // cypress/e2e/auth/signup.cy.ts
 
 import type { ExtendedAUTWindow } from '../../types/ExtendedAUTWindow';
-
-// TODO: test resend OTP functionality
+import { createTestUser } from '../../support/helpers/createTestUser';
 
 describe('Signup Flow', () => {
   beforeEach(() => {
@@ -34,7 +33,7 @@ describe('Signup Flow', () => {
       const recentYear = today.getFullYear() - 5; // 5 years old
 
       cy.get('input[data-cy="signup-name"]').type('Little Infant');
-      cy.get('input[data-cy="signup-email"]').type('young@example.com');
+      cy.get('input[data-cy="signup-email"]').type('young@baby.com');
       cy.get('select[data-cy="signup-dob-month"]').select('January');
       cy.get('select[data-cy="signup-dob-day"]').select('15');
       cy.get('select[data-cy="signup-dob-year"]').select(recentYear.toString());
@@ -44,14 +43,13 @@ describe('Signup Flow', () => {
       cy.get('button[data-cy="signup-next-button"]').should('be.disabled');
     });
 
-    it('should handle different monthdays', () => {
+    it('should handle different month days', () => {
       // Test January 31st
-      // TODO: Test selecting the day before the month (waiting on fix for the issue)
       cy.get('select[data-cy="signup-dob-month"]').select('January');
       cy.get('select[data-cy="signup-dob-day"]').select('31');
       cy.get('select[data-cy="signup-dob-day"]').should('have.value', '31');
 
-      // Test April 31th (which is invalid)
+      // Test April 31st (which is invalid)
       cy.get('select[data-cy="signup-dob-day"]').select('31');
       cy.get('select[data-cy="signup-dob-month"]').select('April');
       // Should deselect the invalid day (null value)
@@ -64,6 +62,7 @@ describe('Signup Flow', () => {
       cy.get('select[data-cy="signup-dob-month"]').select('February');
       cy.get('select[data-cy="signup-dob-day"]').select('29');
       cy.get('select[data-cy="signup-dob-day"]').should('have.value', '29');
+
       // Check that non-leap years aren't selectable (not in the years dropdown)
       cy.get('select[data-cy="signup-dob-year"] option').each(($el) => {
         const year = parseInt($el.text());
@@ -94,11 +93,7 @@ describe('Signup Flow', () => {
     });
 
     it('should allow signup with new email', () => {
-      const user = {
-        name: 'New User',
-        email: 'newuser' + Date.now() + '@example.com',
-        dob: { day: '15', month: '6', year: '1995' },
-      };
+      const user = createTestUser();
 
       cy.get('input[data-cy="signup-name"]').type(user.name);
       cy.get('input[data-cy="signup-email"]').type(user.email);
@@ -111,73 +106,9 @@ describe('Signup Flow', () => {
     });
   });
 
-  describe('Complete Signup Flow', () => {
-    it('should complete signup successfully', () => {
-      const user = {
-        name: 'Amr Samy',
-        email: 'amrsamy' + Date.now() + '@example.com',
-        dob: { day: '10', month: '5', year: '1998' },
-        password: 'TestPass123!',
-      };
-
-      // Step 1: Fill registration info
-      cy.get('input[data-cy="signup-name"]').type(user.name);
-      cy.get('input[data-cy="signup-email"]').type(user.email);
-
-      cy.get('select[data-cy="signup-dob-month"]').select(user.dob.month);
-      cy.get('select[data-cy="signup-dob-day"]').select(user.dob.day);
-      cy.get('select[data-cy="signup-dob-year"]').select(user.dob.year);
-      cy.get('button[data-cy="signup-next-button"]').click();
-
-      // Step 2: Enter OTP
-      // TODO: Handle OTP retrieval dynamically
-      cy.get('[data-cy="signup-otp-form"]').should('be.visible');
-      cy.get('input[data-cy="signup-otp"]').type('123456');
-      cy.get('button[data-cy="signup-next-button"]').click();
-
-      // Step 3: Set Password
-      cy.get('[data-cy="signup-password-form"]').should('be.visible');
-      cy.get('input[data-cy="signup-password"]').type(user.password);
-      cy.get('button[data-cy="signup-next-button"]').click();
-
-      // Verify successful signup
-      cy.url().should('include', '/home');
-    });
-
-    it('should handle invalid OTP', () => {
-      const user = {
-        name: 'Nora Ali',
-        email: 'noraali' + Date.now() + '@example.com',
-        dob: { day: '22', month: '8', year: '1992' },
-      };
-      // Fill registration info
-      cy.get('input[data-cy="signup-name"]').type(user.name);
-      cy.get('input[data-cy="signup-email"]').type(user.email);
-
-      cy.get('select[data-cy="signup-dob-month"]').select(user.dob.month);
-      cy.get('select[data-cy="signup-dob-day"]').select(user.dob.day);
-      cy.get('select[data-cy="signup-dob-year"]').select(user.dob.year);
-      cy.get('button[data-cy="signup-next-button"]').click();
-
-      // Enter invalid OTP
-      cy.get('[data-cy="signup-otp-form"]').should('be.visible');
-      cy.get('input[data-cy="signup-otp"]').type('000000');
-      cy.get('button[data-cy="signup-next-button"]').click();
-
-      // Should show error and stay on OTP page
-      cy.get('[data-cy="signup-otp-form"]').should('be.visible');
-      cy.get('[data-test-id="otp-error"]').should('be.visible');
-      cy.get('button[data-cy="signup-next-button"]').should('be.disabled');
-    });
-  });
-
   describe('Navigation', () => {
     it('should allow going back from OTP step', () => {
-      const user = {
-        name: 'Youssef Adel',
-        email: 'youssefadel' + Date.now() + '@example.com',
-        dob: { day: '4', month: '12', year: '2000' },
-      };
+      const user = createTestUser();
       // Fill and submit registration info
       cy.get('input[data-cy="signup-name"]').type(user.name);
       cy.get('input[data-cy="signup-email"]').type(user.email);
@@ -202,6 +133,126 @@ describe('Signup Flow', () => {
       cy.get('select[data-cy="signup-dob-month"]').should('have.value', user.dob.month);
       cy.get('select[data-cy="signup-dob-day"]').should('have.value', user.dob.day);
       cy.get('select[data-cy="signup-dob-year"]').should('have.value', user.dob.year);
+    });
+  });
+
+  describe('OTP', () => {
+    it('should handle invalid OTP', () => {
+      const user = createTestUser();
+      // Fill registration info
+      cy.get('input[data-cy="signup-name"]').type(user.name);
+      cy.get('input[data-cy="signup-email"]').type(user.email);
+
+      cy.get('select[data-cy="signup-dob-month"]').select(user.dob.month);
+      cy.get('select[data-cy="signup-dob-day"]').select(user.dob.day);
+      cy.get('select[data-cy="signup-dob-year"]').select(user.dob.year);
+      cy.get('button[data-cy="signup-next-button"]').click();
+
+      // Enter invalid OTP
+      cy.get('[data-cy="signup-otp-form"]').should('be.visible');
+      cy.get('input[data-cy="signup-otp"]').type('000000');
+      cy.get('button[data-cy="signup-next-button"]').click();
+
+      // Should show error and stay on OTP page
+      cy.get('[data-cy="signup-otp-form"]').should('be.visible');
+      cy.get('[data-test-id="otp-error"]').should('be.visible');
+      cy.get('button[data-cy="signup-next-button"]').should('be.disabled');
+    });
+    it('should handle resend OTP', () => {
+      // TODO: Check retryAfter, error showing, time countdown, etc.
+      const user = createTestUser();
+
+      // Step 1: Fill registration info
+      cy.get('input[data-cy="signup-name"]').type(user.name);
+      cy.get('input[data-cy="signup-email"]').type(user.email);
+
+      cy.get('select[data-cy="signup-dob-month"]').select(user.dob.month);
+      cy.get('select[data-cy="signup-dob-day"]').select(user.dob.day);
+      cy.get('select[data-cy="signup-dob-year"]').select(user.dob.year);
+      cy.get('button[data-cy="signup-next-button"]').click();
+
+      // Step 2: Request a new OTP
+      cy.get('[data-cy="signup-otp-form"]').should('be.visible');
+
+      cy.getOTP(user.email, 'registration').then((firstOtp) => {
+        // Click resend OTP
+        cy.get('button[data-cy="signup-resend-otp-button"]').click();
+        cy.wait(1000); // A short wait to ensure OTP is processed
+        // Get the new OTP
+        cy.getOTP(user.email, 'registration').then((secondOtp) => {
+          // Ensure the OTPs are different
+          expect(secondOtp).to.not.equal(firstOtp);
+          // Enter the new OTP
+          cy.get('input[data-cy="signup-otp"]').type(secondOtp);
+          cy.get('button[data-cy="signup-next-button"]').click();
+        });
+      });
+    });
+  });
+
+  describe('Password Strength Validation', () => {
+    it('should show password strength feedback', () => {
+      const user = createTestUser();
+
+      // Fill registration info
+      cy.get('input[data-cy="signup-name"]').type(user.name);
+      cy.get('input[data-cy="signup-email"]').type(user.email);
+
+      cy.get('select[data-cy="signup-dob-month"]').select(user.dob.month);
+      cy.get('select[data-cy="signup-dob-day"]').select(user.dob.day);
+      cy.get('select[data-cy="signup-dob-year"]').select(user.dob.year);
+      cy.get('button[data-cy="signup-next-button"]').click();
+
+      // Enter OTP
+      cy.get('[data-cy="signup-otp-form"]').should('be.visible');
+      cy.getOTP(user.email, 'registration').then((otp) => {
+        cy.get('input[data-cy="signup-otp"]').type(otp);
+        cy.get('button[data-cy="signup-next-button"]').click();
+      });
+
+      // On password step
+      cy.get('[data-cy="signup-password-form"]').should('be.visible');
+
+      // Test weak password
+      cy.get('input[data-cy="signup-password"]').type('12345');
+      cy.get('[data-test-id="password-error"]').should('be.visible');
+      cy.get('button[data-cy="signup-next-button"]').should('be.disabled');
+
+      // Test strong password
+      cy.get('input[data-cy="signup-password"]').clear().type('Str0ngP@ssw0rd!');
+      cy.get('[data-test-id="password-error"]').should('not.exist');
+      cy.get('button[data-cy="signup-next-button"]').should('not.be.disabled');
+    });
+  });
+
+  describe('Complete Signup Flow', () => {
+    it('should complete signup successfully', () => {
+      const user = createTestUser();
+
+      // Step 1: Fill registration info
+      cy.get('input[data-cy="signup-name"]').type(user.name);
+      cy.get('input[data-cy="signup-email"]').type(user.email);
+
+      cy.get('select[data-cy="signup-dob-month"]').select(user.dob.month);
+      cy.get('select[data-cy="signup-dob-day"]').select(user.dob.day);
+      cy.get('select[data-cy="signup-dob-year"]').select(user.dob.year);
+      cy.get('button[data-cy="signup-next-button"]').click();
+
+      // Step 2: Enter OTP
+      cy.get('[data-cy="signup-otp-form"]').should('be.visible');
+
+      cy.getOTP(user.email, 'registration').then((otp) => {
+        cy.get('input[data-cy="signup-otp"]').type(otp);
+        cy.get('button[data-cy="signup-next-button"]').click();
+      });
+
+      // Step 3: Set Password
+      cy.get('[data-cy="signup-password-form"]').should('be.visible');
+      cy.get('input[data-cy="signup-password"]').type(user.password);
+      cy.get('button[data-cy="signup-next-button"]').click();
+
+      // Verify successful signup
+      cy.url().should('include', '/home');
     });
   });
 });
