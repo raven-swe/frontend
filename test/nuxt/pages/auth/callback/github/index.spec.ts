@@ -71,7 +71,7 @@ describe('GitHub Callback Page', () => {
       '/api/oauth/github/callback',
       expect.objectContaining({
         method: 'POST',
-        body: { code: 'test-github-code' },
+        body: { providerToken: 'test-github-code' },
       }),
     );
     expect(pushMock).not.toHaveBeenCalled();

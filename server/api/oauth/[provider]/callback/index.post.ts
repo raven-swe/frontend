@@ -1,45 +1,40 @@
-import { FetchError } from 'ofetch';
+import * as cookie from 'cookie';
+import * as jwt from 'jsonwebtoken';
+
 import type { ApiSuccessResponse } from '~~/shared/types/api';
 import type { OAuthCallbackResponse } from '~~/shared/types/oauth';
 
-interface ApiError {
-  message: string;
-}
-
-export default defineEventHandler(async (event) => {
-  const provider = event.context.params as { provider: string };
+export default defineWrappedResponseHandler(async (event) => {
+  const { provider } = event.context.params as { provider: string };
   const body = await readBody<OAuthCallbackRequest>(event);
 
-  const API_URL = process.env.BACKEND_URL;
+  const response = await serverApiFetch.raw<ApiSuccessResponse<OAuthCallbackResponse>>(
+    `/oauth/${provider}/callback`,
+    {
+      method: 'POST',
+      body,
+      credentials: 'include',
+    },
+  );
 
-  try {
-    const response = await $fetch<ApiSuccessResponse<OAuthCallbackResponse>>(
-      `${API_URL}/oauth/${provider}/callback`,
-      {
-        method: 'POST',
-        body: {
-          providerToken: body.code,
-        },
-      },
+  const cookies = response.headers.getSetCookie?.();
+  cookies.forEach((cookie) => {
+    appendHeader(event, 'set-cookie', cookie);
+  });
+  if (response._data?.data && 'accessToken' in response._data.data) {
+    const accessTokenContent = jwt.decode(response._data.data.accessToken) as { exp?: number };
+    appendHeader(
+      event,
+      'set-cookie',
+      cookie.serialize('access_token', response._data!.data.accessToken, {
+        path: '/',
+        maxAge: accessTokenContent?.exp
+          ? accessTokenContent.exp - Math.floor(Date.now() / 1000)
+          : 60 * 5, // Default to 5 minutes if exp is missing
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+      }),
     );
-    return response;
-  } catch (e) {
-    if (e instanceof FetchError) {
-      const errData = e.data as ApiError;
-      return {
-        success: false,
-        error: {
-          code: 'OAUTH_CALLBACK_FAILED',
-          message: errData?.message || 'OAuth callback request failed',
-        },
-      };
-    }
-    return {
-      success: false,
-      error: {
-        code: 'UNKNOWN_ERROR',
-        message: 'An unexpected error occurred',
-      },
-    };
   }
+  return response._data;
 });

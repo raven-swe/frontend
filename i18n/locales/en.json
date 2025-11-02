@@ -116,6 +116,15 @@
       "copyright": "© 2025 Raven Corp."
     }
   },
+  "tweet": {
+    "composer": {
+      "placeholder": "What's happening?",
+      "media": "Media",
+      "gif": "GIF",
+      "emoji": "Emoji",
+      "profile-alt": "Avatar of {name}"
+    }
+  },
   "ui": {
     "close": "Close",
     "next": "Next",
@@ -123,7 +132,8 @@
     "skip-for-now": "Skip for now",
     "save": "Save",
     "cancel": "Cancel",
-    "discard": "Discard"
+    "discard": "Discard",
+    "post": "Post"
   },
   "errors": {
     "INVALID_EMAIL": "Please enter a valid email.",
@@ -142,7 +152,9 @@
     "PASSWORD_REQUIRED": "Please enter your password",
     "GENERIC_ERROR": "Something went wrong. Please try again.",
     "EMPTY_NAME": "Name can't be blank",
-    "RECAPTCHA_REQUIRED": "Please complete the reCAPTCHA challenge"
+    "RECAPTCHA_REQUIRED": "Please complete the reCAPTCHA challenge",
+    "ACCOUNT_NOT_FOUND": "This account doesn't \nexist",
+    "TRY_SEARCHING": "Try searching for another one"
   },
   "register": {
     "register-info": {

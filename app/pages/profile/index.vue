@@ -3,6 +3,7 @@ const { t } = useI18n();
 
 definePageMeta({
   layout: 'default',
+  middleware: ['profile-redirect'],
 });
 </script>
 

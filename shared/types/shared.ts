@@ -20,3 +20,12 @@ export interface UserData {
   phone: string;
   languageCode: string;
 }
+
+export type MediaType = 'image' | 'video' | 'gif';
+
+export type MediaItem = {
+  id: string;
+  file: File;
+  url: string;
+  type: MediaType;
+};
