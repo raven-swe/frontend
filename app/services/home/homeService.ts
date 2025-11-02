@@ -11,28 +11,22 @@ export type Pagination = {
 };
 export const homeService = {
   async forYou(timeline: timelineSchema) {
-    return await apiFetch<ApiSuccessResponse<{ data: Tweet[]; pagination: Pagination }>>(
-      '/api/timeline/for-you',
-      {
-        method: 'GET',
-        query: {
-          limit: timeline.limit,
-          cursor: timeline.cursor,
-        },
+    return await apiFetch<ApiSuccessResponse<Tweet[]>>('/api/timeline/for-you', {
+      method: 'GET',
+      query: {
+        limit: timeline.limit,
+        cursor: timeline.cursor,
       },
-    );
+    });
   },
 
   async following(timeline: timelineSchema) {
-    return await apiFetch<ApiSuccessResponse<{ data: Tweet[]; pagination: Pagination }>>(
-      '/api/timeline/following',
-      {
-        method: 'GET',
-        query: {
-          limit: timeline.limit,
-          cursor: timeline.cursor ?? undefined,
-        },
+    return await apiFetch<ApiSuccessResponse<Tweet[]>>('/api/timeline/following', {
+      method: 'GET',
+      query: {
+        limit: timeline.limit,
+        cursor: timeline.cursor ?? undefined,
       },
-    );
+    });
   },
 };

@@ -151,18 +151,13 @@ export const handlers = [
       {
         success: true,
         message: 'Timeline fetched successfully.',
-        data: {
-          data: paginatedTweets,
-          pagination: {
-            cursor: String(startIndex),
-            nextCursor,
-            hasNextPage: !!nextCursor,
-          },
+        data: paginatedTweets,
+        pagination: {
+          cursor: String(startIndex),
+          nextCursor,
+          hasNextPage: !!nextCursor,
         },
-      } as ApiSuccessResponse<{
-        data: Tweet[];
-        pagination: { cursor: string; nextCursor: string | null; hasNextPage: boolean };
-      }>,
+      } as ApiSuccessResponse<Tweet[]>,
       { status: 200 },
     );
   }),
@@ -183,18 +178,13 @@ export const handlers = [
       {
         success: true,
         message: 'Timeline fetched successfully.',
-        data: {
-          data: paginatedTweets,
-          pagination: {
-            cursor: String(startIndex),
-            nextCursor,
-            hasNextPage: !!nextCursor,
-          },
+        data: paginatedTweets,
+        pagination: {
+          cursor: String(startIndex),
+          nextCursor,
+          hasNextPage: !!nextCursor,
         },
-      } as ApiSuccessResponse<{
-        data: Tweet[];
-        pagination: { cursor: string; nextCursor: string | null; hasNextPage: boolean };
-      }>,
+      } as ApiSuccessResponse<Tweet[]>,
       { status: 200 },
     );
   }),
