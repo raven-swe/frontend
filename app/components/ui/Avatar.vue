@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { cva } from 'class-variance-authority';
-import { AvatarRoot, AvatarFallback } from 'reka-ui';
+import { AvatarRoot } from 'reka-ui';
 import AvatarImg from './AvatarImg.vue';
 
 const avatarRoot = cva('relative flex shrink-0 overflow-hidden rounded-full', {
@@ -38,11 +38,6 @@ withDefaults(defineProps<Props>(), {
 <template>
   <AvatarRoot :class="avatarRoot({ variant, size })">
     <AvatarImg :src="img" alt="User Avatar" />
-    <AvatarFallback
-      class="bg-input text-foreground flex size-full items-center justify-center rounded-full"
-    >
-      ?
-    </AvatarFallback>
   </AvatarRoot>
 </template>
 
