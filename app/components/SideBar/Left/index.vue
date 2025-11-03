@@ -35,7 +35,9 @@ const handleLogout = async () => {
           route: `/profile/${userStore.user?.username || ''}`,
         }"
       ></SideBarLeftTab>
-      <SideBarLeftTab :tab="{ label: 'more', icon: 'more-horiz', route: '#' }"></SideBarLeftTab>
+      <SideBarLeftTab
+        :tab="{ label: 'settings', icon: 'settings', route: '/settings/account' }"
+      ></SideBarLeftTab>
       <UiButton variant="ghost-default" size="icon-xl" @click="handleLogout">
         <Icon name="ic:outline-logout" size="24" />
       </UiButton>
