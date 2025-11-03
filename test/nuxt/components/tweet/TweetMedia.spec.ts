@@ -55,8 +55,8 @@ describe('TweetMedia.vue', () => {
     });
     const gifs = wrapper.findAll('img');
     expect(gifs).toHaveLength(2);
-    expect(gifs[0].attributes('src')).toBe('/gif-1.gif');
-    expect(gifs[0].attributes('alt')).toBe('gif-1');
+    expect(gifs[0]!.attributes('src')).toBe('/gif-1.gif');
+    expect(gifs[0]!.attributes('alt')).toBe('gif-1');
   });
 
   it('renders VIDEOS from media with controls and src', async () => {
@@ -79,7 +79,7 @@ describe('TweetMedia.vue', () => {
     });
     const gifs = wrapper.findAll('img');
     expect(gifs).toHaveLength(1);
-    expect(gifs[0].attributes('alt')).toBe('Tweet media');
+    expect(gifs[0]!.attributes('alt')).toBe('Tweet media');
   });
 
   it('falls back to default alt text for VIDEO when altText is empty and keeps sizing classes', async () => {

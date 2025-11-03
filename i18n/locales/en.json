@@ -207,6 +207,10 @@
     }
   },
   "setting": {
+    "email": "Email",
+    "change-username": "Change username",
+    "suggestions": "Suggestions",
+    "save": "Save Changes",
     "settings": "Settings",
     "change-password": "Change Password",
     "date-of-birth": "Date of Birth",

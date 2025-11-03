@@ -1,9 +1,15 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { relativeTime, formatDate, birthDateFormat } from './time';
+import { relativeTimeFormat, formatDate, birthDateFormat } from './time';
 import { cleanUrl } from './cleanUrl';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
-export { relativeTime, formatDate, birthDateFormat, cleanUrl };
+export {
+  relativeTimeFormat as relativeTime,
+  formatDate,
+  cleanUrl as dataFormat,
+  birthDateFormat as formatBirthDate,
+  cleanUrl,
+};
