@@ -16,14 +16,6 @@
       "tweets-list": "قائمة التغريدات"
     }
   },
-  "playground": {
-    "dialog": {
-      "title": "إنشاء حسابك",
-      "open": "فتح النافذة",
-      "content": "هذه هى النافذة",
-      "description": "وصف النافذة"
-    }
-  },
   "leftsidebar": {
     "nav": {
       "home": "الرئيسية",
@@ -75,6 +67,24 @@
       "confirmation-dialog": "نافذة التأكيد"
     }
   },
+  "home": {
+    "tabs": {
+      "for-you": "لك",
+      "following": "متابعة"
+    },
+    "messages": {
+      "loadingMore": "جارٍ تحميل المزيد من التغريدات...",
+      "noMoreTweets": "لا توجد تغريدات أخرى"
+    }
+  },
+  "playground": {
+    "dialog": {
+      "title": "إنشاء حسابك",
+      "open": "فتح النافذة",
+      "content": "هذه هى النافذة",
+      "description": "وصف النافذة"
+    }
+  },
   "profile-info": {
     "edit-profile": "تعديل الملف الشخصي",
     "joined": "انضم في",
@@ -103,12 +113,24 @@
       "copyright": "© 2025 Raven Corp."
     }
   },
+  "tweet": {
+    "composer": {
+      "placeholder": "ما الذي يحدث؟",
+      "media": "الوسائط",
+      "gif": "GIF صور متحركة",
+      "emoji": "رموز ايموجي",
+      "profile-alt": "{name}الصورة الرمزية لـ "
+    }
+  },
   "ui": {
     "close": "إغلاق",
     "next": "التالي",
     "loading": "جار التحميل",
     "skip-for-now": "تخطي الآن",
-    "save": "حفظ"
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "discard": "تجاهل",
+    "post": "نشر"
   },
   "errors": {
     "INVALID_EMAIL": "يرجى إدخال بريد إلكتروني صالح.",
@@ -125,7 +147,9 @@
     "USER_NOT_FOUND": "لم يتم العثور على المستخدم",
     "IDENTIFIER_REQUIRED": "يرجى إدخال بريدك الإلكتروني أو اسم المستخدم",
     "PASSWORD_REQUIRED": "يرجى إدخال كلمة المرور الخاصة بك",
-    "GENERIC_ERROR": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+    "GENERIC_ERROR": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+    "ACCOUNT_NOT_FOUND": "هذا الحساب غير موجود",
+    "TRY_SEARCHING": "حاول البحث عن حساب آخر"
   },
   "register": {
     "register-info": {

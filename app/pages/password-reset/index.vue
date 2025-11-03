@@ -16,7 +16,12 @@ onMounted(() => {
 
 <template>
   <div class="bg-background">
-    <UiDialog :open="passwordStore.open">
+    <UiDialog :open="passwordStore.open" :modal="false">
+      <div
+        v-if="passwordStore.open"
+        :data-state="passwordStore.open ? 'open' : 'closed'"
+        class="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 bg-dialog-backdrop fixed inset-0 z-50"
+      />
       <UiDialogContent :hide-close-button="true" header-class="ps-0">
         <template #header>
           <UiButton

@@ -1,8 +1,17 @@
 import { http, HttpResponse } from 'msw';
 import type { UpdateProfileRequest, UserData } from '~~/shared/types/shared';
-import type { ApiSuccessResponse } from '~~/shared/types/api';
+import type { ApiSuccessResponse, ApiErrorResponse } from '~~/shared/types/api';
+import rawUsers from '../data/mock-users.json' assert { type: 'json' };
+import type { User } from '#shared/types/user';
+import jwt from 'jsonwebtoken';
 
 const API_URL = process.env.BACKEND_URL;
+const mockUsers = rawUsers as User[];
+// Create a mapping of username to user info for easy lookup
+const mockUserInfos: Record<string, User> = {};
+mockUsers.forEach((user) => {
+  mockUserInfos[user.username] = user;
+});
 
 // Mock user data that will be updated
 const mockUserData: UserData = {
@@ -180,6 +189,41 @@ export const handlers = [
     return HttpResponse.json(response, { status: 200 });
   }),
 
+  http.get(`${API_URL}/me`, (req) => {
+    const accessToken = req.cookies['access_token'];
+
+    if (!accessToken) {
+      return new HttpResponse(
+        JSON.stringify({ error: { message: 'No access token provided' } } as ApiErrorResponse),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      );
+    }
+    try {
+      const decoded = jwt.verify(accessToken, 'refresh_secret') as { username: string };
+      // search for user by username in mockUsers
+      const user = mockUserInfos[decoded.username];
+      if (!user) throw new Error('User not found');
+
+      const response: ApiSuccessResponse<User> = {
+        success: true,
+        data: user,
+      };
+
+      return HttpResponse.json(response, { status: 200 });
+    } catch {
+      return new HttpResponse(
+        JSON.stringify({ error: { message: 'Invalid access token' } } as ApiErrorResponse),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      );
+    }
+  }),
+
   http.post(`${API_URL}/me/username`, async () => {
     mockUserData.username = '';
 
@@ -194,9 +238,7 @@ export const handlers = [
 
   http.put(`${API_URL}/me/password`, async ({ request }) => {
     try {
-      console.log('Password change request received');
       const body = await request.json();
-      console.log('Request body:', body);
 
       const { currentPassword, newPassword } = body as ChangePasswordRequest;
 

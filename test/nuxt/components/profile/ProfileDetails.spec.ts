@@ -20,6 +20,9 @@ const mockUserProfile = {
   followersCount: 200,
   mutualsCount: 5,
   mutualNames: [],
+  languageCode: 'en',
+  email: 'tes@#gmail.com',
+  phone: '+201234567890',
 };
 
 describe('ProfileDetails Component', () => {

@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import type { Tweet } from '../../shared/types/tweets';
 import tweetsData from '../data/mock-tweets.json' assert { type: 'json' };
+import type { ApiSuccessResponse } from '#shared/types/api';
 
 const API_URL = process.env.BACKEND_URL;
 const initialTweets = (tweetsData as unknown as Tweet[]) || [];
@@ -130,6 +131,60 @@ export const handlers = [
     unretweet(tweet);
     return HttpResponse.json(
       { success: true, message: 'Retweet undone successfully.' },
+      { status: 200 },
+    );
+  }),
+
+  // GET /timeline/for-you
+  http.get(`${API_URL}/timeline/for-you`, ({ request }) => {
+    const url = new URL(request.url);
+    const cursor = url.searchParams.get('cursor') || null;
+    const limit = Number(url.searchParams.get('limit') || '20');
+
+    const allTweets = Array.from(tweets.values());
+    const startIndex = cursor ? Math.max(0, Number(cursor)) : 0;
+    const paginatedTweets = allTweets.slice(startIndex, startIndex + limit);
+    const nextIndex = startIndex + paginatedTweets.length;
+    const nextCursor = nextIndex < allTweets.length ? String(nextIndex) : null;
+
+    return HttpResponse.json(
+      {
+        success: true,
+        message: 'Timeline fetched successfully.',
+        data: paginatedTweets,
+        pagination: {
+          cursor: String(startIndex),
+          nextCursor,
+          hasNextPage: !!nextCursor,
+        },
+      } as ApiSuccessResponse<Tweet[]>,
+      { status: 200 },
+    );
+  }),
+
+  // GET /timeline/following
+  http.get(`${API_URL}/timeline/following`, ({ request }) => {
+    const url = new URL(request.url);
+    const cursor = url.searchParams.get('cursor') || null;
+    const limit = Number(url.searchParams.get('limit') || '20');
+
+    const allTweets = Array.from(tweets.values());
+    const startIndex = cursor ? Math.max(0, Number(cursor)) : 0;
+    const paginatedTweets = allTweets.slice(startIndex, startIndex + limit);
+    const nextIndex = startIndex + paginatedTweets.length;
+    const nextCursor = nextIndex < allTweets.length ? String(nextIndex) : null;
+
+    return HttpResponse.json(
+      {
+        success: true,
+        message: 'Timeline fetched successfully.',
+        data: paginatedTweets,
+        pagination: {
+          cursor: String(startIndex),
+          nextCursor,
+          hasNextPage: !!nextCursor,
+        },
+      } as ApiSuccessResponse<Tweet[]>,
       { status: 200 },
     );
   }),

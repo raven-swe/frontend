@@ -27,6 +27,8 @@ const onSubmit = handleSubmit(async (values) => {
       password: values.password.trim(),
     };
     await loginStore.submitLogin(submissionValues);
+    // update user store after successful login
+    // await userStore.fetchCurrentUser();
   } catch (err: unknown) {
     showToaster('error', (err as Error).message || $t('errors.GENERIC_ERROR'));
   }

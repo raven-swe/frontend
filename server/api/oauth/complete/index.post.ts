@@ -1,37 +1,37 @@
-import { FetchError } from 'ofetch';
+import * as cookie from 'cookie';
+import * as jwt from 'jsonwebtoken';
 import type { OAuthTokenRequest, OAuthCallbackResponse } from '~~/shared/types/oauth';
-
-interface ApiError {
-  message: string;
-}
 
 export default defineEventHandler(async (event) => {
   const body = await readBody<OAuthTokenRequest>(event);
 
-  const API_URL = process.env.BACKEND_URL;
-
-  try {
-    const response = await $fetch<OAuthCallbackResponse>(`${API_URL}/oauth/complete`, {
+  const response = await serverApiFetch.raw<ApiSuccessResponse<OAuthCallbackResponse>>(
+    '/oauth/complete',
+    {
       method: 'POST',
-      body: {
-        creationToken: body.creationToken,
-        birthDate: body.birthDate,
-      },
-    });
-    return response;
-  } catch (e) {
-    if (e instanceof FetchError) {
-      const errData = e.data as ApiError;
-      return {
-        success: false,
-        message: errData?.message || 'OAuth complete request failed',
-        data: { creationToken: '' },
-      };
-    }
-    return {
-      success: false,
-      message: 'An unexpected error occurred',
-      data: { creationToken: '' },
-    };
+      body,
+      credentials: 'include',
+    },
+  );
+
+  const cookies = response.headers.getSetCookie?.();
+  cookies.forEach((cookie) => {
+    appendHeader(event, 'set-cookie', cookie);
+  });
+  if (response._data?.data && 'accessToken' in response._data.data) {
+    const accessTokenContent = jwt.decode(response._data.data.accessToken) as { exp?: number };
+    appendHeader(
+      event,
+      'set-cookie',
+      cookie.serialize('access_token', response._data!.data.accessToken, {
+        path: '/',
+        maxAge: accessTokenContent?.exp
+          ? accessTokenContent.exp - Math.floor(Date.now() / 1000)
+          : 60 * 5, // Default to 5 minutes if exp is missing
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+      }),
+    );
   }
+  return response._data;
 });
