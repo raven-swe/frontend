@@ -170,6 +170,19 @@
       "INVALID_TOKEN": "The OTP you entered is invalid",
       "ISLENGTH": "OTP must be exactly 6 digits",
       "IS_EMPTY": "Please enter your OTP code"
+    },
+    "name": {
+      "CONTAINSLETTER": "What's your name?"
+    },
+    "birthDate": {
+      "NOT_MINIMUM_AGE": "You must be at least 13 years old"
+    },
+    "email": {
+      "IS_EMPTY": "Please enter a valid email.",
+      "NOT_AN_EMAIL": "Please enter a valid email."
+    },
+    "recaptchaToken": {
+      "IS_EMPTY": "Verify that you are not a robot."
     }
   },
   "register": {
