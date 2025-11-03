@@ -1,6 +1,10 @@
 <script lang="ts" setup>
 import { loginService } from '~/services/auth/loginService';
 import { useQueryClient } from '@tanstack/vue-query';
+import { ref } from 'vue';
+import { useI18n } from '#imports';
+
+const { locale, setLocale } = useI18n();
 
 const userStore = useUserStore();
 const queryClient = useQueryClient();
@@ -8,6 +12,18 @@ const queryClient = useQueryClient();
 const handleLogout = async () => {
   await loginService.logout();
   queryClient.removeQueries({ queryKey: ['layout-data'] });
+};
+
+const lang = ref(locale.value);
+
+const switchLanguage = () => {
+  setLocale(lang.value);
+
+  if (lang.value === 'en') {
+    lang.value = 'ar';
+  } else {
+    lang.value = 'en';
+  }
 };
 </script>
 <template>
@@ -38,6 +54,9 @@ const handleLogout = async () => {
       <SideBarLeftTab
         :tab="{ label: 'settings', icon: 'settings', route: '/settings/account' }"
       ></SideBarLeftTab>
+      <UiButton variant="ghost-default" size="icon-xl" @click="switchLanguage">
+        <Icon name="material-symbols:language" size="24" />
+      </UiButton>
       <UiButton variant="ghost-default" size="icon-xl" @click="handleLogout">
         <Icon name="ic:outline-logout" size="24" />
       </UiButton>

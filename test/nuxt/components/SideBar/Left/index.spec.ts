@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { mountSuspended } from '@nuxt/test-utils/runtime';
+import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime';
 import SideBarLeft from '@/components/SideBar/Left/index.vue';
+
+mockNuxtImport('useI18n', () => {
+  return () => ({
+    locale: { value: 'en' },
+    localeProperties: { value: { dir: 'ltr' } },
+  });
+});
 
 describe('SideBar Left Component', () => {
   it('renders the sidebar container', async () => {
