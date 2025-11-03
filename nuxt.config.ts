@@ -72,4 +72,14 @@ export default defineNuxtConfig({
       }
     },
   },
+  fonts: {
+    families: [
+      {
+        name: 'Inter',
+        provider: 'google', // Load from Google Fonts
+        weights: [400, 500, 600, 700],
+        styles: ['normal', 'oblique', 'italic'],
+      },
+    ],
+  },
 });
