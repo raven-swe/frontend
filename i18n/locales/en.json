@@ -183,6 +183,12 @@
     },
     "recaptchaToken": {
       "IS_EMPTY": "Verify that you are not a robot."
+    },
+    "password": {
+      "NOT_A_STRING": "Please enter your password",
+      "IS_EMPTY": "Please enter your password",
+      "TOO_SHORT": "Password must be at least 10 characters long",
+      "INVALID_FORMAT": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
     }
   },
   "register": {
