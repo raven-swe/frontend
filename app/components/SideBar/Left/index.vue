@@ -3,8 +3,10 @@ import { loginService } from '~/services/auth/loginService';
 import { useQueryClient } from '@tanstack/vue-query';
 import { ref } from 'vue';
 import { useI18n } from '#imports';
+import { useTheme } from '~/composables/useTheme';
 
 const { locale, setLocale } = useI18n();
+const { mode, toggleTheme } = useTheme();
 
 const userStore = useUserStore();
 const queryClient = useQueryClient();
@@ -56,6 +58,14 @@ const switchLanguage = () => {
       ></SideBarLeftTab>
       <UiButton variant="ghost-default" size="icon-xl" @click="switchLanguage">
         <Icon name="material-symbols:language" size="24" />
+      </UiButton>
+      <UiButton variant="ghost-default" size="icon-xl" @click="toggleTheme">
+        <Icon
+          :name="
+            mode === 'dark' ? 'material-symbols:light-mode-outline' : 'material-symbols:nightlight'
+          "
+          size="24"
+        />
       </UiButton>
       <UiButton variant="ghost-default" size="icon-xl" @click="handleLogout">
         <Icon name="ic:outline-logout" size="24" />
