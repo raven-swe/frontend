@@ -31,6 +31,7 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
+      title: 'Raven',
       link: [
         { rel: 'preconnect', href: 'https://www.google.com' },
         { rel: 'preconnect', href: 'https://www.gstatic.com', crossorigin: '' },
