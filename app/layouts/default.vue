@@ -18,14 +18,20 @@ const { data, error, isError } = useQuery({
 });
 
 // Reactively sync userStore when data changes
-watchEffect(() => {
-  if (isError.value && error.value) {
-    userStore.error = error.value.message;
-  } else if (data.value?.success) {
-    userStore.setUser(data.value.data);
-    userStore.error = null;
-  }
-});
+watch(
+  () => data.value,
+  (newVal) => {
+    if (!newVal) return;
+
+    if (newVal.success) {
+      userStore.setUser(newVal.data);
+      userStore.error = null;
+    } else if (isError.value && error.value) {
+      userStore.error = error.value.message;
+    }
+  },
+  { immediate: true, deep: true },
+);
 </script>
 
 <template>

@@ -10,8 +10,9 @@ interface Emits {
   (e: 'update:open', value: boolean): void;
 }
 const emit = defineEmits<Emits>();
+const userStore = useUserStore();
 
-const bio = ref('');
+const bio = ref(userStore.user?.bio || '');
 const actionButton = computed(() => {
   const isBioSet = bio.value.trim().length > 0;
   return {
@@ -31,6 +32,16 @@ const handleOpenChange = (value: boolean) => {
     bio.value = '';
   }
 };
+
+watch(
+  () => userStore.user.bio,
+  (newVal) => {
+    if (!bio.value.trim()) {
+      bio.value = newVal || '';
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
