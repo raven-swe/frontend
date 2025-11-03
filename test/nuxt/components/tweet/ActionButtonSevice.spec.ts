@@ -2,7 +2,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Stub global $fetch used by service functions
 const fetchMock = vi.fn();
-vi.stubGlobal('$fetch', fetchMock);
+const $fetchMock = Object.assign(fetchMock, {
+  create: vi.fn(() => fetchMock),
+});
+vi.stubGlobal('$fetch', $fetchMock);
 
 describe('actionButtonsService', () => {
   beforeEach(() => {
