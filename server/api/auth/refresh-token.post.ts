@@ -2,7 +2,8 @@ import { defineWrappedResponseHandler } from '~~/server/utils/handler';
 
 export default defineWrappedResponseHandler(async (event) => {
   const clientCookie = getHeader(event, 'cookie');
-  const response = await serverApiFetch.raw<ApiSuccessResponse<{ accessToken: string }>>(
+  const fetcher = serverApiFetch(event);
+  const response = await fetcher.raw<ApiSuccessResponse<{ accessToken: string }>>(
     '/auth/refresh-token',
     {
       method: 'POST',

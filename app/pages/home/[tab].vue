@@ -5,7 +5,6 @@ import { useInfiniteScroll, useVirtualList } from '@vueuse/core';
 import TweetDefaultCard from '~/components/tweet/TweetDefaultCard.vue';
 import type { Tweet } from '~~/shared/types/tweets';
 import { homeService } from '~/services/home/homeService';
-import type { ApiSuccessResponse } from '~~/shared/types/apiResponses';
 
 definePageMeta({
   layout: 'home',
