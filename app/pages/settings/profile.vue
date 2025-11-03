@@ -130,7 +130,10 @@ const isFormValid = computed(() => {
 const queryClient = useQueryClient();
 const handleSubmit = async () => {
   if (!isFormValid.value) return;
-  if (!hasUnsavedChanges.value) return;
+  if (!hasUnsavedChanges.value) {
+    router.push(`/profile/${userStore.user.username}`);
+    return;
+  }
 
   // optimistic navigation
   router.push(`/profile/${userStore.user.username}`);
