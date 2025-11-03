@@ -1,6 +1,6 @@
 import type { ApiSuccessResponse } from '~~/shared/types/api';
 
-export default defineEventHandler(async (event) => {
+export default defineWrappedResponseHandler(async (event) => {
   const authHeader = getHeader(event, 'authorization');
 
   const response = await serverApiFetch<ApiSuccessResponse<{ success: boolean; message: string }>>(
