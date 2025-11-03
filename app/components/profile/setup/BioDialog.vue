@@ -48,7 +48,7 @@ watch(
   <UiDialog :open="props.open" @update:open="handleOpenChange">
     <UiDialogContent header-class="flex items-center justify-center p-0" class="h-auto">
       <template #header>
-        <img src="https://placehold.co/32x32" class="size-8" />
+        <LogoRaven class="h-32 w-32" />
       </template>
       <UiDialogHeader class="px-8 py-4">
         <UiDialogTitle class="text-3xl font-bold">{{

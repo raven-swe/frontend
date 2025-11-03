@@ -12,7 +12,7 @@ const handleLogout = async () => {
 </script>
 <template>
   <div class="flex h-screen flex-col items-center xl:items-start">
-    <div class="hover:bg-foreground/10 my-2 w-min p-2 hover:rounded-full">
+    <div class="my-2 w-min p-2 hover:rounded-full">
       <NuxtLink to="/">
         <LogoRaven class="h-14 w-14" />
       </NuxtLink>
