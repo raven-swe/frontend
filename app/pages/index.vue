@@ -118,7 +118,13 @@ onMounted(() => {
             <p class="font-semibold">
               {{ $t('root.auth.already-have-account') }}
             </p>
-            <Button id="signin" variant="outline" class="my-4 w-75" @click="loginStore.openDialog">
+            <Button
+              id="signin"
+              variant="outline"
+              class="my-4 w-75"
+              data-cy="signin-start-button"
+              @click="loginStore.openDialog"
+            >
               {{ $t('root.auth.signin') }}
             </Button>
           </section>

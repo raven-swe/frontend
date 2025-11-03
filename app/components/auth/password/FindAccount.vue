@@ -50,7 +50,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <form @submit.prevent="onSubmit">
+  <form data-cy="signin-forgot-pwd-account-form" @submit.prevent="onSubmit">
     <UiDialogHeader class="mt-3 w-fit px-8 py-4">
       <UiDialogTitle class="text-start text-3xl font-bold">
         {{ $t('forgot-password.find-account.title') }}
