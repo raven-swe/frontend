@@ -95,12 +95,12 @@ describe('Register Store', () => {
     store.creationToken = 'ct-1';
 
     const ok = await store.submitOtp('123456');
-    expect(ok).toBe(true);
+    expect(ok).toBeUndefined();
     expect(store.step).toBe(2);
 
     store.step = 0;
     const failed = await store.submitOtp('0000');
-    expect(failed).toBe(false);
+    expect(failed).toBeUndefined();
     expect(store.step).toBe(0);
   });
 
@@ -138,11 +138,21 @@ describe('Register Store', () => {
     const { useRegisterStore } = await import('@/stores/register');
     const store = useRegisterStore();
     store.step = 2;
-    store.registerationInfo = { name: 'Test', email: 'test@example.com', birthDate: '2000-01-01' };
+    store.registerationInfo = {
+      name: 'Test',
+      email: 'test@example.com',
+      birthDate: '2000-01-01',
+      recaptchaToken: 'token',
+    };
     store.resetInitialData();
     expect(store.step).toBe(0);
     expect(store.open).toBe(false);
-    expect(store.registerationInfo).toEqual({ name: '', email: '', birthDate: '' });
+    expect(store.registerationInfo).toEqual({
+      name: '',
+      email: '',
+      birthDate: '',
+      recaptchaToken: '',
+    });
   });
 
   it('call resendOtp handles errors gracefully', async () => {
