@@ -25,7 +25,7 @@ const onSubmit = handleSubmit(async (values) => {
 </script>
 
 <template>
-  <form @submit.prevent="onSubmit">
+  <form data-cy="forgot-pwd-otp-form" @submit.prevent="onSubmit">
     <UiDialogHeader class="mt-3 w-fit px-8 py-4">
       <UiDialogTitle class="text-start text-3xl font-bold">
         {{ $t('forgot-password.otp.title') }}
@@ -43,6 +43,7 @@ const onSubmit = handleSubmit(async (values) => {
           name="otp"
           v-bind="otpAttrs"
           data-testid="otp-input"
+          data-cy="forgot-pwd-otp-input"
         />
         <p
           class="text-primary ms-1 mt-2 block w-fit cursor-pointer text-sm"
@@ -61,6 +62,7 @@ const onSubmit = handleSubmit(async (values) => {
         type="submit"
         data-testid="submit-button"
         :disabled="!meta.valid || isSubmitting"
+        data-cy="forgot-pwd-next-button"
       >
         {{ $t('ui.next') }}
       </UiButton>

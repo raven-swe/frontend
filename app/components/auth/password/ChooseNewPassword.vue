@@ -35,7 +35,7 @@ const onSubmit = handleSubmit(async (values) => {
 </script>
 
 <template>
-  <form @submit.prevent="onSubmit">
+  <form data-cy="forgot-pwd-new-password-form" @submit.prevent="onSubmit">
     <UiDialogHeader class="mt-3 w-fit px-8 py-4">
       <UiDialogTitle class="text-start text-3xl font-bold">
         {{ $t('forgot-password.new-password.title') }}
@@ -55,12 +55,14 @@ const onSubmit = handleSubmit(async (values) => {
           name="newPassword"
           v-bind="newPasswordAttrs"
           data-testid="new-password-input"
+          data-cy="forgot-pwd-new-password-input"
         />
         <UiFormFieldPassword
           :placeholder="$t('forgot-password.new-password.confirm-password.label')"
           name="confirmPassword"
           v-bind="confirmPasswordAttrs"
           data-testid="confirm-password-input"
+          data-cy="forgot-pwd-confirm-password-input"
         />
       </section>
     </div>
@@ -72,6 +74,7 @@ const onSubmit = handleSubmit(async (values) => {
         type="submit"
         data-testid="submit-button"
         :disabled="!meta.valid || isSubmitting"
+        data-cy="forgot-pwd-next-button"
       >
         {{ $t('forgot-password.new-password.change-password-button') }}
       </UiButton>
