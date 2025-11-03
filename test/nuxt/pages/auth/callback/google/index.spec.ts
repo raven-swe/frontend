@@ -29,6 +29,7 @@ vi.mock('~/components/ui/OAuthCompleteForm.vue', () => ({
 
 // Mock $fetch
 const fetchMock = vi.fn();
+fetchMock.create = vi.fn(() => fetchMock);
 vi.stubGlobal('$fetch', fetchMock);
 
 describe('Google Callback Page', () => {

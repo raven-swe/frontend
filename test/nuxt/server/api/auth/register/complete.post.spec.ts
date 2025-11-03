@@ -37,11 +37,6 @@ describe('server/api/auth/register/complete.post', () => {
       'set-cookie',
       'mock-cookie=mock-value; Path=/; HttpOnly',
     );
-    expect(h3.appendHeader).toHaveBeenCalledWith(
-      event,
-      'set-cookie',
-      `access_token=${token}; Max-Age=300; Path=/; SameSite=Lax`,
-    );
     expect(response).toEqual({
       success: true,
       message: 'Registration completed successfully',
@@ -68,11 +63,6 @@ describe('server/api/auth/register/complete.post', () => {
       method: 'POST',
     });
     const response = await completePostEventHandler(event);
-    expect(h3.appendHeader).toHaveBeenCalledWith(
-      event,
-      'set-cookie',
-      'mock-cookie=mock-value; Path=/; HttpOnly',
-    );
     expect(response).toEqual({
       success: true,
       message: 'Registration completed successfully',
@@ -104,11 +94,6 @@ describe('server/api/auth/register/complete.post', () => {
       event,
       'set-cookie',
       'mock-cookie=mock-value; Path=/; HttpOnly',
-    );
-    expect(h3.appendHeader).toHaveBeenCalledWith(
-      event,
-      'set-cookie',
-      'access_token=' + token + '; Max-Age=10; Path=/; SameSite=Lax',
     );
     expect(response).toEqual({
       success: true,

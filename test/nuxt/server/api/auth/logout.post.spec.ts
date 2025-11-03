@@ -12,6 +12,9 @@ const mockServerApiFetchRaw = vi.fn(async (url: string, options: { method: strin
         success: true,
         message: 'Logged out successfully',
       },
+      headers: {
+        getSetCookie: () => ['mock-cookie=mock-value; Path=/; HttpOnly'],
+      },
     };
   }
 });

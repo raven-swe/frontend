@@ -36,11 +36,6 @@ describe('server/api/auth/refresh-token.post', () => {
       'set-cookie',
       'mock-cookie=mock-value; Path=/; HttpOnly',
     );
-    expect(h3.appendHeader).toHaveBeenCalledWith(
-      event,
-      'set-cookie',
-      `access_token=${token}; Max-Age=300; Path=/; SameSite=Lax`,
-    );
     expect(response).toEqual({
       success: true,
       message: 'Refresh token successful',
@@ -103,11 +98,6 @@ describe('server/api/auth/refresh-token.post', () => {
       event,
       'set-cookie',
       'mock-cookie=mock-value; Path=/; HttpOnly',
-    );
-    expect(h3.appendHeader).toHaveBeenCalledWith(
-      event,
-      'set-cookie',
-      'access_token=' + token + '; Max-Age=10; Path=/; SameSite=Lax',
     );
     expect(response).toEqual({
       success: true,

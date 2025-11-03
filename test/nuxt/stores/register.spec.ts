@@ -112,6 +112,13 @@ describe('Register Store', () => {
       registerationService,
     }));
 
+    const useAuth = vi.fn().mockReturnValue({
+      signup: vi.fn().mockResolvedValueOnce({ message: 'Signup successful', success: true }),
+    });
+    vi.doMock('@/composables/useAuth', () => ({
+      useAuth,
+    }));
+
     const { useRegisterStore } = await import('@/stores/register');
 
     const store = useRegisterStore();

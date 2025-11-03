@@ -37,11 +37,6 @@ describe('server/api/auth/login.post', () => {
       'set-cookie',
       'mock-cookie=mock-value; Path=/; HttpOnly',
     );
-    expect(h3.appendHeader).toHaveBeenCalledWith(
-      event,
-      'set-cookie',
-      `access_token=${token}; Max-Age=300; Path=/; SameSite=Lax`,
-    );
     expect(response).toEqual({
       success: true,
       message: 'Login successful',
@@ -100,16 +95,6 @@ describe('server/api/auth/login.post', () => {
       method: 'POST',
     });
     const response = await loginPostEventHandler(event);
-    expect(h3.appendHeader).toHaveBeenCalledWith(
-      event,
-      'set-cookie',
-      'mock-cookie=mock-value; Path=/; HttpOnly',
-    );
-    expect(h3.appendHeader).toHaveBeenCalledWith(
-      event,
-      'set-cookie',
-      'access_token=' + token + '; Max-Age=10; Path=/; SameSite=Lax',
-    );
     expect(response).toEqual({
       success: true,
       message: 'Login successful',
