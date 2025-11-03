@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { apiFetch } from '~/api';
 import type { Tweet } from '~~/shared/types/tweets';
 definePageMeta({
   layout: 'profile',
@@ -6,7 +7,10 @@ definePageMeta({
 
 const tweets = ref<Tweet[]>([]);
 
-const { data: tweetsData, error } = await useFetch<{ data: Tweet[] }>('/api/tweets');
+const { data: tweetsData, error } = await useAsyncData<{ data: Tweet[] }>(
+  'user-tweets',
+  async () => await apiFetch('/api/tweets'),
+);
 tweets.value = tweetsData.value?.data || [];
 
 if (error.value) console.error(error.value);

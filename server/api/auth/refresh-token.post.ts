@@ -1,5 +1,3 @@
-import * as cookie from 'cookie';
-import * as jwt from 'jsonwebtoken';
 import { defineWrappedResponseHandler } from '~~/server/utils/handler';
 
 export default defineWrappedResponseHandler(async (event) => {
@@ -20,20 +18,5 @@ export default defineWrappedResponseHandler(async (event) => {
     appendHeader(event, 'set-cookie', cookie);
   });
 
-  if (response._data?.data.accessToken) {
-    const accessTokenContent = jwt.decode(response._data.data.accessToken) as { exp: number };
-    appendHeader(
-      event,
-      'set-cookie',
-      cookie.serialize('access_token', response._data?.data.accessToken, {
-        path: '/',
-        maxAge: accessTokenContent?.exp
-          ? accessTokenContent.exp - Math.floor(Date.now() / 1000)
-          : 60 * 5, // Default to 5 minutes if exp is missing
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-      }),
-    );
-  }
   return response._data;
 });

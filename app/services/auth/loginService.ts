@@ -17,7 +17,7 @@ export const loginService = {
   },
 
   async login(data: LoginSchema) {
-    return await $fetch<ApiSuccessResponse<{ accessToken: string }>>('/api/auth/login', {
+    return await $fetch('/api/auth/login', {
       method: 'POST',
       body: data,
     });
@@ -27,8 +27,6 @@ export const loginService = {
     const response = await apiFetch<ApiResponseBase>('/api/auth/logout', {
       method: 'POST',
     });
-    useUserStore().logout();
-    navigateTo('/');
     return response;
   },
 };

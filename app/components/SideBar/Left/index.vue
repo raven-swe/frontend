@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { loginService } from '~/services/auth/loginService';
 import { useQueryClient } from '@tanstack/vue-query';
 import { ref } from 'vue';
 import { useI18n } from '#imports';
@@ -10,9 +9,9 @@ const { mode, toggleTheme } = useTheme();
 
 const userStore = useUserStore();
 const queryClient = useQueryClient();
-
+const auth = useAuth();
 const handleLogout = async () => {
-  await loginService.logout();
+  await auth.logout();
   queryClient.removeQueries({ queryKey: ['layout-data'] });
 };
 

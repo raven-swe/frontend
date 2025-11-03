@@ -58,10 +58,11 @@ export const useLoginStore = defineStore('login', () => {
     }
   };
 
+  const auth = useAuth();
   const submitLogin = async (data: LoginSchema) => {
     loading.value = true;
     try {
-      await loginService.login(data);
+      await auth.login(data);
       open.value = false;
       showToaster('success', 'Login successful');
       navigateTo('/home');

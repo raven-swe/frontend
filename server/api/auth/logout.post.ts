@@ -12,7 +12,9 @@ export default defineWrappedResponseHandler(async (event) => {
       ...(authHeader ? { Authorization: authHeader } : {}),
     },
   });
-  deleteCookie(event, 'access_token', { path: '/' });
-  deleteCookie(event, 'refresh_token', { path: '/' });
+  const cookies = response.headers.getSetCookie?.();
+  cookies.forEach((cookie) => {
+    appendHeader(event, 'set-cookie', cookie);
+  });
   return response._data;
 });

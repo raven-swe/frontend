@@ -36,6 +36,10 @@ onMounted(async () => {
           creationToken.value = result.data.creationToken;
           showForm.value = true;
         } else {
+          if ('accessToken' in result.data) {
+            const auth = useAuth();
+            auth.setAccessToken(result.data.accessToken);
+          }
           // Handle accessToken/refreshToken as usual
           await router.push('/home');
         }

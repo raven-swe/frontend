@@ -34,6 +34,10 @@ onMounted(async () => {
           showForm.value = true;
         } else {
           // Handle accessToken/refreshToken as usual
+          if ('accessToken' in result.data) {
+            const auth = useAuth();
+            auth.setAccessToken(result.data.accessToken);
+          }
           await router.push('/home');
         }
       } catch (error) {

@@ -76,9 +76,10 @@ export const useRegisterStore = defineStore('register', () => {
     }
   };
 
+  const auth = useAuth();
   const submitPassword = async (password: string) => {
     try {
-      await registerationService.complete(password, creationToken.value);
+      await auth.signup(password, creationToken.value);
       resetInitialData();
       open.value = false;
       navigateTo('/home');
