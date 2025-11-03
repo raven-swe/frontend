@@ -44,6 +44,9 @@ const startCountdown = () => {
         setErrors({
           otp: t('errors.OTP_RESEND_LIMIT_EXCEEDED', { seconds: retryOtpTimeout.value }),
         });
+      if (retryOtpTimeout.value === 0) {
+        setErrors({ otp: undefined });
+      }
     } else {
       if (countdownInterval) clearInterval(countdownInterval);
       setErrors({ otp: undefined });
