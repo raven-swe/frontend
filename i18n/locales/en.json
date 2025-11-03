@@ -168,7 +168,38 @@
     "EMPTY_NAME": "Name can't be blank",
     "RECAPTCHA_REQUIRED": "Please complete the reCAPTCHA challenge",
     "ACCOUNT_NOT_FOUND": "This account doesn't \nexist",
-    "TRY_SEARCHING": "Try searching for another one"
+    "TRY_SEARCHING": "Try searching for another one",
+    "OTP_RESEND_LIMIT_EXCEEDED": "OTP resend limit reached. Please try again in {seconds}.",
+    "otp": {
+      "INVALID_TOKEN": "The OTP you entered is invalid",
+      "ISLENGTH": "OTP must be exactly 6 digits",
+      "IS_EMPTY": "Please enter your OTP code"
+    },
+    "name": {
+      "CONTAINSLETTER": "What's your name?",
+      "NOT_A_STRING": "What's your name?",
+      "IS_EMPTY": "What's your name?",
+      "TOO_LONG": "Name must be at most 50 characters long"
+    },
+    "birthDate": {
+      "NOT_MINIMUM_AGE": "You must be at least 13 years old",
+      "IS_EMPTY": "Please enter your date of birth.",
+      "NOT_A_DATE": "Please enter a valid date."
+    },
+    "email": {
+      "IS_EMPTY": "Please enter a valid email.",
+      "NOT_AN_EMAIL": "Please enter a valid email."
+    },
+    "recaptchaToken": {
+      "IS_EMPTY": "Verify that you are not a robot.",
+      "NOT_A_STRING": "Verify that you are not a robot."
+    },
+    "password": {
+      "NOT_A_STRING": "Please enter your password",
+      "IS_EMPTY": "Please enter your password",
+      "TOO_SHORT": "Password must be at least 10 characters long",
+      "INVALID_FORMAT": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+    }
   },
   "register": {
     "register-info": {

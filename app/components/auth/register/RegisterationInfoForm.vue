@@ -9,21 +9,24 @@ import useRecaptcha from '@/composables/useRecaptcha';
 import Select from '~/components/ui/Select.vue';
 import { registerationService } from '~/services/auth/registerationService';
 
+const { t } = useI18n();
 const registerStore = useRegisterStore();
-const today = new Date();
-const thirteenYearsAgo = new Date(today.getFullYear() - 13, today.getMonth(), today.getDate());
 const schema = yup.object({
-  email: yup.string().min(1, $t('errors.INVALID_EMAIL')).email($t('errors.INVALID_EMAIL')),
-  name: yup.string().min(1, $t('errors.NAME_TOO_SHORT')).max(50, $t('errors.NAME_TOO_LONG')),
+  email: yup.string().min(1, t('errors.INVALID_EMAIL')).email(t('errors.INVALID_EMAIL')),
+  name: yup.string().min(1, t('errors.NAME_TOO_SHORT')).max(50, t('errors.NAME_TOO_LONG')),
   birthDate: yup
     .date()
-    .typeError($t('errors.AGE_RESTRICTION'))
-    .required($t('errors.AGE_RESTRICTION'))
-    .max(thirteenYearsAgo, $t('errors.AGE_RESTRICTION')), // at least 13 years old
-  recaptcha: yup
+    .typeError(t('errors.AGE_RESTRICTION'))
+    .required(t('errors.AGE_RESTRICTION'))
+    .test('age', t('errors.AGE_RESTRICTION'), function (birthdate) {
+      const cutoff = new Date();
+      cutoff.setFullYear(cutoff.getFullYear() - 13);
+      return birthdate <= cutoff;
+    }),
+  recaptchaToken: yup
     .string()
-    .required($t('errors.RECAPTCHA_REQUIRED'))
-    .min(1, $t('errors.RECAPTCHA_REQUIRED')),
+    .required(t('errors.RECAPTCHA_REQUIRED'))
+    .min(1, t('errors.RECAPTCHA_REQUIRED')),
 });
 const { errors, values, defineField, handleSubmit, isSubmitting, setFieldError, setFieldValue } =
   useForm<yup.InferType<typeof schema>>({
@@ -34,22 +37,25 @@ const { errors, values, defineField, handleSubmit, isSubmitting, setFieldError, 
       birthDate: registerStore.registerationInfo?.birthDate
         ? new Date(registerStore.registerationInfo.birthDate)
         : undefined,
-      recaptcha: undefined,
+      recaptchaToken: undefined,
     },
   });
 
-const onSubmit = handleSubmit(async (values) => {
+const onSubmit = handleSubmit(async (values, actions) => {
   if (!values.birthDate || !values.email || !values.name) return;
 
   // Format date as yyyy-mm-dd
-  const formattedBirthDate = values.birthDate.toISOString().split('T')[0] as string;
+  const formattedBirthDate = values.birthDate?.toISOString()?.split('T')[0] as string;
   const vals = {
     name: values.name,
     email: values.email,
     birthDate: formattedBirthDate,
-    recaptchaToken: values.recaptcha,
+    recaptchaToken: values.recaptchaToken,
   };
-  await registerStore.submitRegisterationInfo(vals);
+  const errors = await registerStore.submitRegisterationInfo(vals);
+  if (errors) {
+    actions.setErrors(backendValidationToFormErrors(errors, t));
+  }
 });
 
 const [_email, emailAttrs] = defineField('email');
@@ -90,7 +96,8 @@ watch(
     if (day && month && year) {
       const birthDate = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
       if (birthDate.getDate() === Number(day)) {
-        setFieldValue('birthDate', birthDate);
+        setFieldError('birthDate', undefined);
+        setFieldValue('birthDate', birthDate, true);
       }
     }
   },
@@ -103,10 +110,11 @@ onMounted(async () => {
   renderRecaptcha({
     elementId: 'recaptcha-container',
     callback: (token: string) => {
-      setFieldValue('recaptcha', token);
+      setFieldValue('recaptchaToken', token);
+      setFieldError('recaptchaToken', undefined);
     },
     expiredCallback: () => {
-      setFieldValue('recaptcha', '', true);
+      setFieldValue('recaptchaToken', '', true);
     },
   });
 });
@@ -179,7 +187,12 @@ onMounted(async () => {
         </p>
       </div>
       <ClientOnly>
-        <div id="recaptcha-container" class="g-recaptcha"></div>
+        <div>
+          <div id="recaptcha-container" class="g-recaptcha"></div>
+          <p v-if="errors.recaptchaToken" class="text-destructive text-xs">
+            {{ errors.recaptchaToken }}
+          </p>
+        </div>
       </ClientOnly>
     </div>
     <UiDialogFooter class="mt-auto">
