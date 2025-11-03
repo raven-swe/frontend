@@ -107,7 +107,7 @@ const handleOpenChange = (value: boolean) => {
         <!-- Profile Section -->
         <div class="flex flex-col items-center gap-3 self-start px-10">
           <img
-            :src="formData.avatarUrl || '/default_profile.png'"
+            :src="formData.avatarUrl || 'https://cdn.raven.cmp27.space/default_avatar.png'"
             class="h-25 w-25 rounded-full object-cover"
           />
           <div>

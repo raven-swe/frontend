@@ -23,7 +23,12 @@ onMounted(async () => {
           '/api/oauth/github/callback',
           {
             method: 'POST',
-            body: { code },
+            body: {
+              providerToken: code,
+            },
+            headers: {
+              'X-Client-Type': 'web',
+            },
           },
         );
 

@@ -16,6 +16,7 @@ const {
   isBioDialogOpen,
   isLocationDialogOpen,
   isConfirmationDialogOpen,
+  startFlow,
   nextStep,
   setProfilePicture,
   setAvatarUrl,
@@ -55,6 +56,10 @@ const handleConfirmationSubmit = async () => {
   closeFlow();
   submitProfile();
 };
+
+onMounted(() => {
+  startFlow();
+});
 </script>
 
 <template>

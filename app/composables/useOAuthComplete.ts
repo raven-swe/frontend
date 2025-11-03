@@ -16,6 +16,9 @@ export function useOAuthComplete() {
         {
           method: 'POST',
           body: { creationToken, birthDate },
+          headers: {
+            'X-Client-Type': 'web',
+          },
         },
       );
       if (result.value?.success) {

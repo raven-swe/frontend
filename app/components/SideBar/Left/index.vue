@@ -1,6 +1,14 @@
 <script lang="ts" setup>
 import { loginService } from '~/services/auth/loginService';
+import { useQueryClient } from '@tanstack/vue-query';
+
 const userStore = useUserStore();
+const queryClient = useQueryClient();
+
+const handleLogout = async () => {
+  await loginService.logout();
+  queryClient.removeQueries({ queryKey: ['layout-data'] });
+};
 </script>
 <template>
   <div class="flex h-screen flex-col items-center xl:items-start">
@@ -30,7 +38,7 @@ const userStore = useUserStore();
       <SideBarLeftTab
         :tab="{ label: 'settings', icon: 'settings', route: '/settings/account' }"
       ></SideBarLeftTab>
-      <UiButton variant="ghost-default" size="icon-xl" @click="loginService.logout">
+      <UiButton variant="ghost-default" size="icon-xl" @click="handleLogout">
         <Icon name="ic:outline-logout" size="24" />
       </UiButton>
     </div>

@@ -27,6 +27,7 @@ export const loginService = {
     const response = await apiFetch<ApiResponseBase>('/api/auth/logout', {
       method: 'POST',
     });
+    useUserStore().logout();
     navigateTo('/');
     return response;
   },

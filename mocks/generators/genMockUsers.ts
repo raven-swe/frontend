@@ -28,6 +28,8 @@ export function generateMockUser(): User {
       .toISOString(),
     email: faker.internet.email(),
     phone: faker.phone.number(),
+    followersCount: faker.number.int({ min: 0, max: 100000 }),
+    followingCount: faker.number.int({ min: 0, max: 10000 }),
     languageCode: faker.helpers.arrayElement(['en', 'es', 'fr', 'de']),
   };
 }

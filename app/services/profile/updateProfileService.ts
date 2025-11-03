@@ -1,10 +1,11 @@
-import type { UpdateProfileRequest, UserData } from '~~/types/shared';
-import type { ApiSuccessResponse } from '~~/types/api';
+import type { UpdateProfileRequest, UserData } from '~~/shared/types/shared';
+import type { ApiSuccessResponse } from '~~/shared/types/api';
+import { apiFetch } from '~/api';
 
 export const updateProfileService = () => {
   const updateProfile = async (profileData: UpdateProfileRequest): Promise<UserData> => {
     try {
-      const response = await $fetch<ApiSuccessResponse<UserData>>('/api/me', {
+      const response = await apiFetch<ApiSuccessResponse<UserData>>('/api/me', {
         method: 'PATCH',
         body: profileData,
       });
@@ -23,7 +24,7 @@ export const updateProfileService = () => {
       const formData = new FormData();
       formData.append('profilePicture', file);
 
-      const response = await $fetch<{ success: boolean; message: string }>(
+      const response = await apiFetch<{ success: boolean; message: string }>(
         '/api/me/profile-picture',
         {
           method: 'POST',
@@ -43,7 +44,7 @@ export const updateProfileService = () => {
       const formData = new FormData();
       formData.append('bannerImage', file);
 
-      const response = await $fetch<{ imageUrl: string }>('/api/me/banner', {
+      const response = await apiFetch<{ imageUrl: string }>('/api/me/banner', {
         method: 'POST',
         body: formData,
       });
@@ -57,7 +58,7 @@ export const updateProfileService = () => {
 
   const removeHeaderImage = async (): Promise<{ success: boolean; message: string }> => {
     try {
-      const response = await $fetch<ApiSuccessResponse<{ success: boolean; message: string }>>(
+      const response = await apiFetch<ApiSuccessResponse<{ success: boolean; message: string }>>(
         '/api/me/banner',
         {
           method: 'DELETE',
