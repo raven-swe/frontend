@@ -12,7 +12,7 @@ import * as cookie from 'cookie';
 
 const mockUsers = rawUsers as User[];
 
-const API_URL = process.env.BACKEND_URL;
+const API_URL = process.env.BACKEND_URL || 'https://example.com';
 
 const generateAuthToken = (username: string) => {
   const payload = {
@@ -42,6 +42,7 @@ export const handlers = [
   http.get(`${API_URL}/auth/check-email`, ({ request }) => {
     const url = new URL(request.url);
     const email = url.searchParams.get('email');
+    console.log('request headers:', request.headers);
 
     if (email == 'test@example.com') {
       return HttpResponse.json(
@@ -59,6 +60,8 @@ export const handlers = [
   }),
 
   http.post(`${API_URL}/auth/register/start`, async ({ request }) => {
+    console.log('request headers:', request.headers);
+
     const body = (await request.json()) as
       | {
           name: string;
