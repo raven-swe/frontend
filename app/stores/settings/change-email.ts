@@ -5,6 +5,7 @@ export const useChangeEmailStore = defineStore('changeEmail', () => {
   const open = ref(false);
   const email = ref('');
   const confirmationToken = ref('');
+  const userStore = useUserStore();
 
   const isOpen = computed(() => open.value);
 
@@ -43,6 +44,7 @@ export const useChangeEmailStore = defineStore('changeEmail', () => {
         },
       });
       showToaster('success', 'Email changed successfully.');
+      userStore.updateUser({ email: email.value });
       email.value = '';
       confirmationToken.value = '';
       step.value = 'email';
