@@ -113,15 +113,31 @@ onMounted(async () => {
 </script>
 
 <template>
-  <form class="flex h-full flex-col justify-between" @submit.prevent="onSubmit">
+  <form
+    class="flex h-full flex-col justify-between"
+    data-cy="signup-info-form"
+    @submit.prevent="onSubmit"
+  >
     <UiDialogHeader class="py-6">
       <UiDialogTitle class="text-4xl font-bold">{{
         $t('register.register-info.title')
       }}</UiDialogTitle>
     </UiDialogHeader>
     <div class="flex flex-col gap-4">
-      <FieldInput placeholder="Name" type="text" name="name" v-bind="nameAttrs" />
-      <FieldInput placeholder="Email" type="text" name="email" v-bind="emailAttrs" />
+      <FieldInput
+        placeholder="Name"
+        type="text"
+        data-cy="signup-name"
+        name="name"
+        v-bind="nameAttrs"
+      />
+      <FieldInput
+        placeholder="Email"
+        type="text"
+        data-cy="signup-email"
+        name="email"
+        v-bind="emailAttrs"
+      />
       <div>
         <h2 class="font-semibold">{{ $t('register.register-info.date-of-birth.title') }}</h2>
         <p class="text-muted-foreground mb-4 text-sm">
@@ -134,6 +150,7 @@ onMounted(async () => {
             :options="dateSelect.months.value"
             placeholder="Month"
             name="birth-month"
+            data-cy="signup-dob-month"
           />
           <Select
             v-model="dateSelect.selectedDay.value"
@@ -141,6 +158,7 @@ onMounted(async () => {
             :options="dateSelect.days.value"
             placeholder="Day"
             name="birth-day"
+            data-cy="signup-dob-day"
           />
           <Select
             v-model="dateSelect.selectedYear.value"
@@ -148,12 +166,14 @@ onMounted(async () => {
             :options="dateSelect.years.value"
             placeholder="Year"
             name="birth-year"
+            data-cy="signup-dob-year"
           />
         </div>
         <p
           v-if="errors.birthDate"
           data-test-id="birth-date-error"
           class="text-destructive ps-1 text-xs"
+          data-cy="signup-dob-error"
         >
           {{ errors.birthDate }}
         </p>
@@ -168,6 +188,7 @@ onMounted(async () => {
         :disabled="Object.entries(errors).length > 0 || isSubmitting"
         size="xl"
         class="w-full"
+        data-cy="signup-next-button"
         >{{ $t('ui.next') }}</Button
       >
     </UiDialogFooter>
