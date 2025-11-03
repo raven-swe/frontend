@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import Button from '~/components/ui/Button.vue';
 import { useLoginStore } from '~/stores/auth/login';
+import { ref } from 'vue';
+import { useI18n } from '#imports';
+
+const { locale, setLocale } = useI18n();
 
 const loginStore = useLoginStore();
 const registerStore = useRegisterStore();
@@ -63,10 +67,25 @@ onMounted(() => {
     }
   });
 });
+
+const lang = ref(locale.value);
+
+const switchLanguage = () => {
+  setLocale(lang.value);
+
+  if (lang.value === 'en') {
+    lang.value = 'ar';
+  } else {
+    lang.value = 'en';
+  }
+};
 </script>
 
 <template>
   <div class="bg-background flex h-screen w-screen flex-col">
+    <UiButton class="fixed start-5 top-5" size="icon-lg" @click="switchLanguage()">
+      <Icon size="1.2rem" name="material-symbols:language" />
+    </UiButton>
     <div class="flex flex-1 flex-row items-center justify-center">
       <section class="hidden basis-[55%] justify-center lg:flex">
         <img src="https://placehold.co/400x400" alt="" class="size-110 p-8" />
