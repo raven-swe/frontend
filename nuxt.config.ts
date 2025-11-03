@@ -31,9 +31,11 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
+      title: 'Raven',
       link: [
         { rel: 'preconnect', href: 'https://www.google.com' },
         { rel: 'preconnect', href: 'https://www.gstatic.com', crossorigin: '' },
+        { rel: 'icon', type: 'image/png', href: 'https://cdn.raven.cmp27.space/favicon.png' },
       ],
     },
   },
