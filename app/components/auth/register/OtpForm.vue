@@ -27,7 +27,11 @@ const [_otp, otpAttrs] = defineField('otp');
 </script>
 
 <template>
-  <form class="flex h-full flex-col justify-between" @submit.prevent="onSubmit">
+  <form
+    class="flex h-full flex-col justify-between"
+    data-cy="signup-otp-form"
+    @submit.prevent="onSubmit"
+  >
     <UiDialogHeader class="py-6">
       <UiDialogTitle class="text-4xl font-bold">{{ $t('register.otp.title') }}</UiDialogTitle>
       <UiDialogDescription>
@@ -43,12 +47,14 @@ const [_otp, otpAttrs] = defineField('otp');
         :placeholder="$t('register.otp.label')"
         inputmode="numeric"
         type="text"
+        data-cy="signup-otp"
         pattern="[0-9]*"
         name="otp"
         v-bind="otpAttrs"
       />
       <Button
         type="button"
+        data-cy="signup-resend-otp-button"
         variant="link"
         size="link"
         class="w-fit"
@@ -63,6 +69,7 @@ const [_otp, otpAttrs] = defineField('otp');
         :disabled="Object.entries(errors).length > 0 || isSubmitting"
         size="xl"
         class="w-full"
+        data-cy="signup-next-button"
         >{{ $t('ui.next') }}</Button
       >
     </UiDialogFooter>
