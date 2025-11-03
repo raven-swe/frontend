@@ -38,7 +38,7 @@ const [_password, passwordAttrs] = defineField('password');
 </script>
 
 <template>
-  <form @submit.prevent="onSubmit">
+  <form data-cy="signin-password-form" @submit.prevent="onSubmit">
     <UiDialogHeader class="mt-1 px-8 py-4">
       <UiDialogTitle class="mx-auto w-100 text-start text-3xl font-bold">
         {{ $t('login.password-step.title') }}
@@ -56,16 +56,19 @@ const [_password, passwordAttrs] = defineField('password');
             loginStore.type ? $t(`login.${loginStore.type}`) : $t('login.email-or-username')
           "
           readonly
+          data-cy="signin-identifier-input"
         />
         <UiFormFieldPassword
           name="password"
           :placeholder="$t('login.password')"
           v-bind="passwordAttrs"
+          data-cy="signin-password-input"
         />
       </section>
       <p
         class="text-primary ms-1 mt-2 block w-fit cursor-pointer text-sm hover:underline"
         data-testid="forgot-password-link"
+        data-cy="signin-forgot-password-link"
         @click="loginStore.openForgotPasswordDialog"
       >
         {{ $t('login.forgot-password') }}
@@ -78,6 +81,7 @@ const [_password, passwordAttrs] = defineField('password');
         size="lg"
         type="submit"
         data-testid="submit-button"
+        data-cy="signin-next-button"
         :disabled="!meta.valid || isSubmitting"
       >
         {{ $t('login.password-step.signin') }}

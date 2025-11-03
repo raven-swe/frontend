@@ -32,7 +32,7 @@ const [_identifier, identifierAttrs] = defineField('identifier');
 </script>
 
 <template>
-  <form @submit.prevent="onSubmit">
+  <form data-cy="signin-email-form" @submit.prevent="onSubmit">
     <UiDialogHeader class="mt-1 px-8 py-4">
       <UiDialogTitle class="mx-auto w-75 text-start text-3xl font-bold">{{
         $t('login.identifier-step.title')
@@ -45,6 +45,7 @@ const [_identifier, identifierAttrs] = defineField('identifier');
           type="button"
           size="lg"
           data-testid="google-button"
+          data-cy="signin-google-button"
         >
           <Icon name="devicon:google" width="128" height="128"></Icon>
           {{ $t('login.identifier-step.google-signin') }}</UiButton
@@ -54,6 +55,7 @@ const [_identifier, identifierAttrs] = defineField('identifier');
           type="button"
           size="lg"
           data-testid="github-button"
+          data-cy="signin-github-button"
         >
           <Icon name="devicon:github" width="128" height="128"></Icon>
           {{ $t('login.identifier-step.github-signin') }}</UiButton
@@ -67,6 +69,7 @@ const [_identifier, identifierAttrs] = defineField('identifier');
           name="identifier"
           v-bind="identifierAttrs"
           data-testid="identifier-input"
+          data-cy="signin-identifier-input"
         ></UiFormFieldInput>
       </section>
     </div>
@@ -76,6 +79,7 @@ const [_identifier, identifierAttrs] = defineField('identifier');
         size="lg"
         type="submit"
         data-testid="submit-button"
+        data-cy="signin-next-button"
         :disabled="!meta.valid || isSubmitting"
       >
         {{ $t('ui.next') }}
@@ -86,6 +90,7 @@ const [_identifier, identifierAttrs] = defineField('identifier');
         variant="outline"
         type="button"
         data-testid="forgot-password-button"
+        data-cy="signin-forgot-password-link"
         @click="loginStore.openForgotPasswordDialog"
       >
         {{ $t('login.forgot-password') }}
@@ -95,6 +100,7 @@ const [_identifier, identifierAttrs] = defineField('identifier');
         <span
           class="text-primary cursor-pointer hover:underline"
           data-testid="signup-link"
+          data-cy="signin-signup-link"
           @click="loginStore.openSignupDialog"
         >
           {{ $t('login.signup') }}
