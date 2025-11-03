@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw';
 import type { Tweet } from '../../shared/types/tweets';
-import tweetsData from '../data/tweet.json' assert { type: 'json' };
+import tweetsData from '../data/mock-tweets.json' assert { type: 'json' };
 import type { ApiSuccessResponse } from '#shared/types/api';
 
 const API_URL = process.env.BACKEND_URL;

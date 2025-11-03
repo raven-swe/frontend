@@ -82,9 +82,11 @@ const contentSegments = computed<Segment[]>(() => {
     <div class="min-w-0 flex-1">
       <!-- Header: display name, username, time -->
       <div class="flex flex-wrap items-center gap-x-1 text-sm">
-        <span class="cursor-pointer font-semibold hover:underline">{{
-          props.tweet.author.displayName
-        }}</span>
+        <NuxtLink :to="`/profile/${props.tweet.author.username}`">
+          <span class="cursor-pointer font-semibold hover:underline">{{
+            props.tweet.author.displayName
+          }}</span>
+        </NuxtLink>
         <span class="text-muted-foreground" v-text="'@' + props.tweet.author.username" />
         <span class="text-muted-foreground">·</span>
         <time

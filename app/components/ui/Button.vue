@@ -32,6 +32,7 @@ const buttonVariants = cva(
           'hover:bg-brand-turquoise/20 text-brand-turquoise focus-visible:bg-brand-turquoise/20 focus-visible:ring-ring-brand-turquoise',
         destructive:
           'bg-destructive text-background hover:bg-destructive/90 focus-visible:bg-destructive/90 focus-visible:ring-ring-destructive',
+        link: 'text-primary underline-offset-4 hover:underline hover:text-primary/80 focus-visible:text-primary/80 focus-visible:ring-0 bg-transparent px-0 py-0',
       },
       size: {
         xs: 'h-8 px-4 text-sm has-[>svg]:px-2.5 [&>svg]:size-4',
