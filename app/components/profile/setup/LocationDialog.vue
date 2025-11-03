@@ -10,8 +10,9 @@ interface Emits {
   (e: 'update:open', value: boolean): void;
 }
 const emit = defineEmits<Emits>();
+const userStore = useUserStore();
 
-const location = ref('');
+const location = ref(userStore.user?.location || '');
 const actionButton = computed(() => {
   const isLocationSet = location.value.trim().length > 0;
   return {
@@ -31,6 +32,16 @@ const handleOpenChange = (value: boolean) => {
     location.value = '';
   }
 };
+
+watch(
+  () => userStore.user.location,
+  (newVal) => {
+    if (!location.value.trim()) {
+      location.value = newVal || '';
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
