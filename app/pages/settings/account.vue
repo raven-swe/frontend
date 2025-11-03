@@ -30,7 +30,7 @@ const birthDate = computed(() =>
       <SettingsItem
         :title="t('setting.change-email.label')"
         :subtitle="`${user.email}`"
-        to="/playground/settings/email"
+        to="/settings/email"
       />
       <SettingsItem
         :title="t('setting.date-of-birth')"
@@ -39,7 +39,7 @@ const birthDate = computed(() =>
       />
       <SettingsItem
         :title="t('setting.change-password')"
-        to="/playground/changePasswordEditor"
+        to="/settings/changePasswordEditor"
         subtitle="Change Your Password at any time"
       />
     </div>
