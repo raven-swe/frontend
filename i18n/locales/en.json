@@ -207,16 +207,10 @@
     }
   },
   "setting": {
-    "username": "Username",
-    "change-password": "Change Password",
     "email": "Email",
-    "date-of-birth": "Date of Birth",
-    "item-icon": "tabler:chevron-right",
-    "failed-to-load-user": "Failed to load user data.",
     "change-username": "Change username",
-    "back-button-icon": "material-symbols:arrow-back",
     "suggestions": "Suggestions",
-    "save": "Save Changes"
+    "save": "Save Changes",
     "settings": "Settings",
     "change-password": "Change Password",
     "date-of-birth": "Date of Birth",

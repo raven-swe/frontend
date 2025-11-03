@@ -188,7 +188,6 @@
     }
   },
   "setting": {
-    "username": "اسم المستخدم",
     "settings": "الإعدادات",
     "change-password": "تغيير كلمة المرور",
     "email": "البريد الإلكتروني",
@@ -196,9 +195,8 @@
     "item-icon": "tabler:chevron-left",
     "failed-to-load-user": ".فشل في تحميل بيانات المستخدم",
     "change-username": "تغيير اسم المستخدم",
-    "back-button-icon": "material-symbols:arrow-forward",
     "suggestions": "اقتراحات",
-    "save": "حفظ التغييرات"
+    "save": "حفظ التغييرات",
     "account-information": "معلومات حسابك",
     "account-information-details": "اطلع على معلومات حسابك، قم بتنزيل أرشيف بياناتك، أو تعرف على خيارات إلغاء تنشيط حسابك.",
     "back-button-icon": "material-symbols:arrow-forward",
