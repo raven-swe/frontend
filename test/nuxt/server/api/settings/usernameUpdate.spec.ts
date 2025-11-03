@@ -29,9 +29,9 @@ describe('server/api/settings/username/update.patch', () => {
 
     const response = await usernameUpdateHandler(event);
 
-    expect(mockServerApiFetch).toHaveBeenCalledWith('/me/username', {
+    expect(mockServerApiFetch).toHaveBeenCalledWith('/me/settings/username', {
       method: 'PATCH',
-      query: {
+      body: {
         newUsername: 'new_name',
       },
       headers: {},
@@ -61,9 +61,9 @@ describe('server/api/settings/username/update.patch', () => {
 
     const response = await usernameUpdateHandler(event);
 
-    expect(mockServerApiFetch).toHaveBeenCalledWith('/me/username', {
+    expect(mockServerApiFetch).toHaveBeenCalledWith('/me/settings/username', {
       method: 'PATCH',
-      query: {
+      body: {
         newUsername: 'new_name',
       },
       headers: {

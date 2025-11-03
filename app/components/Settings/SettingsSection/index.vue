@@ -3,15 +3,6 @@ import { useRouter, useRoute } from 'vue-router';
 const router = useRouter();
 const route = useRoute();
 
-const tabs = [
-  {
-    id: '001',
-    name: 'general',
-    label: $t('setting.account-information'),
-    route: '/settings/account',
-  },
-];
-
 const isActiveTab = (tabRoute: string) => {
   return route.path === tabRoute;
 };
@@ -22,18 +13,18 @@ const isActiveTab = (tabRoute: string) => {
       {{ $t('setting.settings') }}
     </h2>
     <div
-      v-for="tab in tabs"
-      :key="tab.id"
       class="text-md mt-10 flex cursor-pointer items-center justify-between px-4 py-[10px] transition-colors"
       :class="
-        isActiveTab(tab.route)
+        isActiveTab('/settings/account')
           ? 'bg-foreground/10 border-primary border-e-4'
           : 'hover:bg-foreground/10'
       "
-      @click="router.push(tab.route)"
+      @click="router.push('/settings/account')"
     >
       <div class="flex flex-col">
-        <span class="text-lg leading-tight font-medium">{{ tab.label }}</span>
+        <span class="text-lg leading-tight font-medium">{{
+          $t('setting.account-information')
+        }}</span>
       </div>
       <Icon :name="$t('setting.item-icon')" size="1.2rem" class="text-muted-foreground" />
     </div>
