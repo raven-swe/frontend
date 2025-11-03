@@ -14,6 +14,10 @@
     "tweets": {
       "tweet-not-found": "التغريدة غير موجودة",
       "tweets-list": "قائمة التغريدات"
+    },
+    "complete-form": {
+      "birthdate-label": "تاريخ الميلاد",
+      "confirm": "تأكيد"
     }
   },
   "leftsidebar": {
@@ -149,7 +153,40 @@
     "PASSWORD_REQUIRED": "يرجى إدخال كلمة المرور الخاصة بك",
     "GENERIC_ERROR": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
     "ACCOUNT_NOT_FOUND": "هذا الحساب غير موجود",
-    "TRY_SEARCHING": "حاول البحث عن حساب آخر"
+    "TRY_SEARCHING": "حاول البحث عن حساب آخر",
+    "EMPTY_NAME": "لا يمكن ترك الاسم فارغًا",
+    "RECAPTCHA_REQUIRED": "يرجى إكمال اختبار reCAPTCHA",
+    "OTP_RESEND_LIMIT_EXCEEDED": "تم الوصول إلى حد إعادة إرسال رمز التحقق. حاول مرة أخرى بعد {seconds}.",
+    "otp": {
+      "INVALID_TOKEN": "رمز OTP الذي أدخلته غير صالح",
+      "ISLENGTH": "يجب أن يتكون OTP من 6 أرقام",
+      "IS_EMPTY": "الرجاء إدخال رمز OTP الخاص بك"
+    },
+    "name": {
+      "CONTAINSLETTER": "ما اسمك؟",
+      "NOT_A_STRING": "ما اسمك؟",
+      "IS_EMPTY": "ما اسمك؟",
+      "TOO_LONG": "يجب أن يتكون الاسم من 50 حرفًا كحد أقصى"
+    },
+    "birthDate": {
+      "NOT_MINIMUM_AGE": "يجب أن تكون على الأقل 13 عامًا",
+      "IS_EMPTY": "يرجى إدخال تاريخ ميلادك.",
+      "NOT_A_DATE": "يرجى إدخال تاريخ صالح."
+    },
+    "email": {
+      "IS_EMPTY": "يرجى إدخال بريد إلكتروني صالح.",
+      "NOT_AN_EMAIL": "يرجى إدخال بريد إلكتروني صالح."
+    },
+    "recaptchaToken": {
+      "IS_EMPTY": "تحقق من أنك لست روبوتًا.",
+      "NOT_A_STRING": "تحقق من أنك لست روبوتًا."
+    },
+    "password": {
+      "NOT_A_STRING": "يرجى إدخال كلمة المرور",
+      "IS_EMPTY": "يرجى إدخال كلمة المرور",
+      "TOO_SHORT": "يجب أن تتكون كلمة المرور من 10 أحرف على الأقل",
+      "INVALID_FORMAT": "يجب أن تحتوي كلمة المرور على حرف كبير واحد على الأقل، وحرف صغير واحد على الأقل، ورقم واحد، ورمز خاص واحد"
+    }
   },
   "register": {
     "register-info": {
