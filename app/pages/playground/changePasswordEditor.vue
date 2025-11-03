@@ -5,7 +5,9 @@ import { useForm } from 'vee-validate';
 import FieldInput from '~/components/ui/form/FieldInput.vue';
 import Button from '~/components/ui/Button.vue';
 import { apiFetch } from '~/api';
-
+definePageMeta({
+  layout: 'settings',
+});
 const router = useRouter();
 
 const schema = yup.object({
@@ -16,7 +18,7 @@ const schema = yup.object({
   newPassword: yup
     .string()
     .required($t('setting.password.errors.new-password-required'))
-    .min(10, $t('setting.password.errors.password-invalid-length'))
+    .min(10, $t('setting.password.errors.password-invalid'))
     .matches(
       /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).*$/,
       $t('setting.password.errors.password-invalid'),
@@ -49,7 +51,7 @@ const onSubmit = handleSubmit(async (values) => {
       query: { currentPassword: values.currentPassword, newPassword: values.newPassword },
     });
 
-    router.push('/playground/settings');
+    router.push('/settings/account');
   } catch (error: unknown) {
     console.error('Error saving password:', error);
 
@@ -73,7 +75,7 @@ const onSubmit = handleSubmit(async (values) => {
         size="1.5rem"
         class="cursor-pointer"
         to="/playground/settings"
-        @click="router.push('/playground/settings')"
+        @click="router.push('/settings/account')"
       />
       <h1 class="text-2xl font-bold">{{ $t('setting.password.change-password') }}</h1>
     </div>

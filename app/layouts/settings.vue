@@ -1,4 +1,38 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import { useQuery } from '@tanstack/vue-query';
+import { meService } from '~/services/me/meService';
+
+const userStore = useUserStore();
+
+// define query key — unique and stable
+const queryKey = ['layout-data'];
+
+// Define the query
+const { data, error, isError } = useQuery({
+  queryKey,
+  queryFn: async () => await meService.fetchProfile(),
+  // Disable re-fetch after hydration if you want to keep SSR data
+  refetchOnMount: false,
+  refetchOnWindowFocus: false,
+  staleTime: 1000 * 60 * 5, // optional: cache for 5min
+});
+
+// Reactively sync userStore when data changes
+watch(
+  () => data.value,
+  (newVal) => {
+    if (!newVal) return;
+
+    if (newVal.success) {
+      userStore.setUser(newVal.data);
+      userStore.error = null;
+    } else if (isError.value && error.value) {
+      userStore.error = error.value.message;
+    }
+  },
+  { immediate: true, deep: true },
+);
+</script>
 
 <template>
   <div>

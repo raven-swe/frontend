@@ -2,6 +2,9 @@
 import { useChangeEmailStore } from '~/stores/settings/change-email';
 import ChangeEmailForm from './ChangeEmailForm.vue';
 import OtpForm from './OtpForm.vue';
+definePageMeta({
+  layout: 'settings',
+});
 
 const userStore = useUserStore();
 const changeEmailStore = useChangeEmailStore();
@@ -13,7 +16,7 @@ const changeEmailStore = useChangeEmailStore();
     <OtpForm />
     <div class="mb-4 flex items-center gap-4 p-4">
       <NuxtLink
-        to="/playground/settings"
+        to="/settings/account"
         class="hover:bg-foreground/10 flex size-8 items-center justify-center rounded-full"
       >
         <Icon

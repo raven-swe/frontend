@@ -1,5 +1,5 @@
 import { describe, expect, vi, it, beforeEach } from 'vitest';
-import usernameUpdateHandler from '~~/server/api/settings/username/update.post';
+import usernameUpdateHandler from '~~/server/api/settings/username/update.patch';
 import { createMockH3Event } from '~~/test/mocks/h3-event';
 import { useH3TestUtils } from '~~/test/mocks/h3-test-utils';
 
@@ -8,7 +8,7 @@ useH3TestUtils();
 const mockServerApiFetch = vi.fn();
 vi.stubGlobal('serverApiFetch', mockServerApiFetch);
 
-describe('server/api/settings/username/update.post', () => {
+describe('server/api/settings/username/update.patch', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -20,7 +20,7 @@ describe('server/api/settings/username/update.post', () => {
     });
 
     const event = createMockH3Event({
-      method: 'POST',
+      method: 'PATCH',
       // Handler uses getQuery, so provide values via query
       query: {
         newUsername: 'new_name',
@@ -30,7 +30,7 @@ describe('server/api/settings/username/update.post', () => {
     const response = await usernameUpdateHandler(event);
 
     expect(mockServerApiFetch).toHaveBeenCalledWith('/me/username', {
-      method: 'POST',
+      method: 'PATCH',
       query: {
         newUsername: 'new_name',
       },
@@ -50,7 +50,7 @@ describe('server/api/settings/username/update.post', () => {
     });
 
     const event = createMockH3Event({
-      method: 'POST',
+      method: 'PATCH',
       query: {
         newUsername: 'new_name',
       },
@@ -62,7 +62,7 @@ describe('server/api/settings/username/update.post', () => {
     const response = await usernameUpdateHandler(event);
 
     expect(mockServerApiFetch).toHaveBeenCalledWith('/me/username', {
-      method: 'POST',
+      method: 'PATCH',
       query: {
         newUsername: 'new_name',
       },

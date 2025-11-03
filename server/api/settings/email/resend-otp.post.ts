@@ -6,7 +6,7 @@ export default defineWrappedResponseHandler(async (event) => {
       success: boolean;
       message: string;
     }>
-  >('/me/email/resend-otp', {
+  >('/me/settings/email/resend-otp', {
     method: 'POST',
     body: {
       confirmationToken: body.confirmationToken,

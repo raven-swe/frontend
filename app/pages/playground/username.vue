@@ -9,6 +9,10 @@ import { useDebounceFn } from '@vueuse/core';
 import { useUserStore } from '~/stores/user';
 import { apiFetch } from '~/api';
 
+definePageMeta({
+  layout: 'settings',
+});
+
 const router = useRouter();
 const userStore = useUserStore();
 
@@ -16,14 +20,19 @@ const suggestions = ref<string[]>([]);
 const usernameExists = ref(false);
 const isChecking = ref(false);
 
-const { data } = await apiFetch<ApiSuccessResponse<{ suggestions: string[] }>>(
-  '/api/settings/username/suggestions',
-  {
-    method: 'GET',
-  },
-);
-if (data.suggestions) {
-  suggestions.value = data.suggestions;
+try {
+  const { data } = await apiFetch<ApiSuccessResponse<{ suggestions: string[] }>>(
+    '/api/settings/username/suggestions',
+    {
+      method: 'GET',
+    },
+  );
+  if (data.suggestions) {
+    suggestions.value = data.suggestions;
+  }
+} catch (error) {
+  // Silently handle 404 or any other errors - just show no suggestions
+  console.error('Could not load username suggestions:', error);
 }
 
 const schema = yup.object({
@@ -94,7 +103,7 @@ const onSubmit = handleSubmit(async (values) => {
   if (usernameExists.value) return;
   try {
     await apiFetch('/api/settings/username/update', {
-      method: 'POST',
+      method: 'PATCH',
       query: {
         newUsername: values.username,
       },
@@ -103,7 +112,7 @@ const onSubmit = handleSubmit(async (values) => {
     // Update the user store with the new username
     userStore.updateUser({ username: values.username });
 
-    router.push('/playground/settings');
+    router.push('/settings/account');
   } catch (error) {
     console.error('Error saving username:', error);
     setFieldError('username', $t('setting.username.error-saving'));
@@ -118,8 +127,8 @@ const onSubmit = handleSubmit(async (values) => {
         :name="$t('setting.back-button-icon')"
         size="1.5rem"
         class="cursor-pointer"
-        to="/playground/settings"
-        @click="router.push('/playground/settings')"
+        to="/settings/account"
+        @click="router.push('/settings/account')"
       />
       <h1 class="text-2xl font-bold">{{ $t('setting.username.change-username') }}</h1>
     </div>

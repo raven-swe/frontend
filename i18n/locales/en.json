@@ -207,11 +207,14 @@
     }
   },
   "setting": {
+    "settings": "Settings",
     "change-password": "Change Password",
     "date-of-birth": "Date of Birth",
     "item-icon": "tabler:chevron-right",
     "failed-to-load-user": "Failed to load user data.",
     "back-button-icon": "material-symbols:arrow-back",
+    "account-information": "Your account",
+    "account-information-details": "See information about your account, download an archive of your data, or learn about your account deactivation options.",
     "username": {
       "username-taken": "That username has been taken. Please choose another.",
       "username-invalid": "Usernames can have letters, digits, and underscores, and must be 3-15 characters long.",

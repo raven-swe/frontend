@@ -6,7 +6,7 @@ export default defineWrappedResponseHandler(async (event) => {
       success: boolean;
       message: string;
     }>
-  >('/me/email/verify', {
+  >('/me/settings/email/verify', {
     method: 'POST',
     body: {
       otp: body.otp,

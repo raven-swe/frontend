@@ -6,7 +6,7 @@ export default defineWrappedResponseHandler(async (event) => {
       success: boolean;
       message: string;
     }>
-  >('/me/email', {
+  >('/me/settings/email', {
     method: 'PUT',
     body: {
       newEmail: body.newEmail,

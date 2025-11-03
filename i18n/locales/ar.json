@@ -188,11 +188,14 @@
     }
   },
   "setting": {
+    "settings": "الإعدادات",
     "change-password": "تغيير كلمة المرور",
     "email": "البريد الإلكتروني",
     "date-of-birth": "تاريخ الميلاد",
     "item-icon": "tabler:chevron-left",
     "failed-to-load-user": ".فشل في تحميل بيانات المستخدم",
+    "account-information": "معلومات حسابك",
+    "account-information-details": "اطلع على معلومات حسابك، قم بتنزيل أرشيف بياناتك، أو تعرف على خيارات إلغاء تنشيط حسابك.",
     "back-button-icon": "material-symbols:arrow-forward",
     "username": {
       "username-taken": "هذا الاسم مستخدم بالفعل. يرجى اختيار اسم آخر.",
