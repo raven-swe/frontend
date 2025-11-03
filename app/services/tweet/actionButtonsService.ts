@@ -1,6 +1,8 @@
+import { apiFetch } from '~/api';
+
 export const likeTweet = async (tweetId: string) => {
   try {
-    const response = await $fetch<{
+    const response = await apiFetch<{
       success: boolean;
       message: string;
     }>(`/api/tweets/${tweetId}/like`, {
@@ -14,7 +16,7 @@ export const likeTweet = async (tweetId: string) => {
 };
 export const unLikeTweet = async (tweetId: string) => {
   try {
-    const response = await $fetch<{
+    const response = await apiFetch<{
       success: boolean;
       message: string;
     }>(`/api/tweets/${tweetId}/like`, {
@@ -28,7 +30,7 @@ export const unLikeTweet = async (tweetId: string) => {
 };
 export const retweetTweet = async (tweetId: string) => {
   try {
-    const response = await $fetch<{
+    const response = await apiFetch<{
       success: boolean;
       message: string;
     }>(`/api/tweets/${tweetId}/retweet`, {
@@ -42,7 +44,7 @@ export const retweetTweet = async (tweetId: string) => {
 };
 export const undoRetweetTweet = async (tweetId: string) => {
   try {
-    const response = await $fetch<{
+    const response = await apiFetch<{
       success: boolean;
       message: string;
     }>(`/api/tweets/${tweetId}/retweet`, {
