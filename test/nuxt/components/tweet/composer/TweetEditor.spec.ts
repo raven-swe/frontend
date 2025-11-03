@@ -172,4 +172,90 @@ describe('TweetEditor', () => {
     const component = wrapper.vm as any;
     expect(component.validText).toBe('Normal text');
   });
+
+  it('highlights hashtags, mentions and links with .text-primary spans', async () => {
+    const content = '#tag @user https://example.com www.example.com';
+    const wrapper = await mountSuspended(TweetEditor, {
+      props: { ...mockProps, modelValue: content },
+    });
+
+    const highlights = wrapper.findAll('.text-primary');
+    // Expect four highlighted items: #tag, @user, https://example.com, www.example.com
+    expect(highlights.length).toBeGreaterThanOrEqual(4);
+
+    const texts = highlights.map((h) => h.text());
+    expect(texts.some((t) => t.includes('#tag'))).toBe(true);
+    expect(texts.some((t) => t.includes('@user'))).toBe(true);
+    expect(texts.some((t) => t.includes('https://example.com'))).toBe(true);
+    expect(texts.some((t) => t.includes('www.example.com'))).toBe(true);
+  });
+
+  it('adjustHeight sets textarea.style.height to "auto" then to "<scrollHeight>px"', async () => {
+    const wrapper = await mountSuspended(TweetEditor, { props: mockProps });
+    const textarea = wrapper.find('textarea');
+
+    // initial height
+    textarea.element.style.height = '50px';
+
+    // capture assignments to style.height
+    const calls: string[] = [];
+    Object.defineProperty(textarea.element.style, 'height', {
+      configurable: true,
+      set(v: string) {
+        calls.push(v);
+      },
+      get() {
+        return calls[calls.length - 1] || '';
+      },
+    });
+
+    // mock scrollHeight used by adjustHeight
+    Object.defineProperty(textarea.element, 'scrollHeight', {
+      value: 150,
+      configurable: true,
+    });
+
+    await textarea.setValue('Line 1\nLine 2');
+    await textarea.trigger('input');
+
+    expect(calls[0]).toBe('auto');
+    expect(calls[1]).toBe('150px');
+    expect(textarea.element.style.height).toBe('150px');
+  });
+
+  it('adjustHeight updates height on subsequent inputs when scrollHeight changes', async () => {
+    const wrapper = await mountSuspended(TweetEditor, { props: mockProps });
+    const textarea = wrapper.find('textarea');
+
+    const calls: string[] = [];
+    Object.defineProperty(textarea.element.style, 'height', {
+      configurable: true,
+      set(v: string) {
+        calls.push(v);
+      },
+      get() {
+        return calls[calls.length - 1] || '';
+      },
+    });
+
+    // first input
+    Object.defineProperty(textarea.element, 'scrollHeight', {
+      value: 80,
+      configurable: true,
+    });
+    await textarea.setValue('A\nB');
+    await textarea.trigger('input');
+
+    // update scrollHeight and input again
+    Object.defineProperty(textarea.element, 'scrollHeight', {
+      value: 120,
+      configurable: true,
+    });
+    await textarea.setValue('A\nB\nC\nD');
+    await textarea.trigger('input');
+
+    // last two assignments should be ['auto', '120px']
+    expect(calls.slice(-2)).toEqual(['auto', '120px']);
+    expect(textarea.element.style.height).toBe('120px');
+  });
 });

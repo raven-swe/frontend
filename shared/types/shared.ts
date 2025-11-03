@@ -1,21 +1,21 @@
 export interface UpdateProfileRequest {
-  displayName?: string;
-  bio?: string;
-  location?: string;
-  websiteUrl?: string;
-  birthDate?: string;
+  displayName?: string | null;
+  bio?: string | null;
+  location?: string | null;
+  websiteUrl?: string | null;
+  birthDate?: string | null;
 }
 
 export interface UserData {
   username: string;
   displayName: string;
-  bio: string;
-  avatarUrl: string;
-  bannerUrl: string;
-  location: string;
-  websiteUrl: string;
-  birthDate: string;
-  joinedAt: string;
+  bio: string | null;
+  avatarUrl: string | null;
+  bannerUrl: string | null;
+  location: string | null;
+  websiteUrl: string | null;
+  birthDate: string | null;
+  joinedAt: string | null;
   email: string;
   phone: string;
   languageCode: string;

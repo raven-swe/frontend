@@ -18,14 +18,20 @@ const { data, error, isError } = useQuery({
 });
 
 // Reactively sync userStore when data changes
-watchEffect(() => {
-  if (isError.value && error.value) {
-    userStore.error = error.value.message;
-  } else if (data.value?.success) {
-    userStore.setUser(data.value.data);
-    userStore.error = null;
-  }
-});
+watch(
+  () => data.value,
+  (newVal) => {
+    if (!newVal) return;
+
+    if (newVal.success) {
+      userStore.setUser(newVal.data);
+      userStore.error = null;
+    } else if (isError.value && error.value) {
+      userStore.error = error.value.message;
+    }
+  },
+  { immediate: true, deep: true },
+);
 </script>
 
 <template>
@@ -34,7 +40,7 @@ watchEffect(() => {
       <div class="flex min-h-screen justify-center">
         <div class="flex w-full max-w-7xl sm:justify-center">
           <!-- Left sidebar -->
-          <div class="w-16 flex-shrink-0 sm:w-16 md:w-24 xl:w-64">
+          <div class="w-16 flex-shrink-0 sm:w-16 md:w-24 xl:w-[306px]">
             <div class="sticky top-0">
               <SideBarLeft />
             </div>
@@ -46,7 +52,7 @@ watchEffect(() => {
           </main>
 
           <!-- Right sidebar -->
-          <div class="hidden w-[300px] flex-shrink-0 lg:block xl:w-[350px]">
+          <div class="hidden w-[320px] flex-shrink-0 lg:block xl:w-[350px]">
             <SideBarRight />
           </div>
         </div>

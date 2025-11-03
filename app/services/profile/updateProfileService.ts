@@ -42,7 +42,7 @@ export const updateProfileService = () => {
   const updateHeaderImage = async (file: File): Promise<string> => {
     try {
       const formData = new FormData();
-      formData.append('bannerImage', file);
+      formData.append('banner', file);
 
       const response = await apiFetch<{ imageUrl: string }>('/api/me/banner', {
         method: 'POST',

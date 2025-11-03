@@ -31,7 +31,7 @@ export const useUserStore = defineStore('user', {
 
   getters: {
     memberSince: (state) => (state.user ? new Date(state.user.joinedAt).getFullYear() : null),
-    isProfileSetup: () => true,
+    isProfileSetup: (state) => (state.user.avatarUrl.includes('default_avatar') ? false : true),
     isCurrentUser: (state) => {
       return (username: string): boolean => {
         return state.user?.username === username;
