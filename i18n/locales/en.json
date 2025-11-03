@@ -206,6 +206,54 @@
       "label": "Password"
     }
   },
+  "setting": {
+    "settings": "Settings",
+    "change-password": "Change Password",
+    "date-of-birth": "Date of Birth",
+    "item-icon": "tabler:chevron-right",
+    "failed-to-load-user": "Failed to load user data.",
+    "back-button-icon": "material-symbols:arrow-back",
+    "account-information": "Your account",
+    "account-information-details": "See information about your account, download an archive of your data, or learn about your account deactivation options.",
+    "username": {
+      "username-taken": "That username has been taken. Please choose another.",
+      "username-invalid": "Usernames can have letters, digits, and underscores, and must be 3-15 characters long.",
+      "username-required": "Username is required",
+      "username": "Username",
+      "suggestions": "Suggestions",
+      "change-username": "Change username",
+      "save": "Save Changes",
+      "error-saving": "An error occurred while saving the username. Please try again.",
+      "error-checking": "Error checking username availability. Please try again."
+    },
+    "password": {
+      "change-password": "Change your password",
+      "current-password": "Current password",
+      "new-password": "New password",
+      "confirm-password": "Confirm password",
+      "forgot-password": "Forgot password?",
+      "save": "Save",
+      "password-invalid-length": "Password must be at least 10 characters long",
+      "errors": {
+        "current-password-required": "Current password is required",
+        "new-password-required": "New password is required",
+        "password-too-short": "Password must be at least 8 characters long",
+        "password-invalid": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+        "confirm-password-required": "Please confirm your password",
+        "passwords-do-not-match": "Passwords do not match",
+        "error-saving": "An error occurred while saving the password. Please try again.",
+        "401": "You are not authorized to change the password",
+        "422": "Current password is incorrect"
+      }
+    },
+    "change-email": {
+      "label": "Email",
+      "title": "Change Email",
+      "description": "Your current email is {email}. What would you like to update it to? Your email is not displayed in your public profile on Raven.",
+      "description-extra": "If you change your email address, any existing Google SSO connections will be removed.",
+      "placeholder": "Email address"
+    }
+  },
   "login": {
     "forgot-password": "Forgot password?",
     "email-or-username": "Email or username",

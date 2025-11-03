@@ -21,3 +21,21 @@ export function formatDate(isoString: string): string {
     minute: '2-digit',
   });
 }
+
+export function birthDateFormat(isoString: string, locale = 'en'): string {
+  if (!isoString) return '';
+
+  const date = new Date(isoString);
+
+  // Check if date is valid
+  if (isNaN(date.getTime())) return '';
+
+  const lang = locale === 'ar' ? 'ar-EG' : 'en-US';
+
+  return new Intl.DateTimeFormat(lang, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(date);
+}
