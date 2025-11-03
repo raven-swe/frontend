@@ -2,6 +2,13 @@ import { describe, expect, it } from 'vitest';
 import { mountSuspended } from '@nuxt/test-utils/runtime';
 import IndexPage from '@/pages/index.vue';
 
+mockNuxtImport('useI18n', () => {
+  return () => ({
+    locale: { value: 'en' },
+    localeProperties: { value: { dir: 'ltr' } },
+  });
+});
+
 describe('Auth Page', () => {
   it('renders page with correct content', async () => {
     const wrapper = await mountSuspended(IndexPage);

@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { mountSuspended } from '@nuxt/test-utils/runtime';
+import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime';
 import DefaultLayout from '@/layouts/default.vue';
+
+mockNuxtImport('useI18n', () => {
+  return () => ({
+    locale: { value: 'en' },
+    localeProperties: { value: { dir: 'ltr' } },
+  });
+});
 
 describe('Default Layout', () => {
   it('renders the layout with three main sections', async () => {
