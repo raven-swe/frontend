@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { useHead } from '#app';
 import { useI18n } from '#imports';
+import { useTheme } from '~/composables/useTheme';
 
 const { locale, localeProperties } = useI18n();
+useTheme();
 
 useHead(() => ({
   htmlAttrs: {
