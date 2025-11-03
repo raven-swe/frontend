@@ -31,9 +31,11 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
+      title: 'Raven',
       link: [
         { rel: 'preconnect', href: 'https://www.google.com' },
         { rel: 'preconnect', href: 'https://www.gstatic.com', crossorigin: '' },
+        { rel: 'icon', type: 'image/png', href: 'https://cdn.raven.cmp27.space/favicon.png' },
       ],
     },
   },
@@ -53,7 +55,7 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
   },
   i18n: {
-    strategy: 'prefix_and_default',
+    strategy: 'no_prefix',
     defaultLocale: 'en',
     locales: [
       { code: 'en', name: 'English', file: 'en.json' },
