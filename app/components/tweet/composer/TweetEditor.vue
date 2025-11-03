@@ -33,8 +33,8 @@ const overLimitText = computed(() =>
 
 // Parse text and highlight hashtags and mentions
 const parseText = (text: string) => {
-  // Match hashtags and mentions: word characters after # or @
-  const regex = /(#\w+|@\w+)/g;
+  // Match hashtags, mentions & links
+  const regex = /(https?:\/\/[^\s]+|www\.[^\s]+|#\w+|@\w+)/g;
   const parts = [];
   let lastIndex = 0;
   let match;
