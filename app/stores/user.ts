@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import type { User } from '~~/shared/types/user';
 
 export const useUserStore = defineStore('user', {
   state: () => ({

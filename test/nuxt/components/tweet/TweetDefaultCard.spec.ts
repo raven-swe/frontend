@@ -40,7 +40,10 @@ describe('TweetDefaultCard.vue', () => {
     const wrapper = await mountSuspended(TweetDefaultCard, {
       props: { tweet },
       global: {
-        stubs: { NuxtImg: true, Icon: true, NuxtLink: true },
+        stubs: {
+          NuxtImg: true,
+          Icon: true,
+        },
       },
     });
 
@@ -122,11 +125,14 @@ describe('TweetDefaultCard.vue', () => {
       global: { stubs: { NuxtImg: true, Icon: true } },
     });
 
-    // Two links, no extra trailing plain text slice
-    const links = wrapper.findAll('a');
-    expect(links).toHaveLength(2);
-    expect(links[0]!.text()).toContain('@john_doe');
-    expect(links[1]!.text()).toContain('#Nuxt3');
+    // Find links within the tweet content area (excluding author username link)
+    const mentionLink = wrapper.find('a[href="/@john_doe"]');
+    const hashtagLink = wrapper.find('a[href="/hashtag/Nuxt3"]');
+
+    expect(mentionLink.exists()).toBe(true);
+    expect(mentionLink.text()).toContain('@john_doe');
+    expect(hashtagLink.exists()).toBe(true);
+    expect(hashtagLink.text()).toContain('#Nuxt3');
   });
 
   it('renders plain text when there are no entities (covers early return)', async () => {

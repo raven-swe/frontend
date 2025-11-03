@@ -189,6 +189,7 @@
   },
   "setting": {
     "username": "اسم المستخدم",
+    "settings": "الإعدادات",
     "change-password": "تغيير كلمة المرور",
     "email": "البريد الإلكتروني",
     "date-of-birth": "تاريخ الميلاد",
@@ -198,6 +199,40 @@
     "back-button-icon": "material-symbols:arrow-forward",
     "suggestions": "اقتراحات",
     "save": "حفظ التغييرات"
+    "account-information": "معلومات حسابك",
+    "account-information-details": "اطلع على معلومات حسابك، قم بتنزيل أرشيف بياناتك، أو تعرف على خيارات إلغاء تنشيط حسابك.",
+    "back-button-icon": "material-symbols:arrow-forward",
+    "username": {
+      "username-taken": "هذا الاسم مستخدم بالفعل. يرجى اختيار اسم آخر.",
+      "username-invalid": "يمكن أن تحتوي أسماء المستخدمين على أحرف وأرقام وشرطات سفلية، ويجب أن تتكون من 3-15 حرفًا.",
+      "username-required": "اسم المستخدم مطلوب",
+      "username": "اسم المستخدم",
+      "suggestions": "اقتراحات",
+      "change-username": "تغيير اسم المستخدم",
+      "save": "حفظ التغييرات",
+      "error-saving": "حدث خطأ أثناء حفظ اسم المستخدم. يرجى المحاولة مرة أخرى.",
+      "error-checking": "حدث خطأ أثناء التحقق من توفر اسم المستخدم. يرجى المحاولة مرة أخرى."
+    },
+    "password": {
+      "change-password": "تغيير كلمة المرور",
+      "current-password": "كلمة المرور الحالية",
+      "new-password": "كلمة المرور الجديدة",
+      "confirm-password": "تأكيد كلمة المرور",
+      "forgot-password": "هل نسيت كلمة المرور؟",
+      "save": "حفظ",
+      "password-invalid-length": "يجب أن تتكون كلمة المرور من 10 أحرف على الأقل",
+      "errors": {
+        "current-password-required": "كلمة المرور الحالية مطلوبة",
+        "new-password-required": "كلمة المرور الجديدة مطلوبة",
+        "password-too-short": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل",
+        "password-invalid": "يجب أن تحتوي كلمة المرور على حرف كبير واحد على الأقل، وحرف صغير واحد على الأقل، ورقم واحد، ورمز خاص واحد",
+        "confirm-password-required": "يرجى تأكيد كلمة المرور",
+        "passwords-do-not-match": "كلمات المرور غير متطابقة",
+        "error-saving": "حدث خطأ أثناء حفظ كلمة المرور. يرجى المحاولة مرة أخرى.",
+        "401": "غير مصرح لك بتغيير كلمة المرور",
+        "422": "كلمة المرور الحالية غير صحيحة"
+      }
+    }
   },
   "login": {
     "forgot-password": "هل نسيت كلمة المرور؟",
