@@ -91,7 +91,7 @@ defineExpose({
         ref="textareaRef"
         :value="modelValue"
         :placeholder="placeholder"
-        class="absolute inset-0 z-10 w-full resize-none border-none bg-transparent text-xl leading-7 text-transparent caret-black outline-none"
+        class="caret-foreground absolute inset-0 z-10 w-full resize-none border-none bg-transparent text-xl leading-7 text-transparent outline-none"
         rows="1"
         @input="handleInput"
       />
