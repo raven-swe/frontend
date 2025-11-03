@@ -1,4 +1,4 @@
-export const relativeTime = (iso: string) => {
+export const relativeTimeFormat = (iso: string) => {
   const now = Date.now();
   const then = new Date(iso).getTime();
   const diff = Math.max(0, Math.floor((now - then) / 1000));
@@ -9,6 +9,9 @@ export const relativeTime = (iso: string) => {
   const months = Math.floor(diff / 2592000);
   return `${months}mo`;
 };
+
+// Backwards-compatible named export expected by tests and some imports
+export { relativeTimeFormat as relativeTime };
 
 export function formatDate(isoString: string): string {
   const date = new Date(isoString);

@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { nextTick } from 'vue';
 import { mountSuspended } from '@nuxt/test-utils/runtime';
 import TweetDefaultCard from '@/components/tweet/TweetDefaultCard.vue';
 import Avatar from '@/components/ui/Avatar.vue';
@@ -167,5 +168,153 @@ describe('TweetDefaultCard.vue', () => {
     expect(contentP.exists()).toBe(true);
     expect(contentP.text()).toContain('No entities field on this tweet.');
     expect(contentP.findAll('a').length).toBe(0);
+  });
+
+  it('updates like state on like-success when not previously liked', async () => {
+    const tweet = makeTweet({ isLiked: false, likeCount: 10 });
+    const wrapper = await mountSuspended(TweetDefaultCard, {
+      props: { tweet },
+      global: { stubs: { NuxtImg: true, Icon: true } },
+    });
+
+    const actions = wrapper.findComponent(TweetActionButtons);
+    expect(actions.exists()).toBe(true);
+
+    // Emit like-success from child
+    actions.vm.$emit('like-success');
+    await nextTick();
+
+    // Props passed to child should reflect updated reactive tweet
+    const updated = actions.props('tweet') as Tweet;
+    expect(updated.isLiked).toBe(true);
+    expect(updated.likeCount).toBe(11);
+  });
+
+  it('does nothing on like-success if already liked (no-op branch)', async () => {
+    const tweet = makeTweet({ isLiked: true, likeCount: 5 });
+    const wrapper = await mountSuspended(TweetDefaultCard, {
+      props: { tweet },
+      global: { stubs: { NuxtImg: true, Icon: true } },
+    });
+
+    const actions = wrapper.findComponent(TweetActionButtons);
+    actions.vm.$emit('like-success');
+    await nextTick();
+
+    const updated = actions.props('tweet') as Tweet;
+    expect(updated.isLiked).toBe(true);
+    expect(updated.likeCount).toBe(5);
+  });
+
+  it('updates like state on unlike-success and clamps likeCount at 0', async () => {
+    // Case 1: normal decrement
+    const tweet1 = makeTweet({ isLiked: true, likeCount: 2 });
+    const wrapper1 = await mountSuspended(TweetDefaultCard, {
+      props: { tweet: tweet1 },
+      global: { stubs: { NuxtImg: true, Icon: true } },
+    });
+    const actions1 = wrapper1.findComponent(TweetActionButtons);
+    actions1.vm.$emit('unlike-success');
+    await nextTick();
+    const updated1 = actions1.props('tweet') as Tweet;
+    expect(updated1.isLiked).toBe(false);
+    expect(updated1.likeCount).toBe(1);
+
+    // Case 2: clamp at zero
+    const tweet2 = makeTweet({ isLiked: true, likeCount: 0 });
+    const wrapper2 = await mountSuspended(TweetDefaultCard, {
+      props: { tweet: tweet2 },
+      global: { stubs: { NuxtImg: true, Icon: true } },
+    });
+    const actions2 = wrapper2.findComponent(TweetActionButtons);
+    actions2.vm.$emit('unlike-success');
+    await nextTick();
+    const updated2 = actions2.props('tweet') as Tweet;
+    expect(updated2.isLiked).toBe(false);
+    expect(updated2.likeCount).toBe(0);
+  });
+
+  it('does nothing on unlike-success if not liked (no-op branch)', async () => {
+    const tweet = makeTweet({ isLiked: false, likeCount: 3 });
+    const wrapper = await mountSuspended(TweetDefaultCard, {
+      props: { tweet },
+      global: { stubs: { NuxtImg: true, Icon: true } },
+    });
+    const actions = wrapper.findComponent(TweetActionButtons);
+    actions.vm.$emit('unlike-success');
+    await nextTick();
+    const updated = actions.props('tweet') as Tweet;
+    expect(updated.isLiked).toBe(false);
+    expect(updated.likeCount).toBe(3);
+  });
+
+  it('updates retweet state on retweet-success when not previously retweeted', async () => {
+    const tweet = makeTweet({ isRetweeted: false, retweetCount: 4 });
+    const wrapper = await mountSuspended(TweetDefaultCard, {
+      props: { tweet },
+      global: { stubs: { NuxtImg: true, Icon: true } },
+    });
+    const actions = wrapper.findComponent(TweetActionButtons);
+    actions.vm.$emit('retweet-success');
+    await nextTick();
+    const updated = actions.props('tweet') as Tweet;
+    expect(updated.isRetweeted).toBe(true);
+    expect(updated.retweetCount).toBe(5);
+  });
+
+  it('does nothing on retweet-success if already retweeted (no-op branch)', async () => {
+    const tweet = makeTweet({ isRetweeted: true, retweetCount: 8 });
+    const wrapper = await mountSuspended(TweetDefaultCard, {
+      props: { tweet },
+      global: { stubs: { NuxtImg: true, Icon: true } },
+    });
+    const actions = wrapper.findComponent(TweetActionButtons);
+    actions.vm.$emit('retweet-success');
+    await nextTick();
+    const updated = actions.props('tweet') as Tweet;
+    expect(updated.isRetweeted).toBe(true);
+    expect(updated.retweetCount).toBe(8);
+  });
+
+  it('updates retweet state on undo-retweet-success and clamps retweetCount at 0', async () => {
+    // Case 1: normal decrement
+    const tweet1 = makeTweet({ isRetweeted: true, retweetCount: 2 });
+    const wrapper1 = await mountSuspended(TweetDefaultCard, {
+      props: { tweet: tweet1 },
+      global: { stubs: { NuxtImg: true, Icon: true } },
+    });
+    const actions1 = wrapper1.findComponent(TweetActionButtons);
+    actions1.vm.$emit('undo-retweet-success');
+    await nextTick();
+    const updated1 = actions1.props('tweet') as Tweet;
+    expect(updated1.isRetweeted).toBe(false);
+    expect(updated1.retweetCount).toBe(1);
+
+    // Case 2: clamp at zero
+    const tweet2 = makeTweet({ isRetweeted: true, retweetCount: 0 });
+    const wrapper2 = await mountSuspended(TweetDefaultCard, {
+      props: { tweet: tweet2 },
+      global: { stubs: { NuxtImg: true, Icon: true } },
+    });
+    const actions2 = wrapper2.findComponent(TweetActionButtons);
+    actions2.vm.$emit('undo-retweet-success');
+    await nextTick();
+    const updated2 = actions2.props('tweet') as Tweet;
+    expect(updated2.isRetweeted).toBe(false);
+    expect(updated2.retweetCount).toBe(0);
+  });
+
+  it('does nothing on undo-retweet-success if not retweeted (no-op branch)', async () => {
+    const tweet = makeTweet({ isRetweeted: false, retweetCount: 7 });
+    const wrapper = await mountSuspended(TweetDefaultCard, {
+      props: { tweet },
+      global: { stubs: { NuxtImg: true, Icon: true } },
+    });
+    const actions = wrapper.findComponent(TweetActionButtons);
+    actions.vm.$emit('undo-retweet-success');
+    await nextTick();
+    const updated = actions.props('tweet') as Tweet;
+    expect(updated.isRetweeted).toBe(false);
+    expect(updated.retweetCount).toBe(7);
   });
 });
