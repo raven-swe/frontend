@@ -11,7 +11,7 @@ const { t } = useI18n();
 const schema = yup.object({
   password: createPasswordSchema(t),
 });
-const { errors, defineField, handleSubmit, isSubmitting } = useForm({
+const { errors, defineField, handleSubmit, isSubmitting, setErrors } = useForm({
   validationSchema: schema,
   initialValues: {
     password: '',
@@ -19,7 +19,10 @@ const { errors, defineField, handleSubmit, isSubmitting } = useForm({
 });
 
 const onSubmit = handleSubmit(async (values) => {
-  await registerStore.submitPassword(values.password.trim());
+  const errors = await registerStore.submitPassword(values.password.trim());
+  if (errors) {
+    setErrors(backendValidationToFormErrors(errors, t));
+  }
 });
 
 const [_password, passwordAttrs] = defineField('password');

@@ -1,4 +1,5 @@
 import { registerationService, type RegisterationInfo } from '@/services/auth/registerationService';
+import { isApiError, isApiValidationError } from '@/utils/errorUtils';
 
 export const useRegisterStore = defineStore('register', () => {
   const step = ref(0);
@@ -8,6 +9,7 @@ export const useRegisterStore = defineStore('register', () => {
     name: '',
     email: '',
     birthDate: '',
+    recaptchaToken: '',
   });
 
   const openDialog = () => {
@@ -21,6 +23,7 @@ export const useRegisterStore = defineStore('register', () => {
       name: '',
       email: '',
       birthDate: '',
+      recaptchaToken: '',
     };
   };
 
@@ -30,26 +33,46 @@ export const useRegisterStore = defineStore('register', () => {
       const response = await registerationService.start(data);
       creationToken.value = response.data.creationToken;
       step.value = 1;
-    } catch {
-      console.error('failed to start registration');
+    } catch (error) {
+      if (isApiValidationError(error)) {
+        const errors = error.data?.data?.error.errors;
+        return errors;
+      } else {
+        console.error('Failed to verify OTP');
+      }
     }
   };
 
-  const submitOtp = async (otp: string): Promise<boolean> => {
+  const submitOtp = async (otp: string) => {
     try {
       await registerationService.verify(otp, creationToken.value);
       step.value = 2;
-      return true;
-    } catch {
-      return false;
+    } catch (error) {
+      if (isApiValidationError(error)) {
+        const errors = error.data?.data?.error.errors;
+        return errors;
+      } else {
+        console.error('Failed to verify OTP');
+      }
     }
   };
 
   const resendOtp = async () => {
     try {
       await registerationService.resendOtp(creationToken.value);
-    } catch {
-      console.error('Failed to resend otp');
+      showToaster('success', 'OTP resent successfully');
+    } catch (error) {
+      if (isApiError(error) && error.status === 429) {
+        const apiError = error.data?.data;
+        showToaster('error', apiError?.message || 'Failed to resend OTP');
+        // Extract retryAfter from the error response (will be updated to match ApiResponse)
+        const { retryAfter } = apiError?.error as unknown as { retryAfter: number };
+        if (retryAfter) {
+          return retryAfter;
+        }
+      } else {
+        console.error('Failed to resend OTP');
+      }
     }
   };
 
@@ -59,8 +82,13 @@ export const useRegisterStore = defineStore('register', () => {
       resetInitialData();
       open.value = false;
       navigateTo('/home');
-    } catch {
-      console.error('Failed to complete registeration');
+    } catch (error) {
+      if (isApiValidationError(error)) {
+        const errors = error.data?.data?.error.errors;
+        return errors;
+      } else {
+        console.error('Failed to verify OTP');
+      }
     }
   };
 

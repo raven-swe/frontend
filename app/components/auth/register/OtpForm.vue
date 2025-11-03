@@ -15,15 +15,45 @@ const { errors, defineField, handleSubmit, isSubmitting, setErrors } = useForm({
 });
 
 const onSubmit = handleSubmit(async (values) => {
-  const success = await registerStore.submitOtp(values.otp);
-  if (!success) {
-    setErrors({ otp: t('errors.INVALID_OTP') });
-  } else {
-    setErrors({ otp: undefined });
+  const validationErrors = await registerStore.submitOtp(values.otp);
+  if (validationErrors) {
+    setErrors(backendValidationToFormErrors(validationErrors, t));
   }
 });
 
 const [_otp, otpAttrs] = defineField('otp');
+
+const retryOtpTimeout = ref<number | null>(null);
+
+const onResendOtp = async () => {
+  const retryAfter = await registerStore.resendOtp();
+  if (!retryAfter) return;
+  retryOtpTimeout.value = retryAfter;
+  setErrors({ otp: t('errors.OTP_RESEND_LIMIT_EXCEEDED', { seconds: retryAfter }) });
+  startCountdown();
+};
+
+let countdownInterval: ReturnType<typeof setInterval> | null = null;
+
+const startCountdown = () => {
+  if (countdownInterval) clearInterval(countdownInterval);
+  countdownInterval = setInterval(() => {
+    if (retryOtpTimeout.value && retryOtpTimeout.value > 0) {
+      retryOtpTimeout.value -= 1;
+      if (retryOtpTimeout.value > 0)
+        setErrors({
+          otp: t('errors.OTP_RESEND_LIMIT_EXCEEDED', { seconds: retryOtpTimeout.value }),
+        });
+      if (retryOtpTimeout.value === 0) {
+        setErrors({ otp: undefined });
+      }
+    } else {
+      if (countdownInterval) clearInterval(countdownInterval);
+      setErrors({ otp: undefined });
+      countdownInterval = null;
+    }
+  }, 1000);
+};
 </script>
 
 <template>
@@ -58,7 +88,8 @@ const [_otp, otpAttrs] = defineField('otp');
         variant="link"
         size="link"
         class="w-fit"
-        @click="registerStore.resendOtp"
+        :disabled="retryOtpTimeout !== null && retryOtpTimeout > 0"
+        @click="onResendOtp"
       >
         {{ $t('register.otp.resend-code') }}
       </Button>
