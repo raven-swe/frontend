@@ -14,9 +14,12 @@ const { errors, defineField, handleSubmit, isSubmitting, setErrors } = useForm({
     otp: '',
   },
 });
+const router = useRouter();
 
 const onSubmit = handleSubmit(async (values) => {
   const success = await changeEmailStore.handleOtpSubmit(values.otp);
+
+  router.push('/settings/account');
   if (!success) {
     setErrors({ otp: t('errors.INVALID_OTP') });
   } else {
