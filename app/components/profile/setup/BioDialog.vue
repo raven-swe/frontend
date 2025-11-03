@@ -48,7 +48,7 @@ watch(
   <UiDialog :open="props.open" @update:open="handleOpenChange">
     <UiDialogContent header-class="flex items-center justify-center p-0" class="h-auto">
       <template #header>
-        <LogoRaven class="h-32 w-32" />
+        <LogoRaven class="h-10 w-10" />
       </template>
       <UiDialogHeader class="px-8 py-4">
         <UiDialogTitle class="text-3xl font-bold">{{
