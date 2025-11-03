@@ -102,4 +102,24 @@ describe('Login Flow', () => {
       });
     });
   });
+
+  describe('Test Logout', () => {
+    it('should logout successfully', () => {
+      cy.fixture('auth/existingUser.json').then((user) => {
+        // Proceed to password step
+        cy.get('input[data-cy="signin-identifier-input"]').type(user.email);
+        cy.get('button[data-cy="signin-next-button"]').click();
+        // Enter valid password
+        cy.get('[data-cy="signin-password-input"] input').type(user.password);
+        cy.get('button[data-cy="signin-next-button"]').should('not.be.disabled');
+        cy.get('button[data-cy="signin-next-button"]').click();
+        // Verify url redirection to home page
+        cy.url({ timeout: 10000 }).should('eq', `${Cypress.config().baseUrl}/home/for-you`);
+        // Click logout button
+        cy.get('button[data-cy="logout-button"]').click();
+        // Verify redirection to login page
+        cy.url({ timeout: 10000 }).should('eq', `${Cypress.config().baseUrl}/`);
+      });
+    });
+  });
 });

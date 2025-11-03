@@ -67,7 +67,12 @@ const switchLanguage = () => {
           size="24"
         />
       </UiButton>
-      <UiButton variant="ghost-default" size="icon-xl" @click="handleLogout">
+      <UiButton
+        variant="ghost-default"
+        size="icon-xl"
+        data-cy="logout-button"
+        @click="handleLogout"
+      >
         <Icon name="ic:outline-logout" size="24" />
       </UiButton>
     </div>
