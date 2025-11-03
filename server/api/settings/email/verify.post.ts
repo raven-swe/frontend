@@ -1,7 +1,7 @@
 export default defineWrappedResponseHandler(async (event) => {
   const body = await readBody<{ otp: string; confirmationToken: string }>(event);
-  const authHeader = getHeader(event, 'Authorization');
-  const response = await serverApiFetch<
+  const fetcher = serverApiFetch(event);
+  const response = await fetcher<
     ApiSuccessResponse<{
       success: boolean;
       message: string;
@@ -11,9 +11,6 @@ export default defineWrappedResponseHandler(async (event) => {
     body: {
       otp: body.otp,
       confirmationToken: body.confirmationToken,
-    },
-    headers: {
-      ...(authHeader ? { Authorization: authHeader } : {}),
     },
   });
   return response;

@@ -9,8 +9,9 @@ export default defineEventHandler(async (event) => {
 
   const clientCookie = getHeader(event, 'cookie');
 
+  const fetcher = serverApiFetch(event);
   try {
-    const response = await serverApiFetch.raw<ApiSuccessResponse<{ accessToken: string }>>(
+    const response = await fetcher.raw<ApiSuccessResponse<{ accessToken: string }>>(
       '/auth/refresh-token',
       {
         method: 'POST',
