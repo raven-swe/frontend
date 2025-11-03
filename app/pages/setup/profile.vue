@@ -6,16 +6,13 @@ import LocationDialog from '~/components/profile/setup/LocationDialog.vue';
 import BioDialog from '~/components/profile/setup/BioDialog.vue';
 import ConfirmationDialog from '~/components/profile/setup/ConfirmationDialog.vue';
 
-definePageMeta({
-  layout: 'profile',
-});
-
 const {
   isProfilePictureDialogOpen,
   isHeaderDialogOpen,
   isBioDialogOpen,
   isLocationDialogOpen,
   isConfirmationDialogOpen,
+  startFlow,
   nextStep,
   setProfilePicture,
   setAvatarUrl,
@@ -55,6 +52,10 @@ const handleConfirmationSubmit = async () => {
   closeFlow();
   submitProfile();
 };
+
+onMounted(() => {
+  startFlow();
+});
 </script>
 
 <template>

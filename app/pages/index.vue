@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import Button from '~/components/ui/Button.vue';
-import { useGoogleAuth } from '~/composables/useGoogleAuth';
 import { useLoginStore } from '~/stores/auth/login';
 
 const loginStore = useLoginStore();
@@ -9,19 +8,27 @@ definePageMeta({
   layout: false, // Disable layout for this page
 });
 
-const { initializeGoogleButton } = useGoogleAuth();
-
 const config = useRuntimeConfig();
 
 const githubClientId = config.public.githubClientId;
 const githubRedirectUri = config.public.githubRedirectUri;
 const githubScope = config.public.githubScope;
+const baseUrl = config.public.baseUrl;
+
+const googleClientId = config.public.googleClientId;
+const googleRedirectUri = config.public.googleRedirectUri;
+const googleScope = config.public.googleScope;
 
 function handleGithubSignIn() {
   const params = new URLSearchParams({
     client_id: githubClientId,
     redirect_uri: githubRedirectUri,
     scope: githubScope,
+    state: btoa(
+      JSON.stringify({
+        redirect: `${baseUrl}/auth/callback/github`,
+      }),
+    ),
   });
   window?.open(
     `https://github.com/login/oauth/authorize?${params.toString()}`,
@@ -30,20 +37,29 @@ function handleGithubSignIn() {
   );
 }
 
-onMounted(() => {
-  // Wait for Google script to load
-  const checkGoogle = setInterval(() => {
-    if (window?.google) {
-      initializeGoogleButton('google-signin-btn');
-      clearInterval(checkGoogle);
-    }
-  }, 100);
+function handleGoogleSignIn() {
+  const params = new URLSearchParams({
+    client_id: googleClientId,
+    redirect_uri: googleRedirectUri,
+    response_type: 'code',
+    scope: googleScope,
+  });
+  window?.open(
+    `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`,
+    'google-oauth',
+    `width=500,height=600,top=${(screen.height - 600) / 2},left=${(screen.width - 500) / 2}`,
+  );
+}
 
+onMounted(() => {
   // Listen for GitHub auth messages from popup
   window?.addEventListener('message', (event) => {
     if (event.origin !== window?.location.origin) return;
     if (event.data.type === 'github-auth') {
       navigateTo('/auth/callback/github?code=' + event.data.code);
+    }
+    if (event.data.type === 'google-auth') {
+      navigateTo('/auth/callback/google?code=' + event.data.code);
     }
   });
 });
@@ -53,11 +69,31 @@ onMounted(() => {
   <div class="bg-background flex h-screen w-screen flex-col">
     <div class="flex flex-1 flex-row items-center justify-center">
       <section class="hidden basis-[55%] justify-center lg:flex">
-        <img src="https://placehold.co/400x400" alt="" class="size-110 p-8" />
+        <img
+          src="https://cdn.raven.cmp27.space/light-raven.jpg"
+          alt=""
+          class="size-110 p-8 dark:hidden"
+        />
+        <img
+          src="https://cdn.raven.cmp27.space/dark-raven.png"
+          alt=""
+          class="hidden size-110 p-8 dark:block"
+        />
       </section>
       <section class="h-full min-w-fit p-8 lg:h-fit lg:basis-[45%]">
         <header>
-          <img src="https://placehold.co/400x400" alt="" class="size-18 lg:hidden" />
+          <div class="lg:hidden">
+            <img
+              src="https://cdn.raven.cmp27.space/light-raven.jpg"
+              alt=""
+              class="size-18 dark:hidden"
+            />
+            <img
+              src="https://cdn.raven.cmp27.space/dark-raven.png"
+              alt=""
+              class="hidden size-18 dark:block"
+            />
+          </div>
           <h1 class="my-12 text-4xl font-bold sm:text-[4rem]">{{ $t('root.hero.title') }}</h1>
           <h2 class="mb-8 text-2xl font-semibold sm:text-[2rem]">{{ $t('root.hero.subtitle') }}</h2>
         </header>
@@ -71,7 +107,12 @@ onMounted(() => {
                 {{ $t('root.auth.github-signin') }}</Button
               >
 
-              <Button id="google-signin-btn" variant="outline" class="w-75">
+              <Button
+                id="google-signin-btn"
+                variant="outline"
+                class="w-75"
+                @click="handleGoogleSignIn"
+              >
                 <Icon name="material-icon-theme:google" />
                 {{ $t('root.auth.google-signin') }}</Button
               >
@@ -81,9 +122,14 @@ onMounted(() => {
               <span class="uppercase">{{ $t('root.auth.separator') }}</span>
               <div class="w-full border-b-1" />
             </div>
-            <Button id="signup" variant="default" class="w-75" @click="registerStore.openDialog">{{
-              $t('root.auth.signup')
-            }}</Button>
+            <Button
+              id="signup"
+              data-cy="signup-start-button"
+              variant="default"
+              class="w-75"
+              @click="registerStore.openDialog"
+              >{{ $t('root.auth.signup') }}</Button
+            >
             <p class="text-muted-foreground mt-4 max-w-75 text-xs">
               {{ $t('root.auth.signup-info') }}
             </p>

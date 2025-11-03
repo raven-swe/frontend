@@ -1,31 +1,51 @@
 <script setup lang="ts">
 import * as yup from 'yup';
+import { nextTick, onMounted } from 'vue';
 import { useForm } from 'vee-validate';
 import { usePasswordStore } from '~/stores/auth/password';
 import { showToaster } from '@/utils/showToaster';
+import useRecaptcha from '@/composables/useRecaptcha';
 
 const passwordStore = usePasswordStore();
 
 const schema = yup.object({
   identifier: yup.string().trim().required($t('errors.IDENTIFIER_REQUIRED')),
+  recaptcha: yup
+    .string()
+    .required($t('errors.RECAPTCHA_REQUIRED'))
+    .min(1, $t('errors.RECAPTCHA_REQUIRED')),
 });
 
-const { defineField, handleSubmit, isSubmitting, meta } = useForm({
+const { defineField, handleSubmit, isSubmitting, meta, setFieldValue } = useForm({
   validationSchema: schema,
-  initialValues: { identifier: passwordStore.identifier },
-  validateOnMount: false,
+  initialValues: { identifier: passwordStore.identifier, recaptcha: undefined },
 });
 
 const [_identifier, identifierAttrs] = defineField('identifier');
+const { render: renderRecaptcha } = useRecaptcha();
+
 const onSubmit = handleSubmit(async (values) => {
   try {
     await passwordStore.checkUserExists({
       identifier: values.identifier.trim(),
-      recaptchaToken: 'recaptchaToken',
+      recaptchaToken: values.recaptcha,
     });
   } catch (err: unknown) {
     showToaster('error', (err as Error).message || $t('errors.GENERIC_ERROR'));
   }
+});
+
+onMounted(async () => {
+  await nextTick();
+  renderRecaptcha({
+    elementId: 'recaptcha-container',
+    callback: (token: string) => {
+      setFieldValue('recaptcha', token);
+    },
+    expiredCallback: () => {
+      setFieldValue('recaptcha', '', true);
+    },
+  });
 });
 </script>
 
@@ -52,6 +72,10 @@ const onSubmit = handleSubmit(async (values) => {
           data-testid="identifier-input"
         />
       </section>
+
+      <ClientOnly class="mt-3">
+        <div id="recaptcha-container" class="g-recaptcha"></div>
+      </ClientOnly>
     </div>
 
     <UiDialogFooter class="absolute end-0 bottom-8 w-full">

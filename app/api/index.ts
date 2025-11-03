@@ -1,6 +1,7 @@
 import { clearAccessToken, getAccessToken } from '~/services/auth/authService';
+import type { NitroFetchRequest, $Fetch } from 'nitropack';
 
-export const apiFetch = $fetch.create({
+export const apiFetch: $Fetch<unknown, NitroFetchRequest> = $fetch.create({
   retry: 3,
   retryStatusCodes: [401],
   onRequest({ options }) {
@@ -9,9 +10,11 @@ export const apiFetch = $fetch.create({
       options.headers.set('Authorization', `Bearer ${token}`);
     }
   },
-  async onResponseError({ response, options }) {
-    // we aleady set retry for 401 status codes
-    // so this will run then on the second try the fetch succeeds or fails again
+  async onResponseError({ request, response, options }) {
+    if (request.toString().includes('/api/auth/refresh-token')) {
+      return;
+    }
+
     if (response.status === 401) {
       try {
         await apiFetch('/api/auth/refresh-token', {

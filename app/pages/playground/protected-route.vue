@@ -1,12 +1,18 @@
 <script lang="ts" setup>
 import { apiFetch } from '~/api';
 
-const { data } = useAsyncData('protected-route-data', async () => {
-  const response = await apiFetch('/api/auth/dummy-protected-resource', {
-    method: 'GET',
-  });
-  return response;
-});
+const { data } = useAsyncData(
+  'protected-route-data',
+  async () => {
+    const response = await apiFetch('/api/auth/dummy-protected-resource', {
+      method: 'GET',
+    });
+    return response;
+  },
+  {
+    lazy: true,
+  },
+);
 </script>
 
 <template>
