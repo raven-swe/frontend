@@ -13,11 +13,12 @@ const emit = defineEmits<Emits>();
 
 // Get user/form data
 const { formData } = useProfileSetupFlow();
-const username = 'Habibayman_'; // TODO: actually fetch after auth is done
-const name = 'Habiba Ayman'; // TODO: actually fetch after auth is done
+const userStore = useUserStore();
+const username = computed(() => userStore.user?.username || '');
+const name = computed(() => userStore.user?.displayName || '');
 
 const fileInputRef = ref<HTMLInputElement | null>(null);
-const selectedImage = ref<string | null>(null);
+const selectedImage = ref<string | null>(userStore.user.bannerUrl || '');
 const selectedFile = ref<File | null>(null);
 
 const actionButton = computed(() => {
@@ -58,13 +59,24 @@ const handleOpenChange = (value: boolean) => {
     selectedFile.value = null;
   }
 };
+
+watch(
+  () => userStore.user.bannerUrl,
+  (newVal) => {
+    // only sync if user hasn’t picked a new one locally
+    if (!selectedFile.value) {
+      selectedImage.value = newVal || '';
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
   <UiDialog :open="props.open" @update:open="handleOpenChange">
     <UiDialogContent header-class="flex items-center justify-center p-0" class="h-auto">
       <template #header>
-        <img src="https://placehold.co/32x32" class="size-8" />
+        <LogoRaven class="h-10 w-10" />
       </template>
       <UiDialogHeader class="px-8 py-4">
         <UiDialogTitle class="text-3xl font-bold">{{
@@ -98,7 +110,7 @@ const handleOpenChange = (value: boolean) => {
           <input
             ref="fileInputRef"
             type="file"
-            accept="image/*"
+            accept="image/png,image/jpg,image/jpeg"
             class="hidden"
             @change="handleFileChange"
           />
@@ -107,7 +119,7 @@ const handleOpenChange = (value: boolean) => {
         <!-- Profile Section -->
         <div class="flex flex-col items-center gap-3 self-start px-10">
           <img
-            :src="formData.avatarUrl || '/default_profile.png'"
+            :src="formData.avatarUrl || 'https://cdn.raven.cmp27.space/default_avatar.png'"
             class="h-25 w-25 rounded-full object-cover"
           />
           <div>

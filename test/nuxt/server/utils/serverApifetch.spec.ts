@@ -35,7 +35,7 @@ describe('serverApiFetch', () => {
     await expect(serverApiFetch('/fail')).rejects.toMatchObject({
       statusCode: 400,
       statusMessage: 'Invalid input',
-      data: { message: 'Invalid input' },
+      data: { error: { message: 'Invalid input' } },
     });
 
     scope.done();

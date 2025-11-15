@@ -1,38 +1,61 @@
 <script lang="ts" setup>
 import ProfileDetails from '~/components/profile/ProfileDetails.vue';
+import ProfileDetailsSkeleton from '~/components/profile/skeletons/ProfileDetailsSkeleton.vue';
 import Tabs from '@/components/ui/Tabs.vue';
 import Tab from '@/components/ui/Tab.vue';
-import Spinner from '~/components/ui/Spinner.vue';
+import { apiFetch } from '~/api';
+import { useQuery } from '@tanstack/vue-query';
 
 const route = useRoute();
-const username = computed(() => (route.params.username as string) || 'hussein');
+const username = computed(() => route.params.username as string);
 const profilePath = computed(() => `/profile/${username.value}`);
-const userStore = useUserStore();
 
-onMounted(() => {
-  userStore.fetchUserProfile(username.value);
+const queryKey = computed(() => ['profile', username.value]);
+
+const { data, isLoading, isError, error } = useQuery<ApiSuccessResponse<User>>({
+  queryKey,
+  queryFn: async () =>
+    await apiFetch<ApiSuccessResponse<User>>(`/api/users/${username.value}/profile`),
+  staleTime: 1000 * 60 * 5, // 5min cache
+  retry: false, // Don't retry on 404
+});
+
+const user = computed(() => (data.value && data.value.success ? data.value.data : null));
+const { isCurrentUser } = useIsCurrentUser();
+
+const isUserNotFound = computed(() => {
+  if (!isError.value || !error.value) return false;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const errorData = error.value as any;
+  return errorData?.data?.code === 'USER_NOT_FOUND' || errorData?.statusCode === 404;
 });
 </script>
 
 <template>
   <NuxtLayout name="default">
-    <!-- Profile header and tabs (sticky across all profile pages) -->
-    <div v-if="userStore.loading" class="flex justify-center p-4">
-      <Spinner />
+    <div v-if="isLoading">
+      <ProfileDetailsSkeleton />
     </div>
 
-    <div v-else-if="userStore.error" class="text-destructive p-4">
-      {{ userStore.error }}
+    <!-- User not found -->
+    <div
+      v-else-if="isUserNotFound"
+      class="flex flex-col items-center justify-center p-8 text-center"
+    >
+      <h1 class="mb-2 text-3xl font-bold">{{ $t('errors.ACCOUNT_NOT_FOUND') }}</h1>
+      <p class="text-gray-600 dark:text-gray-400">{{ $t('errors.TRY_SEARCHING') }}</p>
     </div>
 
-    <div v-else-if="userStore.user">
-      <ProfileDetails :user-profile="userStore.user" />
+    <!-- Profile content -->
+    <template v-else-if="user">
+      <ProfileDetails :user-profile="user" />
 
       <Tabs>
         <Tab
           :label="$t('profile.tabs.posts')"
-          :route="`${profilePath}`"
-          :is-active="$route.path === `${profilePath}`"
+          :route="profilePath"
+          :is-active="$route.path === profilePath"
         />
         <Tab
           :label="$t('profile.tabs.replies')"
@@ -45,6 +68,7 @@ onMounted(() => {
           :is-active="$route.path === `${profilePath}/media`"
         />
         <Tab
+          v-if="isCurrentUser"
           :label="$t('profile.tabs.likes')"
           :route="`${profilePath}/likes`"
           :is-active="$route.path === `${profilePath}/likes`"
@@ -53,6 +77,6 @@ onMounted(() => {
 
       <!-- Dynamic content from child tab pages -->
       <slot />
-    </div>
+    </template>
   </NuxtLayout>
 </template>

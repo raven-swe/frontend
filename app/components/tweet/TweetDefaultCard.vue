@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Avatar from '~/components/ui/Avatar.vue';
 import type { Tweet } from '~~/shared/types/tweets';
-import { relativeTime, formatDate } from '~/utils/index';
+import { relativeTime, dataFormat } from '~/utils/index';
 import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
 interface Props {
@@ -11,12 +11,43 @@ const props = defineProps<Props>();
 // Format createdAt to a short relative time like "6h", "3d", "2m"
 
 type Segment = { type: 'text' | 'mention' | 'hashtag'; text: string; href?: string };
+const tweet = ref(props.tweet);
+
+// Update local tweet state when like/unlike succeeds
+const onLikeSuccess = () => {
+  if (!tweet.value.isLiked) {
+    tweet.value.isLiked = true;
+    tweet.value.likeCount = (tweet.value.likeCount ?? 0) + 1;
+  }
+};
+
+const onUnlikeSuccess = () => {
+  if (tweet.value.isLiked) {
+    tweet.value.isLiked = false;
+    const next = (tweet.value.likeCount ?? 0) - 1;
+    tweet.value.likeCount = next < 0 ? 0 : next;
+  }
+};
+const onRetweetSuccess = () => {
+  if (!tweet.value.isRetweeted) {
+    tweet.value.isRetweeted = true;
+    tweet.value.retweetCount += 1;
+  }
+};
+
+const onUndoRetweetSuccess = () => {
+  if (tweet.value.isRetweeted) {
+    tweet.value.isRetweeted = false;
+    const next = (tweet.value.retweetCount ?? 0) - 1;
+    tweet.value.retweetCount = next < 0 ? 0 : next;
+  }
+};
 
 // Build content segments using entities positions so we can style mentions and hashtags
 const contentSegments = computed<Segment[]>(() => {
   const segments: Segment[] = [];
-  const content = props.tweet.content || '';
-  const { entities } = props.tweet;
+  const content = tweet.value.content || '';
+  const { entities } = tweet.value;
   if (!entities || (!entities.mentions?.length && !entities.hashtags?.length)) {
     return [{ type: 'text', text: content }];
   }
@@ -82,16 +113,18 @@ const contentSegments = computed<Segment[]>(() => {
     <div class="min-w-0 flex-1">
       <!-- Header: display name, username, time -->
       <div class="flex flex-wrap items-center gap-x-1 text-sm">
-        <span class="cursor-pointer font-semibold hover:underline">{{
-          props.tweet.author.displayName
-        }}</span>
+        <NuxtLink :to="`/profile/${props.tweet.author.username}`">
+          <span class="cursor-pointer font-semibold hover:underline">{{
+            props.tweet.author.displayName
+          }}</span>
+        </NuxtLink>
         <span class="text-muted-foreground" v-text="'@' + props.tweet.author.username" />
         <span class="text-muted-foreground">·</span>
         <time
-          :title="formatDate(props.tweet.createdAt)"
-          :datetime="props.tweet.createdAt"
+          :title="dataFormat(tweet.createdAt)"
+          :datetime="tweet.createdAt"
           class="text-muted-foreground hover:cursor-pointer hover:underline"
-          >{{ relativeTime(props.tweet.createdAt) }}</time
+          >{{ relativeTime(tweet.createdAt) }}</time
         >
       </div>
 
@@ -101,17 +134,23 @@ const contentSegments = computed<Segment[]>(() => {
           <span v-if="seg.type === 'text'" class="inline">
             {{ seg.text }}
           </span>
-          <NuxtLink v-else :to="seg.href" class="text-primary inline font-medium hover:underline">
+          <a v-else :href="seg.href" class="text-primary inline font-medium hover:underline">
             {{ seg.text }}
-          </NuxtLink>
+          </a>
         </template>
       </p>
 
       <!-- Media (single image basic layout) -->
-      <TweetMedia :media="props.tweet.media" />
+      <TweetMedia :media="tweet.media" />
 
       <!-- Actions -->
-      <TweetActionButtons :tweet="props.tweet" />
+      <TweetActionButtons
+        :tweet="tweet"
+        @like-success="onLikeSuccess"
+        @unlike-success="onUnlikeSuccess"
+        @retweet-success="onRetweetSuccess"
+        @undo-retweet-success="onUndoRetweetSuccess"
+      />
     </div>
   </article>
 </template>

@@ -31,6 +31,34 @@ const overLimitText = computed(() =>
   isOverLimit.value ? props.modelValue.slice(props.maxLength) : '',
 );
 
+// Parse text and highlight hashtags and mentions
+const parseText = (text: string) => {
+  // Match hashtags, mentions & links
+  const regex = /(?:^|\s)(https?:\/\/[^\s]+|www\.[^\s]+|#\w+|@\w+)/g;
+  const parts = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = regex.exec(text)) !== null) {
+    // Add text before the match
+    if (match.index > lastIndex) {
+      parts.push({ text: text.slice(lastIndex, match.index), type: 'normal' });
+    }
+    // Add the matched hashtag or mention
+    parts.push({ text: match[0], type: 'highlight' });
+    lastIndex = match.index + match[0].length;
+  }
+
+  // Add remaining text
+  if (lastIndex < text.length) {
+    parts.push({ text: text.slice(lastIndex), type: 'normal' });
+  }
+
+  return parts;
+};
+
+const highlightedValidText = computed(() => parseText(validText.value));
+
 const adjustHeight = () => {
   if (textareaRef.value) {
     textareaRef.value.style.height = 'auto';
@@ -63,7 +91,7 @@ defineExpose({
         ref="textareaRef"
         :value="modelValue"
         :placeholder="placeholder"
-        class="absolute inset-0 z-10 w-full resize-none border-none bg-transparent text-xl leading-7 text-transparent caret-black outline-none"
+        class="caret-foreground absolute inset-0 z-10 w-full resize-none border-none bg-transparent text-xl leading-7 text-transparent outline-none"
         rows="1"
         @input="handleInput"
       />
@@ -75,7 +103,10 @@ defineExpose({
       >
         <span v-if="!modelValue" class="text-muted-foreground">{{ placeholder }}</span>
         <span v-else>
-          <span>{{ validText }}</span>
+          <template v-for="(part, index) in highlightedValidText" :key="index">
+            <span v-if="part.type === 'normal'">{{ part.text }}</span>
+            <span v-else class="text-primary">{{ part.text }}</span>
+          </template>
           <span v-if="overLimitText" class="bg-destructive/50">{{ overLimitText }}</span>
         </span>
       </div>

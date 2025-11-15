@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import Button from '~/components/ui/Button.vue';
 import { useLoginStore } from '~/stores/auth/login';
+import { ref } from 'vue';
+import { useI18n } from '#imports';
+
+const { locale, setLocale } = useI18n();
 
 const loginStore = useLoginStore();
 const registerStore = useRegisterStore();
@@ -13,6 +17,7 @@ const config = useRuntimeConfig();
 const githubClientId = config.public.githubClientId;
 const githubRedirectUri = config.public.githubRedirectUri;
 const githubScope = config.public.githubScope;
+const baseUrl = config.public.baseUrl;
 
 const googleClientId = config.public.googleClientId;
 const googleRedirectUri = config.public.googleRedirectUri;
@@ -23,6 +28,11 @@ function handleGithubSignIn() {
     client_id: githubClientId,
     redirect_uri: githubRedirectUri,
     scope: githubScope,
+    state: btoa(
+      JSON.stringify({
+        redirect: `${baseUrl}/auth/callback/github`,
+      }),
+    ),
   });
   window?.open(
     `https://github.com/login/oauth/authorize?${params.toString()}`,
@@ -57,17 +67,52 @@ onMounted(() => {
     }
   });
 });
+
+const lang = ref(locale.value);
+
+const switchLanguage = () => {
+  setLocale(lang.value);
+
+  if (lang.value === 'en') {
+    lang.value = 'ar';
+  } else {
+    lang.value = 'en';
+  }
+};
 </script>
 
 <template>
   <div class="bg-background flex h-screen w-screen flex-col">
+    <UiButton class="fixed start-5 top-5" size="icon-lg" @click="switchLanguage()">
+      <Icon size="1.2rem" name="material-symbols:language" />
+    </UiButton>
     <div class="flex flex-1 flex-row items-center justify-center">
       <section class="hidden basis-[55%] justify-center lg:flex">
-        <img src="https://placehold.co/400x400" alt="" class="size-110 p-8" />
+        <img
+          src="https://cdn.raven.cmp27.space/light-raven.jpg"
+          alt=""
+          class="size-110 p-8 dark:hidden"
+        />
+        <img
+          src="https://cdn.raven.cmp27.space/dark-raven.png"
+          alt=""
+          class="hidden size-110 p-8 dark:block"
+        />
       </section>
       <section class="h-full min-w-fit p-8 lg:h-fit lg:basis-[45%]">
         <header>
-          <img src="https://placehold.co/400x400" alt="" class="size-18 lg:hidden" />
+          <div class="lg:hidden">
+            <img
+              src="https://cdn.raven.cmp27.space/light-raven.jpg"
+              alt=""
+              class="size-18 dark:hidden"
+            />
+            <img
+              src="https://cdn.raven.cmp27.space/dark-raven.png"
+              alt=""
+              class="hidden size-18 dark:block"
+            />
+          </div>
           <h1 class="my-12 text-4xl font-bold sm:text-[4rem]">{{ $t('root.hero.title') }}</h1>
           <h2 class="mb-8 text-2xl font-semibold sm:text-[2rem]">{{ $t('root.hero.subtitle') }}</h2>
         </header>
@@ -96,9 +141,14 @@ onMounted(() => {
               <span class="uppercase">{{ $t('root.auth.separator') }}</span>
               <div class="w-full border-b-1" />
             </div>
-            <Button id="signup" variant="default" class="w-75" @click="registerStore.openDialog">{{
-              $t('root.auth.signup')
-            }}</Button>
+            <Button
+              id="signup"
+              data-cy="signup-start-button"
+              variant="default"
+              class="w-75"
+              @click="registerStore.openDialog"
+              >{{ $t('root.auth.signup') }}</Button
+            >
             <p class="text-muted-foreground mt-4 max-w-75 text-xs">
               {{ $t('root.auth.signup-info') }}
             </p>
@@ -107,7 +157,13 @@ onMounted(() => {
             <p class="font-semibold">
               {{ $t('root.auth.already-have-account') }}
             </p>
-            <Button id="signin" variant="outline" class="my-4 w-75" @click="loginStore.openDialog">
+            <Button
+              id="signin"
+              variant="outline"
+              class="my-4 w-75"
+              data-cy="signin-start-button"
+              @click="loginStore.openDialog"
+            >
               {{ $t('root.auth.signin') }}
             </Button>
           </section>

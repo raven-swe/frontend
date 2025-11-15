@@ -10,8 +10,9 @@ interface Emits {
   (e: 'update:open', value: boolean): void;
 }
 const emit = defineEmits<Emits>();
+const userStore = useUserStore();
 
-const location = ref('');
+const location = ref(userStore.user?.location || '');
 const actionButton = computed(() => {
   const isLocationSet = location.value.trim().length > 0;
   return {
@@ -31,13 +32,23 @@ const handleOpenChange = (value: boolean) => {
     location.value = '';
   }
 };
+
+watch(
+  () => userStore.user.location,
+  (newVal) => {
+    if (!location.value.trim()) {
+      location.value = newVal || '';
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
   <UiDialog :open="props.open" @update:open="handleOpenChange">
     <UiDialogContent header-class="flex items-center justify-center p-0" class="h-auto">
       <template #header>
-        <img src="https://placehold.co/32x32" class="size-8" />
+        <LogoRaven class="h-10 w-10" />
       </template>
       <UiDialogHeader class="px-8 py-4">
         <UiDialogTitle class="text-3xl font-bold">{{

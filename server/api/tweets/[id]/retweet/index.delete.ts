@@ -1,35 +1,16 @@
-import { FetchError } from 'ofetch';
+import { defineWrappedResponseHandler } from '~~/server/utils/handler';
+import * as yup from 'yup';
 
-interface ApiError {
-  message: string;
-}
+const paramsSchema = yup.object({ id: yup.string().required().min(1) });
 
-const API_URL = process.env.BACKEND_URL;
-
-export default defineEventHandler(async (event) => {
-  const { id } = event.context.params as { id: string };
-  try {
-    // Forward the request to your backend API
-    const response = await $fetch<{
-      success: boolean;
-      message: string;
-    }>(`${API_URL}/tweets/${id}/retweet`, {
-      method: 'DELETE',
-    });
-
-    return response;
-  } catch (e) {
-    if (e instanceof FetchError) {
-      const errData = e.data as ApiError;
-      throw createError({
-        message: errData?.message || 'Failed to create tweet',
-        statusCode: e.statusCode || 500,
-      });
-    }
-
-    throw createError({
-      message: 'Unexpected error creating tweet',
-      statusCode: 500,
-    });
-  }
+export default defineWrappedResponseHandler(async (event) => {
+  const { id } = await getValidatedRouterParams(event, (data) => paramsSchema.validate(data));
+  const authHeader = getHeader(event, 'authorization');
+  console.log(authHeader);
+  return await serverApiFetch<ApiResponseBase>(`/tweets/${id}/retweet`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: authHeader || '',
+    },
+  });
 });

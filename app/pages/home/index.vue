@@ -1,12 +1,5 @@
-<script lang="ts"></script>
+<script setup lang="ts">
+import { navigateTo } from '#app';
 
-<template>
-  <div>
-    <UiTabs>
-      <UiTab label="For you" route="/home" :is-active="$route.path.startsWith('/home')" />
-      <UiTab label="Following" route="/home" :is-active="$route.path === 'false'" />
-    </UiTabs>
-    <TweetComposer />
-    <h1 class="p-4 text-2xl font-bold">{{ $t('homepage.tweets') }}</h1>
-  </div>
-</template>
+navigateTo('/home/for-you', { redirectCode: 301 });
+</script>

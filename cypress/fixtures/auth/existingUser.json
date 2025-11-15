@@ -1,0 +1,10 @@
+{
+  "name": "Omar Hassan",
+  "email": "omarg@gmail.com",
+  "dob": {
+    "day": "4",
+    "month": "12",
+    "year": "2003"
+  },
+  "password": "test1234"
+}

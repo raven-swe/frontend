@@ -1,6 +1,7 @@
 import { clearAccessToken, getAccessToken } from '~/services/auth/authService';
+import type { NitroFetchRequest, $Fetch } from 'nitropack';
 
-export const apiFetch = $fetch.create({
+export const apiFetch: $Fetch<unknown, NitroFetchRequest> = $fetch.create({
   retry: 3,
   retryStatusCodes: [401],
   onRequest({ options }) {

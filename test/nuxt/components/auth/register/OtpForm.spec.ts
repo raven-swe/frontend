@@ -15,7 +15,7 @@ const i18n = createI18n({
   messages: { en: messages },
 });
 
-describe('PasswordForm.vue', () => {
+describe('OtpForm.vue', () => {
   beforeAll(() => {
     setActivePinia(createPinia());
   });
@@ -97,7 +97,10 @@ describe('PasswordForm.vue', () => {
 
   it('submits form with valid input', async () => {
     const store = reactive({
-      submitOtp: vi.fn().mockResolvedValueOnce(false).mockReturnValueOnce(true),
+      submitOtp: vi
+        .fn()
+        .mockReturnValueOnce([{ field: 'otp', code: 'INVALID_TOKEN' }])
+        .mockReturnValueOnce(undefined),
     });
 
     vi.doMock('@/stores/register', () => ({
@@ -129,6 +132,7 @@ describe('PasswordForm.vue', () => {
     await flushPromises();
     expect(store.submitOtp).toHaveBeenCalledWith('123456');
     let errorMessage = wrapper.find('[data-test-id="otp-error"]');
+    expect(errorMessage.exists()).toBe(true);
     expect(errorMessage.text()).toBe(i18n.global.t('errors.INVALID_OTP'));
     // Submit again to test success path
     await form.trigger('submit');

@@ -14,6 +14,8 @@ import type {
   ResetPasswordSchema,
 } from '@/services/auth/passwordService';
 
+import * as cookie from 'cookie';
+
 const mockUsers = rawUsers as User[];
 
 const API_URL = process.env.BACKEND_URL;
@@ -30,6 +32,16 @@ const generateRefreshToken = (user: User) => {
     username: user.username,
   };
   return jwt.sign(payload, 'refresh_secret', { expiresIn: '7d' });
+};
+
+const generateRefreshCookie = (token: string) => {
+  return cookie.serialize('refresh_token', token, {
+    httpOnly: true,
+    path: '/',
+    maxAge: 10 * 60, // make it 10 min for testing
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+  });
 };
 
 export const handlers = [
@@ -250,14 +262,15 @@ export const handlers = [
       // Generate new access and refresh tokens
       const accessToken = generateAuthToken(user);
       const refreshToken = generateRefreshToken(user);
+      const refreshTokenCookie = generateRefreshCookie(refreshToken);
 
-      return HttpResponse.json(
-        {
+      return new HttpResponse(
+        JSON.stringify({
           success: true,
           message: 'Password reset successfully.',
-          data: { accessToken, refreshToken },
-        } as ApiSuccessResponse<{ accessToken: string; refreshToken: string }>,
-        { status: 200 },
+          data: { accessToken: accessToken },
+        }),
+        { headers: { 'Content-Type': 'application/json', 'set-cookie': refreshTokenCookie } },
       );
     } catch {
       return HttpResponse.json(

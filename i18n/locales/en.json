@@ -18,6 +18,10 @@
     "complete-form": {
       "birthdate-label": "Birthdate",
       "confirm": "Confirm"
+    },
+    "settings": {
+      "title": "Settings",
+      "account": "Account"
     }
   },
   "leftsidebar": {
@@ -26,8 +30,9 @@
       "explore": "Explore",
       "notifications": "Notifications",
       "messages": "Messages",
+      "bookmarks": "Bookmarks",
       "profile": "Profile",
-      "more": "More"
+      "settings": "Settings"
     }
   },
   "rightsidebar": {
@@ -78,6 +83,16 @@
       "birth-date": "Birth date",
       "discard-changes": "Discard changes?",
       "discard-changes-desc": "This can't be undone and you'll lose your changes."
+    }
+  },
+  "home": {
+    "tabs": {
+      "for-you": "For You",
+      "following": "Following"
+    },
+    "messages": {
+      "loadingMore": "Loading more tweets...",
+      "noMoreTweets": "No more tweets"
     }
   },
   "playground": {
@@ -141,7 +156,7 @@
     "NAME_TOO_LONG": "Name must be at most 50 characters long",
     "AGE_RESTRICTION": "You must be at least 13 years old",
     "PASSWORD_MISMATCH": "Passwords do not match",
-    "PASSWORD_TOO_SHORT": "Password must be at least 8 characters long",
+    "PASSWORD_TOO_SHORT": "Password must be at least 10 characters long",
     "PASSWORD_INVALID": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
     "EMAIL_ALREADY_EXISTS": "An account with this email already exists",
     "OTP_MUST_6": "OTP must be exactly 6 digits",
@@ -152,7 +167,40 @@
     "PASSWORD_REQUIRED": "Please enter your password",
     "GENERIC_ERROR": "Something went wrong. Please try again.",
     "EMPTY_NAME": "Name can't be blank",
-    "RECAPTCHA_REQUIRED": "Please complete the reCAPTCHA challenge"
+    "RECAPTCHA_REQUIRED": "Please complete the reCAPTCHA challenge",
+    "ACCOUNT_NOT_FOUND": "This account doesn't \nexist",
+    "TRY_SEARCHING": "Try searching for another one",
+    "OTP_RESEND_LIMIT_EXCEEDED": "OTP resend limit reached. Please try again in {seconds}.",
+    "otp": {
+      "INVALID_TOKEN": "The OTP you entered is invalid",
+      "ISLENGTH": "OTP must be exactly 6 digits",
+      "IS_EMPTY": "Please enter your OTP code"
+    },
+    "name": {
+      "CONTAINSLETTER": "What's your name?",
+      "NOT_A_STRING": "What's your name?",
+      "IS_EMPTY": "What's your name?",
+      "TOO_LONG": "Name must be at most 50 characters long"
+    },
+    "birthDate": {
+      "NOT_MINIMUM_AGE": "You must be at least 13 years old",
+      "IS_EMPTY": "Please enter your date of birth.",
+      "NOT_A_DATE": "Please enter a valid date."
+    },
+    "email": {
+      "IS_EMPTY": "Please enter a valid email.",
+      "NOT_AN_EMAIL": "Please enter a valid email."
+    },
+    "recaptchaToken": {
+      "IS_EMPTY": "Verify that you are not a robot.",
+      "NOT_A_STRING": "Verify that you are not a robot."
+    },
+    "password": {
+      "NOT_A_STRING": "Please enter your password",
+      "IS_EMPTY": "Please enter your password",
+      "TOO_SHORT": "Password must be at least 10 characters long",
+      "INVALID_FORMAT": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+    }
   },
   "register": {
     "register-info": {
@@ -185,9 +233,61 @@
     },
     "password": {
       "title": "You'll need a password",
-      "description": "Make sure it's 8 characters or more.",
+      "description": "Make sure it's 10 characters or more.",
       "disclaimer": "By signing up, you agree to the Terms of Service and Privacy Policy, including Cookie Use. Raven may use your contact information, including your email address and phone number for purposes outlined in our Privacy Policy, like keeping your account secure and personalizing our services, including ads. Others will be able to find you by email or phone number, when provided, unless you choose otherwise here.",
       "label": "Password"
+    }
+  },
+  "setting": {
+    "email": "Email",
+    "change-username": "Change username",
+    "suggestions": "Suggestions",
+    "save": "Save Changes",
+    "settings": "Settings",
+    "change-password": "Change Password",
+    "date-of-birth": "Date of Birth",
+    "item-icon": "tabler:chevron-right",
+    "failed-to-load-user": "Failed to load user data.",
+    "back-button-icon": "material-symbols:arrow-back",
+    "account-information": "Your account",
+    "account-information-details": "See information about your account, download an archive of your data, or learn about your account deactivation options.",
+    "username": {
+      "username-taken": "That username has been taken. Please choose another.",
+      "username-invalid": "Usernames can have letters, digits, and underscores, and must be 3-15 characters long.",
+      "username-required": "Username is required",
+      "username": "Username",
+      "suggestions": "Suggestions",
+      "change-username": "Change username",
+      "save": "Save Changes",
+      "error-saving": "An error occurred while saving the username. Please try again.",
+      "error-checking": "Error checking username availability. Please try again."
+    },
+    "password": {
+      "change-password": "Change your password",
+      "current-password": "Current password",
+      "new-password": "New password",
+      "confirm-password": "Confirm password",
+      "forgot-password": "Forgot password?",
+      "save": "Save",
+      "password-invalid-length": "Password must be at least 10 characters long",
+      "errors": {
+        "current-password-required": "Current password is required",
+        "new-password-required": "New password is required",
+        "password-too-short": "Password must be at least 8 characters long",
+        "password-invalid": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+        "confirm-password-required": "Please confirm your password",
+        "passwords-do-not-match": "Passwords do not match",
+        "error-saving": "An error occurred while saving the password. Please try again.",
+        "401": "You are not authorized to change the password",
+        "422": "Current password is incorrect"
+      }
+    },
+    "change-email": {
+      "label": "Email",
+      "title": "Change Email",
+      "description": "Your current email is {email}. What would you like to update it to? Your email is not displayed in your public profile on Raven.",
+      "description-extra": "If you change your email address, any existing Google SSO connections will be removed.",
+      "placeholder": "Email address"
     }
   },
   "login": {

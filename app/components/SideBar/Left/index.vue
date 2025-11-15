@@ -1,12 +1,38 @@
 <script lang="ts" setup>
 import { loginService } from '~/services/auth/loginService';
+import { useQueryClient } from '@tanstack/vue-query';
+import { ref } from 'vue';
+import { useI18n } from '#imports';
+import { useTheme } from '~/composables/useTheme';
+
+const { locale, setLocale } = useI18n();
+const { mode, toggleTheme } = useTheme();
+
 const userStore = useUserStore();
+const queryClient = useQueryClient();
+
+const handleLogout = async () => {
+  await loginService.logout();
+  queryClient.removeQueries({ queryKey: ['layout-data'] });
+};
+
+const lang = ref(locale.value);
+
+const switchLanguage = () => {
+  setLocale(lang.value);
+
+  if (lang.value === 'en') {
+    lang.value = 'ar';
+  } else {
+    lang.value = 'en';
+  }
+};
 </script>
 <template>
   <div class="flex h-screen flex-col items-center xl:items-start">
-    <div class="hover:bg-foreground/10 my-2 w-min p-2 hover:rounded-full">
+    <div class="my-2 w-min p-2 hover:rounded-full">
       <NuxtLink to="/">
-        <LogoRaven class="h-8 w-8" />
+        <LogoRaven class="h-14 w-14" />
       </NuxtLink>
     </div>
     <div class="mt-2 flex flex-col items-center space-y-3 xl:items-start">
@@ -27,8 +53,26 @@ const userStore = useUserStore();
           route: `/profile/${userStore.user?.username || ''}`,
         }"
       ></SideBarLeftTab>
-      <SideBarLeftTab :tab="{ label: 'more', icon: 'more-horiz', route: '#' }"></SideBarLeftTab>
-      <UiButton variant="ghost-default" size="icon-xl" @click="loginService.logout">
+      <SideBarLeftTab
+        :tab="{ label: 'settings', icon: 'settings', route: '/settings/account' }"
+      ></SideBarLeftTab>
+      <UiButton variant="ghost-default" size="icon-xl" @click="switchLanguage">
+        <Icon name="material-symbols:language" size="24" />
+      </UiButton>
+      <UiButton variant="ghost-default" size="icon-xl" @click="toggleTheme">
+        <Icon
+          :name="
+            mode === 'dark' ? 'material-symbols:light-mode-outline' : 'material-symbols:nightlight'
+          "
+          size="24"
+        />
+      </UiButton>
+      <UiButton
+        variant="ghost-default"
+        size="icon-xl"
+        data-cy="logout-button"
+        @click="handleLogout"
+      >
         <Icon name="ic:outline-logout" size="24" />
       </UiButton>
     </div>

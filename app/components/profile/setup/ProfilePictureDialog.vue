@@ -62,7 +62,7 @@ const handleOpenChange = (value: boolean) => {
   <UiDialog :open="props.open" @update:open="handleOpenChange">
     <UiDialogContent header-class="flex items-center justify-center p-0" class="h-auto">
       <template #header>
-        <img src="https://placehold.co/32x32" class="size-8" />
+        <LogoRaven class="h-10 w-10" />
       </template>
       <UiDialogHeader class="px-8 py-4">
         <UiDialogTitle class="text-3xl font-bold">{{
@@ -75,7 +75,7 @@ const handleOpenChange = (value: boolean) => {
       <div class="mx-2 flex flex-grow items-center justify-center">
         <div class="relative">
           <img
-            :src="selectedImage || '/default_profile.png'"
+            :src="selectedImage || 'https://cdn.raven.cmp27.space/default_avatar.png'"
             class="h-40 w-40 cursor-pointer rounded-full object-cover brightness-70 filter"
           />
           <button
@@ -88,7 +88,7 @@ const handleOpenChange = (value: boolean) => {
           <input
             ref="fileInputRef"
             type="file"
-            accept="image/*"
+            accept="image/png,image/jpg,image/jpeg"
             class="hidden"
             @change="handleFileChange"
           />

@@ -29,7 +29,7 @@ describe('defineWrappedResponseHandler', () => {
     await expect(wrapped(createMockH3Event({}))).rejects.toMatchObject({
       statusCode: 500,
       statusMessage: 'Internal Server Error',
-      data: 'Boom!',
+      data: { message: 'Boom!' },
     });
   });
 

@@ -1,18 +1,28 @@
 import { faker } from '@faker-js/faker';
-import { mkdirSync, writeFileSync } from 'fs';
+import { mkdirSync, writeFileSync, readFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import type { Tweet } from '../../shared/types/tweets';
+import type { User } from '#shared/types/user';
+
+type TweetAuthor = {
+  username: string;
+  displayName: string;
+  avatarUrl: string;
+  isFollowing: boolean;
+  isFollower: boolean;
+};
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-function makeAuthor(index: number) {
-  const username = faker.internet.username().toLowerCase() + index;
+function makeAuthorFromUser(user: User | undefined, index: number) {
+  const rawName = user?.username ?? faker.internet.username();
+  const username = (String(rawName).toLowerCase() + index).replace(/\s+/g, '');
   return {
     username,
-    displayName: faker.person.fullName(),
-    avatarUrl: `/avatars/${username}.png`,
+    displayName: user?.displayName ?? faker.person.fullName(),
+    avatarUrl: user?.avatarUrl ?? `/avatars/${username}.png`,
     isFollowing: faker.datatype.boolean(),
     isFollower: faker.datatype.boolean(),
   };
@@ -33,14 +43,48 @@ function randomEntities() {
 }
 
 function randomMedia() {
-  const shouldHaveMedia = faker.datatype.boolean(0.3);
+  const shouldHaveMedia = faker.datatype.boolean(0.4);
   if (!shouldHaveMedia) return [] as Tweet['media'];
+
   const types = ['IMAGE', 'GIF', 'VIDEO'] as const;
   const type = faker.helpers.arrayElement(types);
+
+  let url = '';
+  switch (type) {
+    case 'IMAGE': {
+      const width = faker.number.int({ min: 400, max: 1200 });
+      const height = faker.number.int({ min: 300, max: 900 });
+      url = `https://picsum.photos/${width}/${height}?random=${faker.number.int(10000)}`;
+      break;
+    }
+
+    case 'GIF': {
+      const gifIds = [
+        '3oEjI6SIIHBdRxXI40',
+        'l0MYC0LajbaPoEADu',
+        '26tPplGWjN0xLybiU',
+        '3ohhwNqj9QjvE3lI8E',
+      ];
+      const gifId = faker.helpers.arrayElement(gifIds);
+      url = `https://media.giphy.com/media/${gifId}/giphy.gif`;
+      break;
+    }
+
+    case 'VIDEO': {
+      const videos = [
+        'https://sample-videos.com/video321/mp4/480/big_buck_bunny_480p_1mb.mp4',
+        'https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_1mb.mp4',
+        'https://sample-videos.com/video321/mp4/240/big_buck_bunny_240p_1mb.mp4',
+      ];
+      url = faker.helpers.arrayElement(videos);
+      break;
+    }
+  }
+
   return [
     {
       type,
-      url: faker.internet.url(),
+      url,
       altText: faker.lorem.sentence(),
       width: faker.number.int({ min: 320, max: 1920 }),
       height: faker.number.int({ min: 240, max: 1080 }),
@@ -48,12 +92,12 @@ function randomMedia() {
   ] as Tweet['media'];
 }
 
-function makeBaseTweet(id: string, content?: string): Tweet {
+function makeBaseTweet(id: string, content?: string, author?: TweetAuthor): Tweet {
   return {
     id,
     content: content ?? faker.lorem.sentences({ min: 1, max: 3 }),
     createdAt: new Date().toISOString(),
-    author: makeAuthor(faker.number.int({ min: 1, max: 999 })),
+    author: author ?? makeAuthorFromUser(undefined, faker.number.int({ min: 1, max: 999 })),
     replyCount: 0,
     retweetCount: faker.number.int({ min: 0, max: 100 }),
     likeCount: faker.number.int({ min: 0, max: 500 }),
@@ -65,39 +109,52 @@ function makeBaseTweet(id: string, content?: string): Tweet {
 }
 
 function makeData() {
-  const t1: Tweet = makeBaseTweet('tw-' + faker.string.nanoid(6));
+  const NUM_TWEETS = 400;
+  const usersPath = path.resolve(__dirname, '../data/mock-users.json');
+  let users: User[] = [];
+  try {
+    const raw = readFileSync(usersPath, 'utf-8');
+    users = JSON.parse(raw);
+  } catch {
+    users = [];
+  }
 
-  const t2: Tweet = makeBaseTweet('tw-' + faker.string.nanoid(6));
-  const t3: Tweet = {
-    ...makeBaseTweet('tw-' + faker.string.nanoid(6), faker.lorem.sentences({ min: 1, max: 2 })),
-    isReplyToTweetId: t1.id,
-  };
-  t1.replyCount += 1;
+  const tweets: Tweet[] = [];
+  for (let i = 0; i < NUM_TWEETS; i++) {
+    const id = 'tw-' + faker.string.nanoid(8);
+    const chosenUser = users.length ? faker.helpers.arrayElement(users) : undefined;
+    const author = makeAuthorFromUser(chosenUser as User | undefined, i + 1);
+    const t: Tweet = makeBaseTweet(id, undefined, author);
+    tweets.push(t);
+  }
 
-  const quotedLight: Tweet = {
-    ...t1,
-    quotedTweet: undefined,
-    quotedTweetId: undefined,
-    isReplyToTweetId: undefined,
-  };
-  const t4: Tweet = {
-    ...makeBaseTweet('tw-' + faker.string.nanoid(6), faker.lorem.sentences({ min: 1, max: 2 })),
-    quotedTweetId: t1.id,
-    quotedTweet: quotedLight,
-  };
+  for (let i = 1; i < tweets.length; i++) {
+    if (faker.number.int({ min: 0, max: 100 }) < 12) {
+      const targetIndex = faker.number.int({ min: 0, max: i - 1 });
+      tweets[i]!.isReplyToTweetId = tweets[targetIndex]!.id;
+      tweets[targetIndex]!.replyCount = (tweets[targetIndex]!.replyCount ?? 0) + 1;
+    }
 
-  const tweets: Tweet[] = [t1, t2, t3, t4];
+    if (faker.number.int({ min: 0, max: 100 }) < 8) {
+      const targetIndex = faker.number.int({ min: 0, max: i - 1 });
+      const quotedLight: Partial<Tweet> = { ...tweets[targetIndex]! };
+      (quotedLight as unknown as Record<string, unknown>).quotedTweet = undefined;
+      (quotedLight as unknown as Record<string, unknown>).quotedTweetId = undefined;
+      (quotedLight as unknown as Record<string, unknown>).isReplyToTweetId = undefined;
+      tweets[i]!.quotedTweetId = tweets[targetIndex]!.id;
+      tweets[i]!.quotedTweet = quotedLight as unknown as Tweet;
+    }
+  }
+
   return tweets;
 }
 
 function main() {
   const data = makeData();
   const outDir = path.resolve(__dirname, '../data');
-  const outFile = path.join(outDir, 'tweet.json');
+  const outFile = path.join(outDir, 'mock-tweets.json');
   mkdirSync(outDir, { recursive: true });
   writeFileSync(outFile, JSON.stringify(data, null, 2), 'utf-8');
-
-  // console.log(`Wrote ${data.length} tweets to ${path.relative(process.cwd(), outFile)}`);
 }
 
 main();

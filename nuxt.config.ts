@@ -14,6 +14,7 @@ export default defineNuxtConfig({
       googleRedirectUri: process.env.NUXT_PUBLIC_GOOGLE_REDIRECT_URI || '',
       googleScope: process.env.NUXT_PUBLIC_GOOGLE_SCOPE || '',
       siteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY || '',
+      baseUrl: process.env.NUXT_PUBLIC_BASE_URL || 'http://localhost:5173',
     },
   },
   devtools: {
@@ -30,9 +31,11 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
+      title: 'Raven',
       link: [
         { rel: 'preconnect', href: 'https://www.google.com' },
         { rel: 'preconnect', href: 'https://www.gstatic.com', crossorigin: '' },
+        { rel: 'icon', type: 'image/png', href: 'https://cdn.raven.cmp27.space/favicon.png' },
       ],
     },
   },
@@ -52,7 +55,7 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
   },
   i18n: {
-    strategy: 'prefix_and_default',
+    strategy: 'no_prefix',
     defaultLocale: 'en',
     locales: [
       { code: 'en', name: 'English', file: 'en.json' },
@@ -68,5 +71,15 @@ export default defineNuxtConfig({
         pages.push(...filteredPages);
       }
     },
+  },
+  fonts: {
+    families: [
+      {
+        name: 'Inter',
+        provider: 'google', // Load from Google Fonts
+        weights: [400, 500, 600, 700],
+        styles: ['normal', 'oblique', 'italic'],
+      },
+    ],
   },
 });

@@ -2,18 +2,30 @@
 import type { H3Event } from 'h3';
 import { merge } from 'lodash';
 
+/** Creates a mock H3Event for testing purposes.
+ * @param partialEvent Partial properties to override in the mock event.
+ * @param headers Optional headers to include in the event.
+ * @returns A fully constructed H3Event object.
+ */
 export const createMockH3Event = (
   partialEvent: Partial<H3Event> & {
     body?: Record<string, unknown>;
     params?: Record<string, unknown>;
     query?: Record<string, unknown>;
   },
+  headers?: Record<string, string>,
 ): H3Event => {
+  // Properly initialize headers as a Map
+  const headerEntries = Object.entries({
+    'content-type': 'application/json',
+    ...(headers || {}),
+  });
+  const headerMap = new Map<string, string>(headerEntries);
   const event = {
-    headers: new Map<string, string>(),
+    headers: headerMap,
     node: {
       req: {
-        headers: { 'content-type': 'application/json' },
+        headers: Object.fromEntries(headerMap),
         method: 'POST',
       },
     },
