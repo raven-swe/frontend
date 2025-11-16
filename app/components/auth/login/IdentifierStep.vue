@@ -5,6 +5,11 @@ import { useLoginStore } from '~/stores/auth/login';
 import { showToaster } from '@/utils/showToaster';
 
 const loginStore = useLoginStore();
+const { handleGithubSignIn, handleGoogleSignIn, setupOAuthMessageListener } = useOAuthHandlers();
+
+onMounted(() => {
+  setupOAuthMessageListener();
+});
 
 const schema = yup.object({
   identifier: yup.string().trim().required($t('errors.IDENTIFIER_REQUIRED')),
@@ -46,6 +51,7 @@ const [_identifier, identifierAttrs] = defineField('identifier');
           size="lg"
           data-testid="google-button"
           data-cy="signin-google-button"
+          @click="handleGoogleSignIn"
         >
           <Icon name="devicon:google" width="128" height="128"></Icon>
           {{ $t('login.identifier-step.google-signin') }}</UiButton
@@ -56,6 +62,7 @@ const [_identifier, identifierAttrs] = defineField('identifier');
           size="lg"
           data-testid="github-button"
           data-cy="signin-github-button"
+          @click="handleGithubSignIn"
         >
           <Icon name="devicon:github" width="128" height="128"></Icon>
           {{ $t('login.identifier-step.github-signin') }}</UiButton
