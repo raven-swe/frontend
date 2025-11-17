@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import * as cookie from 'cookie';
+import { isPublicRoute } from '../../app/utils/public-routes';
 
 export default defineEventHandler(async (event) => {
   const refreshToken = getCookie(event, 'refreshToken');
@@ -42,6 +43,6 @@ export default defineEventHandler(async (event) => {
   } catch {
     deleteCookie(event, 'refreshToken');
     deleteCookie(event, 'access_token');
-    sendRedirect(event, '/', 401);
+    if (!isPublicRoute(event.node.req.url || '')) sendRedirect(event, '/', 401);
   }
 });
