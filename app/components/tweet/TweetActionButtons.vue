@@ -25,10 +25,12 @@ const pendingLike = ref(false);
 const handleLike = async () => {
   if (pendingLike.value) return;
   pendingLike.value = true;
+  emit('like-success');
   try {
     const res = await likeTweet(props.tweet.id);
-    if (res?.success) emit('like-success');
+    if (!res?.success) emit('unlike-success');
   } catch (err) {
+    emit('unlike-success');
     console.error('like failed', err);
   } finally {
     pendingLike.value = false;
@@ -38,10 +40,12 @@ const handleLike = async () => {
 const handleUnlike = async () => {
   if (pendingLike.value) return;
   pendingLike.value = true;
+  emit('unlike-success');
   try {
     const res = await unLikeTweet(props.tweet.id);
-    if (res?.success) emit('unlike-success');
+    if (!res?.success) emit('like-success');
   } catch (err) {
+    emit('like-success');
     console.error('unlike failed', err);
   } finally {
     pendingLike.value = false;
@@ -53,10 +57,14 @@ const pendingRetweet = ref(false);
 const handleRetweet = async () => {
   if (pendingRetweet.value) return;
   pendingRetweet.value = true;
+  emit('retweet-success');
   try {
     const res = await retweetTweet(props.tweet.id);
-    if (res?.success) emit('retweet-success');
+    if (!res?.success) {
+      emit('undo-retweet-success');
+    }
   } catch (err) {
+    emit('undo-retweet-success');
     console.error('retweet failed', err);
   } finally {
     pendingRetweet.value = false;
@@ -66,10 +74,14 @@ const handleRetweet = async () => {
 const handleUndoRetweet = async () => {
   if (pendingRetweet.value) return;
   pendingRetweet.value = true;
+  emit('undo-retweet-success');
   try {
     const res = await undoRetweetTweet(props.tweet.id);
-    if (res?.success) emit('undo-retweet-success');
+    if (!res?.success) {
+      emit('retweet-success');
+    }
   } catch (err) {
+    emit('retweet-success');
     console.error('undo retweet failed', err);
   } finally {
     pendingRetweet.value = false;
