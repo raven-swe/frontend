@@ -68,9 +68,12 @@ describe('POST /api/tweets/[id]/retweet', () => {
 
     await expect(retweetByIdPostHandler(event)).rejects.toEqual(
       createError({
-        statusCode: 500,
-        statusMessage: 'Internal Server Error',
-        data: { message: 'id is a required field' },
+        statusCode: 422,
+        statusMessage: 'Validation Error',
+        data: {
+          message: 'id is a required field',
+          errors: ['id is a required field'],
+        },
       }),
     );
 
@@ -84,9 +87,12 @@ describe('POST /api/tweets/[id]/retweet', () => {
 
     await expect(unRetweetByIdDeleteHandler(event)).rejects.toEqual(
       createError({
-        statusCode: 500,
-        statusMessage: 'Internal Server Error',
-        data: { message: 'id is a required field' },
+        statusCode: 422,
+        statusMessage: 'Validation Error',
+        data: {
+          message: 'id is a required field',
+          errors: ['id is a required field'],
+        },
       }),
     );
 
