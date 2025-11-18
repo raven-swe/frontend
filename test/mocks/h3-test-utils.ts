@@ -31,6 +31,26 @@ export function useH3TestUtils() {
         return validateFn(params);
       },
     ),
+    getRequestIP: vi.fn(
+      (
+        event: H3Event,
+        opts: {
+          xForwardedFor?: boolean;
+        } = {},
+      ) => {
+        if (opts.xForwardedFor) {
+          const _header = event.headers.get('x-forwarded-for');
+          if (_header) {
+            const xForwardedFor = _header.split(',')[0]?.trim();
+            if (xForwardedFor) {
+              return xForwardedFor;
+            }
+          }
+        }
+
+        return (event.req.context?.clientAddress as string) || event.req.ip || undefined;
+      },
+    ),
   }));
 
   // Stub global functions to emulate Nuxt auto-imports
@@ -42,6 +62,7 @@ export function useH3TestUtils() {
   vi.stubGlobal('appendHeader', h3.appendHeader);
   vi.stubGlobal('deleteCookie', h3.deleteCookie);
   vi.stubGlobal('getValidatedRouterParams', h3.getValidatedRouterParams);
+  vi.stubGlobal('getRequestIP', h3.getRequestIP);
 
   return h3;
 }
