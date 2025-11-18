@@ -1,10 +1,11 @@
+import { defineWrappedResponseHandler } from '~~/server/utils/handler';
+
 export default defineWrappedResponseHandler(async (event) => {
   const body = await readBody<{ newEmail: string }>(event);
   const fetcher = serverApiFetch(event);
   const response = await fetcher<
     ApiSuccessResponse<{
-      success: boolean;
-      message: string;
+      confirmationToken: string;
     }>
   >('/me/settings/email', {
     method: 'PUT',
