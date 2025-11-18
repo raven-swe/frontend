@@ -10,16 +10,18 @@ mockNuxtImport('useI18n', () => {
 });
 
 describe('Settings Layout', () => {
-  it('renders default slot content', async () => {
+  it('renders middle and right slot content', async () => {
     const wrapper = await mountSuspended(SettingsLayout, {
       slots: {
-        default: '<div class="slot-content">Main Content</div>',
+        middle: '<div >Middle Content</div>',
+        right: '<div >Right Content</div>',
       },
     });
 
-    expect(wrapper.html()).toContain('Main Content');
-    const right = wrapper.find('div.flex-1.border');
-    expect(right.exists()).toBe(true);
+    expect(wrapper.html()).toContain('Middle Content');
+    expect(wrapper.html()).toContain('Right Content');
+    const rightSection = wrapper.find('div.flex-1.border');
+    expect(rightSection.exists()).toBe(true);
   });
 
   it('renders the left sidebar container', async () => {
