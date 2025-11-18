@@ -336,5 +336,9 @@
       },
       "change-password-button": "تغيير كلمة المرور"
     }
+  },
+  "dm": {
+    "placeholder-search": "ابحث في الرسائل المباشرة",
+    "header-title": "الرسائل"
   }
 }

@@ -47,13 +47,13 @@ watch(
           </div>
 
           <!-- settings Section -->
-          <SettingsSettingsSection
-            class="hidden w-[320px] flex-shrink-0 border lg:block xl:w-[390px] 2xl:w-[450px]"
-          />
+          <div class="hidden w-[320px] flex-shrink-0 border lg:block xl:w-[390px] 2xl:w-[450px]">
+            <slot name="middle" />
+          </div>
 
           <!-- Right sidebar -->
           <div class="flex-1 border sm:w-[560px] sm:flex-none md:w-[600px]">
-            <slot />
+            <slot name="right" />
           </div>
         </div>
       </div>
