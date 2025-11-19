@@ -15,5 +15,20 @@ declare namespace Cypress {
      * @example cy.getOTP('user@example.com', 'registration')
      */
     getOTP(identifier: string, type: 'registration' | 'password-reset'): Chainable<string>;
+
+    /**
+     * Custom command to visit a page and wait for Nuxt hydration
+     * @param url - URL to visit
+     * @example cy.visitAndWaitForHydration('/home')
+     */
+    visitAndWaitForHydration(url: string): Chainable<void>;
+
+    /**
+     * Custom command to log in with session caching
+     * @param email - User email
+     * @param password - User password
+     * @example cy.login('user@example.com', 'password123')
+     */
+    login(email: string, password: string): Chainable<void>;
   }
 }
