@@ -15,7 +15,7 @@ describe('loginService', () => {
 
     const res = await loginService.checkUser('test@example.com');
 
-    expect(res).toEqual({ data: { exists: true, type: 'email' } });
+    expect(res).toEqual({ exists: true, type: 'email' });
   });
 
   it('check identifier calls API with incorrect params and returns response', async () => {
@@ -25,7 +25,7 @@ describe('loginService', () => {
 
     const res = await loginService.checkUser('wrong@example.com');
 
-    expect(res).toEqual({ data: { exists: false, type: 'email' } });
+    expect(res).toEqual({ exists: false, type: 'email' });
   });
 
   it('submit login calls API with correct params and returns response', async () => {
