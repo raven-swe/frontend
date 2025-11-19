@@ -38,6 +38,7 @@ export interface DmMessageSender {
 
 export interface DmMessage {
   id: string;
+  sender: DmMessageSender;
   content: string;
   entities: DmMessageEntities;
   mediaUrl?: string | null;

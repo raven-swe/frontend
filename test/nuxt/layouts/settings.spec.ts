@@ -41,7 +41,7 @@ describe('Settings Layout', () => {
     const wrapper = await mountSuspended(SettingsLayout);
 
     expect(wrapper.html()).toContain('max-w-7xl');
-    expect(wrapper.html()).toContain('min-h-screen');
+    expect(wrapper.html()).toContain('w-full');
   });
 
   it('applies theme/background classes', async () => {
