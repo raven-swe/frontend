@@ -61,7 +61,6 @@ export default defineNuxtConfig({
     locales: [
       { code: 'en-US', iso: 'en-US', name: 'English', file: 'en.json' },
       { code: 'ar-EG', iso: 'ar-EG', name: 'العربية', file: 'ar.json', dir: 'rtl' },
-      { code: 'de-DE', iso: 'de-DE', name: 'Deutsch', file: 'de.json' },
     ],
   },
   hooks: {
