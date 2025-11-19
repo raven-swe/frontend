@@ -17,7 +17,7 @@ export const handlers = [
       { status: 200 },
     );
   }),
-  http.post(`${API_URL}/onboarding/interests/update`, async () => {
+  http.post(`${API_URL}/onboarding/interests`, async () => {
     return HttpResponse.json(
       {
         success: true,

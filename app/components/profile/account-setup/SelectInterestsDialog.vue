@@ -51,7 +51,7 @@ const isInterestActive = (interestId: string) => {
   <UiDialog :open="props.open">
     <UiDialogContent hide-close-button header-class="flex items-center justify-center p-0">
       <template #header>
-        <img src="https://placehold.co/32x32" class="size-8" />
+        <LogoRaven class="text-primary h-10 w-10" />
       </template>
       <UiDialogHeader class="mx-auto w-full max-w-100">
         <UiDialogTitle class="text-3xl font-bold">{{
@@ -71,17 +71,31 @@ const isInterestActive = (interestId: string) => {
             @toggle-interest="handleToggleInterest(interest.id)"
           />
         </div>
-        <UiDialogFooter class="mt-auto items-end border-t-1 pt-4">
-          <div class="mx-auto flex w-full max-w-100 justify-end">
-            <UiButton
-              class="px-8"
-              size="xl"
-              :disabled="fields.length === 0 || !isFieldValid('interests')"
-              @click="handleSubmit"
-            >
-              {{ $t('ui.next') }}
-            </UiButton>
-          </div>
+        <UiDialogFooter
+          class="mt-auto flex flex-row items-center justify-between border-t-1 px-8 pt-4"
+        >
+          <p v-if="fields.length <= 0" class="text-muted-foreground shrink-0 text-sm">
+            {{
+              $t('profile.account-setup.interests.selected-count', {
+                count: fields.length,
+              })
+            }}
+          </p>
+          <p v-else class="text-foreground shrink-0 text-sm font-medium">
+            {{
+              $t('profile.account-setup.interests.selected-done', {
+                count: fields.length,
+              })
+            }}
+          </p>
+          <UiButton
+            class="px-8"
+            size="xl"
+            :disabled="fields.length === 0 || !isFieldValid('interests')"
+            @click="handleSubmit"
+          >
+            {{ $t('ui.next') }}
+          </UiButton>
         </UiDialogFooter>
       </form>
     </UiDialogContent>
