@@ -113,12 +113,7 @@ const handleShare = async () => {
       v-if="props.tweet.isRetweeted"
       class="hover:text-brand-turquoise text-brand-turquoise relative flex items-center justify-center gap-[1px]"
     >
-      <Button
-        :disabled="pendingRetweet"
-        variant="tweet-icon-turquoise-active"
-        size="icon-md"
-        @click="handleUndoRetweet"
-      >
+      <Button variant="tweet-icon-turquoise-active" size="icon-md" @click="handleUndoRetweet">
         <Icon name="tabler:repeat" size="1.2rem" />
       </Button>
       <span class="absolute start-8">{{ props.tweet.retweetCount }}</span>
@@ -127,12 +122,7 @@ const handleShare = async () => {
       v-else
       class="hover:text-brand-turquoise relative flex items-center justify-center gap-[1px]"
     >
-      <Button
-        :disabled="pendingRetweet"
-        variant="tweet-icon-turquoise"
-        size="icon-md"
-        @click="handleRetweet"
-      >
+      <Button variant="tweet-icon-turquoise" size="icon-md" @click="handleRetweet">
         <Icon name="tabler:repeat" size="1.2rem" />
       </Button>
       <span class="absolute start-8">{{ props.tweet.retweetCount }}</span>
@@ -142,19 +132,14 @@ const handleShare = async () => {
       v-if="props.tweet.isLiked"
       class="hover:text-brand-red text-brand-red relative flex items-center justify-center"
     >
-      <Button
-        :disabled="pendingLike"
-        variant="tweet-icon-red-active"
-        size="icon-md"
-        @click="handleUnlike"
-      >
+      <Button variant="tweet-icon-red-active" size="icon-md" @click="handleUnlike">
         <Icon name="line-md:heart-filled" size="1.2rem" />
       </Button>
       <span class="absolute start-8">{{ props.tweet.likeCount }}</span>
     </label>
 
     <label v-else class="hover:text-brand-red relative flex items-center justify-center gap-[1px]">
-      <Button :disabled="pendingLike" variant="tweet-icon-red" size="icon-md" @click="handleLike">
+      <Button variant="tweet-icon-red" size="icon-md" @click="handleLike">
         <Icon name="tabler:heart" size="1.2rem" />
       </Button>
       <span class="absolute start-8">{{ props.tweet.likeCount }}</span>
