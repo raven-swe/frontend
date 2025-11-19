@@ -22,6 +22,7 @@ const { data } = useAsyncData(
   'username-suggestions',
   async () => await accountSettingsService.getUsernameSuggestions(),
 );
+const currentUsername = useUserStore().user?.username || '';
 
 const usernameSchema = yup
   .string()
@@ -30,7 +31,7 @@ const usernameSchema = yup
   .test('uniqueUsername', $t('errors.USERNAME_ALREADY_EXISTS'), async (username) => {
     if (!username || !usernameRegex.test(username)) return true;
     const exists = await checkUsername(username);
-    return !exists;
+    return !exists || username.toLowerCase() === currentUsername.toLowerCase();
   });
 
 const { values, defineField, handleSubmit, isSubmitting, isFieldValid, setFieldValue } = useForm({
@@ -38,13 +39,17 @@ const { values, defineField, handleSubmit, isSubmitting, isFieldValid, setFieldV
     username: usernameSchema.required(),
   }),
   initialValues: {
-    username: '',
+    username: currentUsername,
   },
 });
 
+const { t } = useI18n();
 const { handleUsernameSubmit, goToNextStep } = useAccountSetup();
-const onSubmit = handleSubmit(async (formValues) => {
-  await handleUsernameSubmit(formValues.username);
+const onSubmit = handleSubmit(async (formValues, actions) => {
+  const errors = await handleUsernameSubmit(formValues.username);
+  if (errors) {
+    actions.setErrors(backendValidationToFormErrors(errors, t));
+  }
 });
 
 const onSkip = async () => {
@@ -70,7 +75,7 @@ const actionButton = computed(() => {
       class="h-auto"
     >
       <template #header>
-        <img src="https://placehold.co/32x32" class="size-8" />
+        <LogoRaven class="text-primary h-10 w-10" />
       </template>
       <UiDialogHeader class="mx-auto w-full max-w-100">
         <UiDialogTitle class="text-3xl font-bold">{{

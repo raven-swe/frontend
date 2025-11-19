@@ -40,8 +40,16 @@ export default function useAccountSetup() {
       await accountSettingsService.updateUsername(username);
       goToNextStep();
     } catch (error) {
-      console.error('Error updating username:', error);
-      showToaster('error', 'Failed to update username. Please try again.');
+      if (isApiValidationError(error)) {
+        const errors = error.data?.data?.error.errors;
+        return errors;
+      } else if (isApiError(error)) {
+        showToaster(
+          'error',
+          error.data?.data?.error.message || 'Failed to update username. Please try again.',
+        );
+        return;
+      }
     }
   }
 
@@ -51,8 +59,16 @@ export default function useAccountSetup() {
       setupStep.value = null;
       goToNextStep();
     } catch (error) {
-      console.error('Error updating interests:', error);
-      showToaster('error', 'Failed to update interests. Please try again.');
+      if (isApiValidationError(error)) {
+        const errors = error.data?.data?.error.errors;
+        return errors;
+      } else if (isApiError(error)) {
+        showToaster(
+          'error',
+          error.data?.data?.error.message || 'Failed to update interests. Please try again.',
+        );
+        return;
+      }
     }
   }
 
