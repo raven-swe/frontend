@@ -100,6 +100,7 @@ const onSubmit = handleSubmit(async (values, actions) => {
         <UiButton
           variant="link"
           size="link"
+          type="button"
           data-testid="signup-link"
           data-cy="signin-signup-link"
           @click="loginStore.openSignupDialog"

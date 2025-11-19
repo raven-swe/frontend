@@ -68,6 +68,7 @@ const onSubmit = handleSubmit(async (values) => {
       <UiButton
         variant="link"
         size="link"
+        type="button"
         class="mt-1 text-sm"
         data-testid="forgot-password-link"
         data-cy="signin-forgot-password-link"
