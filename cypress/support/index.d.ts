@@ -17,6 +17,19 @@ declare namespace Cypress {
     getOTP(identifier: string, type: 'registration' | 'password-reset'): Chainable<string>;
 
     /**
+     * Custom command to create a test user and retrieve its info
+     * @example cy.createTestUser()
+     */
+    createTestUser(): Chainable<{
+      id: string;
+      email: string;
+      username: string;
+      password: string;
+      passwordHash: string;
+      birthdate: string;
+      createdAt: string;
+    }>;
+    /**
      * Custom command to visit a page and wait for Nuxt hydration
      * @param url - URL to visit
      * @example cy.visitAndWaitForHydration('/home')

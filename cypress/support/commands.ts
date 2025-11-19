@@ -40,6 +40,11 @@ Cypress.Commands.add('getOTP', (identifier: string, type: 'registration' | 'pass
     .its('body.data.otp');
 });
 
+// Create a test user and retrieve its info
+Cypress.Commands.add('createTestUser', () => {
+  return cy.request('POST', `${Cypress.env('API_URL')}/test/users`).its('body.data');
+});
+
 // Visit a page and wait for Nuxt hydration to complete
 Cypress.Commands.add('visitAndWaitForHydration', (url: string) => {
   cy.visit(url);
