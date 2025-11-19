@@ -3,16 +3,21 @@ import * as yup from 'yup';
 import { useForm } from 'vee-validate';
 import { storeToRefs } from 'pinia';
 import { useLoginStore } from '~/stores/auth/login';
-import { showToaster } from '@/utils/showToaster';
+import FieldInput from '~/components/ui/form/FieldInput.vue';
+import FieldPassword from '~/components/ui/form/FieldPassword.vue';
+import { useI18n } from 'vue-i18n';
+import { backendValidationToFormErrors } from '~/utils/errorUtils';
 
 const loginStore = useLoginStore();
+const { t } = useI18n();
+
 const { identifier } = storeToRefs(loginStore);
 
 const schema = yup.object({
-  password: yup.string().trim().required($t('errors.PASSWORD_REQUIRED')),
+  password: yup.string().trim().required(t('errors.PASSWORD_REQUIRED')),
 });
 
-const { defineField, handleSubmit, isSubmitting, meta } = useForm({
+const { handleSubmit, isSubmitting, meta, setErrors } = useForm({
   validationSchema: schema,
   initialValues: {
     password: '',
@@ -21,20 +26,16 @@ const { defineField, handleSubmit, isSubmitting, meta } = useForm({
 });
 
 const onSubmit = handleSubmit(async (values) => {
-  try {
-    const submissionValues = {
-      identifier: identifier.value,
-      password: values.password.trim(),
-    };
-    await loginStore.submitLogin(submissionValues);
-    // update user store after successful login
-    // await userStore.fetchCurrentUser();
-  } catch (err: unknown) {
-    showToaster('error', (err as Error).message || $t('errors.GENERIC_ERROR'));
+  const submissionValues = {
+    identifier: identifier.value,
+    password: values.password.trim(),
+  };
+
+  const errors = await loginStore.login(submissionValues);
+  if (errors) {
+    setErrors(backendValidationToFormErrors(errors, t));
   }
 });
-
-const [_password, passwordAttrs] = defineField('password');
 </script>
 
 <template>
@@ -47,7 +48,7 @@ const [_password, passwordAttrs] = defineField('password');
 
     <div class="mx-auto mt-6 w-100">
       <section class="flex flex-col gap-6">
-        <UiFormFieldInput
+        <FieldInput
           class="input-readonly"
           name="identifier"
           type="text"
@@ -58,21 +59,22 @@ const [_password, passwordAttrs] = defineField('password');
           readonly
           data-cy="signin-identifier-input"
         />
-        <UiFormFieldPassword
+        <FieldPassword
           name="password"
           :placeholder="$t('login.password')"
-          v-bind="passwordAttrs"
           data-cy="signin-password-input"
         />
       </section>
-      <p
-        class="text-primary ms-1 mt-2 block w-fit cursor-pointer text-sm hover:underline"
+      <UiButton
+        variant="link"
+        size="link"
+        class="mt-1 text-sm"
         data-testid="forgot-password-link"
         data-cy="signin-forgot-password-link"
         @click="loginStore.openForgotPasswordDialog"
       >
         {{ $t('login.forgot-password') }}
-      </p>
+      </UiButton>
     </div>
 
     <UiDialogFooter class="absolute end-0 bottom-15 w-full">

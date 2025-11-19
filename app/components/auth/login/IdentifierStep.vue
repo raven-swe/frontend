@@ -2,33 +2,34 @@
 import * as yup from 'yup';
 import { useForm } from 'vee-validate';
 import { useLoginStore } from '~/stores/auth/login';
-import { showToaster } from '@/utils/showToaster';
+import FieldInput from '~/components/ui/form/FieldInput.vue';
+import { useI18n } from 'vue-i18n';
+import { backendValidationToFormErrors } from '~/utils/errorUtils';
 
 const loginStore = useLoginStore();
+const { t } = useI18n();
 
 const schema = yup.object({
-  identifier: yup.string().trim().required($t('errors.IDENTIFIER_REQUIRED')),
+  identifier: yup.string().trim().required(t('errors.IDENTIFIER_REQUIRED')),
 });
 
-const { defineField, handleSubmit, isSubmitting, meta } = useForm({
+const { handleSubmit, isSubmitting, meta, setErrors } = useForm<yup.InferType<typeof schema>>({
   validationSchema: schema,
   initialValues: {
-    identifier: '',
+    identifier: loginStore.identifier,
   },
   validateOnMount: false,
 });
 
-const onSubmit = handleSubmit(async (values) => {
-  try {
-    const success = await loginStore.checkUserExists(values.identifier.trim());
-    if (!success) {
-      throw new Error($t('errors.USER_NOT_FOUND'));
-    }
-  } catch (err: unknown) {
-    showToaster('error', (err as Error).message || $t('errors.GENERIC_ERROR'));
+const onSubmit = handleSubmit(async (values, actions) => {
+  const res = await loginStore.checkUserExists(values.identifier.trim());
+  if (res === undefined) return;
+  else if (typeof res === 'object') {
+    actions.setErrors(backendValidationToFormErrors(res, t));
+  } else if (res === false) {
+    setErrors({ identifier: t('errors.USER_NOT_FOUND') });
   }
 });
-const [_identifier, identifierAttrs] = defineField('identifier');
 </script>
 
 <template>
@@ -63,14 +64,13 @@ const [_identifier, identifierAttrs] = defineField('identifier');
       </section>
       <p class="py-2 text-center">{{ $t('root.auth.separator') }}</p>
       <section class="flex flex-col gap-4">
-        <UiFormFieldInput
+        <FieldInput
           :placeholder="$t('login.email-or-username')"
           type="text"
           name="identifier"
-          v-bind="identifierAttrs"
           data-testid="identifier-input"
           data-cy="signin-identifier-input"
-        ></UiFormFieldInput>
+        />
       </section>
     </div>
     <UiDialogFooter class="absolute end-0 bottom-15 w-full">
@@ -97,14 +97,15 @@ const [_identifier, identifierAttrs] = defineField('identifier');
       </UiButton>
       <p class="mt-6">
         {{ $t('login.dont-have-account') }}
-        <span
-          class="text-primary cursor-pointer hover:underline"
+        <UiButton
+          variant="link"
+          size="link"
           data-testid="signup-link"
           data-cy="signin-signup-link"
           @click="loginStore.openSignupDialog"
         >
           {{ $t('login.signup') }}
-        </span>
+        </UiButton>
       </p>
     </UiDialogFooter>
   </form>
