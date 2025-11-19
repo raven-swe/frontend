@@ -1,10 +1,12 @@
 <script lang="ts" setup>
 import type { User } from '~~/shared/types/user';
 import { formatMonthYear } from '~/utils/date';
+
 const props = defineProps<{
   userProfile: User;
 }>();
-const displayUsername = '@' + props.userProfile.username;
+
+const displayUsername = computed(() => '@' + props.userProfile.username);
 const displayUrl = computed(() => {
   if (props.userProfile.websiteUrl) {
     const cleanedUrl = cleanUrl(props.userProfile.websiteUrl);
@@ -13,6 +15,7 @@ const displayUrl = computed(() => {
   return '';
 });
 </script>
+
 <template>
   <div class="mt-2 flex flex-col">
     <div class="px-4">
