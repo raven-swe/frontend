@@ -65,7 +65,7 @@ describe('DmConversationList Component', () => {
 
       // After click, the item should have selected styling
       const html = wrapper.html();
-      expect(html).toContain('border-r-primary');
+      expect(html).toContain('border-e-primary');
     }
   });
 

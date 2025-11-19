@@ -339,6 +339,8 @@
   },
   "dm": {
     "placeholder-search": "ابحث في الرسائل المباشرة",
-    "header-title": "الرسائل"
+    "header-title": "الرسائل",
+    "placeholder-start-message": "ابدأ رسالة جديدة",
+    "attachedImage": "صورة مرفقة"
   }
 }

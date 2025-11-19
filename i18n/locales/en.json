@@ -339,6 +339,9 @@
   },
   "dm": {
     "placeholder-search": "Search Direct Messages",
-    "header-title": "Messages"
+    "header-title": "Messages",
+    "placeholder-start-message": "Start a new message",
+
+    "attachedImage": "Attached image"
   }
 }
