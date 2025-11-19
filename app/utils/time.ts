@@ -1,8 +1,8 @@
-export const relativeTime = (iso: string, locale = 'en') => {
+export const relativeTime = (iso: string, locale = 'en-US') => {
   const now = Date.now();
   const then = new Date(iso).getTime();
   const diff = Math.max(0, Math.floor((now - then) / 1000));
-  if (locale === 'ar') {
+  if (locale === 'ar-EG') {
     const arabicMap = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'] as const;
     const toArabicDigits = (n: number): string =>
       String(n).replace(/\d/g, (d) => arabicMap[Number(d)] || d);
@@ -21,10 +21,9 @@ export const relativeTime = (iso: string, locale = 'en') => {
   }
 };
 
-export function formatDate(isoString: string, locale = 'en'): string {
+export function formatDate(isoString: string, locale = 'en-US'): string {
   const date = new Date(isoString);
-  const lang = locale === 'ar' ? 'ar-EG' : 'en-US';
-  return date.toLocaleString(lang, {
+  return date.toLocaleString(locale, {
     weekday: 'short',
     year: 'numeric',
     month: 'short',
@@ -34,17 +33,13 @@ export function formatDate(isoString: string, locale = 'en'): string {
   });
 }
 
-export function birthDateFormat(isoString: string, locale = 'en'): string {
+export function birthDateFormat(isoString: string, locale = 'en-US'): string {
   if (!isoString) return '';
 
   const date = new Date(isoString);
-
   // Check if date is valid
   if (isNaN(date.getTime())) return '';
-
-  const lang = locale === 'ar' ? 'ar-EG' : 'en-US';
-
-  return new Intl.DateTimeFormat(lang, {
+  return new Intl.DateTimeFormat(locale, {
     month: 'short',
     day: 'numeric',
     year: 'numeric',

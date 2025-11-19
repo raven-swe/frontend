@@ -52,28 +52,28 @@ describe('Time Utils: relativeTime', () => {
   // Arabic locale tests
   describe('Arabic locale relativeTime', () => {
     it('returns Arabic seconds for differences under a minute', () => {
-      expect(relativeTime(isoShift(0), 'ar')).toBe('٠ ث');
-      expect(relativeTime(isoShift(30), 'ar')).toBe('٣٠ ث');
-      expect(relativeTime(isoShift(59), 'ar')).toBe('٥٩ ث');
+      expect(relativeTime(isoShift(0), 'ar-EG')).toBe('٠ ث');
+      expect(relativeTime(isoShift(30), 'ar-EG')).toBe('٣٠ ث');
+      expect(relativeTime(isoShift(59), 'ar-EG')).toBe('٥٩ ث');
       // Additional digit coverage: include digits 2,7 and 4,8 and 1,0
-      expect(relativeTime(isoShift(27), 'ar')).toBe('٢٧ ث');
-      expect(relativeTime(isoShift(48), 'ar')).toBe('٤٨ ث');
-      expect(relativeTime(isoShift(10), 'ar')).toBe('١٠ ث');
+      expect(relativeTime(isoShift(27), 'ar-EG')).toBe('٢٧ ث');
+      expect(relativeTime(isoShift(48), 'ar-EG')).toBe('٤٨ ث');
+      expect(relativeTime(isoShift(10), 'ar-EG')).toBe('١٠ ث');
     });
 
     it('returns Arabic minutes for differences under an hour', () => {
-      expect(relativeTime(isoShift(60), 'ar')).toBe('١ د');
-      expect(relativeTime(isoShift(2 * 60), 'ar')).toBe('٢ د');
-      expect(relativeTime(isoShift(59 * 60), 'ar')).toBe('٥٩ د');
+      expect(relativeTime(isoShift(60), 'ar-EG')).toBe('١ د');
+      expect(relativeTime(isoShift(2 * 60), 'ar-EG')).toBe('٢ د');
+      expect(relativeTime(isoShift(59 * 60), 'ar-EG')).toBe('٥٩ د');
       // Multi-digit minute with digits 4 and 8
-      expect(relativeTime(isoShift(48 * 60), 'ar')).toBe('٤٨ د');
+      expect(relativeTime(isoShift(48 * 60), 'ar-EG')).toBe('٤٨ د');
     });
 
     it('returns Arabic hours for differences under a day', () => {
-      expect(relativeTime(isoShift(60 * 60), 'ar')).toBe('١ س');
-      expect(relativeTime(isoShift(23 * 60 * 60), 'ar')).toBe('٢٣ س');
+      expect(relativeTime(isoShift(60 * 60), 'ar-EG')).toBe('١ س');
+      expect(relativeTime(isoShift(23 * 60 * 60), 'ar-EG')).toBe('٢٣ س');
       // Additional hour with two digits 12
-      expect(relativeTime(isoShift(12 * 60 * 60), 'ar')).toBe('١٢ س');
+      expect(relativeTime(isoShift(12 * 60 * 60), 'ar-EG')).toBe('١٢ س');
     });
 
     it('returns calendar date in Arabic for >= 1 day', () => {
@@ -81,24 +81,24 @@ describe('Time Utils: relativeTime', () => {
       const twoDaysIso = isoShift(2 * 24 * 60 * 60); // 2 days ago
       const fmt = (iso: string) =>
         new Intl.DateTimeFormat('ar-EG', { day: 'numeric', month: 'long' }).format(new Date(iso));
-      expect(relativeTime(oneDayIso, 'ar')).toBe(fmt(oneDayIso));
-      expect(relativeTime(twoDaysIso, 'ar')).toBe(fmt(twoDaysIso));
+      expect(relativeTime(oneDayIso, 'ar-EG')).toBe(fmt(oneDayIso));
+      expect(relativeTime(twoDaysIso, 'ar-EG')).toBe(fmt(twoDaysIso));
     });
 
     it('clamps future times to 0 Arabic seconds', () => {
       const futureIso = new Date(base.getTime() + 10_000).toISOString();
-      expect(relativeTime(futureIso, 'ar')).toBe('٠ ث');
+      expect(relativeTime(futureIso, 'ar-EG')).toBe('٠ ث');
     });
   });
 });
 
 describe('birthDateFormat', () => {
   it('returns empty string for empty input', () => {
-    expect(birthDateFormat('', 'en')).toBe('');
+    expect(birthDateFormat('', 'en-US')).toBe('');
   });
 
   it('returns empty string for invalid date', () => {
-    expect(birthDateFormat('not-a-date', 'en')).toBe('');
+    expect(birthDateFormat('not-a-date', 'en-US')).toBe('');
   });
 
   it('formats valid date in English', () => {
@@ -110,7 +110,7 @@ describe('birthDateFormat', () => {
       year: 'numeric',
       timeZone: 'UTC',
     }).format(new Date(iso));
-    expect(birthDateFormat(iso, 'en')).toBe(expected);
+    expect(birthDateFormat(iso, 'en-US')).toBe(expected);
   });
 
   it('formats valid date in Arabic with Arabic-Indic digits', () => {
@@ -121,14 +121,14 @@ describe('birthDateFormat', () => {
       year: 'numeric',
       timeZone: 'UTC',
     }).format(new Date(iso));
-    expect(birthDateFormat(iso, 'ar')).toBe(expected);
+    expect(birthDateFormat(iso, 'ar-EG')).toBe(expected);
     // Ensure Arabic-Indic digits present (check a digit from the year)
-    expect(birthDateFormat(iso, 'ar')).toMatch(/[٠-٩]/);
+    expect(birthDateFormat(iso, 'ar-EG')).toMatch(/[٠-٩]/);
   });
 
   it('uses default locale when locale omitted', () => {
     const iso = '1990-11-16T00:00:00.000Z';
-    const expected = birthDateFormat(iso, 'en');
+    const expected = birthDateFormat(iso, 'en-US');
     expect(birthDateFormat(iso)).toBe(expected);
   });
 });
@@ -136,14 +136,14 @@ describe('birthDateFormat', () => {
 describe('formatDate', () => {
   it('formats date-time in English', () => {
     const iso = '2025-10-22T12:34:00.000Z';
-    const out = formatDate(iso, 'en');
+    const out = formatDate(iso, 'en-US');
     expect(out).toMatch(/Oct|Nov|Dec|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep/); // month short
     expect(out).toMatch(/2025/);
   });
 
   it('formats date-time in Arabic with Arabic-Indic digits', () => {
     const iso = '2025-10-22T12:34:00.000Z';
-    const out = formatDate(iso, 'ar');
+    const out = formatDate(iso, 'ar-EG');
     // Month long or short depending on locale conventions
     expect(out).toMatch(/١٢|١٣|١٤|١٥|١٦|١٧|١٨|١٩|٢٢|٣٤/); // contains Arabic digits from hour/minute/day
     expect(out).toMatch(/[٠-٩]/); // at least one Arabic digit
@@ -151,7 +151,7 @@ describe('formatDate', () => {
 
   it('uses default locale when locale omitted', () => {
     const iso = '2025-10-22T12:34:00.000Z';
-    const expected = formatDate(iso, 'en');
+    const expected = formatDate(iso, 'en-US');
     expect(formatDate(iso)).toBe(expected);
   });
 });
