@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { showToaster } from '@/utils/showToaster';
+import { MAX_IMAGE_SIZE_BYTES, MAX_IMAGE_SIZE_MB } from '~/constants/files';
+
 interface Props {
   selectedProfileImage: string | null;
 }
@@ -20,6 +23,12 @@ const handleProfileImageClick = () => {
 const handleProfileFileChange = (event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
+
+  if (file && file.size > MAX_IMAGE_SIZE_BYTES) {
+    showToaster('error', $t('errors.FILE_TOO_LARGE', { size: MAX_IMAGE_SIZE_MB }));
+    target.value = '';
+    return;
+  }
 
   if (file && file.type.startsWith('image/')) {
     const reader = new FileReader();

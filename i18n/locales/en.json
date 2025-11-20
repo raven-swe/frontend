@@ -209,7 +209,8 @@
       "INVALID_FORMAT": "Please enter a valid email or username",
       "TOO_SHORT": "Identifier is too short"
     },
-    "INVALID_WEBSITE_URL": "Please enter a real website URL"
+    "INVALID_WEBSITE_URL": "Please enter a real website URL",
+    "FILE_TOO_LARGE": "File size exceeds {size}MB limit. Please choose a smaller file."
   },
   "register": {
     "register-info": {
