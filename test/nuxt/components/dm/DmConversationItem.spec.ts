@@ -99,7 +99,7 @@ describe('DmConversationItem Component', () => {
     });
 
     const container = wrapper.find('div');
-    expect(container.classes()).toContain('border-r-primary');
+    expect(container.classes()).toContain('border-e-primary');
   });
 
   it('applies transparent border when not selected', async () => {
@@ -111,7 +111,7 @@ describe('DmConversationItem Component', () => {
     });
 
     const container = wrapper.find('div');
-    expect(container.classes()).toContain('border-r-transparent');
+    expect(container.classes()).toContain('border-e-transparent');
   });
 
   it('has proper styling classes', async () => {
@@ -122,7 +122,7 @@ describe('DmConversationItem Component', () => {
     });
 
     const container = wrapper.find('div');
-    expect(container.classes()).toContain('border-r-2');
+    expect(container.classes()).toContain('border-e-2');
     expect(container.classes()).toContain('p-4');
     expect(container.classes()).toContain('transition-colors');
   });
