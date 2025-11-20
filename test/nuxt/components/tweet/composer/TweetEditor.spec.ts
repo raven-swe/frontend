@@ -323,4 +323,375 @@ describe('TweetEditor', () => {
     expect(calls.slice(-2)).toEqual(['auto', '120px']);
     expect(textarea.element.style.height).toBe('120px');
   });
+
+  describe('Image Pasting', () => {
+    const createMockFile = (name: string, type: string) => {
+      return new File(['dummy content'], name, { type });
+    };
+
+    it('emits paste-media event when valid image is pasted', async () => {
+      const wrapper = await mountSuspended(TweetEditor, {
+        props: mockProps,
+        global: {
+          plugins: [i18n],
+        },
+      });
+
+      const file = createMockFile('image.png', 'image/png');
+      const clipboardData = {
+        items: [
+          {
+            kind: 'file',
+            type: 'image/png',
+            getAsFile: () => file,
+          },
+        ],
+      };
+
+      const pasteEvent = new ClipboardEvent('paste', {
+        clipboardData: clipboardData as any,
+      });
+
+      const root = wrapper.element as HTMLElement;
+      root.dispatchEvent(pasteEvent);
+
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.emitted('paste-media')).toBeTruthy();
+      expect(wrapper.emitted('paste-media')?.[0]?.[0]).toEqual([file]);
+    });
+
+    it('emits paste-media with multiple valid images', async () => {
+      const wrapper = await mountSuspended(TweetEditor, {
+        props: mockProps,
+        global: {
+          plugins: [i18n],
+        },
+      });
+
+      const file1 = createMockFile('image1.png', 'image/png');
+      const file2 = createMockFile('image2.jpg', 'image/jpeg');
+
+      const clipboardData = {
+        items: [
+          {
+            kind: 'file',
+            type: 'image/png',
+            getAsFile: () => file1,
+          },
+          {
+            kind: 'file',
+            type: 'image/jpeg',
+            getAsFile: () => file2,
+          },
+        ],
+      };
+
+      const pasteEvent = new ClipboardEvent('paste', {
+        clipboardData: clipboardData as any,
+      });
+
+      const root = wrapper.element as HTMLElement;
+      root.dispatchEvent(pasteEvent);
+
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.emitted('paste-media')?.[0]?.[0]).toEqual([file1, file2]);
+    });
+
+    it('accepts jpeg images when pasted', async () => {
+      const wrapper = await mountSuspended(TweetEditor, {
+        props: mockProps,
+        global: {
+          plugins: [i18n],
+        },
+      });
+
+      const file = createMockFile('image.jpeg', 'image/jpeg');
+      const clipboardData = {
+        items: [
+          {
+            kind: 'file',
+            type: 'image/jpeg',
+            getAsFile: () => file,
+          },
+        ],
+      };
+
+      const pasteEvent = new ClipboardEvent('paste', {
+        clipboardData: clipboardData as any,
+      });
+
+      const root = wrapper.element as HTMLElement;
+      root.dispatchEvent(pasteEvent);
+
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.emitted('paste-media')).toBeTruthy();
+      expect(wrapper.emitted('paste-media')?.[0]?.[0]).toEqual([file]);
+    });
+
+    it('accepts gif images when pasted', async () => {
+      const wrapper = await mountSuspended(TweetEditor, {
+        props: mockProps,
+        global: {
+          plugins: [i18n],
+        },
+      });
+
+      const file = createMockFile('animation.gif', 'image/gif');
+      const clipboardData = {
+        items: [
+          {
+            kind: 'file',
+            type: 'image/gif',
+            getAsFile: () => file,
+          },
+        ],
+      };
+
+      const pasteEvent = new ClipboardEvent('paste', {
+        clipboardData: clipboardData as any,
+      });
+
+      const root = wrapper.element as HTMLElement;
+      root.dispatchEvent(pasteEvent);
+
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.emitted('paste-media')).toBeTruthy();
+      expect(wrapper.emitted('paste-media')?.[0]?.[0]).toEqual([file]);
+    });
+
+    it('accepts jpg images when pasted', async () => {
+      const wrapper = await mountSuspended(TweetEditor, {
+        props: mockProps,
+        global: {
+          plugins: [i18n],
+        },
+      });
+
+      const file = createMockFile('image.jpg', 'image/jpg');
+      const clipboardData = {
+        items: [
+          {
+            kind: 'file',
+            type: 'image/jpg',
+            getAsFile: () => file,
+          },
+        ],
+      };
+
+      const pasteEvent = new ClipboardEvent('paste', {
+        clipboardData: clipboardData as any,
+      });
+
+      const root = wrapper.element as HTMLElement;
+      root.dispatchEvent(pasteEvent);
+
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.emitted('paste-media')).toBeTruthy();
+      expect(wrapper.emitted('paste-media')?.[0]?.[0]).toEqual([file]);
+    });
+
+    it('does not emit paste-media when unsupported file type is pasted', async () => {
+      const wrapper = await mountSuspended(TweetEditor, {
+        props: mockProps,
+        global: {
+          plugins: [i18n],
+        },
+      });
+
+      const file = createMockFile('video.mp4', 'video/mp4');
+      const clipboardData = {
+        items: [
+          {
+            kind: 'file',
+            type: 'video/mp4',
+            getAsFile: () => file,
+          },
+        ],
+      };
+
+      const pasteEvent = new ClipboardEvent('paste', {
+        clipboardData: clipboardData as any,
+      });
+
+      const root = wrapper.element as HTMLElement;
+      root.dispatchEvent(pasteEvent);
+
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.emitted('paste-media')).toBeFalsy();
+    });
+
+    it('filters out unsupported types and emits only valid images', async () => {
+      const wrapper = await mountSuspended(TweetEditor, {
+        props: mockProps,
+        global: {
+          plugins: [i18n],
+        },
+      });
+
+      const validFile = createMockFile('image.png', 'image/png');
+      const invalidFile = createMockFile('document.pdf', 'application/pdf');
+
+      const clipboardData = {
+        items: [
+          {
+            kind: 'file',
+            type: 'image/png',
+            getAsFile: () => validFile,
+          },
+          {
+            kind: 'file',
+            type: 'application/pdf',
+            getAsFile: () => invalidFile,
+          },
+        ],
+      };
+
+      const pasteEvent = new ClipboardEvent('paste', {
+        clipboardData: clipboardData as any,
+      });
+
+      const root = wrapper.element as HTMLElement;
+      root.dispatchEvent(pasteEvent);
+
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.emitted('paste-media')?.[0]?.[0]).toEqual([validFile]);
+    });
+
+    it('does not emit paste-media when pasting text only', async () => {
+      const wrapper = await mountSuspended(TweetEditor, {
+        props: mockProps,
+        global: {
+          plugins: [i18n],
+        },
+      });
+
+      const clipboardData = {
+        items: [
+          {
+            kind: 'string',
+            type: 'text/plain',
+            getAsFile: () => null,
+          },
+        ],
+      };
+
+      const pasteEvent = new ClipboardEvent('paste', {
+        clipboardData: clipboardData as any,
+      });
+
+      const root = wrapper.element as HTMLElement;
+      root.dispatchEvent(pasteEvent);
+
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.emitted('paste-media')).toBeFalsy();
+    });
+
+    it('handles paste event with no clipboard data', async () => {
+      const wrapper = await mountSuspended(TweetEditor, {
+        props: mockProps,
+        global: {
+          plugins: [i18n],
+        },
+      });
+
+      const pasteEvent = new ClipboardEvent('paste', {
+        clipboardData: null as any,
+      });
+
+      const root = wrapper.element as HTMLElement;
+      root.dispatchEvent(pasteEvent);
+
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.emitted('paste-media')).toBeFalsy();
+    });
+
+    it('handles paste event when getAsFile returns null', async () => {
+      const wrapper = await mountSuspended(TweetEditor, {
+        props: mockProps,
+        global: {
+          plugins: [i18n],
+        },
+      });
+
+      const clipboardData = {
+        items: [
+          {
+            kind: 'file',
+            type: 'image/png',
+            getAsFile: () => null,
+          },
+        ],
+      };
+
+      const pasteEvent = new ClipboardEvent('paste', {
+        clipboardData: clipboardData as any,
+      });
+
+      const root = wrapper.element as HTMLElement;
+      root.dispatchEvent(pasteEvent);
+
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.emitted('paste-media')).toBeFalsy();
+    });
+
+    it('prevents default behavior when pasting images', async () => {
+      const wrapper = await mountSuspended(TweetEditor, {
+        props: mockProps,
+        global: {
+          plugins: [i18n],
+        },
+      });
+
+      const file = createMockFile('image.png', 'image/png');
+      const clipboardData = {
+        items: [
+          {
+            kind: 'file',
+            type: 'image/png',
+            getAsFile: () => file,
+          },
+        ],
+      };
+
+      const pasteEvent = new ClipboardEvent('paste', {
+        clipboardData: clipboardData as any,
+        cancelable: true,
+      });
+
+      const preventDefaultSpy = vi.spyOn(pasteEvent, 'preventDefault');
+
+      const root = wrapper.element as HTMLElement;
+      root.dispatchEvent(pasteEvent);
+
+      await wrapper.vm.$nextTick();
+
+      expect(preventDefaultSpy).toHaveBeenCalled();
+    });
+
+    it('removes paste event listener on unmount', async () => {
+      const wrapper = await mountSuspended(TweetEditor, {
+        props: mockProps,
+        global: {
+          plugins: [i18n],
+        },
+      });
+
+      const root = wrapper.element as HTMLElement;
+      const removeEventListenerSpy = vi.spyOn(root, 'removeEventListener');
+
+      wrapper.unmount();
+
+      expect(removeEventListenerSpy).toHaveBeenCalledWith('paste', expect.any(Function));
+    });
+  });
 });
