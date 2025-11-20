@@ -63,6 +63,7 @@ export const useLoginStore = defineStore('login', () => {
     try {
       await loginService.login(data);
       open.value = false;
+      resetData();
       showToaster('success', 'Login successful');
       navigateTo('/home');
     } catch (error) {
