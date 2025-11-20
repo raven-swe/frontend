@@ -210,7 +210,8 @@
       "TOO_SHORT": "Identifier is too short"
     },
     "INVALID_WEBSITE_URL": "Please enter a real website URL",
-    "FILE_TOO_LARGE": "File size exceeds {size}MB limit. Please choose a smaller file."
+    "FILE_TOO_LARGE": "File size exceeds {size}MB limit. Please choose a smaller file.",
+    "FAILED_UPDATE_X": "Failed to update {field}. Please try again later."
   },
   "register": {
     "register-info": {
