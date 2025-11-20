@@ -55,6 +55,7 @@ const onSubmit = handleSubmit(async (values, actions) => {
   const errors = await registerStore.submitRegisterationInfo(vals);
   if (errors) {
     actions.setErrors(backendValidationToFormErrors(errors, t));
+    resetRecaptcha(undefined);
   }
 });
 
@@ -103,7 +104,7 @@ watch(
   },
 );
 
-const { render: renderRecaptcha } = useRecaptcha();
+const { render: renderRecaptcha, reset: resetRecaptcha } = useRecaptcha();
 
 onMounted(async () => {
   await nextTick();
