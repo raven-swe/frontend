@@ -3,35 +3,42 @@ import * as yup from 'yup';
 import { nextTick, onMounted } from 'vue';
 import { useForm } from 'vee-validate';
 import { usePasswordStore } from '~/stores/auth/password';
-import { showToaster } from '@/utils/showToaster';
 import useRecaptcha from '@/composables/useRecaptcha';
+import FieldInput from '~/components/ui/form/FieldInput.vue';
+import { useI18n } from 'vue-i18n';
+import { backendValidationToFormErrors } from '~/utils/errorUtils';
+import type { CheckUserSchema } from '~/services/auth/passwordService';
 
 const passwordStore = usePasswordStore();
+const { t } = useI18n();
 
 const schema = yup.object({
-  identifier: yup.string().trim().required($t('errors.IDENTIFIER_REQUIRED')),
-  recaptcha: yup
+  identifier: yup.string().trim().required(t('errors.IDENTIFIER_REQUIRED')),
+  recaptchaToken: yup
     .string()
-    .required($t('errors.RECAPTCHA_REQUIRED'))
-    .min(1, $t('errors.RECAPTCHA_REQUIRED')),
+    .required(t('errors.RECAPTCHA_REQUIRED'))
+    .min(1, t('errors.RECAPTCHA_REQUIRED')),
 });
 
-const { defineField, handleSubmit, isSubmitting, meta, setFieldValue } = useForm({
-  validationSchema: schema,
-  initialValues: { identifier: passwordStore.identifier, recaptcha: undefined },
-});
+const { errors, defineField, handleSubmit, isSubmitting, meta, setFieldValue, setFieldError } =
+  useForm({
+    validationSchema: schema,
+    initialValues: { identifier: passwordStore.identifier, recaptchaToken: '' },
+    validateOnMount: false,
+  });
 
 const [_identifier, identifierAttrs] = defineField('identifier');
-const { render: renderRecaptcha } = useRecaptcha();
+const { render: renderRecaptcha, reset: resetRecaptcha } = useRecaptcha();
 
-const onSubmit = handleSubmit(async (values) => {
-  try {
-    await passwordStore.checkUserExists({
-      identifier: values.identifier.trim(),
-      recaptchaToken: values.recaptcha,
-    });
-  } catch (err: unknown) {
-    showToaster('error', (err as Error).message || $t('errors.GENERIC_ERROR'));
+const onSubmit = handleSubmit(async (values, actions) => {
+  const vals: CheckUserSchema = {
+    identifier: values.identifier.trim(),
+    recaptchaToken: values.recaptchaToken,
+  };
+  const errors = await passwordStore.checkUserExists(vals);
+  if (errors) {
+    actions.setErrors(backendValidationToFormErrors(errors, t));
+    resetRecaptcha(undefined);
   }
 });
 
@@ -40,10 +47,11 @@ onMounted(async () => {
   renderRecaptcha({
     elementId: 'recaptcha-container',
     callback: (token: string) => {
-      setFieldValue('recaptcha', token);
+      setFieldValue('recaptchaToken', token);
+      setFieldError('recaptchaToken', undefined);
     },
     expiredCallback: () => {
-      setFieldValue('recaptcha', '', true);
+      setFieldValue('recaptchaToken', '', true);
     },
   });
 });
@@ -62,8 +70,7 @@ onMounted(async () => {
 
     <div class="mx-auto mt-7 px-8">
       <section class="flex flex-col gap-4">
-        <UiFormFieldInput
-          class="mb-4"
+        <FieldInput
           :placeholder="$t('forgot-password.email-or-username')"
           type="text"
           name="identifier"
@@ -73,8 +80,13 @@ onMounted(async () => {
         />
       </section>
 
-      <ClientOnly class="mt-3">
-        <div id="recaptcha-container" class="g-recaptcha"></div>
+      <ClientOnly class="mt-10">
+        <div>
+          <div id="recaptcha-container" class="g-recaptcha"></div>
+          <p v-if="errors.recaptchaToken" class="text-destructive text-xs">
+            {{ errors.recaptchaToken }}
+          </p>
+        </div>
       </ClientOnly>
     </div>
 
@@ -83,8 +95,8 @@ onMounted(async () => {
         class="w-100"
         size="xl"
         type="submit"
-        data-testid="submit-button"
         :disabled="!meta.valid || isSubmitting"
+        data-testid="submit-button"
       >
         {{ $t('ui.next') }}
       </UiButton>
