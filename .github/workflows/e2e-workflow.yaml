@@ -2,7 +2,7 @@ name: Daily Dev E2E Tests
 
 on:
   schedule:
-    - cron: "30 23 * * *" # 11 PM UTC
+    - cron: "30 23 * * *" # 11:30 PM UTC
   workflow_dispatch:
   push:
 
