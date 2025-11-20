@@ -4,7 +4,7 @@ import { accountSettingsService } from '~/services/settings/accountSettingsServi
 export default function useAccountSetup() {
   const setupStep = useState<'profile-picture' | 'username' | 'interests' | 'follow-user' | null>(
     'account-setup-step',
-    () => 'interests',
+    () => null,
   );
   const { updateProfilePicture } = updateProfileService();
 
