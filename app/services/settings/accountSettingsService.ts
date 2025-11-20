@@ -23,4 +23,10 @@ export const accountSettingsService = {
       method: 'GET',
     });
   },
+
+  getFollowSuggestions: async () => {
+    return await apiFetch('/api/onboarding/follow-suggestions', {
+      method: 'GET',
+    });
+  },
 };

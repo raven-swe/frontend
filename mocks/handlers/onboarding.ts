@@ -1,5 +1,10 @@
 import { http, HttpResponse } from 'msw';
 
+import rawUsers from '../data/mock-users.json' assert { type: 'json' };
+import type { User } from '../../shared/types/user';
+
+const mockUsers = rawUsers as User[];
+
 const mockSuggestions = ['Abdallahfahewr', 'Abdallahfawe', 'Abdallahfaklh'];
 
 const API_URL = process.env.BACKEND_URL;
@@ -33,23 +38,7 @@ export const handlers = [
         success: true,
         message: 'Follow suggestions fetched successfully.',
         data: {
-          suggestions: [
-            {
-              username: 'user1',
-              displayName: 'User One',
-              avatarUrl: 'https://example.com/avatar1.png',
-            },
-            {
-              username: 'user2',
-              displayName: 'User Two',
-              avatarUrl: 'https://example.com/avatar2.png',
-            },
-            {
-              username: 'user3',
-              displayName: 'User Three',
-              avatarUrl: 'https://example.com/avatar3.png',
-            },
-          ],
+          suggestions: mockUsers,
         },
       },
       { status: 200 },

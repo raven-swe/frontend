@@ -104,6 +104,10 @@
         "COMEDY": "Comedy",
         "selected-count": "{count} of 1 selected",
         "selected-done": "Great work 🎉"
+      },
+      "follow-user": {
+        "title": "Don't miss out",
+        "description": "When you follow someone, you'll see their posts in your Timeline. you'll also get more relevant recommendations."
       }
     },
     "setup": {

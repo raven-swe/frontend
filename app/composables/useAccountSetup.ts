@@ -4,7 +4,7 @@ import { accountSettingsService } from '~/services/settings/accountSettingsServi
 export default function useAccountSetup() {
   const setupStep = useState<'profile-picture' | 'username' | 'interests' | 'follow-user' | null>(
     'account-setup-step',
-    () => null,
+    () => 'interests',
   );
   const { updateProfilePicture } = updateProfileService();
 
@@ -22,6 +22,9 @@ export default function useAccountSetup() {
         break;
       case 'interests':
         setupStep.value = 'follow-user';
+        break;
+      case 'follow-user':
+        setupStep.value = null;
         break;
       default:
         break;
@@ -60,7 +63,6 @@ export default function useAccountSetup() {
   async function handleInterestsSubmit(interests: string[]) {
     try {
       await accountSettingsService.updateInterests(interests);
-      setupStep.value = null;
       goToNextStep();
     } catch (error) {
       if (isApiValidationError(error)) {

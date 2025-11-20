@@ -1,94 +1,83 @@
 <script lang="ts" setup>
-import { useForm } from 'vee-validate';
-import type { buttonVariants } from '~~/shared/types/ui';
-import * as yup from 'yup';
-import FieldInput from '~/components/ui/form/FieldInput.vue';
-import { accountService } from '~/services/auth/accountService';
+import { useQuery } from '@tanstack/vue-query';
+import { accountSettingsService } from '~/services/settings/accountSettingsService';
 
 const props = defineProps<{
   open: boolean;
 }>();
 
-const _checkUsername = async (username: string) => {
-  if (!username) return false;
-  return await accountService.checkAccountExists(username);
+const accountSetup = useAccountSetup();
+
+const { data: response, isLoading } = useQuery({
+  queryKey: ['follow-user-suggestions'],
+  queryFn: () => accountSettingsService.getFollowSuggestions(),
+});
+const suggestions = ref<User[]>([]);
+
+watch(response, (newResponse) => {
+  suggestions.value = newResponse?.data.suggestions ?? [];
+});
+
+const hasFollowedAtLeastOne = computed(() => {
+  return suggestions.value?.some((user) => user.relationship?.following) ?? false;
+});
+
+const followUser = async (username: string) => {
+  suggestions.value = suggestions.value.map((user) =>
+    user.username === username
+      ? { ...user, relationship: { ...user.relationship, following: true } }
+      : user,
+  );
 };
 
-const checkUsername = useDebounceFn(_checkUsername, 300);
-const usernameRegex = /^[a-zA-Z0-9_]{3,15}$/;
-
-const usernameSchema = yup
-  .string()
-  .trim()
-  .matches(usernameRegex, $t('errors.INVALID_USERNAME'))
-  .test('uniqueUsername', $t('errors.USERNAME_ALREADY_EXISTS'), async (username) => {
-    if (!username || !usernameRegex.test(username)) return true;
-    const exists = await checkUsername(username);
-    return !exists;
-  });
-
-const { values, defineField, handleSubmit, isSubmitting, isFieldValid } = useForm({
-  validationSchema: yup.object({
-    username: usernameSchema.required(),
-  }),
-  initialValues: {
-    username: '',
-  },
-});
-
-const { handleUsernameSubmit } = useAccountSetup();
-const onSubmit = handleSubmit(async (formValues) => {
-  await handleUsernameSubmit(formValues.username);
-});
-
-const [_, usernameAttrs] = defineField('username');
-
-const actionButton = computed(() => {
-  const isUsernameSet = values.username.trim().length > 0;
-  return {
-    text: isUsernameSet ? $t('ui.next') : $t('ui.skip-for-now'),
-    variant: (isUsernameSet ? 'primary' : 'outline') as buttonVariants,
-  };
-});
+const unfollowUser = async (username: string) => {
+  suggestions.value = suggestions.value.map((user) =>
+    user.username === username
+      ? { ...user, relationship: { ...user.relationship, following: false } }
+      : user,
+  );
+};
 </script>
 
 <template>
   <UiDialog :open="props.open">
     <UiDialogContent
       hide-close-button
-      header-class="flex items-center justify-center p-0"
+      header-class="flex items-center justify-center p-0 overflow-hidden"
       class="h-auto"
     >
       <template #header>
-        <img src="https://placehold.co/32x32" class="size-8" />
+        <LogoRaven class="size-8" />
       </template>
       <UiDialogHeader class="mx-auto w-full max-w-100">
         <UiDialogTitle class="text-3xl font-bold">{{
-          $t('profile.account-setup.username.title')
+          $t('profile.account-setup.follow-user.title')
         }}</UiDialogTitle>
         <UiDialogDescription>
-          {{ $t('profile.account-setup.username.description') }}
+          {{ $t('profile.account-setup.follow-user.description') }}
         </UiDialogDescription>
       </UiDialogHeader>
-      <form class="flex flex-1 flex-col" @submit.prevent="onSubmit">
-        <FieldInput
-          :placeholder="$t('profile.account-setup.username.username-label')"
-          class="mx-auto w-full max-w-100"
-          v-bind="usernameAttrs"
-          name="username"
+      <div class="mx-auto flex max-w-110 flex-1 flex-col overflow-y-auto">
+        <UiSpinner v-if="isLoading" class="mx-20" />
+        <UiUserPreview
+          v-for="user in suggestions"
+          :key="user.username"
+          :user="user"
+          is-onboarding
+          @follow="followUser"
+          @unfollow="unfollowUser"
         />
-        <UiDialogFooter class="mt-auto">
-          <UiButton
-            :variant="actionButton.variant"
-            class="w-full max-w-100"
-            size="xl"
-            :disabled="isSubmitting || !isFieldValid('username')"
-            @click="handleSubmit"
-          >
-            {{ actionButton.text }}
-          </UiButton>
-        </UiDialogFooter>
-      </form>
+      </div>
+      <div class="flex flex-col items-center justify-center">
+        <UiButton
+          class="w-full max-w-100"
+          size="xl"
+          :disabled="!hasFollowedAtLeastOne"
+          @click="accountSetup.goToNextStep()"
+        >
+          {{ $t('ui.next') }}
+        </UiButton>
+      </div>
     </UiDialogContent>
   </UiDialog>
 </template>
