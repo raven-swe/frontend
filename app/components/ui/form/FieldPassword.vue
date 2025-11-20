@@ -12,7 +12,7 @@ const togglePassword = () => (showPassword.value = !showPassword.value);
 
 <template>
   <div class="relative w-full">
-    <UiFormFieldInput
+    <UiInput
       v-model="value"
       :name="props.name"
       :placeholder="props.placeholder ?? $t('root.auth.password')"

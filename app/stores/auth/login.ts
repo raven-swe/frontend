@@ -42,33 +42,42 @@ export const useLoginStore = defineStore('login', () => {
     try {
       const response = await loginService.checkUser(_identifier);
       identifier.value = _identifier;
-      if (response.data.exists) {
+      if (response.exists) {
         step.value = 1;
-        type.value = response.data.type;
-      } else {
-        step.value = 0;
-        type.value = '';
+        type.value = response.type;
       }
-      return response.data.exists;
+      return response.exists;
     } catch (error) {
-      const msg = error?.data?.message || 'Unexpected error occurred';
-      throw new Error(msg);
+      if (isApiValidationError(error)) {
+        const errors = error.data?.data?.error.errors;
+        return errors;
+      } else {
+        showToaster('error', 'toaster.checkUser.error');
+      }
     } finally {
       loading.value = false;
     }
   };
 
-  const submitLogin = async (data: LoginSchema) => {
+  const login = async (data: LoginSchema) => {
     loading.value = true;
     try {
       await loginService.login(data);
+      resetData();
       open.value = false;
-      showToaster('success', 'Login successful');
+      showToaster('success', 'toaster.login.success');
       navigateTo('/home');
     } catch (error) {
-      console.error('Login failed');
-      const msg = error?.data?.message || error?.data?.error?.message || 'Invalid credentials';
-      throw new Error(msg);
+      if (isApiValidationError(error)) {
+        if (error.data?.data?.error?.errors) {
+          return error.data.data.error.errors;
+        }
+      } else {
+        if (error.data?.statusCode === 401) {
+          return [{ field: 'password', code: error.data.data.error.code }];
+        }
+        showToaster('error', 'toaster.login.error');
+      }
     } finally {
       loading.value = false;
     }
@@ -86,6 +95,6 @@ export const useLoginStore = defineStore('login', () => {
     openForgotPasswordDialog,
     openSignupDialog,
     checkUserExists,
-    submitLogin,
+    login,
   };
 });

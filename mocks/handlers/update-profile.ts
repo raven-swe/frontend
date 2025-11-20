@@ -38,10 +38,50 @@ export const handlers = [
   // Update profile PATCH request
   http.patch(`${API_URL}/me`, async ({ request }) => {
     try {
-      const body = (await request.json()) as UpdateProfileRequest;
+      const formData = await request.formData();
 
-      // Update the mock user data with new values
-      Object.assign(mockUserData, body);
+      // Parse the 'data' field which contains JSON
+      const dataString = formData.get('data') as string;
+      if (!dataString) {
+        return HttpResponse.json(
+          {
+            success: false,
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: 'Profile data is required',
+            },
+          },
+          { status: 400 },
+        );
+      }
+
+      const profileData = JSON.parse(dataString) as UpdateProfileRequest & {
+        deleteBanner?: boolean;
+      };
+
+      // Get files if provided
+      const profilePicture = formData.get('profilePicture') as File | null;
+      const bannerImage = formData.get('bannerImage') as File | null;
+
+      // Update profile data
+      Object.assign(mockUserData, profileData);
+
+      // Handle banner deletion
+      if (profileData.deleteBanner) {
+        mockUserData.bannerUrl = null;
+      }
+
+      // Handle profile picture upload
+      if (profilePicture) {
+        const mockProfileUrl = 'https://ibb.co/rGzj2kS4';
+        mockUserData.avatarUrl = mockProfileUrl;
+      }
+
+      // Handle banner image upload
+      if (bannerImage) {
+        const mockBannerUrl = 'https://i.ibb.co/Z1Yx04kS/dfghj.webp';
+        mockUserData.bannerUrl = mockBannerUrl;
+      }
 
       const response: ApiSuccessResponse<UserData> = {
         success: true,

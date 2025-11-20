@@ -14,11 +14,13 @@ const handleDialogChange = (val: boolean) => {
     <UiDialogContent class="pt-2">
       <UiSpinner v-if="loginStore.loading" class="mx-auto my-auto"></UiSpinner>
       <AuthLoginIdentifierStep
-        v-if="loginStore.step === 0 && !loginStore.loading"
+        v-if="loginStore.step === 0"
+        v-show="!loginStore.loading"
         id="identifier-step-test"
       />
       <AuthLoginPasswordStep
-        v-if="loginStore.step === 1 && !loginStore.loading"
+        v-if="loginStore.step === 1"
+        v-show="!loginStore.loading"
         id="password-step-test"
       />
     </UiDialogContent>
