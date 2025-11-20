@@ -43,11 +43,13 @@ const handleAddMedia = (files: File[]) => {
     const url = URL.createObjectURL(file);
     const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
+    const type = file.type.startsWith('video') ? 'video' : 'image';
+
     media.value.push({
       id,
       file,
-      url, // for display
-      type: 'image',
+      url,
+      type,
     });
   });
 };

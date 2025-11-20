@@ -154,7 +154,7 @@ const handleFileSelect = (event: Event) => {
     <input
       ref="fileInputRef"
       type="file"
-      accept="image/png,image/jpg,image/jpeg"
+      accept="image/png,image/jpg,image/jpeg,video/mp4"
       multiple
       class="hidden"
       @change="handleFileSelect"
