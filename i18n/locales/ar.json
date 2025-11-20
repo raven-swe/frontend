@@ -240,6 +240,7 @@
   },
   "setting": {
     "settings": "الإعدادات",
+    "change-password-subtitle": "قم بتغيير كلمة المرور الخاصة بك في أي وقت",
     "change-password": "تغيير كلمة المرور",
     "email": "البريد الإلكتروني",
     "date-of-birth": "تاريخ الميلاد",
