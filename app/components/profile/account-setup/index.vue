@@ -2,9 +2,6 @@
 import EditUsernameDialog from '~/components/profile/account-setup/EditUsernameDialog.vue';
 import FollowUserDialog from '~/components/profile/account-setup/FollowUserDialog.vue';
 import SelectInterestsDialog from '~/components/profile/account-setup/SelectInterestsDialog.vue';
-definePageMeta({
-  layout: 'profile',
-});
 
 const { setupStep, handleProfilePictureSubmit } = useAccountSetup();
 </script>

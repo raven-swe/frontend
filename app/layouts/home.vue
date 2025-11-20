@@ -1,10 +1,20 @@
 <script lang="ts" setup>
 import Tabs from '@/components/ui/Tabs.vue';
 import Tab from '@/components/ui/Tab.vue';
+import AccountSetup from '@/components/profile/account-setup/index.vue';
+
+onMounted(() => {
+  const { start } = useAccountSetup();
+  if (sessionStorage.getItem('showAccountSetup') === 'true') {
+    start();
+    sessionStorage.removeItem('showAccountSetup');
+  }
+});
 </script>
 
 <template>
   <NuxtLayout name="default">
+    <AccountSetup />
     <Tabs
       class="bg-background/60 fixed top-0 z-50 inline-flex h-12 w-full max-w-[598px] cursor-pointer items-center gap-2 rounded-b-md py-1 text-sm font-medium backdrop-blur-sm"
     >

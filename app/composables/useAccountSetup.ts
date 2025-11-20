@@ -4,9 +4,13 @@ import { accountSettingsService } from '~/services/settings/accountSettingsServi
 export default function useAccountSetup() {
   const setupStep = useState<'profile-picture' | 'username' | 'interests' | 'follow-user' | null>(
     'account-setup-step',
-    () => 'profile-picture',
+    () => null,
   );
   const { updateProfilePicture } = updateProfileService();
+
+  const start = () => {
+    setupStep.value = 'profile-picture';
+  };
 
   const goToNextStep = () => {
     switch (setupStep.value) {
@@ -78,5 +82,6 @@ export default function useAccountSetup() {
     handleProfilePictureSubmit,
     handleUsernameSubmit,
     handleInterestsSubmit,
+    start,
   };
 }
