@@ -24,14 +24,29 @@ export const useEditProfile = () => {
   const profileFileInput = ref<HTMLInputElement | null>(null);
 
   // Initialize with existing user data
-  const selectedImage = ref<string | null>(userStore.user.bannerUrl || null);
-  const selectedProfileImage = ref<string | null>(userStore.user.avatarUrl || null);
-  const name = ref<string>(userStore.user.displayName || '');
-  const bio = ref<string>(userStore.user.bio || '');
-  const location = ref<string>(userStore.user.location || '');
-  const website = ref<string>(userStore.user.websiteUrl || '');
-  const birthDate = ref<Date | undefined>(
-    userStore.user.birthDate ? new Date(userStore.user.birthDate) : undefined,
+  const selectedImage = ref<string | null>(null);
+  const selectedProfileImage = ref<string | null>(null);
+  const name = ref<string>('');
+  const bio = ref<string>('');
+  const location = ref<string>('');
+  const website = ref<string>('');
+  const birthDate = ref<Date | undefined>(undefined);
+
+  watch(
+    () => userStore.user,
+    (user) => {
+      if (!user) return;
+
+      selectedImage.value = user.bannerUrl || null;
+      selectedProfileImage.value = user.avatarUrl || null;
+
+      name.value = user.displayName || '';
+      bio.value = user.bio || '';
+      location.value = user.location || '';
+      website.value = user.websiteUrl || '';
+      birthDate.value = user.birthDate ? new Date(user.birthDate) : undefined;
+    },
+    { immediate: true },
   );
 
   // Normalize empty values to null

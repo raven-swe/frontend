@@ -21,12 +21,25 @@ const emit = defineEmits<{
 }>();
 
 const props = defineProps<Props>();
-
 // Initialize date selector with existing birth date
 const dateSelect = useDateSelect(
   new Date().getFullYear() - 100,
   new Date().getFullYear(),
   props.birthDate,
+);
+
+watch(
+  () => props.birthDate,
+  (date) => {
+    if (!date) return;
+
+    const d = new Date(date);
+
+    dateSelect.selectedDay.value = d.getUTCDate();
+    dateSelect.selectedMonth.value = d.getUTCMonth() + 1;
+    dateSelect.selectedYear.value = d.getUTCFullYear();
+  },
+  { immediate: true },
 );
 
 watch(
