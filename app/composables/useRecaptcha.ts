@@ -31,7 +31,14 @@ export default function useRecaptcha() {
     }
   };
 
+  const resetRecapcha = (elementId: string | undefined) => {
+    if (window.grecaptcha) {
+      window.grecaptcha.reset(elementId);
+    }
+  };
+
   return {
     render: renderRecaptcha,
+    reset: resetRecapcha,
   };
 }
