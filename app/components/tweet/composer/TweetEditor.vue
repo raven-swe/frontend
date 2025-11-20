@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { showToaster } from '@/utils/showToaster';
 
 interface Props {
   modelValue: string;
@@ -76,6 +77,7 @@ const handleInput = (event: Event) => {
 const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'video/mp4'];
 const handlePaste = (e: ClipboardEvent) => {
   const items = e.clipboardData?.items;
+  e.preventDefault();
   if (!items) return;
 
   const files: File[] = [];
@@ -87,6 +89,13 @@ const handlePaste = (e: ClipboardEvent) => {
 
       if (allowedTypes.includes(file.type)) {
         files.push(file);
+      } else {
+        showToaster(
+          'error',
+          $t('errors.UNSUPPORTED-IMAGE-TYPE', {
+            types: allowedTypes.map((t) => t.split('/')[1]).join(', '),
+          }) as string,
+        );
       }
     }
   }
