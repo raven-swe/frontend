@@ -14,7 +14,10 @@ declare namespace Cypress {
      * @param type - Type of OTP (registration or password-reset)
      * @example cy.getOTP('user@example.com', 'registration')
      */
-    getOTP(identifier: string, type: 'registration' | 'password-reset'): Chainable<string>;
+    getOTP(
+      identifier: string,
+      type: 'registration' | 'forgotPassword' | 'changeEmail',
+    ): Chainable<string>;
 
     /**
      * Custom command to create a test user and retrieve its info

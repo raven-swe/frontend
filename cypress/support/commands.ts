@@ -34,11 +34,14 @@ Cypress.Commands.add('mockRecaptcha', () => {
 });
 
 // Get OTP from test endpoint
-Cypress.Commands.add('getOTP', (identifier: string, type: 'registration' | 'password-reset') => {
-  return cy
-    .request(`${Cypress.env('API_URL')}/test/otp?identifier=${identifier}&type=${type}`)
-    .its('body.data.otp');
-});
+Cypress.Commands.add(
+  'getOTP',
+  (identifier: string, type: 'registration' | 'forgotPassword' | 'changeEmail') => {
+    return cy
+      .request(`${Cypress.env('API_URL')}/test/otp?identifier=${identifier}&type=${type}`)
+      .its('body.data.otp');
+  },
+);
 
 // Create a test user and retrieve its info
 Cypress.Commands.add('createTestUser', () => {

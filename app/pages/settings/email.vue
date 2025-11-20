@@ -28,8 +28,16 @@ const changeEmailStore = useChangeEmailStore();
       <h1 class="text-2xl font-bold">{{ $t('setting.change-email.title') }}</h1>
     </div>
     <div class="flex flex-col gap-6 px-4">
-      <UiInput placeholder="Email" :model-value="userStore.user.email" disabled />
-      <UiButton @click="() => changeEmailStore.handleDialogChange(true)">
+      <UiInput
+        placeholder="Email"
+        :model-value="userStore.user.email"
+        data-cy="email-settings-input"
+        disabled
+      />
+      <UiButton
+        data-cy="email-settings-change-btn"
+        @click="() => changeEmailStore.handleDialogChange(true)"
+      >
         {{ $t('setting.change-email.title') }}
       </UiButton>
     </div>

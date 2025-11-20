@@ -60,7 +60,11 @@ watch(errors, (errs) => {
     @update:open="changeEmailStore.handleDialogChange"
   >
     <UiDialogContent>
-      <form class="flex h-full flex-col justify-between" @submit.prevent="onSubmit">
+      <form
+        class="flex h-full flex-col justify-between"
+        data-cy="change-email-form"
+        @submit.prevent="onSubmit"
+      >
         <UiDialogHeader class="py-6">
           <UiDialogTitle class="text-4xl font-bold">{{
             $t('setting.change-email.title')
@@ -74,7 +78,13 @@ watch(errors, (errs) => {
           </UiDialogDescription>
         </UiDialogHeader>
         <div class="flex flex-col gap-4">
-          <FieldInput placeholder="Email" type="text" name="email" v-bind="emailAttrs" />
+          <FieldInput
+            placeholder="Email"
+            type="text"
+            name="email"
+            v-bind="emailAttrs"
+            data-cy="change-email-form-input"
+          />
         </div>
         <UiDialogFooter class="mt-auto">
           <Button
@@ -82,6 +92,7 @@ watch(errors, (errs) => {
             :disabled="Object.entries(errors).length > 0 || isSubmitting"
             size="xl"
             class="w-full"
+            data-cy="change-email-form-next-btn"
             >{{ $t('ui.next') }}</Button
           >
         </UiDialogFooter>
