@@ -7,8 +7,8 @@ const props = defineProps<{
 </script>
 <template>
   <div
-    class="flex items-center gap-2 border-r-2 p-4 transition-colors"
-    :class="props.isSelected ? 'border-r-primary' : 'border-r-transparent'"
+    class="flex items-center gap-2 border-e-2 p-4 transition-colors"
+    :class="props.isSelected ? 'border-e-primary' : 'border-e-transparent'"
   >
     <div>
       <NuxtImg
