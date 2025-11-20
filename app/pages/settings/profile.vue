@@ -201,7 +201,13 @@ const handleDialogClose = () => {
             </UiButton>
             <h2 class="text-xl font-bold">{{ $t('profile.edit.edit-profile') }}</h2>
           </div>
-          <UiButton class="w-16" size="xs" :disabled="!isFormValid" @click="handleSubmit">
+          <UiButton
+            class="w-16"
+            size="xs"
+            :disabled="!isFormValid"
+            data-cy="profile-save-btn"
+            @click="handleSubmit"
+          >
             {{ $t('ui.save') }}
           </UiButton>
         </template>
@@ -316,7 +322,7 @@ const handleDialogClose = () => {
             />
 
             <!-- Birth Date Section -->
-            <div class="mb-10">
+            <div class="mb-10" data-cy="birth-date-select">
               <h3 class="mb-2 font-medium">{{ $t('profile.edit.birth-date') }}</h3>
               <div class="flex gap-2">
                 <uiSelect
@@ -325,6 +331,7 @@ const handleDialogClose = () => {
                   :options="dateSelect.months.value"
                   placeholder="Month"
                   name="birth-month"
+                  data-cy="birth-month-select"
                 />
                 <uiSelect
                   v-model="dateSelect.selectedDay.value"
@@ -332,6 +339,7 @@ const handleDialogClose = () => {
                   :options="dateSelect.days.value"
                   placeholder="Day"
                   name="birth-day"
+                  data-cy="birth-day-select"
                 />
                 <uiSelect
                   v-model="dateSelect.selectedYear.value"
@@ -339,6 +347,7 @@ const handleDialogClose = () => {
                   :options="dateSelect.years.value"
                   placeholder="Year"
                   name="birth-year"
+                  data-cy="birth-year-select"
                 />
               </div>
             </div>
