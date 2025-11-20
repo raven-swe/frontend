@@ -74,7 +74,7 @@ const handleInput = (event: Event) => {
   emit('update:modelValue', target.value);
 };
 
-const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'video/mp4'];
+const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
 const handlePaste = (e: ClipboardEvent) => {
   const items = e.clipboardData?.items;
   e.preventDefault();
