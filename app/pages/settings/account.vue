@@ -40,7 +40,7 @@ const birthDate = computed(() =>
       <SettingsItem
         :title="t('setting.change-password')"
         to="/settings/changePasswordEditor"
-        subtitle="Change Your Password at any time"
+        :subtitle="t('setting.change-password-subtitle')"
       />
     </div>
     <div v-else class="p-4">

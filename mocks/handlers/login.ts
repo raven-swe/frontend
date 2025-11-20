@@ -28,7 +28,7 @@ const generateRefreshToken = (username: string) => {
 };
 
 const generateRefreshCookie = (token: string) => {
-  return cookie.serialize('refresh_token', token, {
+  return cookie.serialize('refreshToken', token, {
     httpOnly: true,
     path: '/',
     maxAge: 10 * 60, // make it 10 min for testing
@@ -174,7 +174,7 @@ export const handlers = [
   // POST /auth/logout
   http.post(`${API_URL}/auth/logout`, ({ request }) => {
     const cookies = cookie.parse(request.headers.get('cookie') || '');
-    if (!cookies['refresh_token']) {
+    if (!cookies['refreshToken']) {
       return HttpResponse.json(
         {
           success: false,
@@ -188,7 +188,7 @@ export const handlers = [
     }
 
     // Clear the refresh token cookie
-    const clearCookie = cookie.serialize('refresh_token', '', {
+    const clearCookie = cookie.serialize('refreshToken', '', {
       httpOnly: true,
       path: '/',
       expires: new Date(0),
