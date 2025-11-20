@@ -14,8 +14,7 @@ const isDialogOpen = computed(() => route.path === '/settings/profile');
 const openDiscardDialog = ref(false);
 
 const userStore = useUserStore();
-const { updateProfile, updateProfilePicture, updateHeaderImage, removeHeaderImage } =
-  updateProfileService();
+const { updateProfile } = updateProfileService();
 
 const bannerFileInput = ref<HTMLInputElement | null>(null);
 const profileFileInput = ref<HTMLInputElement | null>(null);
@@ -139,28 +138,24 @@ const handleSubmit = async () => {
   router.push(`/profile/${userStore.user.username}`);
   await nextTick(); // allow DOM and route to update
 
-  // Handle uploads and updates
-  if (!selectedImage.value && userStore.user.bannerUrl) {
-    await removeHeaderImage();
-  } else if (bannerFileInput.value?.files?.[0]) {
-    await updateHeaderImage(bannerFileInput.value.files[0]);
-  }
-
-  if (profileFileInput.value?.files?.[0]) {
-    await updateProfilePicture(profileFileInput.value.files[0]);
-  }
-
   const formattedBirthDate = birthDate.value
     ? birthDate.value.toISOString().split('T')[0]
     : undefined;
 
-  await updateProfile({
+  // Prepare profile data
+  const profileData = {
     displayName: name.value,
     bio: normalize(bio.value),
     location: normalize(location.value),
     websiteUrl: normalize(website.value),
     birthDate: formattedBirthDate,
-  });
+    deleteBanner: !selectedImage.value && !!userStore.user.bannerUrl,
+  };
+  // Get files
+  const bannerFile = bannerFileInput.value?.files?.[0];
+  const profileFile = profileFileInput.value?.files?.[0];
+
+  await updateProfile(profileData, profileFile, bannerFile);
 
   // refresh data
   queryClient.invalidateQueries({ queryKey: ['layout-data'] });

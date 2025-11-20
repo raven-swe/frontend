@@ -255,6 +255,7 @@
   },
   "setting": {
     "email": "Email",
+    "change-password-subtitle": "Change Your Password at any time",
     "change-username": "Change username",
     "suggestions": "Suggestions",
     "save": "Save Changes",

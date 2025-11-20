@@ -31,7 +31,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
         const setCookies = response.headers.getSetCookie?.();
         for (const rawCookie of setCookies) {
           const { name, value, options } = parseSetCookie(rawCookie);
-          if (name === 'access_token' || name === 'refresh_token') {
+          if (name === 'access_token' || name === 'refreshToken') {
             const cookie = useCookie(name, options);
             cookie.value = value;
           }

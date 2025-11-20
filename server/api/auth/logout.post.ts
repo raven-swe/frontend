@@ -13,6 +13,6 @@ export default defineWrappedResponseHandler(async (event) => {
     },
   });
   deleteCookie(event, 'access_token', { path: '/' });
-  deleteCookie(event, 'refresh_token', { path: '/' });
+  deleteCookie(event, 'refreshToken', { path: '/' });
   return response._data;
 });
