@@ -51,7 +51,7 @@ const isInterestActive = (interestId: string) => {
   <UiDialog :open="props.open">
     <UiDialogContent hide-close-button header-class="flex items-center justify-center p-0">
       <template #header>
-        <LogoRaven class="text-primary h-10 w-10" />
+        <LogoRaven class="size-8" />
       </template>
       <UiDialogHeader class="mx-auto w-full max-w-100">
         <UiDialogTitle class="text-3xl font-bold">{{

@@ -75,7 +75,7 @@ const actionButton = computed(() => {
       class="h-auto"
     >
       <template #header>
-        <LogoRaven class="text-primary h-10 w-10" />
+        <LogoRaven class="size-8" />
       </template>
       <UiDialogHeader class="mx-auto w-full max-w-100">
         <UiDialogTitle class="text-3xl font-bold">{{
