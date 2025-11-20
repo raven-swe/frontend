@@ -6,6 +6,7 @@ export default defineNuxtConfig({
   css: ['@/assets/css/main.css'],
   runtimeConfig: {
     public: {
+      useMocks: process.env.NUXT_PUBLIC_USE_MOCKS === 'true',
       googleClientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID || '',
       backendUrl: process.env.BACKEND_URL || '',
       githubClientId: process.env.NUXT_PUBLIC_GITHUB_CLIENT_ID || '',

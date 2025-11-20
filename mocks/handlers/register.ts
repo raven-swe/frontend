@@ -29,7 +29,7 @@ const generateRefreshToken = (username: string) => {
 };
 
 const generateRefreshCookie = (token: string) => {
-  return cookie.serialize('refresh_token', token, {
+  return cookie.serialize('refreshToken', token, {
     httpOnly: true,
     path: '/',
     maxAge: 10 * 60, // make it 10 min for testing
