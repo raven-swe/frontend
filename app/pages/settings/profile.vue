@@ -7,15 +7,11 @@ import EditProfileInfo from '~/components/profile/edit/EditProfileInfo.vue';
 import { useEditProfile } from '@/composables/useEditProfile';
 import { VisuallyHidden } from 'reka-ui';
 
-const route = useRoute();
 const router = useRouter();
 const userStore = useUserStore();
 
-// Control dialog open state based on current route
-const isDialogOpen = computed(() => route.path === '/settings/profile');
 const openDiscardDialog = ref(false);
 
-// Use the profile form composable
 const {
   bannerFileInput,
   profileFileInput,
@@ -63,7 +59,7 @@ const handleDialogClose = () => {
 
 <template>
   <div>
-    <UiDialog :open="isDialogOpen">
+    <UiDialog :open="true">
       <UiDialogContent
         header-class="flex items-center justify-between px-4"
         class="h-auto !w-[600px] !max-w-[600px]"
