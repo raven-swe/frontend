@@ -53,6 +53,13 @@ export const usePasswordStore = defineStore('password', () => {
       if (isApiValidationError(error)) {
         const errors = error.data?.data?.error.errors;
         return errors;
+      } else if (isApiError(error)) {
+        if (error.data?.statusCode === 404 || error.data?.statusCode === 400) {
+          const errorCode = error.data?.data?.error?.code;
+          return [{ field: 'identifier', code: errorCode }];
+        } else if (error.data?.statusCode === 429) {
+          showToaster('error', 'toaster.checkUser.rateLimit');
+        }
       } else {
         showToaster('error', 'toaster.checkUser.error');
       }
