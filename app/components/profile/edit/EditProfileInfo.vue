@@ -7,7 +7,8 @@ interface Props {
   location: string;
   website: string;
   birthDate: Date | undefined;
-  isFormValid: boolean;
+  isNameValid: boolean;
+  isAgeValid: boolean;
 }
 
 const emit = defineEmits<{
@@ -45,11 +46,11 @@ watch(
     <UiInput
       :model-value="name"
       placeholder="Name"
-      :class="isFormValid ? 'mb-6' : 'mb-1'"
-      :aria-invalid="!isFormValid"
+      :class="isNameValid ? 'mb-6' : 'mb-1'"
+      :aria-invalid="!isNameValid"
       @update:model-value="emit('update:name', $event as string)"
     />
-    <p v-if="!isFormValid" class="text-destructive mb-6 text-sm" role="alert" aria-live="assertive">
+    <p v-if="!isNameValid" class="text-destructive mb-6 text-sm" role="alert" aria-live="assertive">
       {{ $t('errors.EMPTY_NAME') }}
     </p>
 
@@ -107,6 +108,14 @@ watch(
           name="birth-year"
         />
       </div>
+      <p
+        v-if="!isAgeValid"
+        class="text-destructive mt-2 text-sm"
+        role="alert"
+        aria-live="assertive"
+      >
+        {{ $t('errors.birthDate.NOT_MINIMUM_AGE') }}
+      </p>
     </div>
   </div>
 </template>

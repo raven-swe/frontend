@@ -64,8 +64,28 @@ export const useEditProfile = () => {
     return false;
   });
 
+  const isNameValid = computed(() => name.value.trim() !== '');
+
+  const isAgeValid = computed(() => {
+    if (!birthDate.value) return true;
+
+    const today = new Date();
+    const bd = new Date(birthDate.value);
+    let age = today.getUTCFullYear() - bd.getUTCFullYear();
+
+    const hasNotHadBirthdayThisYear =
+      today.getUTCMonth() < bd.getUTCMonth() ||
+      (today.getUTCMonth() === bd.getUTCMonth() && today.getUTCDate() < bd.getUTCDate());
+
+    if (hasNotHadBirthdayThisYear) {
+      age--;
+    }
+
+    return age >= 13;
+  });
+
   const isFormValid = computed(() => {
-    return name.value.trim() !== '';
+    return isNameValid.value && isAgeValid.value;
   });
 
   const handleSubmit = async () => {
@@ -118,6 +138,8 @@ export const useEditProfile = () => {
     // Computed
     hasUnsavedChanges,
     isFormValid,
+    isAgeValid,
+    isNameValid,
     // Methods
     handleSubmit,
   };
