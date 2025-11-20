@@ -40,7 +40,7 @@ const handleCardClick = () => {
 
 <template>
   <div
-    class="hover:bg-foreground/4 flex w-full max-w-full gap-3 px-4 py-3"
+    class="hover:bg-foreground/5 flex w-full max-w-full gap-3 px-4 py-3 transition-all duration-200"
     :class="{
       'cursor-pointer': isOnboarding,
     }"
