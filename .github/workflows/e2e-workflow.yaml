@@ -1,0 +1,100 @@
+name: Daily Dev E2E Tests
+
+on:
+  schedule:
+    - cron: "30 23 * * *" # 11 PM UTC
+  workflow_dispatch:
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    environment: e2e
+    env:
+      APP_POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+      APP_POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      APP_POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+      APP_POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+      APP_DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      APP_REDIS_HOST: ${{ secrets.REDIS_HOST }}
+      APP_REDIS_PORT: ${{ secrets.REDIS_PORT }}
+      APP_RECAPTCHA_SECRET_KEY: ${{ secrets.RECAPTCHA_SECRET_KEY }}
+      APP_RECAPTCHA_SECRET_KEY_TEST: ${{ secrets.RECAPTCHA_SECRET_KEY_TEST }}
+      APP_SMTP_USER: ${{ secrets.SMTP_USER }}
+      APP_SMTP_HOST: ${{ secrets.SMTP_HOST }}
+      APP_SMTP_PASS: ${{ secrets.SMTP_PASS }}
+      APP_SMTP_PORT: ${{ secrets.SMTP_PORT }}
+      APP_JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      APP_TLS: ${{ secrets.TLS }}
+      APP_SSL: ${{ secrets.SSL }}
+      APP_MAIL_FROM: ${{ secrets.MAIL_FROM }}
+      APP_MAIL_NAME: ${{ secrets.MAIL_NAME }}
+      APP_GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      APP_GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      APP_GOOGLE_REDIRECT_URI: ${{ secrets.GOOGLE_REDIRECT_URI }}
+      APP_ACCESS_JWT_EXPIRES_IN: ${{ secrets.ACCESS_JWT_EXPIRES_IN }}
+      APP_ACCESS_TOKEN_EXPIRES_IN_SECONDS: ${{ secrets.ACCESS_TOKEN_EXPIRES_IN_SECONDS }}
+      APP_REFRESH_TOKEN_EXPIRES_IN_DAYS: ${{ secrets.REFRESH_TOKEN_EXPIRES_IN_DAYS }}
+      APP_NODE_ENV: ${{ secrets.NODE_ENV }}
+      APP_SPACES_KEY: ${{ secrets.SPACES_KEY }}
+      APP_SPACES_SECRET: ${{ secrets.SPACES_SECRET }}
+      APP_SPACES_ENDPOINT: ${{ secrets.SPACES_ENDPOINT }}
+      APP_SPACES_BUCKET: ${{ secrets.SPACES_BUCKET }}
+      APP_SPACES_REGION: ${{ secrets.SPACES_REGION }}
+      APP_CDN_URL: ${{ secrets.CDN_URL }}
+      APP_RATE_LIMIT_BYPASS_SECRET: ${{ secrets.RATE_LIMIT_BYPASS_SECRET }}
+      APP_PORT: ${{ secrets.PORT }}
+      APP_SEED_ENV: ${{ secrets.SEED_ENV }}
+      APP_BACKEND_URL: ${{ secrets.BACKEND_URL }}
+      APP_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      APP_NUXT_PUBLIC_GOOGLE_CLIENT_ID: ${{ secrets.NUXT_PUBLIC_GOOGLE_CLIENT_ID }}
+      APP_NUXT_PUBLIC_GITHUB_CLIENT_ID: ${{ secrets.NUXT_PUBLIC_GITHUB_CLIENT_ID }}
+      APP_NUXT_PUBLIC_GITHUB_REDIRECT_URI: ${{ secrets.NUXT_PUBLIC_GITHUB_REDIRECT_URI }}
+      APP_NUXT_PUBLIC_GITHUB_SCOPE: ${{ secrets.NUXT_PUBLIC_GITHUB_SCOPE }}
+      APP_NUXT_PUBLIC_RECAPTCHA_SITE_KEY: ${{ secrets.NUXT_PUBLIC_RECAPTCHA_SITE_KEY }}
+      APP_NUXT_PUBLIC_USE_MOCKS: ${{ secrets.NUXT_PUBLIC_USE_MOCKS }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate .env
+        run: |
+          printenv | grep '^APP_' | sed 's/^APP_//' > .env
+
+      - name: Set up Corepack
+        run: corepack enable
+
+      - name: Set up pnpm
+        run: corepack prepare pnpm@latest --activate
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+          cache-dependency-path: "**/pnpm-lock.yaml"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Cypress globally
+        run: npm i -g cypress
+
+      - name: Install Cypress
+        run: pnpm cypress install
+
+      - name: Start Docker Compose
+        run: |
+          docker compose -f ./e2e.docker-compose.yaml up -d
+
+      - name: Run E2E Tests
+        run: pnpm test:e2e
+
+      - name: Check logs
+        if: failure()
+        run: |
+          echo "Fetching logs..."
+          docker compose -f ./e2e.docker-compose.yaml logs
+
+      - name: Cleanup docker
+        if: always()
+        run: |
+          echo "Stopping containers..."
+          docker compose -f ./e2e.docker-compose.yaml down -v --remove-orphans || true
