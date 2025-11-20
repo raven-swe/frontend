@@ -25,6 +25,7 @@ const {
   hasUnsavedChanges,
   isFormValid,
   isNameValid,
+  isWebsiteValid,
   isAgeValid,
   handleSubmit,
 } = useEditProfile();
@@ -114,6 +115,7 @@ const handleDialogClose = () => {
             v-model:birth-date="birthDate"
             :is-name-valid="isNameValid"
             :is-age-valid="isAgeValid"
+            :is-website-valid="isWebsiteValid"
           />
         </div>
 

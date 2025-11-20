@@ -66,6 +66,16 @@ export const useEditProfile = () => {
 
   const isNameValid = computed(() => name.value.trim() !== '');
 
+  const isWebsiteValid = computed(() => {
+    if (website.value.trim() === '') return true;
+    try {
+      const url = new URL(website.value);
+      return url.protocol === 'http:' || url.protocol === 'https:';
+    } catch {
+      return false;
+    }
+  });
+
   const isAgeValid = computed(() => {
     if (!birthDate.value) return true;
 
@@ -140,6 +150,7 @@ export const useEditProfile = () => {
     isFormValid,
     isAgeValid,
     isNameValid,
+    isWebsiteValid,
     // Methods
     handleSubmit,
   };

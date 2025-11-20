@@ -9,6 +9,7 @@ interface Props {
   birthDate: Date | undefined;
   isNameValid: boolean;
   isAgeValid: boolean;
+  isWebsiteValid: boolean;
 }
 
 const emit = defineEmits<{
@@ -77,10 +78,18 @@ watch(
       :model-value="website"
       type="text"
       :placeholder="$t('profile.edit.website')"
-      class="mb-6 w-full"
+      :class="isWebsiteValid ? 'mb-6' : 'mb-1'"
       maxlength="100"
       @update:model-value="emit('update:website', $event as string)"
     />
+    <p
+      v-if="!isWebsiteValid"
+      class="text-destructive mb-6 text-sm"
+      role="alert"
+      aria-live="assertive"
+    >
+      {{ $t('errors.INVALID_WEBSITE_URL') }}
+    </p>
 
     <!-- Birth Date Section -->
     <div class="mb-10">
