@@ -3,6 +3,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mountSuspended } from '@nuxt/test-utils/runtime';
 import TweetEditor from '~/components/tweet/composer/TweetEditor.vue';
+import { createI18n } from 'vue-i18n';
+import messages from '@@/i18n/locales/en.json';
+
+const i18n = createI18n({
+  locale: 'en',
+  messages: { en: messages },
+});
 
 describe('TweetEditor', () => {
   const mockProps = {
@@ -18,6 +25,9 @@ describe('TweetEditor', () => {
   it('renders correctly with default props', async () => {
     const wrapper = await mountSuspended(TweetEditor, {
       props: mockProps,
+      global: {
+        plugins: [i18n],
+      },
     });
 
     expect(wrapper.find('textarea').exists()).toBe(true);
@@ -27,6 +37,9 @@ describe('TweetEditor', () => {
   it('displays modelValue correctly', async () => {
     const wrapper = await mountSuspended(TweetEditor, {
       props: { ...mockProps, modelValue: 'Hello world' },
+      global: {
+        plugins: [i18n],
+      },
     });
 
     expect(wrapper.find('textarea').element.value).toBe('Hello world');
@@ -36,6 +49,9 @@ describe('TweetEditor', () => {
   it('shows placeholder when modelValue is empty', async () => {
     const wrapper = await mountSuspended(TweetEditor, {
       props: mockProps,
+      global: {
+        plugins: [i18n],
+      },
     });
 
     expect(wrapper.find('.text-muted-foreground').exists()).toBe(true);
@@ -45,6 +61,9 @@ describe('TweetEditor', () => {
   it('hides placeholder when modelValue has content', async () => {
     const wrapper = await mountSuspended(TweetEditor, {
       props: { ...mockProps, modelValue: 'Test content' },
+      global: {
+        plugins: [i18n],
+      },
     });
 
     expect(wrapper.find('.text-muted-foreground').exists()).toBe(false);
@@ -53,6 +72,9 @@ describe('TweetEditor', () => {
   it('emits update:modelValue on input', async () => {
     const wrapper = await mountSuspended(TweetEditor, {
       props: mockProps,
+      global: {
+        plugins: [i18n],
+      },
     });
 
     const textarea = wrapper.find('textarea');
@@ -66,6 +88,9 @@ describe('TweetEditor', () => {
   it('calculates character count correctly', async () => {
     const wrapper = await mountSuspended(TweetEditor, {
       props: { ...mockProps, modelValue: 'Hello' },
+      global: {
+        plugins: [i18n],
+      },
     });
 
     const component = wrapper.vm as any;
@@ -76,6 +101,9 @@ describe('TweetEditor', () => {
     const longText = 'a'.repeat(300);
     const wrapper = await mountSuspended(TweetEditor, {
       props: { ...mockProps, modelValue: longText, maxLength: 280 },
+      global: {
+        plugins: [i18n],
+      },
     });
 
     const component = wrapper.vm as any;
@@ -86,6 +114,9 @@ describe('TweetEditor', () => {
     const longText = 'a'.repeat(300);
     const wrapper = await mountSuspended(TweetEditor, {
       props: { ...mockProps, modelValue: longText, maxLength: 280 },
+      global: {
+        plugins: [i18n],
+      },
     });
 
     const component = wrapper.vm as any;
@@ -97,6 +128,9 @@ describe('TweetEditor', () => {
     const longText = 'a'.repeat(300);
     const wrapper = await mountSuspended(TweetEditor, {
       props: { ...mockProps, modelValue: longText, maxLength: 280 },
+      global: {
+        plugins: [i18n],
+      },
     });
 
     const overLimitSpan = wrapper.find('.bg-destructive\\/50');
@@ -107,6 +141,9 @@ describe('TweetEditor', () => {
   it('adjusts textarea height on input', async () => {
     const wrapper = await mountSuspended(TweetEditor, {
       props: mockProps,
+      global: {
+        plugins: [i18n],
+      },
     });
 
     const textarea = wrapper.find('textarea');
@@ -121,6 +158,9 @@ describe('TweetEditor', () => {
   it('exposes resetHeight method', async () => {
     const wrapper = await mountSuspended(TweetEditor, {
       props: mockProps,
+      global: {
+        plugins: [i18n],
+      },
     });
 
     const exposed = (wrapper.vm as any).$?.exposed;
@@ -137,6 +177,9 @@ describe('TweetEditor', () => {
   it('exposes isOverLimit method', async () => {
     const wrapper = await mountSuspended(TweetEditor, {
       props: { ...mockProps, modelValue: 'a'.repeat(300) },
+      global: {
+        plugins: [i18n],
+      },
     });
     const exposed = (wrapper.vm as any).$?.exposed;
 
@@ -147,6 +190,9 @@ describe('TweetEditor', () => {
   it('exposes characterCount', async () => {
     const wrapper = await mountSuspended(TweetEditor, {
       props: { ...mockProps, modelValue: 'Hello' },
+      global: {
+        plugins: [i18n],
+      },
     });
 
     const exposed = (wrapper.vm as any).$?.exposed;
@@ -157,6 +203,9 @@ describe('TweetEditor', () => {
   it('handles empty over-limit text when not over limit', async () => {
     const wrapper = await mountSuspended(TweetEditor, {
       props: { ...mockProps, modelValue: 'Short text' },
+      global: {
+        plugins: [i18n],
+      },
     });
 
     const component = wrapper.vm as any;
@@ -167,6 +216,9 @@ describe('TweetEditor', () => {
   it('maintains valid text when not over limit', async () => {
     const wrapper = await mountSuspended(TweetEditor, {
       props: { ...mockProps, modelValue: 'Normal text' },
+      global: {
+        plugins: [i18n],
+      },
     });
 
     const component = wrapper.vm as any;
@@ -177,6 +229,9 @@ describe('TweetEditor', () => {
     const content = '#tag @user https://example.com www.example.com';
     const wrapper = await mountSuspended(TweetEditor, {
       props: { ...mockProps, modelValue: content },
+      global: {
+        plugins: [i18n],
+      },
     });
 
     const highlights = wrapper.findAll('.text-primary');
@@ -191,7 +246,12 @@ describe('TweetEditor', () => {
   });
 
   it('adjustHeight sets textarea.style.height to "auto" then to "<scrollHeight>px"', async () => {
-    const wrapper = await mountSuspended(TweetEditor, { props: mockProps });
+    const wrapper = await mountSuspended(TweetEditor, {
+      props: mockProps,
+      global: {
+        plugins: [i18n],
+      },
+    });
     const textarea = wrapper.find('textarea');
 
     // initial height
@@ -224,7 +284,12 @@ describe('TweetEditor', () => {
   });
 
   it('adjustHeight updates height on subsequent inputs when scrollHeight changes', async () => {
-    const wrapper = await mountSuspended(TweetEditor, { props: mockProps });
+    const wrapper = await mountSuspended(TweetEditor, {
+      props: mockProps,
+      global: {
+        plugins: [i18n],
+      },
+    });
     const textarea = wrapper.find('textarea');
 
     const calls: string[] = [];
