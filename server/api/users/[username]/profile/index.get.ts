@@ -11,6 +11,5 @@ export default defineWrappedResponseHandler(async (event) => {
     method: 'GET',
   });
 
-  console.log(response.data);
   return response;
 });
