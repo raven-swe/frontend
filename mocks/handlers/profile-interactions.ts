@@ -9,7 +9,7 @@ export const handlers = [
   http.post<{ username: string }>(`${API_URL}/users/:username/following`, async ({ params }) => {
     await new Promise((resolve) => setTimeout(resolve, 500));
     const { username } = params;
-    const user = mockUserInfos[username];
+    const user = mockUserInfos[username.toLowerCase()];
     if (!user) {
       return HttpResponse.json<ApiErrorResponse>(
         {
@@ -21,7 +21,7 @@ export const handlers = [
     }
     user.relationship.following = true;
     user.followersCount += 1;
-    mockUserInfos[username] = user;
+    mockUserInfos[username.toLowerCase()] = user;
     return HttpResponse.json<ApiResponseBase>({
       success: true,
       message: `Successfully followed user "${username}".`,
@@ -31,7 +31,7 @@ export const handlers = [
   http.delete<{ username: string }>(`${API_URL}/users/:username/following`, async ({ params }) => {
     await new Promise((resolve) => setTimeout(resolve, 500));
     const { username } = params;
-    const user = mockUserInfos[username];
+    const user = mockUserInfos[username.toLowerCase()];
     if (!user) {
       return HttpResponse.json<ApiErrorResponse>(
         {
@@ -43,7 +43,7 @@ export const handlers = [
     }
     user.relationship.following = false;
     user.followersCount = Math.max(0, user.followersCount - 1);
-    mockUserInfos[username] = user;
+    mockUserInfos[username.toLowerCase()] = user;
     return HttpResponse.json<ApiResponseBase>({
       success: true,
       message: `Successfully unfollowed user "${username}".`,
@@ -55,7 +55,7 @@ export const handlers = [
     const url = new URL(request.url);
     const cursor = url.searchParams.get('cursor') || null;
     const limit = Number(url.searchParams.get('limit') || '20');
-    const user = mockUserInfos[username];
+    const user = mockUserInfos[username.toLowerCase()];
 
     if (!user) {
       return HttpResponse.json<ApiErrorResponse>(
@@ -118,7 +118,7 @@ export const handlers = [
   http.post<{ username: string }>(`${API_URL}/me/mutes/:username`, async ({ params }) => {
     await new Promise((resolve) => setTimeout(resolve, 500));
     const { username } = params;
-    const user = mockUserInfos[username];
+    const user = mockUserInfos[username.toLowerCase()];
     if (!user) {
       return HttpResponse.json<ApiErrorResponse>(
         {
@@ -129,7 +129,7 @@ export const handlers = [
       );
     }
     user.relationship.muted = true;
-    mockUserInfos[username] = user;
+    mockUserInfos[username.toLowerCase()] = user;
     return HttpResponse.json<ApiResponseBase>({
       success: true,
       message: `Successfully muted user "${username}".`,
@@ -139,7 +139,7 @@ export const handlers = [
   http.delete<{ username: string }>(`${API_URL}/me/mutes/:username`, async ({ params }) => {
     await new Promise((resolve) => setTimeout(resolve, 500));
     const { username } = params;
-    const user = mockUserInfos[username];
+    const user = mockUserInfos[username.toLowerCase()];
     if (!user) {
       return HttpResponse.json<ApiErrorResponse>(
         {
@@ -150,7 +150,7 @@ export const handlers = [
       );
     }
     user.relationship.muted = false;
-    mockUserInfos[username] = user;
+    mockUserInfos[username.toLowerCase()] = user;
     return HttpResponse.json<ApiResponseBase>({
       success: true,
       message: `Successfully unmuted user "${username}".`,
@@ -160,7 +160,7 @@ export const handlers = [
   http.post<{ username: string }>(`${API_URL}/me/blocks/:username`, async ({ params }) => {
     await new Promise((resolve) => setTimeout(resolve, 500));
     const { username } = params;
-    const user = mockUserInfos[username];
+    const user = mockUserInfos[username.toLowerCase()];
     if (!user) {
       return HttpResponse.json<ApiErrorResponse>(
         {
@@ -171,7 +171,7 @@ export const handlers = [
       );
     }
     user.relationship.blocking = true;
-    mockUserInfos[username] = user;
+    mockUserInfos[username.toLowerCase()] = user;
     return HttpResponse.json<ApiResponseBase>({
       success: true,
       message: `Successfully blocked user "${username}".`,
@@ -181,7 +181,7 @@ export const handlers = [
   http.delete<{ username: string }>(`${API_URL}/me/blocks/:username`, async ({ params }) => {
     await new Promise((resolve) => setTimeout(resolve, 500));
     const { username } = params;
-    const user = mockUserInfos[username];
+    const user = mockUserInfos[username.toLowerCase()];
     if (!user) {
       return HttpResponse.json<ApiErrorResponse>(
         {
@@ -192,7 +192,7 @@ export const handlers = [
       );
     }
     user.relationship.blocking = false;
-    mockUserInfos[username] = user;
+    mockUserInfos[username.toLowerCase()] = user;
     return HttpResponse.json<ApiResponseBase>({
       success: true,
       message: `Successfully unblocked user "${username}".`,

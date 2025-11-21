@@ -31,5 +31,5 @@ const exampleUser: User = {
 export const users: User[] = [...(rawUsers as User[]), exampleUser];
 // Create a mapping of username to user info for easy lookup
 export const mockUserInfos: Record<string, User> = Object.fromEntries(
-  users.map((user) => [user.username, user]),
+  users.map((user) => [user.username.toLowerCase(), user]),
 );

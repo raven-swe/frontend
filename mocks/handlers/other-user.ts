@@ -8,7 +8,7 @@ export const handlers = [
   http.get(`${API_URL}/users/:username/profile`, async ({ params }) => {
     await new Promise((resolve) => setTimeout(resolve, 500));
     const username = params.username as string;
-    const user = mockUserInfos[username];
+    const user = mockUserInfos[username.toLowerCase()];
     if (user) {
       return HttpResponse.json(
         {
