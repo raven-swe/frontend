@@ -2,18 +2,18 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createMockH3Event } from '~~/test/mocks/h3-event';
 import { useH3TestUtils } from '~~/test/mocks/h3-test-utils';
 import { createError } from '#app';
-import followingGetEventHandler from '~~/server/api/users/[username]/following.get';
+import followersGetEventHandler from '~~/server/api/users/[username]/followers.get';
 
 useH3TestUtils();
 
 const mockServerApiFetch = vi.fn();
 vi.stubGlobal('serverApiFetch', () => mockServerApiFetch);
 
-describe('GET /api/users/[username]/following', () => {
+describe('GET /api/users/[username]/followers', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
-  it('returns user following data for valid username', async () => {
+  it('returns user followers data for valid username', async () => {
     const mockResponse = {
       success: true,
       data: [{ username: 'janedoe', fullName: 'Jane Doe' }],
@@ -25,9 +25,9 @@ describe('GET /api/users/[username]/following', () => {
       params: { username: 'johndoe' },
     });
 
-    const response = await followingGetEventHandler(event);
+    const response = await followersGetEventHandler(event);
 
-    expect(mockServerApiFetch).toHaveBeenCalledWith('/users/johndoe/following', {
+    expect(mockServerApiFetch).toHaveBeenCalledWith('/users/johndoe/followers', {
       method: 'GET',
     });
     expect(response).toEqual(mockResponse);
@@ -39,7 +39,7 @@ describe('GET /api/users/[username]/following', () => {
       params: {},
     });
 
-    await expect(followingGetEventHandler(emptyUsernameEvent)).rejects.toEqual(
+    await expect(followersGetEventHandler(emptyUsernameEvent)).rejects.toEqual(
       createError({
         statusCode: 422,
         statusMessage: 'Validation Error',
@@ -56,7 +56,7 @@ describe('GET /api/users/[username]/following', () => {
       params: { username: 'a' },
     });
 
-    await expect(followingGetEventHandler(shortUsernameEvent)).rejects.toEqual(
+    await expect(followersGetEventHandler(shortUsernameEvent)).rejects.toEqual(
       createError({
         statusCode: 422,
         statusMessage: 'Validation Error',
