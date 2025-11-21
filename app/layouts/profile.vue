@@ -56,33 +56,41 @@ onServerPrefetch(async () => {
     <!-- Profile content -->
     <template v-else-if="user">
       <ProfileDetails />
+      <template v-if="!user.relationship.blocking">
+        <Tabs>
+          <Tab
+            :label="$t('profile.tabs.posts')"
+            :route="profilePath"
+            :is-active="$route.path === profilePath"
+          />
+          <Tab
+            :label="$t('profile.tabs.replies')"
+            :route="`${profilePath}/replies`"
+            :is-active="$route.path === `${profilePath}/replies`"
+          />
+          <Tab
+            :label="$t('profile.tabs.media')"
+            :route="`${profilePath}/media`"
+            :is-active="$route.path === `${profilePath}/media`"
+          />
+          <Tab
+            v-if="isCurrentUser"
+            :label="$t('profile.tabs.likes')"
+            :route="`${profilePath}/likes`"
+            :is-active="$route.path === `${profilePath}/likes`"
+          />
+        </Tabs>
 
-      <Tabs>
-        <Tab
-          :label="$t('profile.tabs.posts')"
-          :route="profilePath"
-          :is-active="$route.path === profilePath"
-        />
-        <Tab
-          :label="$t('profile.tabs.replies')"
-          :route="`${profilePath}/replies`"
-          :is-active="$route.path === `${profilePath}/replies`"
-        />
-        <Tab
-          :label="$t('profile.tabs.media')"
-          :route="`${profilePath}/media`"
-          :is-active="$route.path === `${profilePath}/media`"
-        />
-        <Tab
-          v-if="isCurrentUser"
-          :label="$t('profile.tabs.likes')"
-          :route="`${profilePath}/likes`"
-          :is-active="$route.path === `${profilePath}/likes`"
-        />
-      </Tabs>
-
-      <!-- Dynamic content from child tab pages -->
-      <slot />
+        <!-- Dynamic content from child tab pages -->
+        <slot />
+      </template>
+      <template v-else>
+        <div class="flex flex-col items-center justify-center p-8 text-center">
+          <h1 class="mb-2 text-3xl font-bold">
+            {{ $t('profile.messages.blocked', { username: user.username }) }}
+          </h1>
+        </div>
+      </template>
     </template>
   </NuxtLayout>
 </template>

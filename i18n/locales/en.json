@@ -83,6 +83,9 @@
       "birth-date": "Birth date",
       "discard-changes": "Discard changes?",
       "discard-changes-desc": "This can't be undone and you'll lose your changes."
+    },
+    "messages": {
+      "blocked": "{'@'}{username} is blocked. You can unblock to view their profile."
     }
   },
   "home": {
@@ -155,7 +158,9 @@
     "following": "Following",
     "follow-back": "Follow back",
     "mute": "Mute",
-    "block": "Block"
+    "block": "Block",
+    "unmute": "Unmute",
+    "unblock": "Unblock"
   },
   "errors": {
     "INVALID_EMAIL": "Please enter a valid email.",
