@@ -9,6 +9,8 @@ definePageMeta({
       <DmConversationsSection />
     </template>
 
-    <template #right> </template>
+    <template #right>
+      <DmConversationView />
+    </template>
   </NuxtLayout>
 </template>
