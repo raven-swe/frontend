@@ -85,6 +85,17 @@ watch(
       <template #header>
         <LogoRaven class="h-10 w-10" />
       </template>
+      <template #dialog-close>
+        <Button
+          variant="ghost-default"
+          size="icon-xs"
+          class="absolute inset-2"
+          @click="handleOpenChange(false)"
+        >
+          <Icon name="lucide:x" class="size-5" />
+          <span class="sr-only">{{ $t('ui.close') }}</span>
+        </Button>
+      </template>
       <UiDialogHeader class="px-8 py-4">
         <UiDialogTitle class="text-3xl font-bold">{{
           $t('profile.setup.pick-header')
