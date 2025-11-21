@@ -110,7 +110,7 @@ export const useEditProfile = () => {
   });
 
   const isFormValid = computed(() => {
-    return isNameValid.value && isAgeValid.value;
+    return isNameValid.value && isAgeValid.value && isWebsiteValid.value;
   });
 
   const handleSubmit = async () => {
@@ -136,6 +136,7 @@ export const useEditProfile = () => {
       websiteUrl: normalize(website.value),
       birthDate: formattedBirthDate,
       deleteBanner: !selectedImage.value && !!userStore.user.bannerUrl,
+      deleteAvatar: !selectedProfileImage.value && !!userStore.user.avatarUrl,
     };
 
     // Get files

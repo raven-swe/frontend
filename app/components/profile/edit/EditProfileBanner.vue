@@ -71,7 +71,7 @@ defineExpose({
         class="bg-foreground/60 hover:bg-foreground/80 flex h-10 w-10 items-center justify-center rounded-full transition-colors"
         @click="handleImageClick"
       >
-        <Icon name="lucide:camera" class="text-white" size="1.2rem" />
+        <Icon name="lucide:camera" class="text-background" size="1.2rem" />
       </button>
       <button
         v-if="selectedImage"
@@ -79,7 +79,7 @@ defineExpose({
         class="bg-foreground/60 hover:bg-foreground/80 flex h-10 w-10 items-center justify-center rounded-full transition-colors"
         @click="handleRemoveHeaderImage"
       >
-        <Icon name="lucide:x" class="text-white" size="1.2rem" />
+        <Icon name="lucide:x" class="text-background" size="1.2rem" />
       </button>
     </div>
     <input

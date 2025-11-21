@@ -298,6 +298,7 @@ describe('useEditProfile', () => {
           websiteUrl: 'https://updated.com',
           birthDate: '1995-06-15',
           deleteBanner: false,
+          deleteAvatar: false,
         },
         undefined,
         undefined,

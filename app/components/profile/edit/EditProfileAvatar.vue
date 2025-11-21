@@ -40,6 +40,13 @@ const handleProfileFileChange = (event: Event) => {
   emit('fileChange', event);
 };
 
+const handleRemoveProfileImage = () => {
+  emit('update:selectedProfileImage', null);
+  if (profileFileInput.value) {
+    profileFileInput.value.value = '';
+  }
+};
+
 defineExpose({
   fileInput: profileFileInput,
 });
@@ -53,13 +60,23 @@ defineExpose({
         class="h-30 w-30 cursor-pointer rounded-full border-3 border-white object-cover"
         @click="handleProfileImageClick"
       />
-      <button
-        type="button"
-        class="bg-foreground/60 hover:bg-foreground/80 absolute start-1/2 top-1/2 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full transition-colors"
-        @click="handleProfileImageClick"
-      >
-        <Icon name="lucide:camera" class="text-white" size="1rem" />
-      </button>
+      <div class="absolute start-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 gap-2">
+        <button
+          type="button"
+          class="bg-foreground/60 hover:bg-foreground/80 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+          @click="handleProfileImageClick"
+        >
+          <Icon name="lucide:camera" class="text-background" size="1rem" />
+        </button>
+        <button
+          v-if="selectedProfileImage"
+          type="button"
+          class="bg-foreground/60 hover:bg-foreground/80 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+          @click="handleRemoveProfileImage"
+        >
+          <Icon name="lucide:x" class="text-background" size="0.9rem" />
+        </button>
+      </div>
       <input
         ref="profileFileInput"
         type="file"
