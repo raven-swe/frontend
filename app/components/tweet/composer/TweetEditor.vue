@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { showToaster } from '@/utils/showToaster';
+import { MAX_IMAGE_SIZE_BYTES, MAX_IMAGE_SIZE_MB } from '~/constants/files';
 
 interface Props {
   modelValue: string;
@@ -97,12 +98,22 @@ const handlePaste = (e: ClipboardEvent) => {
           }) as string,
         );
       }
-    }
-  }
 
-  if (files.length > 0) {
-    e.preventDefault(); // Prevent text insertion of the image name
-    emit('paste-media', files);
+      if (files.length >= 4) break;
+
+      if (file.size > MAX_IMAGE_SIZE_BYTES) {
+        showToaster(
+          'warning',
+          `Image "${file.name}" size exceeds the maximum limit of ${MAX_IMAGE_SIZE_MB} MB.`,
+        );
+        continue; // Skip this file
+      }
+    }
+
+    if (files.length > 0) {
+      e.preventDefault(); // Prevent text insertion of the image name
+      emit('paste-media', files);
+    }
   }
 };
 
