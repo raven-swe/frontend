@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useInfiniteScroll, useVirtualList } from '@vueuse/core';
 import TweetView from '~/components/tweet/TweetView.vue';
@@ -8,7 +8,6 @@ import type { ApiSuccessResponse } from '~~/shared/types/apiResponses';
 import { tweetsService } from '~/services/tweet/tweetsService';
 import { isApiError } from '~/utils/errorUtils';
 import { showToaster } from '~/utils/showToaster';
-import { apiFetch } from '~/api';
 
 const route = useRoute();
 const router = useRouter();
@@ -20,34 +19,20 @@ const repliesIsLoading = ref(false);
 const isLoading = ref(false);
 
 const tweetData = ref<Tweet | null>(null);
-const isUserFound = ref(true);
 const isMainTweetFound = ref(true);
 
-const username = route.params.username as string;
-const tweetid = route.params.tweetid as string;
-
-async function loadUser() {
-  isLoading.value = true;
-  isUserFound.value = true;
-  try {
-    await apiFetch(`/api/users/${username}`);
-  } catch (error) {
-    if (isApiError(error) && error.data?.statusCode === 404) {
-      isUserFound.value = false;
-    } else {
-      showToaster('error', 'toaster.tweet-page.user-error', true);
-    }
-  } finally {
-    isLoading.value = false;
-  }
-}
+const username = computed(() => route.params.username as string);
+const tweetid = computed(() => route.params.tweetid as string);
 
 async function loadMainTweet() {
   isLoading.value = true;
   isMainTweetFound.value = true;
   try {
-    const resp = await tweetsService.tweet(tweetid);
+    const resp = await tweetsService.tweet(tweetid.value);
     tweetData.value = resp.data;
+    if (tweetData.value && tweetData.value.author.username !== username.value) {
+      router.replace(`/profile/${tweetData.value.author.username}/status/${tweetData.value.id}`);
+    }
   } catch (error) {
     if (isApiError(error) && error.data?.statusCode === 404) {
       isMainTweetFound.value = false;
@@ -71,7 +56,7 @@ async function loadTweets(reset = false) {
   repliesIsLoading.value = true;
 
   try {
-    const resp = await tweetsService.replies(tweetid, { limit: 10, cursor: cursor.value });
+    const resp = await tweetsService.replies(tweetid.value, { limit: 10, cursor: cursor.value });
 
     const body = resp as ApiSuccessResponse<Tweet[]>;
     const newTweets = body.data ?? [];
@@ -111,14 +96,19 @@ useInfiniteScroll(
 );
 
 onMounted(() => {
-  loadUser();
   loadMainTweet();
   loadTweets();
 });
 
 watch(
-  () => route.params.tab,
-  () => loadTweets(true),
+  () => [route.params.username, route.params.tweetid],
+  ([newUsername, newTweetid], [oldUsername, oldTweetid]) => {
+    if (newUsername !== oldUsername || newTweetid !== oldTweetid) {
+      tweetData.value = null;
+      loadMainTweet();
+      loadTweets(true);
+    }
+  },
 );
 
 function goBackToHome() {
@@ -132,14 +122,7 @@ function goBackToHome() {
   </div>
   <div v-else>
     <div
-      v-if="!isUserFound"
-      class="mt-20 flex flex-col items-center justify-center p-8 text-center"
-    >
-      <h1 class="mb-5 text-3xl font-bold">{{ $t('errors.ACCOUNT_NOT_FOUND') }}</h1>
-      <p class="text-gray-600 dark:text-gray-400">{{ $t('errors.TRY_SEARCHING') }}</p>
-    </div>
-    <div
-      v-else-if="!isMainTweetFound"
+      v-if="!isMainTweetFound"
       class="mt-20 flex flex-col items-center justify-center p-8 text-center"
     >
       <h1 class="mb-5 text-3xl font-bold">{{ $t('errors.TWEET_NOT_FOUND') }}</h1>
