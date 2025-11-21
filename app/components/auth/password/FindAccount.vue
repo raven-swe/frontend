@@ -39,6 +39,7 @@ const onSubmit = handleSubmit(async (values, actions) => {
   if (errors) {
     actions.setErrors(backendValidationToFormErrors(errors, t));
     resetRecaptcha(undefined);
+    setFieldValue('recaptchaToken', '', true);
   }
 });
 
