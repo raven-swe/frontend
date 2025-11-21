@@ -57,10 +57,10 @@ export default defineNuxtConfig({
   },
   i18n: {
     strategy: 'no_prefix',
-    defaultLocale: 'en',
+    defaultLocale: 'en-US',
     locales: [
-      { code: 'en', name: 'English', file: 'en.json' },
-      { code: 'ar', name: 'العربية', file: 'ar.json', dir: 'rtl' },
+      { code: 'en-US', iso: 'en-US', name: 'English', file: 'en.json' },
+      { code: 'ar-EG', iso: 'ar-EG', name: 'العربية', file: 'ar.json', dir: 'rtl' },
     ],
   },
   hooks: {
