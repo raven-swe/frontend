@@ -5,6 +5,7 @@ import Tabs from '@/components/ui/Tabs.vue';
 import Tab from '@/components/ui/Tab.vue';
 import { apiFetch } from '~/api';
 import { useQuery } from '@tanstack/vue-query';
+import type { FetchError } from 'ofetch';
 
 const route = useRoute();
 const username = computed(() => route.params.username as string);
@@ -12,23 +13,29 @@ const profilePath = computed(() => `/profile/${username.value}`);
 
 const queryKey = computed(() => ['profile', username.value]);
 
-const { data, isLoading, isError, error } = useQuery<ApiSuccessResponse<User>>({
+const { data, isLoading, isError, error, suspense } = useQuery<
+  ApiSuccessResponse<User>,
+  FetchError<FetchError<ApiErrorResponse>>
+>({
   queryKey,
-  queryFn: async () =>
-    await apiFetch<ApiSuccessResponse<User>>(`/api/users/${username.value}/profile`),
+  queryFn: async () => await apiFetch(`/api/users/${username.value}/profile`),
   staleTime: 1000 * 60 * 5, // 5min cache
   retry: false, // Don't retry on 404
 });
 
 const user = computed(() => (data.value && data.value.success ? data.value.data : null));
+provide('user-data', user);
 const { isCurrentUser } = useIsCurrentUser();
 
 const isUserNotFound = computed(() => {
   if (!isError.value || !error.value) return false;
+  return false;
+  const errorData = error.value;
+  return errorData?.data?.data?.error.code === 'USER_NOT_FOUND' || errorData?.statusCode === 404;
+});
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const errorData = error.value as any;
-  return errorData?.data?.code === 'USER_NOT_FOUND' || errorData?.statusCode === 404;
+onServerPrefetch(async () => {
+  await suspense();
 });
 </script>
 
@@ -49,7 +56,7 @@ const isUserNotFound = computed(() => {
 
     <!-- Profile content -->
     <template v-else-if="user">
-      <ProfileDetails :user-profile="user" />
+      <ProfileDetails />
 
       <Tabs>
         <Tab
