@@ -8,6 +8,7 @@ const props = withDefaults(
     size?: string | number;
   }>(),
   {
+    class: '',
     size: '2rem',
   },
 );

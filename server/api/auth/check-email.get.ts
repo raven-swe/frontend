@@ -1,6 +1,9 @@
-export default defineEventHandler(async (event) => {
+import { defineWrappedResponseHandler } from '~~/server/utils/handler';
+
+export default defineWrappedResponseHandler(async (event) => {
   const query = getQuery<{ email: string }>(event);
-  return await serverApiFetch<ApiSuccessResponse<{ exists: boolean }>>('/auth/check-email', {
+  const fetcher = serverApiFetch(event);
+  return await fetcher<ApiSuccessResponse<{ exists: boolean }>>('/auth/check-email', {
     method: 'GET',
     query: {
       email: query.email,

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Avatar from '~/components/ui/Avatar.vue';
 import type { Tweet } from '~~/shared/types/tweets';
-import { relativeTime, dataFormat } from '~/utils/index';
+import { relativeTime, formatDate } from '~/utils/time';
 import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
 import { useRouter } from 'vue-router';
@@ -140,10 +140,10 @@ function goToTweet() {
         />
         <span class="text-muted-foreground">·</span>
         <time
-          :title="dataFormat(tweet.createdAt)"
+          :title="formatDate(tweet.createdAt, $i18n.locale)"
           :datetime="tweet.createdAt"
           class="text-muted-foreground hover:cursor-pointer hover:underline"
-          >{{ relativeTime(tweet.createdAt) }}</time
+          >{{ relativeTime(tweet.createdAt, $i18n.locale) }}</time
         >
       </div>
 

@@ -6,7 +6,7 @@ import followingEventHandler from '~~/server/api/timeline/following.get';
 useH3TestUtils();
 
 const mockServerApiFetch = vi.fn();
-vi.stubGlobal('serverApiFetch', mockServerApiFetch);
+vi.stubGlobal('serverApiFetch', () => mockServerApiFetch);
 
 describe('GET /api/timeline/following', () => {
   it('returns success response with tweets data', async () => {
