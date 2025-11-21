@@ -98,22 +98,11 @@ export const handlers = [
     );
   }),
 
-  // post tweets: /tweets
-  // request body: { content: string; media?: string[];  isReplyToTweetId?: string }
-  // response: { success: boolean; message: string; data: Tweet }
-
   // POST /tweets
   http.post(`${API_URL}/tweets`, async ({ request }) => {
     const body = (await request.json()) as CreateTweetRequest;
 
     const { content, media = [], isReplyToTweetId = null } = body;
-
-    if (!content || typeof content !== 'string' || content.trim().length === 0) {
-      return HttpResponse.json(
-        { success: false, message: 'Content is required.' },
-        { status: 400 },
-      );
-    }
 
     // basically unreachable
     if (media.length > 4) {
@@ -170,9 +159,6 @@ export const handlers = [
       })),
       isReplyToTweetId,
     };
-
-    // eslint-disable-next-line no-console
-    console.log('New tweet created (mock):', newTweet);
 
     tweets.set(id, newTweet);
 
