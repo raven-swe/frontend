@@ -16,8 +16,8 @@
   --ring: #888a8c;
   --ring-primary: color-mix(in oklch, var(--primary) 60%, white);
   --destructive: #f4212e;
-  --popover: 0 0% 100%;
-  --popover-foreground: 222.2 84% 4.9%;
+  --popover: #ffffff;
+  --popover-foreground: #0f1419;
   --dialog-backdrop: rgba(91, 112, 131, 0.4);
   --input-autofill: #e8f0fe;
   --oauth: #ffffff;
@@ -45,8 +45,8 @@
   --brand-turquoise: #00b77a;
   --ring-primary: color-mix(in oklch, var(--primary) 60%, white);
   --destructive: #f4212e;
-  --popover: 222.2 84% 4.9%;
-  --popover-foreground: 210 40% 98%;
+  --popover: #000000;
+  --popover-foreground: #e7e9ea;
   --input-autofill: #202939;
   --oauth: #ffffff;
   --toaster-bg-success: #064e3b;

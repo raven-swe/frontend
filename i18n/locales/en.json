@@ -107,7 +107,8 @@
     "edit-profile": "Edit Profile",
     "joined": "Joined",
     "following": "Following",
-    "followers": "Followers"
+    "followers": "Followers",
+    "user-muted": "You have muted posts from this account."
   },
   "root": {
     "hero": {
@@ -152,7 +153,9 @@
     "follow": "Follow",
     "unfollow": "Unfollow",
     "following": "Following",
-    "follow-back": "Follow back"
+    "follow-back": "Follow back",
+    "mute": "Mute",
+    "block": "Block"
   },
   "errors": {
     "INVALID_EMAIL": "Please enter a valid email.",

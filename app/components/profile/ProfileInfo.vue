@@ -25,7 +25,7 @@ const displayUrl = computed(() => {
         <!-- location -->
         <p
           v-if="userProfile?.location"
-          class="text-muted-foreground flex items-center gap-1 text-sm leading-tight"
+          class="text-muted-foreground flex items-center gap-1 leading-tight"
         >
           <Icon name="ic:sharp-location-on" class="text-muted-foreground" size="18" />
           {{ userProfile.location }}
@@ -37,21 +37,21 @@ const displayUrl = computed(() => {
           :href="userProfile?.websiteUrl"
           target="_blank"
           rel="noopener noreferrer"
-          class="text-brand-blue me-2 flex items-center gap-1 text-sm hover:underline"
+          class="text-brand-blue me-2 flex items-center gap-1 hover:underline"
         >
           <Icon class="text-muted-foreground" name="ic:sharp-link" size="18" />
           {{ displayUrl }}
         </a>
 
         <!-- join date -->
-        <p class="text-muted-foreground flex items-center gap-1 text-sm">
+        <p class="text-muted-foreground flex items-center gap-1">
           <Icon name="ic:sharp-calendar-month" />
           {{ $t('profile-info.joined') }}
           {{ formatMonthYear(userProfile?.joinedAt ?? '') }}
         </p>
       </div>
 
-      <div class="text-muted-foreground mt-4 flex space-x-4">
+      <div class="mt-4 flex space-x-4">
         <span
           ><strong>{{
             $n(userProfile?.followingCount ?? 0, {
@@ -68,6 +68,11 @@ const displayUrl = computed(() => {
           }}</strong>
           <span class="text-muted-foreground ms-1"> {{ $t('profile-info.followers') }} </span>
         </span>
+      </div>
+      <div v-if="userProfile?.relationship.muted" class="mt-4">
+        <p class="text-muted-foreground text-sm">
+          {{ $t('profile-info.user-muted') }}
+        </p>
       </div>
     </div>
   </div>
