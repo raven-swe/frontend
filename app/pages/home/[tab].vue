@@ -85,9 +85,7 @@ watch(
       <TweetDefaultCard v-for="{ data: tweet } in list" :key="tweet.id" :tweet="tweet" />
     </div>
 
-    <div v-if="isLoading" class="text-muted-foreground py-4 text-center">
-      {{ $t('home.messages.loadingMore') }}
-    </div>
+    <UiSpinner v-if="isLoading" class="text-primary mx-auto my-15"> </UiSpinner>
 
     <div v-if="!hasNextPage && !isLoading" class="text-muted-foreground py-4 text-center">
       {{ $t('home.messages.noMoreTweets') }}
