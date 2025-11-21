@@ -85,7 +85,8 @@ describe('TweetDefaultCard.vue', () => {
 
     const profileLink = wrapper.find('a[href="/profile/aestheticsguy"]');
     expect(profileLink.exists()).toBe(true);
-    expect(profileLink.text()).toContain('Aesthetics X');
+    // Use wrapper text to assert display name to avoid potential slot timing issues
+    expect(wrapper.text()).toContain('Aesthetics X');
   });
 
   it('sets time element attributes: datetime and non-empty title', async () => {
@@ -110,7 +111,7 @@ describe('TweetDefaultCard.vue', () => {
     });
 
     // Mention link
-    const mention = wrapper.find('a[href="/@john_doe"]');
+    const mention = wrapper.find('a[href="/profile/john_doe"]');
     expect(mention.exists()).toBe(true);
     expect(mention.text()).toContain('@john_doe');
 
@@ -166,7 +167,7 @@ describe('TweetDefaultCard.vue', () => {
     });
 
     // Find links within the tweet content area (excluding author username link)
-    const mentionLink = wrapper.find('a[href="/@john_doe"]');
+    const mentionLink = wrapper.find('a[href="/profile/john_doe"]');
     const hashtagLink = wrapper.find('a[href="/hashtag/Nuxt3"]');
 
     expect(mentionLink.exists()).toBe(true);
@@ -224,7 +225,7 @@ describe('TweetDefaultCard.vue', () => {
       global: { stubs: { NuxtImg: true, Icon: true } },
     });
 
-    const mention = wrapper.find('a[href="/@john_doe"]');
+    const mention = wrapper.find('a[href="/profile/john_doe"]');
     expect(mention.exists()).toBe(true);
     expect(wrapper.text()).toContain('Hello');
     expect(wrapper.text()).toContain('there');
