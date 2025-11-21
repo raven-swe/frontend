@@ -151,7 +151,8 @@
     "post": "Post",
     "follow": "Follow",
     "unfollow": "Unfollow",
-    "following": "Following"
+    "following": "Following",
+    "follow-back": "Follow back"
   },
   "errors": {
     "INVALID_EMAIL": "Please enter a valid email.",
