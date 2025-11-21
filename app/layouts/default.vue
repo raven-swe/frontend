@@ -30,7 +30,7 @@ watch(
       userStore.error = error.value.message;
     }
   },
-  { immediate: true, deep: true },
+  { immediate: true },
 );
 </script>
 

@@ -112,7 +112,7 @@ const IconStub = {
 };
 
 /* eslint-disable import/first */
-import UsernamePage from '@/pages/settings/username.vue';
+import UsernamePage from '@/pages/settings/account/username.vue';
 /* eslint-enable import/first */
 
 describe('Settings Username Page', () => {

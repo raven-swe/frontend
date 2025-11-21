@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { showToaster } from '@/utils/showToaster';
 
 interface Props {
   modelValue: string;
@@ -9,6 +10,7 @@ interface Props {
 
 interface Emits {
   (e: 'update:modelValue', value: string): void;
+  (e: 'paste-media', files: File[]): void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -71,6 +73,51 @@ const handleInput = (event: Event) => {
   const target = event.target as HTMLTextAreaElement;
   emit('update:modelValue', target.value);
 };
+
+const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
+const handlePaste = (e: ClipboardEvent) => {
+  const items = e.clipboardData?.items;
+  e.preventDefault();
+  if (!items) return;
+
+  const files: File[] = [];
+
+  for (const item of items) {
+    if (item.kind === 'file') {
+      const file = item.getAsFile();
+      if (!file) continue;
+
+      if (allowedTypes.includes(file.type)) {
+        files.push(file);
+      } else {
+        showToaster(
+          'error',
+          $t('errors.UNSUPPORTED-IMAGE-TYPE', {
+            types: allowedTypes.map((t) => t.split('/')[1]).join(', '),
+          }) as string,
+        );
+      }
+    }
+  }
+
+  if (files.length > 0) {
+    e.preventDefault(); // Prevent text insertion of the image name
+    emit('paste-media', files);
+  }
+};
+
+// Get root DOM element of this component
+const vm = getCurrentInstance();
+
+onMounted(() => {
+  const root = vm?.proxy?.$el as HTMLElement;
+  root?.addEventListener('paste', handlePaste);
+});
+
+onBeforeUnmount(() => {
+  const root = vm?.proxy?.$el as HTMLElement;
+  root?.removeEventListener('paste', handlePaste);
+});
 
 defineExpose({
   resetHeight: () => {

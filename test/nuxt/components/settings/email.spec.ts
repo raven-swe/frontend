@@ -26,7 +26,7 @@ vi.mock('~/stores/settings/change-email', () => ({
 }));
 
 /* eslint-disable import/first */
-import EmailPage from '@/pages/settings/email.vue';
+import EmailPage from '@/pages/settings/account/email.vue';
 /* eslint-enable import/first */
 
 // ---- Lightweight stubs for child and UI components

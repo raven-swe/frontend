@@ -1,16 +1,12 @@
-import type { ApiSuccessResponse } from '../../../shared/types/api';
-
-const API_URL = process.env.BACKEND_URL;
+import { defineWrappedResponseHandler } from '~~/server/utils/handler';
 
 export default defineWrappedResponseHandler(async (event) => {
-  const authHeader = getHeader(event, 'authorization');
-  const response = await serverApiFetch<ApiSuccessResponse<User>>(`${API_URL}/me`, {
+  const body = await readBody<UpdateProfileRequest>(event);
+  const fetcher = serverApiFetch(event);
+
+  const response = await fetcher<ApiSuccessResponse<User>>('/me', {
     method: 'PATCH',
-    body: event.node.req,
-    headers: {
-      authorization: authHeader || '',
-      'content-type': event.node.req.headers['content-type']!,
-    },
+    body,
   });
 
   return response;

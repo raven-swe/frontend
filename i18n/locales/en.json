@@ -203,6 +203,10 @@
       "INVALID_FORMAT": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
       "UNAUTHORIZED": "The password you entered is incorrect"
     },
+    "UNSUPPORTED-IMAGE-TYPE": "Only images of type {types} are supported.",
+    "INVALID_WEBSITE_URL": "Please enter a real website URL",
+    "FILE_TOO_LARGE": "File size exceeds {size}MB limit. Please choose a smaller file.",
+    "FAILED_UPDATE_X": "Failed to update {field}. Please try again later.",
     "identifier": {
       "IS_EMPTY": "Please enter your email or username",
       "NOT_A_STRING": "Please enter your email or username",
@@ -352,6 +356,10 @@
       },
       "change-password-button": "Change Password"
     }
+  },
+  "dm": {
+    "placeholder-search": "Search Direct Messages",
+    "header-title": "Messages"
   },
   "toaster": {
     "login": {

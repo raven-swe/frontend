@@ -21,7 +21,7 @@ mockNuxtImport('useUserStore', () => {
 
 // Import after mocks
 /* eslint-disable import/first */
-import AccountPage from '@/pages/settings/account.vue';
+import AccountPage from '@/pages/settings/account/index.vue';
 /* eslint-enable import/first */
 
 const stubSettingsItem = {
@@ -65,12 +65,12 @@ describe('Settings Account Page', () => {
     // Username item
     expect(i0.find('.title').text()).toBe('setting.username.username');
     expect(i0.find('.subtitle').text()).toBe(`@${user.username}`);
-    expect(i0.find('.to').text()).toBe('/settings/username');
+    expect(i0.find('.to').text()).toBe('/settings/account/username');
 
     // Email item
     expect(i1.find('.title').text()).toBe('setting.change-email.label');
     expect(i1.find('.subtitle').text()).toBe(user.email);
-    expect(i1.find('.to').text()).toBe('/settings/email');
+    expect(i1.find('.to').text()).toBe('/settings/account/email');
 
     // Birth date item (formatted via Intl using current locale)
     expect(i2.find('.title').text()).toBe('setting.date-of-birth');
@@ -83,10 +83,11 @@ describe('Settings Account Page', () => {
     expect(i2.find('.subtitle').text()).toBe(expectedEn);
     expect(i2.find('.to').text()).toBe('/settings/profile');
 
-    // Change password item (subtitle via i18n key)
+    // Change password item
     expect(i3.find('.title').text()).toBe('setting.change-password');
-    expect(i3.find('.subtitle').text()).toBe('setting.change-password-subtitle');
-    expect(i3.find('.to').text()).toBe('/settings/changePasswordEditor');
+    expect(i3.find('.subtitle').text()).toBe('Change Your Password at any time');
+    expect(i3.find('.to').text()).toBe('/settings/account/changePasswordEditor');
+    expect(i3.find('.subtitle').text()).toBe('Change Your Password at any time');
 
     // No explicit call assertion needed; value is derived from computed
   });
@@ -98,7 +99,7 @@ describe('Settings Account Page', () => {
       birthDate: '2010-01-01T00:00:00.000Z',
     };
     store = { user } as MockStore;
-    localeRef.value = 'ar';
+    localeRef.value = 'ar-EG';
 
     const wrapper = await mountSuspended(AccountPage, {
       global: {

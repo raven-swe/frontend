@@ -6,7 +6,9 @@ import * as jwt from 'jsonwebtoken';
 const h3 = useH3TestUtils();
 
 const mockServerApiFetchRaw = vi.fn();
-vi.stubGlobal('serverApiFetch', { raw: mockServerApiFetchRaw });
+vi.stubGlobal('serverApiFetch', () => ({
+  raw: mockServerApiFetchRaw,
+}));
 
 describe('server/api/auth/refresh-token.post', () => {
   beforeEach(() => {
