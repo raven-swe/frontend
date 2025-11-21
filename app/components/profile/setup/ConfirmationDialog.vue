@@ -24,7 +24,7 @@ const handleSubmit = () => {
         </UiDialogTitle>
         <UiDialogDescription aria-describedby="undefined" />
         <div class="m-auto flex flex-col items-center justify-center gap-6">
-          <img src="https://placehold.co/48" />
+          <LogoRaven class="h-40 w-40" />
           <p class="text-2xl font-bold">{{ $t('profile.setup.click-to-save') }}</p>
           <UiButton class="w-65" size="xl" @click="handleSubmit">
             {{ $t('ui.save') }}
