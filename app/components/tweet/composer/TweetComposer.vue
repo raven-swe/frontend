@@ -78,6 +78,7 @@ const handleRemoveMedia = (id: string) => {
         v-model="tweetContent"
         :placeholder="$t('tweet.composer.placeholder')"
         :max-length="MAX_LENGTH"
+        @paste-media="handleAddMedia"
       />
     </div>
 
