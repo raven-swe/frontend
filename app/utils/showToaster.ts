@@ -26,10 +26,11 @@ const typeConfig = {
 
 type ToastType = keyof typeof typeConfig;
 
-export function showToaster(type: ToastType, message: string) {
+export function showToaster(type: ToastType, message: string, translate: boolean = false) {
   const { icon, bg, color } = typeConfig[type];
   const { $i18n } = useNuxtApp();
-  const translatedMessage = $i18n.t(message);
+
+  const translatedMessage = translate ? $i18n.t(message) : message;
 
   toast(`${icon} ${translatedMessage}`, {
     style: {

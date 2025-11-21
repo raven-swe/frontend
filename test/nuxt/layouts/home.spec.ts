@@ -21,6 +21,7 @@ describe('Home layout', () => {
           NuxtLayout: { template: '<div><slot /></div>' },
           Tabs: { template: '<div><slot /></div>' },
           Tab: { name: 'Tab', template: '<div />' },
+          TweetComposer: { template: '<div class="tweet-composer-stub" />' },
         },
         plugins: [i18n],
       },

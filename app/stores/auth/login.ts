@@ -52,7 +52,7 @@ export const useLoginStore = defineStore('login', () => {
         const errors = error.data?.data?.error.errors;
         return errors;
       } else {
-        showToaster('error', 'toaster.checkUser.error');
+        showToaster('error', 'toaster.checkUser.error', true);
       }
     } finally {
       loading.value = false;
@@ -65,7 +65,7 @@ export const useLoginStore = defineStore('login', () => {
       await loginService.login(data);
       resetData();
       open.value = false;
-      showToaster('success', 'toaster.login.success');
+      showToaster('success', 'toaster.login.success', true);
       navigateTo('/home');
     } catch (error) {
       if (isApiValidationError(error)) {
@@ -76,7 +76,7 @@ export const useLoginStore = defineStore('login', () => {
         if (error.data?.statusCode === 401) {
           return [{ field: 'password', code: error.data.data.error.code }];
         }
-        showToaster('error', 'toaster.login.error');
+        showToaster('error', 'toaster.login.error', true);
       }
     } finally {
       loading.value = false;

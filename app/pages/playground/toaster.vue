@@ -4,10 +4,10 @@ import { showToaster } from '@/utils/showToaster';
 function showToasts(error: string) {
   switch (error) {
     case 'error':
-      showToaster('error', 'toaster.login.error');
+      showToaster('error', 'toaster.login.error', true);
       break;
     case 'success':
-      showToaster('success', 'toaster.login.success');
+      showToaster('success', 'toaster.login.success', true);
       break;
     case 'warning':
       showToaster('warning', 'toaster.login.success');
