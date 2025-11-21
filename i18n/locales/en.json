@@ -203,15 +203,15 @@
       "UNAUTHORIZED": "The password you entered is incorrect"
     },
     "UNSUPPORTED-IMAGE-TYPE": "Only images of type {types} are supported.",
+    "INVALID_WEBSITE_URL": "Please enter a real website URL",
+    "FILE_TOO_LARGE": "File size exceeds {size}MB limit. Please choose a smaller file.",
+    "FAILED_UPDATE_X": "Failed to update {field}. Please try again later.",
     "identifier": {
       "IS_EMPTY": "Please enter your email or username",
       "NOT_A_STRING": "Please enter your email or username",
       "INVALID_FORMAT": "Please enter a valid email or username",
       "TOO_SHORT": "Identifier is too short"
-    },
-    "INVALID_WEBSITE_URL": "Please enter a real website URL",
-    "FILE_TOO_LARGE": "File size exceeds {size}MB limit. Please choose a smaller file.",
-    "FAILED_UPDATE_X": "Failed to update {field}. Please try again later."
+    }
   },
   "register": {
     "register-info": {
