@@ -6,7 +6,9 @@ import * as jwt from 'jsonwebtoken';
 const h3 = useH3TestUtils();
 
 const mockServerApiFetchRaw = vi.fn();
-vi.stubGlobal('serverApiFetch', { raw: mockServerApiFetchRaw });
+vi.stubGlobal('serverApiFetch', () => ({
+  raw: mockServerApiFetchRaw,
+}));
 
 // Import handler after mocking globals
 const completePostEventHandler = await import('~~/server/api/oauth/complete/index.post').then(
