@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { buttonVariants } from '~~/shared/types/ui';
+import { MAX_IMAGE_SIZE_MB, MAX_IMAGE_SIZE_BYTES } from '@/constants/files';
 
 const props = defineProps<{
   open: boolean;
@@ -30,6 +31,12 @@ const handleImageClick = () => {
 const handleFileChange = (event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
+
+  if (file && file.size > MAX_IMAGE_SIZE_BYTES) {
+    showToaster('error', $t('errors.FILE_TOO_LARGE', { size: MAX_IMAGE_SIZE_MB }));
+    target.value = '';
+    return;
+  }
 
   if (file && file.type.startsWith('image/')) {
     selectedFile.value = file;
