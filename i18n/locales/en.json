@@ -148,7 +148,10 @@
     "save": "Save",
     "cancel": "Cancel",
     "discard": "Discard",
-    "post": "Post"
+    "post": "Post",
+    "follow": "Follow",
+    "unfollow": "Unfollow",
+    "following": "Following"
   },
   "errors": {
     "INVALID_EMAIL": "Please enter a valid email.",
@@ -291,15 +294,15 @@
       "save": "Save",
       "password-invalid-length": "Password must be at least 10 characters long",
       "errors": {
+        "401": "You are not authorized to change the password",
+        "422": "Current password is incorrect",
         "current-password-required": "Current password is required",
         "new-password-required": "New password is required",
         "password-too-short": "Password must be at least 8 characters long",
         "password-invalid": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
         "confirm-password-required": "Please confirm your password",
         "passwords-do-not-match": "Passwords do not match",
-        "error-saving": "An error occurred while saving the password. Please try again.",
-        "401": "You are not authorized to change the password",
-        "422": "Current password is incorrect"
+        "error-saving": "An error occurred while saving the password. Please try again."
       }
     },
     "change-email": {
