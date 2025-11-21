@@ -121,18 +121,23 @@ function goToTweet() {
       :img="props.tweet.author.avatarUrl || '/default_profile.png'"
       size="sm"
       variant="primary"
+      @click.stop
     />
 
     <!-- Main -->
     <div class="min-w-0 flex-1">
       <!-- Header: display name, username, time -->
       <div class="flex flex-wrap items-center gap-x-1 text-sm">
-        <NuxtLink :to="`/profile/${props.tweet.author.username}`">
+        <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
           <span class="cursor-pointer font-semibold hover:underline">{{
             props.tweet.author.displayName
           }}</span>
         </NuxtLink>
-        <span class="text-muted-foreground" v-text="'@' + props.tweet.author.username" />
+        <span
+          class="text-muted-foreground"
+          @click.stop
+          v-text="'@' + props.tweet.author.username"
+        />
         <span class="text-muted-foreground">·</span>
         <time
           :title="dataFormat(tweet.createdAt)"
@@ -148,7 +153,12 @@ function goToTweet() {
           <span v-if="seg.type === 'text'" class="inline">
             {{ seg.text }}
           </span>
-          <a v-else :href="seg.href" class="text-primary inline font-medium hover:underline">
+          <a
+            v-else
+            :href="seg.href"
+            class="text-primary inline font-medium hover:underline"
+            @click.stop
+          >
             {{ seg.text }}
           </a>
         </template>
@@ -160,6 +170,7 @@ function goToTweet() {
       <!-- Actions -->
       <TweetActionButtons
         :tweet="tweet"
+        @click.stop
         @like-success="onLikeSuccess"
         @unlike-success="onUnlikeSuccess"
         @retweet-success="onRetweetSuccess"
