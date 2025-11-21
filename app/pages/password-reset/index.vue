@@ -36,15 +36,18 @@ onMounted(() => {
         </template>
         <UiSpinner v-if="passwordStore.loading" class="mx-auto my-auto"></UiSpinner>
         <FindAccount
-          v-if="passwordStore.step === 0 && !passwordStore.loading"
+          v-if="passwordStore.step === 0"
+          v-show="!passwordStore.loading"
           id="identifier-step-test"
         />
         <SentCode
-          v-if="passwordStore.step === 1 && !passwordStore.loading"
+          v-if="passwordStore.step === 1"
+          v-show="!passwordStore.loading"
           id="password-step-test"
         />
         <ChooseNewPassword
-          v-if="passwordStore.step === 2 && !passwordStore.loading"
+          v-if="passwordStore.step === 2"
+          v-show="!passwordStore.loading"
           id="new-password-step-test"
         />
       </UiDialogContent>

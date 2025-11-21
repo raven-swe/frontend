@@ -2,8 +2,9 @@
 import * as yup from 'yup';
 import { useForm } from 'vee-validate';
 import { usePasswordStore } from '~/stores/auth/password';
-import { showToaster } from '@/utils/showToaster';
 import { createPasswordSchema } from '~/schemas/auth';
+import { backendValidationToFormErrors } from '~/utils/errorUtils';
+import { useI18n } from 'vue-i18n';
 
 const passwordStore = usePasswordStore();
 const { t } = useI18n();
@@ -16,7 +17,7 @@ const schema = yup.object({
   ),
 });
 
-const { defineField, handleSubmit, isSubmitting, meta } = useForm({
+const { defineField, handleSubmit, isSubmitting, meta, setErrors } = useForm({
   validationSchema: schema,
   initialValues: { newPassword: '', confirmPassword: '' },
   validateOnMount: false,
@@ -26,10 +27,9 @@ const [_newPassword, newPasswordAttrs] = defineField('newPassword');
 const [_confirmPassword, confirmPasswordAttrs] = defineField('confirmPassword');
 
 const onSubmit = handleSubmit(async (values) => {
-  try {
-    await passwordStore.resetPassword(values.newPassword.trim());
-  } catch (err: unknown) {
-    showToaster('error', (err as Error).message || t('errors.GENERIC_ERROR'));
+  const errors = await passwordStore.resetPassword(values.newPassword.trim());
+  if (errors) {
+    setErrors(backendValidationToFormErrors(errors, t));
   }
 });
 </script>

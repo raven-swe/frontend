@@ -200,7 +200,8 @@
     },
     "recaptchaToken": {
       "IS_EMPTY": "Verify that you are not a robot.",
-      "NOT_A_STRING": "Verify that you are not a robot."
+      "NOT_A_STRING": "Verify that you are not a robot.",
+      "INVALID_TOKEN": "reCAPTCHA verification failed. Please try again."
     },
     "password": {
       "NOT_A_STRING": "Please enter your password",
@@ -218,7 +219,14 @@
       "IS_EMPTY": "Please enter your email or username",
       "NOT_A_STRING": "Please enter your email or username",
       "INVALID_FORMAT": "Please enter a valid email or username",
-      "TOO_SHORT": "Identifier is too short"
+      "TOO_SHORT": "Identifier is too short",
+      "USER_NOT_FOUND": "No account found with that email or username"
+    },
+    "newPassword": {
+      "NOT_A_STRING": "Please enter your password",
+      "IS_EMPTY": "Please enter your password",
+      "TOO_SHORT": "Password must be at least 10 characters long",
+      "INVALID_FORMAT": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
     }
   },
   "register": {
@@ -367,11 +375,24 @@
       "error": "Failed to login"
     },
     "checkUser": {
-      "error": "Failed to check user existence"
+      "error": "Failed to check user existence",
+      "rateLimit": "You are making requests too frequently. Please try again later."
     },
     "tweet-page": {
       "tweet-load-error": "Failed to load the tweet. Please try again.",
       "user-error": "Failed to load user data. Please try again."
+    },
+    "verfyUser": {
+      "error": "Failed to verify user"
+    },
+    "resendOtp": {
+      "success": "OTP resent successfully",
+      "error": "Failed to resend OTP",
+      "rateLimit": "You are sending OTP requests too frequently. Please try again later."
+    },
+    "resetPassword": {
+      "success": "Password reset successful",
+      "error": "Failed to reset password"
     }
   },
   "icons": {
