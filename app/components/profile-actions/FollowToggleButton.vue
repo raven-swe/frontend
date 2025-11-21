@@ -24,6 +24,7 @@ const { mutate: followUser } = useProfileMutation<'follow' | 'unfollow'>({
     }
   },
 });
+const isHovered = ref(false);
 </script>
 
 <template>
@@ -31,7 +32,14 @@ const { mutate: followUser } = useProfileMutation<'follow' | 'unfollow'>({
     {{ props.follower ? $t('ui.follow-back') : $t('ui.follow') }}
   </UiButton>
 
-  <UiButton v-else-if="props.following" variant="outline" @click="followUser('unfollow')">
-    {{ $t('ui.unfollow') }}
-  </UiButton>
+  <UiButton
+    v-else-if="props.following"
+    variant="outline-destructive"
+    size="md"
+    data-test="unfollow-button"
+    @mouseenter="isHovered = true"
+    @mouseleave="isHovered = false"
+    @click.stop="followUser('unfollow')"
+    >{{ isHovered ? $t('testing.unfollow') : $t('testing.following') }}</UiButton
+  >
 </template>
