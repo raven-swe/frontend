@@ -1,5 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import {
+  MAX_IMAGE_SIZE_BYTES,
+  MAX_IMAGE_SIZE_MB,
+  MAX_VIDEO_SIZE_BYTES,
+  MAX_VIDEO_SIZE_MB,
+} from '~/constants/files';
+import { showToaster } from '@/utils/showToaster';
 
 interface Props {
   disabled?: boolean;
@@ -52,8 +59,33 @@ const handleFileSelect = (event: Event) => {
   const target = event.target as HTMLInputElement;
   const files = Array.from(target.files || []);
 
-  if (files.length > 0) {
-    emit('add-media', files);
+  // filter valid files based on size
+  const validFiles: File[] = [];
+
+  for (const file of files) {
+    if (file.type.startsWith('image/')) {
+      if (file.size > MAX_IMAGE_SIZE_BYTES) {
+        showToaster(
+          'warning',
+          `Image "${file.name}" size exceeds the maximum limit of ${MAX_IMAGE_SIZE_MB} MB.`,
+        );
+        continue; // Skip this file
+      }
+    } else if (file.type.startsWith('video/')) {
+      if (file.size > MAX_VIDEO_SIZE_BYTES) {
+        showToaster(
+          'warning',
+          `Video "${file.name}" size exceeds the maximum limit of ${MAX_VIDEO_SIZE_MB} MB.`,
+        );
+        continue; // Skip this file
+      }
+    }
+
+    validFiles.push(file);
+  }
+
+  if (validFiles.length > 0) {
+    emit('add-media', validFiles);
   }
 
   // Reset input
