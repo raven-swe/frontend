@@ -4,8 +4,8 @@ export default defineWrappedResponseHandler(async (event) => {
     currentPassword: string;
     newPassword: string;
   }>(event);
-  const authHeader = getHeader(event, 'Authorization');
-  const response = await serverApiFetch<
+  const fetcher = serverApiFetch(event);
+  const response = await fetcher<
     ApiSuccessResponse<{
       success: boolean;
       message: string;
@@ -15,9 +15,6 @@ export default defineWrappedResponseHandler(async (event) => {
     body: {
       currentPassword: body.currentPassword,
       newPassword: body.newPassword,
-    },
-    headers: {
-      ...(authHeader ? { Authorization: authHeader } : {}),
     },
   });
   return response;

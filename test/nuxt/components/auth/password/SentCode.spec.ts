@@ -3,6 +3,7 @@ import { mount, type VueWrapper } from '@vue/test-utils';
 import { setActivePinia, createPinia } from 'pinia';
 import { mockNuxtImport } from '@nuxt/test-utils/runtime';
 import { createI18n } from 'vue-i18n';
+import messages from '@@/i18n/locales/en.json';
 import { nextTick } from 'vue';
 import SentCode from '@/components/auth/password/SentCode.vue';
 import { usePasswordStore } from '@/stores/auth/password';
@@ -33,18 +34,8 @@ mockNuxtImport('useRouter', () => {
 
 // Create i18n instance
 const i18n = createI18n({
-  legacy: false,
   locale: 'en',
-  messages: {
-    en: {
-      'errors.GENERIC_ERROR': 'An error occurred',
-      'root.auth.we-sent-code': 'We sent you a code',
-      'root.auth.enter-otp': 'Enter it below to verify your account',
-      'root.auth.enter-your-code': 'Enter your code',
-      'root.auth.resend-code': 'Resend code',
-      'ui.next': 'Next',
-    },
-  },
+  messages: { en: messages },
 });
 
 describe('SentCode.vue', () => {
@@ -122,7 +113,9 @@ describe('SentCode.vue', () => {
   });
 
   it('shows error when OTP verification fails', async () => {
-    vi.spyOn(passwordStore, 'verifyUser').mockRejectedValue(new Error('Invalid OTP'));
+    vi.spyOn(passwordStore, 'verifyUser').mockResolvedValue([
+      { field: 'otp', code: 'INVALID_TOKEN' },
+    ]);
 
     const input = wrapper.find('input[name="otp"]');
     await input.setValue('000000');
@@ -138,11 +131,14 @@ describe('SentCode.vue', () => {
     await nextTick();
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    expect(showToasterMock).toHaveBeenCalledWith('error', 'Invalid OTP');
+    expect(passwordStore.verifyUser).toHaveBeenCalledWith('000000');
+    // Verify error is set in form
+    expect(wrapper.text()).toContain('The OTP you entered is invalid');
   });
 
-  it('handles generic error during submission', async () => {
-    vi.spyOn(passwordStore, 'verifyUser').mockRejectedValue(new Error('Network error'));
+  it('handles generic error during submission - store shows toaster internally', async () => {
+    // verifyUser returns undefined on success or when store handles error internally
+    vi.spyOn(passwordStore, 'verifyUser').mockResolvedValue(undefined);
 
     const input = wrapper.find('input[name="otp"]');
     await input.setValue('123456');
@@ -158,11 +154,11 @@ describe('SentCode.vue', () => {
     await nextTick();
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    expect(showToasterMock).toHaveBeenCalledWith('error', 'Network error');
+    expect(passwordStore.verifyUser).toHaveBeenCalledWith('123456');
   });
 
-  it('handles error without message', async () => {
-    vi.spyOn(passwordStore, 'verifyUser').mockRejectedValue({});
+  it('successfully submits when no errors returned', async () => {
+    vi.spyOn(passwordStore, 'verifyUser').mockResolvedValue(undefined);
 
     const input = wrapper.find('input[name="otp"]');
     await input.setValue('123456');
@@ -178,7 +174,7 @@ describe('SentCode.vue', () => {
     await nextTick();
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    expect(showToasterMock).toHaveBeenCalledWith('error', 'An error occurred');
+    expect(passwordStore.verifyUser).toHaveBeenCalledWith('123456');
   });
 
   it('calls resendOtp when resend button is clicked', async () => {
@@ -203,5 +199,76 @@ describe('SentCode.vue', () => {
     await nextTick();
 
     expect(passwordStore.resendOtp).toHaveBeenCalled();
+  });
+
+  it('handles rate limit with countdown timer', async () => {
+    vi.useFakeTimers();
+    vi.spyOn(passwordStore, 'resendOtp').mockResolvedValue(60);
+
+    const resendButton = wrapper.find('[data-testid="resend-link"]');
+    await resendButton.trigger('click');
+    await nextTick();
+
+    expect(passwordStore.resendOtp).toHaveBeenCalled();
+    expect(resendButton.element.hasAttribute('disabled')).toBe(true);
+
+    // Advance timers by 1 second
+    vi.advanceTimersByTime(1000);
+    await nextTick();
+
+    // Button should still be disabled
+    expect(resendButton.element.hasAttribute('disabled')).toBe(true);
+
+    // Fast forward to end of countdown
+    vi.advanceTimersByTime(59000);
+    await nextTick();
+
+    // Button should be enabled again
+    expect(resendButton.element.hasAttribute('disabled')).toBe(false);
+
+    vi.useRealTimers();
+  });
+
+  it('disables resend button during countdown', async () => {
+    vi.useFakeTimers();
+    vi.spyOn(passwordStore, 'resendOtp').mockResolvedValue(30);
+
+    const resendButton = wrapper.find('[data-testid="resend-link"]');
+    await resendButton.trigger('click');
+    await nextTick();
+
+    expect(resendButton.element.hasAttribute('disabled')).toBe(true);
+
+    vi.useRealTimers();
+  });
+
+  it('clears error when countdown reaches zero', async () => {
+    vi.useFakeTimers();
+    vi.spyOn(passwordStore, 'resendOtp').mockResolvedValue(2);
+
+    const resendButton = wrapper.find('[data-testid="resend-link"]');
+    await resendButton.trigger('click');
+    await nextTick();
+
+    // Fast forward past countdown
+    vi.advanceTimersByTime(3000);
+    await nextTick();
+
+    // Error should be cleared
+    const resendButtonAfter = wrapper.find('[data-testid="resend-link"]');
+    expect(resendButtonAfter.element.hasAttribute('disabled')).toBe(false);
+
+    vi.useRealTimers();
+  });
+
+  it('does not disable button when resendOtp returns undefined', async () => {
+    vi.spyOn(passwordStore, 'resendOtp').mockResolvedValue(undefined);
+
+    const resendButton = wrapper.find('[data-testid="resend-link"]');
+    await resendButton.trigger('click');
+    await nextTick();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    expect(resendButton.element.hasAttribute('disabled')).toBe(false);
   });
 });

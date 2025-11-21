@@ -3,6 +3,7 @@ import { mount, type VueWrapper } from '@vue/test-utils';
 import { setActivePinia, createPinia } from 'pinia';
 import { mockNuxtImport } from '@nuxt/test-utils/runtime';
 import { createI18n } from 'vue-i18n';
+import messages from '@@/i18n/locales/en.json';
 import { nextTick } from 'vue';
 import ChooseNewPassword from '@/components/auth/password/ChooseNewPassword.vue';
 import { usePasswordStore } from '@/stores/auth/password';
@@ -31,23 +32,9 @@ mockNuxtImport('useRouter', () => {
   });
 });
 
-// Create i18n instance
 const i18n = createI18n({
-  legacy: false,
   locale: 'en',
-  messages: {
-    en: {
-      'errors.PASSWORD_TOO_SHORT': 'Password is too short',
-      'errors.PASSWORD_MISMATCH': 'Passwords do not match',
-      'errors.GENERIC_ERROR': 'An error occurred',
-      'root.auth.choose-new-password': 'Choose a new password',
-      'root.auth.password-strength': 'Make sure it is strong',
-      'root.auth.logout-warning': 'You will be logged out of all devices',
-      'root.auth.password': 'Password',
-      'root.auth.confirm-password': 'Confirm password',
-      'root.auth.change-password': 'Change password',
-    },
-  },
+  messages: { en: messages },
 });
 
 describe('ChooseNewPassword.vue', () => {
@@ -163,8 +150,10 @@ describe('ChooseNewPassword.vue', () => {
     expect(passwordStore.resetPassword).toHaveBeenCalledWith('Password@123');
   });
 
-  it('shows error when password reset fails', async () => {
-    vi.spyOn(passwordStore, 'resetPassword').mockRejectedValue(new Error('Password reset failed'));
+  it('shows error when password reset fails with validation error', async () => {
+    vi.spyOn(passwordStore, 'resetPassword').mockResolvedValue([
+      { field: 'newPassword', code: 'TOO_SHORT' },
+    ]);
 
     const newPasswordInput = wrapper.find('input[name="newPassword"]');
     const confirmPasswordInput = wrapper.find('input[name="confirmPassword"]');
@@ -183,11 +172,16 @@ describe('ChooseNewPassword.vue', () => {
     await nextTick();
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    expect(showToasterMock).toHaveBeenCalledWith('error', 'Password reset failed');
+    expect(passwordStore.resetPassword).toHaveBeenCalledWith('Password@123');
+    // Check that error is displayed in the form
+    const errorText = wrapper.text();
+    expect(errorText).toContain('Password must be at least 10 characters long');
   });
 
-  it('handles generic error during submission', async () => {
-    vi.spyOn(passwordStore, 'resetPassword').mockRejectedValue(new Error('Network error'));
+  it('handles generic error during submission - store shows toaster internally', async () => {
+    // resetPassword returns undefined on success or non-validation errors
+    // The store handles toaster internally for generic errors
+    vi.spyOn(passwordStore, 'resetPassword').mockResolvedValue(undefined);
 
     const newPasswordInput = wrapper.find('input[name="newPassword"]');
     const confirmPasswordInput = wrapper.find('input[name="confirmPassword"]');
@@ -206,11 +200,11 @@ describe('ChooseNewPassword.vue', () => {
     await nextTick();
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    expect(showToasterMock).toHaveBeenCalledWith('error', 'Network error');
+    expect(passwordStore.resetPassword).toHaveBeenCalledWith('Password@123');
   });
 
-  it('handles error without message', async () => {
-    vi.spyOn(passwordStore, 'resetPassword').mockRejectedValue({});
+  it('successfully submits when no validation errors returned', async () => {
+    vi.spyOn(passwordStore, 'resetPassword').mockResolvedValue(undefined);
 
     const newPasswordInput = wrapper.find('input[name="newPassword"]');
     const confirmPasswordInput = wrapper.find('input[name="confirmPassword"]');
@@ -229,6 +223,6 @@ describe('ChooseNewPassword.vue', () => {
     await nextTick();
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    expect(showToasterMock).toHaveBeenCalledWith('error', 'An error occurred');
+    expect(passwordStore.resetPassword).toHaveBeenCalledWith('Password@123');
   });
 });

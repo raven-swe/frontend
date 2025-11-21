@@ -1,6 +1,7 @@
 import type { UpdateProfileRequest, UserData } from '~~/shared/types/shared';
 import type { ApiSuccessResponse } from '~~/shared/types/api';
 import { apiFetch } from '~/api';
+import { showToaster } from '@/utils/showToaster';
 
 export const updateProfileService = () => {
   const updateProfile = async (
@@ -27,7 +28,7 @@ export const updateProfileService = () => {
 
       return response.data;
     } catch (error) {
-      console.error('Failed to update profile:', error);
+      showToaster('error', $t('errors.FAILED_UPDATE_X', { field: 'profile' }));
       throw error;
     }
   };
@@ -49,7 +50,7 @@ export const updateProfileService = () => {
 
       return response;
     } catch (error) {
-      console.error('Failed to update profile picture:', error);
+      showToaster('error', $t('errors.FAILED_UPDATE_X', { field: 'profile picture' }));
       throw error;
     }
   };
@@ -66,7 +67,7 @@ export const updateProfileService = () => {
 
       return response.imageUrl;
     } catch (error) {
-      console.error('Failed to update header image:', error);
+      showToaster('error', $t('errors.FAILED_UPDATE_X', { field: 'banner' }));
       throw error;
     }
   };
@@ -81,7 +82,7 @@ export const updateProfileService = () => {
       );
       return response.data;
     } catch (error) {
-      console.error('Failed to remove header image:', error);
+      showToaster('error', $t('errors.FAILED_UPDATE_X', { field: 'banner' }));
       throw error;
     }
   };

@@ -1,7 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mountSuspended } from '@nuxt/test-utils/runtime';
+import { createI18n } from 'vue-i18n';
+import messages from '@@/i18n/locales/en.json';
 
-vi.stubGlobal('$t', (k: string) => k);
+const i18n = createI18n({ locale: 'en', messages: { en: messages } });
+
 vi.stubGlobal('$route', { path: '/home' });
 
 describe('Home layout', () => {
@@ -19,6 +22,7 @@ describe('Home layout', () => {
           Tabs: { template: '<div><slot /></div>' },
           Tab: { name: 'Tab', template: '<div />' },
         },
+        plugins: [i18n],
       },
       slots: {
         default: '<div class="slot-test">child</div>',
