@@ -46,7 +46,7 @@ const handleCardClick = () => {
     }"
     @click="handleCardClick"
   >
-    <UiHoverCard>
+    <UiHoverCard v-if="!isOnboarding">
       <NuxtLink :to="`users/${user.username}`">
         <UiHoverCardTrigger>
           <Avatar size="sm" :img="user.avatarUrl" />
@@ -56,9 +56,10 @@ const handleCardClick = () => {
         <UiUserMetadata :user="user" @follow="handleFollow" @unfollow="handleUnfollow" />
       </UiHoverCardContent>
     </UiHoverCard>
+    <Avatar v-else size="sm" :img="user.avatarUrl" />
     <div class="w-full">
       <div class="flex items-center justify-between">
-        <UiHoverCard>
+        <UiHoverCard v-if="!isOnboarding">
           <UiHoverCardTrigger>
             <NuxtLink :to="`users/${user.username}`">
               <div class="text-sm font-bold hover:underline">{{ user.displayName }}</div>
@@ -71,6 +72,12 @@ const handleCardClick = () => {
             <UiUserMetadata :user="user" @follow="handleFollow" @unfollow="handleUnfollow" />
           </UiHoverCardContent>
         </UiHoverCard>
+        <div v-else>
+          <div class="text-sm font-bold">{{ user.displayName }}</div>
+          <div class="text-muted-foreground text-sm">
+            {{ '@' + user.username }}
+          </div>
+        </div>
         <div class="ms-auto">
           <Button
             v-if="isFollowing"
