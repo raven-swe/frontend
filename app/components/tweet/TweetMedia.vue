@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { TweetMedia } from '~~/shared/types/tweets';
+import MediaItem from './MediaItem.vue';
 // Local placeholder image to show when there is no media
 interface Props {
   media: TweetMedia[] | undefined;
@@ -15,13 +16,12 @@ const media = ref(props.media || []);
 
     <!-- 1 media -->
     <div v-if="media.length === 1" class="grid overflow-hidden rounded-xl">
-      <img src="./image.jpg" class="h-auto w-full object-cover" />
+      <MediaItem :media="media[0]!" />
     </div>
 
     <!-- 2 media: side by side -->
     <div v-else-if="media.length === 2" class="grid grid-cols-2 gap-0.5 overflow-hidden rounded-xl">
-      <img src="./image.jpg" class="h-full w-full object-cover" />
-      <img src="./image2.jpg" class="h-full w-full object-cover" />
+      <MediaItem v-for="(m, i) in media" :key="i" :media="m" />
     </div>
 
     <!-- 3 media: first spans full height on left -->
@@ -29,9 +29,9 @@ const media = ref(props.media || []);
       v-else-if="media.length === 3"
       class="grid grid-cols-2 grid-rows-2 gap-0.5 overflow-hidden rounded-xl"
     >
-      <img src="./image.jpg" class="col-span-1 row-span-2 h-full w-full object-cover" />
-      <img src="./image2.jpg" class="h-full w-full object-cover" />
-      <img src="./image2.jpg" class="h-full w-full object-cover" />
+      <div class="col-span-1 row-span-2"><MediaItem :media="media[0]!" /></div>
+      <MediaItem :media="media[1]!" />
+      <MediaItem :media="media[2]!" />
     </div>
 
     <!-- 4 media: uniform grid -->
@@ -39,24 +39,7 @@ const media = ref(props.media || []);
       v-else-if="media.length === 4"
       class="grid grid-cols-2 grid-rows-2 gap-0.5 overflow-hidden rounded-xl"
     >
-      <img src="./image2.jpg" class="h-full w-full object-cover" />
-      <img src="./image.jpg" class="h-full w-full object-cover" />
-      <img src="./image.jpg" class="h-full w-full object-cover" />
-      <img src="./image2.jpg" class="h-full w-full object-cover" />
-    </div>
-
-    <!-- Fallback for >4: simple 3-column grid -->
-    <div
-      v-else
-      class="grid gap-0.5 overflow-hidden rounded-xl"
-      :class="media.length > 6 ? 'grid-cols-4' : 'grid-cols-3'"
-    >
-      <img
-        v-for="(m, i) in media"
-        :key="i"
-        :src="i % 2 === 0 ? './image.jpg' : './image2.jpg'"
-        class="h-full w-full object-cover"
-      />
+      <MediaItem v-for="(m, i) in media" :key="i" :media="m!" />
     </div>
   </div>
 </template>
