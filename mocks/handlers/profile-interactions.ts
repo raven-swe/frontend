@@ -114,4 +114,88 @@ export const handlers = [
       },
     });
   }),
+
+  http.post<{ username: string }>(`${API_URL}/me/mutes/:username`, async ({ params }) => {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    const { username } = params;
+    const user = mockUserInfos[username];
+    if (!user) {
+      return HttpResponse.json<ApiErrorResponse>(
+        {
+          success: false,
+          error: { message: `User with username "${username}" not found.`, code: 'USER_NOT_FOUND' },
+        },
+        { status: 404 },
+      );
+    }
+    user.relationship.muted = true;
+    mockUserInfos[username] = user;
+    return HttpResponse.json<ApiResponseBase>({
+      success: true,
+      message: `Successfully muted user "${username}".`,
+    });
+  }),
+
+  http.delete<{ username: string }>(`${API_URL}/me/mutes/:username`, async ({ params }) => {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    const { username } = params;
+    const user = mockUserInfos[username];
+    if (!user) {
+      return HttpResponse.json<ApiErrorResponse>(
+        {
+          success: false,
+          error: { message: `User with username "${username}" not found.`, code: 'USER_NOT_FOUND' },
+        },
+        { status: 404 },
+      );
+    }
+    user.relationship.muted = false;
+    mockUserInfos[username] = user;
+    return HttpResponse.json<ApiResponseBase>({
+      success: true,
+      message: `Successfully unmuted user "${username}".`,
+    });
+  }),
+
+  http.post<{ username: string }>(`${API_URL}/me/blocks/:username`, async ({ params }) => {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    const { username } = params;
+    const user = mockUserInfos[username];
+    if (!user) {
+      return HttpResponse.json<ApiErrorResponse>(
+        {
+          success: false,
+          error: { message: `User with username "${username}" not found.`, code: 'USER_NOT_FOUND' },
+        },
+        { status: 404 },
+      );
+    }
+    user.relationship.blocking = true;
+    mockUserInfos[username] = user;
+    return HttpResponse.json<ApiResponseBase>({
+      success: true,
+      message: `Successfully blocked user "${username}".`,
+    });
+  }),
+
+  http.delete<{ username: string }>(`${API_URL}/me/blocks/:username`, async ({ params }) => {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    const { username } = params;
+    const user = mockUserInfos[username];
+    if (!user) {
+      return HttpResponse.json<ApiErrorResponse>(
+        {
+          success: false,
+          error: { message: `User with username "${username}" not found.`, code: 'USER_NOT_FOUND' },
+        },
+        { status: 404 },
+      );
+    }
+    user.relationship.blocking = false;
+    mockUserInfos[username] = user;
+    return HttpResponse.json<ApiResponseBase>({
+      success: true,
+      message: `Successfully unblocked user "${username}".`,
+    });
+  }),
 ];
