@@ -1,17 +1,11 @@
-import type { ApiSuccessResponse } from '~~/shared/types/api';
+import { defineWrappedResponseHandler } from '~~/server/utils/handler';
 
 export default defineWrappedResponseHandler(async (event) => {
-  const authHeader = getHeader(event, 'authorization');
+  const fetcher = serverApiFetch(event);
 
-  const response = await serverApiFetch<ApiSuccessResponse<{ success: boolean; message: string }>>(
-    `/me/banner`,
-    {
-      method: 'DELETE',
-      headers: {
-        authorization: authHeader || '',
-      },
-    },
-  );
+  const response = await fetcher<ApiResponseBase>(`/me/banner`, {
+    method: 'DELETE',
+  });
 
   return response;
 });

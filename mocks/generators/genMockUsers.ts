@@ -43,4 +43,4 @@ if (!fs.existsSync(outputDir)) {
 
 const outputPath = path.join(outputDir, 'mock-users.json');
 fs.writeFileSync(outputPath, JSON.stringify(mockUsers, null, 2));
-console.log(`Mock users written to ${outputPath}`);
+console.warn(`Mock users written to ${outputPath}`);

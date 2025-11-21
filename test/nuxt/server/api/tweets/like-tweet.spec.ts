@@ -3,11 +3,12 @@ import { useH3TestUtils } from '~~/test/mocks/h3-test-utils';
 import likeTweetByIdGetHandler from '~~/server/api/tweets/[id]/like/index.post';
 import unLikeTweetByIdGetHandler from '~~/server/api/tweets/[id]/like/index.delete';
 import { createMockH3Event } from '~~/test/mocks/h3-event';
+import { createError } from '#app';
 
 useH3TestUtils();
 
 const mockServerApiFetch = vi.fn();
-vi.stubGlobal('serverApiFetch', mockServerApiFetch);
+vi.stubGlobal('serverApiFetch', () => mockServerApiFetch);
 
 describe('POST /api/tweets/[id]/like', () => {
   beforeEach(() => {
@@ -33,9 +34,6 @@ describe('POST /api/tweets/[id]/like', () => {
 
     expect(mockServerApiFetch).toHaveBeenCalledWith('/tweets/1/like', {
       method: 'POST',
-      headers: {
-        Authorization: 'Bearer mock-token',
-      },
     });
 
     expect(response).toEqual({
@@ -50,23 +48,15 @@ describe('POST /api/tweets/[id]/like', () => {
       message: 'unliked tweet successfully',
     });
 
-    const event = createMockH3Event(
-      {
-        method: 'DELETE',
-        params: { id: '1' },
-      },
-      {
-        authorization: 'Bearer mock-token',
-      },
-    );
+    const event = createMockH3Event({
+      method: 'DELETE',
+      params: { id: '1' },
+    });
 
     const response = await unLikeTweetByIdGetHandler(event);
 
     expect(mockServerApiFetch).toHaveBeenCalledWith('/tweets/1/like', {
       method: 'DELETE',
-      headers: {
-        Authorization: 'Bearer mock-token',
-      },
     });
 
     expect(response).toEqual({
@@ -76,20 +66,18 @@ describe('POST /api/tweets/[id]/like', () => {
   });
 
   it('should handle missing tweet id parameter on like', async () => {
-    const event = createMockH3Event(
-      {
-        method: 'POST',
-      },
-      {
-        authorization: 'Bearer mock-token',
-      },
-    );
+    const event = createMockH3Event({
+      method: 'POST',
+    });
 
     await expect(likeTweetByIdGetHandler(event)).rejects.toEqual(
       createError({
-        statusCode: 500,
-        statusMessage: 'Internal Server Error',
-        data: { message: 'id is a required field' },
+        statusCode: 422,
+        statusMessage: 'Validation Error',
+        data: {
+          message: 'id is a required field',
+          errors: ['id is a required field'],
+        },
       }),
     );
 
@@ -97,19 +85,17 @@ describe('POST /api/tweets/[id]/like', () => {
   });
 
   it('should handle missing tweet id parameter on unlike', async () => {
-    const event = createMockH3Event(
-      {
-        method: 'DELETE',
-      },
-      {
-        authorization: 'Bearer mock-token',
-      },
-    );
+    const event = createMockH3Event({
+      method: 'DELETE',
+    });
     await expect(unLikeTweetByIdGetHandler(event)).rejects.toEqual(
       createError({
-        statusCode: 500,
-        statusMessage: 'Internal Server Error',
-        data: { message: 'id is a required field' },
+        statusCode: 422,
+        statusMessage: 'Validation Error',
+        data: {
+          message: 'id is a required field',
+          errors: ['id is a required field'],
+        },
       }),
     );
     expect(mockServerApiFetch).not.toHaveBeenCalled();
