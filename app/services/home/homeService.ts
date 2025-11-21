@@ -15,7 +15,7 @@ export const homeService = {
       method: 'GET',
       query: {
         limit: timeline.limit,
-        cursor: timeline.cursor,
+        cursor: timeline.cursor ?? undefined,
       },
     });
   },
