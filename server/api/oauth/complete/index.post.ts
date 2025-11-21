@@ -1,18 +1,16 @@
 import * as cookie from 'cookie';
 import * as jwt from 'jsonwebtoken';
-import type { OAuthTokenRequest, OAuthCallbackResponse } from '~~/shared/types/oauth';
+import { defineWrappedResponseHandler } from '~~/server/utils/handler';
 
-export default defineEventHandler(async (event) => {
+export default defineWrappedResponseHandler(async (event) => {
   const body = await readBody<OAuthTokenRequest>(event);
+  const fetcher = serverApiFetch(event);
 
-  const response = await serverApiFetch.raw<ApiSuccessResponse<OAuthCallbackResponse>>(
-    '/oauth/complete',
-    {
-      method: 'POST',
-      body,
-      credentials: 'include',
-    },
-  );
+  const response = await fetcher.raw<ApiSuccessResponse<OAuthCallbackResponse>>('/oauth/complete', {
+    method: 'POST',
+    body,
+    credentials: 'include',
+  });
 
   const cookies = response.headers.getSetCookie?.();
   cookies.forEach((cookie) => {

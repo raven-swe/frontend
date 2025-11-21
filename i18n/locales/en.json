@@ -203,6 +203,7 @@
       "INVALID_FORMAT": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
       "UNAUTHORIZED": "The password you entered is incorrect"
     },
+    "UNSUPPORTED-IMAGE-TYPE": "Only images of type {types} are supported.",
     "identifier": {
       "IS_EMPTY": "Please enter your email or username",
       "NOT_A_STRING": "Please enter your email or username",
@@ -352,6 +353,10 @@
       },
       "change-password-button": "Change Password"
     }
+  },
+  "dm": {
+    "placeholder-search": "Search Direct Messages",
+    "header-title": "Messages"
   },
   "toaster": {
     "login": {

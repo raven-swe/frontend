@@ -6,6 +6,7 @@ type Handler = (event: H3Event<EventHandlerRequest>) => Promise<unknown>;
 export function useH3TestUtils() {
   const h3 = vi.hoisted(() => ({
     defineEventHandler: vi.fn((handler: Handler) => handler),
+    defineWrappedResponseHandler: vi.fn((handler: Handler) => handler),
     readBody: vi.fn(async (event: H3Event) => {
       if (event._requestBody && typeof event._requestBody === 'string') {
         return JSON.parse(event._requestBody);
@@ -31,10 +32,31 @@ export function useH3TestUtils() {
         return validateFn(params);
       },
     ),
+    getRequestIP: vi.fn(
+      (
+        event: H3Event,
+        opts: {
+          xForwardedFor?: boolean;
+        } = {},
+      ) => {
+        if (opts.xForwardedFor) {
+          const _header = event.headers.get('x-forwarded-for');
+          if (_header) {
+            const xForwardedFor = _header.split(',')[0]?.trim();
+            if (xForwardedFor) {
+              return xForwardedFor;
+            }
+          }
+        }
+
+        return (event.req.context?.clientAddress as string) || event.req.ip || undefined;
+      },
+    ),
   }));
 
   // Stub global functions to emulate Nuxt auto-imports
   vi.stubGlobal('defineEventHandler', h3.defineEventHandler);
+  vi.stubGlobal('defineWrappedResponseHandler', h3.defineWrappedResponseHandler);
   vi.stubGlobal('readBody', h3.readBody);
   vi.stubGlobal('getRouterParams', h3.getRouterParams);
   vi.stubGlobal('getQuery', h3.getQuery);
@@ -42,6 +64,7 @@ export function useH3TestUtils() {
   vi.stubGlobal('appendHeader', h3.appendHeader);
   vi.stubGlobal('deleteCookie', h3.deleteCookie);
   vi.stubGlobal('getValidatedRouterParams', h3.getValidatedRouterParams);
+  vi.stubGlobal('getRequestIP', h3.getRequestIP);
 
   return h3;
 }

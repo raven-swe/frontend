@@ -5,8 +5,14 @@ import { useLoginStore } from '~/stores/auth/login';
 import FieldInput from '~/components/ui/form/FieldInput.vue';
 import { useI18n } from 'vue-i18n';
 import { backendValidationToFormErrors } from '~/utils/errorUtils';
+import { useOAuthHandlers } from '~/composables/useOAuthHandlers';
 
 const loginStore = useLoginStore();
+const { handleGithubSignIn, handleGoogleSignIn, setupOAuthMessageListener } = useOAuthHandlers();
+
+onMounted(() => {
+  setupOAuthMessageListener();
+});
 const { t } = useI18n();
 
 const schema = yup.object({
@@ -47,6 +53,7 @@ const onSubmit = handleSubmit(async (values, actions) => {
           size="lg"
           data-testid="google-button"
           data-cy="signin-google-button"
+          @click="handleGoogleSignIn"
         >
           <Icon name="devicon:google" width="128" height="128"></Icon>
           {{ $t('login.identifier-step.google-signin') }}</UiButton
@@ -57,6 +64,7 @@ const onSubmit = handleSubmit(async (values, actions) => {
           size="lg"
           data-testid="github-button"
           data-cy="signin-github-button"
+          @click="handleGithubSignIn"
         >
           <Icon name="devicon:github" width="128" height="128"></Icon>
           {{ $t('login.identifier-step.github-signin') }}</UiButton
