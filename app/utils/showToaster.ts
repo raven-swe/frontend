@@ -1,4 +1,5 @@
 import { toast } from 'vue-sonner';
+import { useNuxtApp } from '#app';
 
 const typeConfig = {
   success: {
@@ -27,7 +28,10 @@ type ToastType = keyof typeof typeConfig;
 
 export function showToaster(type: ToastType, message: string) {
   const { icon, bg, color } = typeConfig[type];
-  toast(`${icon} ${message}`, {
+  const { $i18n } = useNuxtApp();
+  const translatedMessage = $i18n.t(message);
+
+  toast(`${icon} ${translatedMessage}`, {
     style: {
       background: bg,
       color: color,
