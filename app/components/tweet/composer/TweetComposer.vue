@@ -5,6 +5,9 @@ import TweetEditor from './TweetEditor.vue';
 import Toolbar from './Toolbar.vue';
 import MediaSlideshow from './MediaSlideshow.vue';
 import type { MediaItem } from '~~/shared/types/shared';
+import { uploadMediaService } from '@/services/tweet/uploadMediaService';
+import { createTweetService } from '@/services/tweet/createTweetService';
+import { showToaster } from '@/utils/showToaster';
 
 const tweetContent = ref('');
 const tweetEditorRef = ref<InstanceType<typeof TweetEditor> | null>(null);
@@ -17,22 +20,43 @@ const MAX_MEDIA = 4;
 const characterCount = computed(() => tweetContent.value.length);
 const isOverLimit = computed(() => characterCount.value > MAX_LENGTH);
 
-const handlePost = () => {
-  if (tweetContent.value.trim() && !isOverLimit.value) {
-    // Extract files from media items
-    const files = media.value.map((item) => item.file);
+const { uploadImage, uploadVideo } = uploadMediaService();
 
-    // eslint-disable-next-line no-console
-    console.log({
+const handlePost = async () => {
+  if (!tweetContent.value.trim() && media.value.length === 0) return;
+  if (isOverLimit.value) return;
+
+  try {
+    // Upload media files → get media IDs
+    const mediaIds: string[] = [];
+
+    for (const item of media.value) {
+      if (item.type === 'image') {
+        const id = await uploadImage(item.file, 'tweets');
+        mediaIds.push(id);
+      } else if (item.type === 'video') {
+        const id = await uploadVideo(item.file, 'tweets');
+        mediaIds.push(id);
+      }
+    }
+
+    // Send create tweet request
+    const newTweet = await createTweetService({
       content: tweetContent.value,
-      media: files,
+      media: mediaIds,
+      isReplyToTweetId: null,
     });
 
-    // Clean up blob URLs
+    // eslint-disable-next-line no-console
+    console.log('Tweet created:', newTweet);
+
+    // Cleanup
     media.value.forEach((item) => URL.revokeObjectURL(item.url));
     tweetContent.value = '';
     media.value = [];
     tweetEditorRef.value?.resetHeight();
+  } catch {
+    showToaster('error', 'error creating tweet. please try again.');
   }
 };
 
@@ -45,12 +69,7 @@ const handleAddMedia = (files: File[]) => {
 
     const type = file.type.startsWith('video') ? 'video' : 'image';
 
-    media.value.push({
-      id,
-      file,
-      url,
-      type,
-    });
+    media.value.push({ id, file, url, type });
   });
 };
 
