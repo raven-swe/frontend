@@ -344,6 +344,10 @@
       "change-password-button": "تغيير كلمة المرور"
     }
   },
+  "dm": {
+    "placeholder-search": "ابحث في الرسائل المباشرة",
+    "header-title": "الرسائل"
+  },
   "toaster": {
     "login": {
       "success": "تم تسجيل الدخول بنجاح",

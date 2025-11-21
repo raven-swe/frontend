@@ -346,6 +346,10 @@
       "change-password-button": "Change Password"
     }
   },
+  "dm": {
+    "placeholder-search": "Search Direct Messages",
+    "header-title": "Messages"
+  },
   "toaster": {
     "login": {
       "success": "Login successful",
