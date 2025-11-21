@@ -1,62 +1,69 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import type { Pagination } from '~~/app/services/home/homeService';
 import { useInfiniteScroll, useVirtualList } from '@vueuse/core';
 import TweetView from '~/components/tweet/TweetView.vue';
 import type { Tweet } from '~~/shared/types/tweets';
+import type { ApiSuccessResponse } from '~~/shared/types/apiResponses';
+import { tweetsService } from '~/services/tweet/tweetsService';
 
 const route = useRoute();
 const router = useRouter();
+
 const tweets = ref<Tweet[]>([]);
 const cursor = ref<string | null>(null);
 const hasNextPage = ref(true);
+const repliesIsLoading = ref(false);
 const isLoading = ref(false);
 const tweetData = ref<Tweet | null>(null);
 
 const tweetid = route.params.tweetid as string;
 
 async function loadMainTweet() {
+  isLoading.value = true;
   try {
-    const resp = await $fetch<{ data: Tweet }>(`/api/tweets/${tweetid}`);
+    const resp = await tweetsService.tweet(tweetid);
     tweetData.value = resp.data;
   } catch (err) {
     console.error('Failed to load main tweet', err);
-  }
-}
-
-async function loadTweets() {
-  isLoading.value = true;
-
-  try {
-    const resp = await $fetch<{ data: Tweet[]; pagination: Pagination }>(
-      `/api/tweets/${tweetid}/replies`,
-      {
-        query: {
-          limit: 10,
-          cursor: cursor.value ?? null,
-        },
-      },
-    );
-
-    const body = resp as { data?: { data?: Tweet[]; pagination?: Pagination } } | undefined;
-    const data = body?.data;
-    const newTweets = data?.data ?? [];
-    const pagination = data?.pagination;
-
-    if (newTweets.length) {
-      tweets.value.push(...newTweets);
-      cursor.value = pagination?.nextCursor ?? null;
-      hasNextPage.value = pagination?.hasNextPage ?? false;
-    }
-  } catch (err) {
-    console.error('Failed to load tweets', err);
   } finally {
     isLoading.value = false;
   }
 }
 
-const { list, containerProps } = useVirtualList(tweets.value, {
+async function loadTweets(reset = false) {
+  if (repliesIsLoading.value || (!reset && !hasNextPage.value)) return;
+
+  if (reset) {
+    tweets.value = [];
+    cursor.value = null;
+    hasNextPage.value = true;
+  }
+
+  repliesIsLoading.value = true;
+
+  try {
+    const resp = await tweetsService.replies(tweetid, { limit: 10, cursor: cursor.value });
+
+    const body = resp as ApiSuccessResponse<Tweet[]>;
+    const newTweets = body.data ?? [];
+    const pagination = body?.pagination;
+
+    if (newTweets.length) {
+      tweets.value = [...tweets.value, ...newTweets];
+      cursor.value = pagination?.nextCursor ?? null;
+      hasNextPage.value = pagination?.hasNextPage ?? false;
+    } else {
+      hasNextPage.value = false;
+    }
+  } catch (err) {
+    console.error('Failed to load tweets', err);
+  } finally {
+    repliesIsLoading.value = false;
+  }
+}
+
+const { list, containerProps } = useVirtualList(tweets, {
   itemHeight: 120,
 });
 
@@ -75,6 +82,11 @@ onMounted(() => {
   loadMainTweet();
   loadTweets();
 });
+
+watch(
+  () => route.params.tab,
+  () => loadTweets(true),
+);
 
 function goBackToHome() {
   router.back();
@@ -97,13 +109,25 @@ function goBackToHome() {
 
     <TweetComposer placeholder="reply" />
 
-    <div v-bind="containerProps">
-      <TweetDefaultCard v-for="{ data } in list" :key="data.id" :tweet="data" />
+    <div v-bind="containerProps" class="border-border mx-auto max-w-[700px] border-y">
+      <div>
+        <TweetDefaultCard v-for="{ data: tweet } in list" :key="tweet.id" :tweet="tweet" />
+        <div
+          v-if="tweets.length === 0"
+          class="text-muted-foreground border-b-border mt-8 h-12 border-b-1 text-center"
+        >
+          {{ $t('tweet.no-replies') }}
+        </div>
+      </div>
+
+      <UiSpinner v-if="repliesIsLoading && tweets.length > 0" class="text-primary mx-auto my-15">
+      </UiSpinner>
+
       <div
-        v-if="tweets.length === 0"
-        class="text-muted-foreground border-b-border mt-8 h-12 border-b-1 text-center"
+        v-if="!hasNextPage && !repliesIsLoading && tweets.length > 0"
+        class="text-muted-foreground py-4 text-center"
       >
-        {{ $t('tweet.no-replies') }}
+        {{ $t('home.messages.noMoreTweets') }}
       </div>
     </div>
   </div>
