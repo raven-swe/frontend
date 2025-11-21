@@ -1,7 +1,6 @@
 <script lang="ts" setup>
-// define props that take username and avatarurl
 defineProps<{
-  username: string;
+  username: string | null;
   avatarUrl: string;
 }>();
 </script>

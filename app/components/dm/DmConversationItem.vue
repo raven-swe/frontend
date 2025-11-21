@@ -24,7 +24,7 @@ const props = defineProps<{
           {{ props.conversation.participant.displayName }}
         </span>
         <span class="text-muted-foreground">
-          {{ props.conversation.participant.username }}
+          {{ '@' + props.conversation.participant.username }}
         </span>
         <span class="text-muted-foreground">
           {{ props.conversation.lastMessage.sentAt }}

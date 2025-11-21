@@ -1,16 +1,15 @@
 <script lang="ts" setup>
-definePageMeta({
-  layout: false,
-});
+import { useRoute } from 'vue-router';
+definePageMeta({ layout: false });
+useRoute();
 </script>
 <template>
   <NuxtLayout name="settings">
     <template #middle>
       <DmConversationsSection />
     </template>
-
     <template #right>
-      <DmConversationEmptyState />
+      <DmConversationView />
     </template>
   </NuxtLayout>
 </template>
