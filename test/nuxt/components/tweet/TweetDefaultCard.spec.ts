@@ -62,6 +62,46 @@ describe('TweetDefaultCard.vue', () => {
     expect(wrapper.text()).toContain('2h');
   });
 
+  it('falls back to default avatar when no avatarUrl is provided', async () => {
+    const tweet = makeTweet();
+    // trigger fallback
+    tweet.author.avatarUrl = '' as unknown as string;
+    const wrapper = await mountSuspended(TweetDefaultCard, {
+      props: { tweet },
+      global: { stubs: { NuxtImg: true, Icon: true } },
+    });
+
+    const avatar = wrapper.findComponent(Avatar);
+    expect(avatar.exists()).toBe(true);
+    expect(avatar.props('img')).toBe('/default_profile.png');
+  });
+
+  it('links display name to the correct profile URL', async () => {
+    const tweet = makeTweet();
+    const wrapper = await mountSuspended(TweetDefaultCard, {
+      props: { tweet },
+      global: { stubs: { NuxtImg: true, Icon: true } },
+    });
+
+    const profileLink = wrapper.find('a[href="/profile/aestheticsguy"]');
+    expect(profileLink.exists()).toBe(true);
+    expect(profileLink.text()).toContain('Aesthetics X');
+  });
+
+  it('sets time element attributes: datetime and non-empty title', async () => {
+    const tweet = makeTweet();
+    const wrapper = await mountSuspended(TweetDefaultCard, {
+      props: { tweet },
+      global: { stubs: { NuxtImg: true, Icon: true } },
+    });
+
+    const timeEl = wrapper.find('time');
+    expect(timeEl.exists()).toBe(true);
+    expect(timeEl.attributes('datetime')).toBe(tweet.createdAt);
+    const title = timeEl.attributes('title');
+    expect(title && title.length > 0).toBe(true);
+  });
+
   it('splits content into text + mention + hashtag links with correct hrefs', async () => {
     const tweet = makeTweet();
     const wrapper = await mountSuspended(TweetDefaultCard, {
@@ -170,6 +210,46 @@ describe('TweetDefaultCard.vue', () => {
     expect(contentP.findAll('a').length).toBe(0);
   });
 
+  it('handles only mentions when hashtags are undefined', async () => {
+    const content = 'Hello @john_doe there';
+    const tweet = makeTweet();
+    tweet.content = content;
+    const entities = {
+      mentions: [{ username: 'john_doe', startPosition: content.indexOf('@john_doe') }],
+      // hashtags intentionally omitted to exercise `|| []`
+    } as unknown as Tweet['entities'];
+    tweet.entities = entities;
+    const wrapper = await mountSuspended(TweetDefaultCard, {
+      props: { tweet },
+      global: { stubs: { NuxtImg: true, Icon: true } },
+    });
+
+    const mention = wrapper.find('a[href="/@john_doe"]');
+    expect(mention.exists()).toBe(true);
+    expect(wrapper.text()).toContain('Hello');
+    expect(wrapper.text()).toContain('there');
+  });
+
+  it('handles only hashtags when mentions are undefined', async () => {
+    const content = 'Hello #Nuxt3 there';
+    const tweet = makeTweet();
+    tweet.content = content;
+    const entities = {
+      hashtags: [{ hashtag: 'Nuxt3', startPosition: content.indexOf('#Nuxt3') }],
+      // mentions intentionally omitted to exercise `|| []`
+    } as unknown as Tweet['entities'];
+    tweet.entities = entities;
+    const wrapper = await mountSuspended(TweetDefaultCard, {
+      props: { tweet },
+      global: { stubs: { NuxtImg: true, Icon: true } },
+    });
+
+    const hashtag = wrapper.find('a[href="/hashtag/Nuxt3"]');
+    expect(hashtag.exists()).toBe(true);
+    expect(wrapper.text()).toContain('Hello');
+    expect(wrapper.text()).toContain('there');
+  });
+
   it('updates like state on like-success when not previously liked', async () => {
     const tweet = makeTweet({ isLiked: false, likeCount: 10 });
     const wrapper = await mountSuspended(TweetDefaultCard, {
@@ -188,6 +268,24 @@ describe('TweetDefaultCard.vue', () => {
     const updated = actions.props('tweet') as Tweet;
     expect(updated.isLiked).toBe(true);
     expect(updated.likeCount).toBe(11);
+  });
+
+  it('increments likeCount from 0 when likeCount is undefined (nullish coalescing path)', async () => {
+    const tweet = makeTweet({ isLiked: false } as Partial<Tweet>);
+    // simulate missing likeCount -> should be treated as 0
+    (tweet as unknown as { likeCount?: number }).likeCount = undefined;
+    const wrapper = await mountSuspended(TweetDefaultCard, {
+      props: { tweet },
+      global: { stubs: { NuxtImg: true, Icon: true } },
+    });
+
+    const actions = wrapper.findComponent(TweetActionButtons);
+    actions.vm.$emit('like-success');
+    await nextTick();
+
+    const updated = actions.props('tweet') as Tweet;
+    expect(updated.isLiked).toBe(true);
+    expect(updated.likeCount).toBe(1);
   });
 
   it('does nothing on like-success if already liked (no-op branch)', async () => {
@@ -232,6 +330,22 @@ describe('TweetDefaultCard.vue', () => {
     const updated2 = actions2.props('tweet') as Tweet;
     expect(updated2.isLiked).toBe(false);
     expect(updated2.likeCount).toBe(0);
+  });
+
+  it('decrements likeCount from 0 when likeCount is undefined (clamp path)', async () => {
+    const tweet = makeTweet({ isLiked: true } as Partial<Tweet>);
+    (tweet as unknown as { likeCount?: number }).likeCount = undefined;
+    const wrapper = await mountSuspended(TweetDefaultCard, {
+      props: { tweet },
+      global: { stubs: { NuxtImg: true, Icon: true } },
+    });
+    const actions = wrapper.findComponent(TweetActionButtons);
+    actions.vm.$emit('unlike-success');
+    await nextTick();
+
+    const updated = actions.props('tweet') as Tweet;
+    expect(updated.isLiked).toBe(false);
+    expect(updated.likeCount).toBe(0);
   });
 
   it('does nothing on unlike-success if not liked (no-op branch)', async () => {
@@ -302,6 +416,37 @@ describe('TweetDefaultCard.vue', () => {
     const updated2 = actions2.props('tweet') as Tweet;
     expect(updated2.isRetweeted).toBe(false);
     expect(updated2.retweetCount).toBe(0);
+  });
+
+  it('decrements retweetCount from 0 when retweetCount is undefined (clamp path)', async () => {
+    const tweet = makeTweet({ isRetweeted: true } as Partial<Tweet>);
+    (tweet as unknown as { retweetCount?: number }).retweetCount = undefined;
+    const wrapper = await mountSuspended(TweetDefaultCard, {
+      props: { tweet },
+      global: { stubs: { NuxtImg: true, Icon: true } },
+    });
+    const actions = wrapper.findComponent(TweetActionButtons);
+    actions.vm.$emit('undo-retweet-success');
+    await nextTick();
+
+    const updated = actions.props('tweet') as Tweet;
+    expect(updated.isRetweeted).toBe(false);
+    expect(updated.retweetCount).toBe(0);
+  });
+
+  it('uses empty-string fallback for content when tweet.content is empty (content || "")', async () => {
+    const tweet = makeTweet();
+    tweet.content = '';
+    // Remove entities to trigger early return with text segment
+    const tObj = tweet as unknown as { entities?: unknown };
+    delete tObj.entities;
+    const wrapper = await mountSuspended(TweetDefaultCard, {
+      props: { tweet: tObj as unknown as Tweet },
+      global: { stubs: { NuxtImg: true, Icon: true } },
+    });
+    const contentP = wrapper.find('p');
+    expect(contentP.exists()).toBe(true);
+    expect(contentP.text().trim()).toBe('');
   });
 
   it('does nothing on undo-retweet-success if not retweeted (no-op branch)', async () => {

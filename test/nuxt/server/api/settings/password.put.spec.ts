@@ -6,7 +6,7 @@ import { useH3TestUtils } from '~~/test/mocks/h3-test-utils';
 useH3TestUtils();
 
 const mockServerApiFetch = vi.fn();
-vi.stubGlobal('serverApiFetch', mockServerApiFetch);
+vi.stubGlobal('serverApiFetch', () => mockServerApiFetch);
 
 describe('server/api/settings/password/index.put', () => {
   beforeEach(() => {
@@ -21,7 +21,6 @@ describe('server/api/settings/password/index.put', () => {
 
     const event = createMockH3Event({
       method: 'PUT',
-      // Handler uses getQuery, so provide values via query
       query: {
         currentPassword: '123456789',
         newPassword: 'NewP@ssw0rd',
@@ -32,47 +31,7 @@ describe('server/api/settings/password/index.put', () => {
 
     expect(mockServerApiFetch).toHaveBeenCalledWith('/me/password', {
       method: 'PUT',
-      body: {
-        currentPassword: '123456789',
-        newPassword: 'NewP@ssw0rd',
-      },
-      headers: {},
-    });
-
-    expect(response).toEqual({
-      success: true,
-      message: 'Password changed successfully',
-    });
-  });
-
-  it('should forward Authorization header to backend', async () => {
-    mockServerApiFetch.mockResolvedValueOnce({
-      success: true,
-      message: 'Password changed successfully',
-    });
-
-    const event = createMockH3Event({
-      method: 'PUT',
-      query: {
-        currentPassword: '123456789',
-        newPassword: 'NewP@ssw0rd',
-      },
-    });
-
-    // Set Authorization header so getHeader(event, 'Authorization') returns it
-    event.headers.set('Authorization', 'Bearer mock-token');
-
-    const response = await passwordPutEventHandler(event);
-
-    expect(mockServerApiFetch).toHaveBeenCalledWith('/me/password', {
-      method: 'PUT',
-      body: {
-        currentPassword: '123456789',
-        newPassword: 'NewP@ssw0rd',
-      },
-      headers: {
-        Authorization: 'Bearer mock-token',
-      },
+      body: { currentPassword: '123456789', newPassword: 'NewP@ssw0rd' },
     });
 
     expect(response).toEqual({

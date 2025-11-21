@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useH3TestUtils } from '~~/test/mocks/h3-test-utils';
 import tweetsGetHandler from '~~/server/api/tweets/index.get';
-import type { Tweet } from '#imports';
+import { createError, type Tweet } from '#imports';
 import { createMockH3Event } from '~~/test/mocks/h3-event';
 
 useH3TestUtils();
 
 const mockServerApiFetch = vi.fn();
-vi.stubGlobal('serverApiFetch', mockServerApiFetch);
+vi.stubGlobal('serverApiFetch', () => mockServerApiFetch);
 
 describe('GET /api/tweets', () => {
   beforeEach(() => {
@@ -43,22 +43,14 @@ describe('GET /api/tweets', () => {
       data: sampleTweets,
     });
 
-    const event = createMockH3Event(
-      {
-        method: 'GET',
-      },
-      {
-        authorization: 'Bearer mock-token',
-      },
-    );
+    const event = createMockH3Event({
+      method: 'GET',
+    });
 
     const response = await tweetsGetHandler(event);
 
     expect(mockServerApiFetch).toHaveBeenCalledWith('/tweets', {
       method: 'GET',
-      headers: {
-        Authorization: 'Bearer mock-token',
-      },
     });
 
     expect(response).toEqual({
@@ -75,35 +67,22 @@ describe('GET /api/tweets', () => {
       data: { message: 'tweets not found', success: false },
     });
     mockServerApiFetch.mockRejectedValueOnce(backendError);
-    const event = createMockH3Event(
-      {
-        method: 'GET',
-      },
-      {
-        authorization: 'Bearer mock-token',
-      },
-    );
+    const event = createMockH3Event({
+      method: 'GET',
+    });
 
     await expect(tweetsGetHandler(event)).rejects.toEqual(backendError);
 
     expect(mockServerApiFetch).toHaveBeenCalledWith('/tweets', {
       method: 'GET',
-      headers: {
-        Authorization: 'Bearer mock-token',
-      },
     });
   });
 
   it('should handle non api errors', async () => {
     mockServerApiFetch.mockRejectedValueOnce(new Error('Network Error'));
-    const event = createMockH3Event(
-      {
-        method: 'GET',
-      },
-      {
-        authorization: 'Bearer mock-token',
-      },
-    );
+    const event = createMockH3Event({
+      method: 'GET',
+    });
     await expect(tweetsGetHandler(event)).rejects.toEqual(
       createError({
         statusCode: 500,
@@ -114,9 +93,6 @@ describe('GET /api/tweets', () => {
 
     expect(mockServerApiFetch).toHaveBeenCalledWith('/tweets', {
       method: 'GET',
-      headers: {
-        Authorization: 'Bearer mock-token',
-      },
     });
   });
 });

@@ -1,5 +1,6 @@
 import type { EventHandler, EventHandlerRequest } from 'h3';
 import { createError, isError, defineEventHandler } from 'h3';
+import { ValidationError } from 'yup';
 
 export const defineWrappedResponseHandler = <T extends EventHandlerRequest, D>(
   handler: EventHandler<T, D>,
@@ -11,6 +12,16 @@ export const defineWrappedResponseHandler = <T extends EventHandlerRequest, D>(
     } catch (err) {
       if (isError(err)) {
         throw err;
+      }
+      if (err instanceof ValidationError) {
+        throw createError({
+          statusCode: 422,
+          statusMessage: 'Validation Error',
+          data: {
+            message: err.message,
+            errors: err.errors,
+          },
+        });
       }
 
       throw createError({

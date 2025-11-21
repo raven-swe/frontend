@@ -5,26 +5,19 @@ import { useH3TestUtils } from '~~/test/mocks/h3-test-utils';
 
 useH3TestUtils();
 
-vi.stubGlobal(
-  'serverApiFetch',
-  async (
-    url: string,
-    options: { method: string; body: { name: string; email: string; birthDate: string } },
-  ) => {
-    if (url === '/auth/register/resend-otp' && options.method === 'POST') {
-      return {
-        status: 200,
-        data: {
-          success: true,
-          message: 'OTP resent successfully',
-        },
-      };
-    }
-  },
-);
+const mockServerApiFetch = vi.fn();
+vi.stubGlobal('serverApiFetch', () => mockServerApiFetch);
 
 describe('server/api/auth/register/start.post', () => {
   it('should return 200 for valid requests', async () => {
+    const mockResponse = {
+      status: 200,
+      data: {
+        success: true,
+        message: 'OTP resent successfully',
+      },
+    };
+    mockServerApiFetch.mockResolvedValueOnce(mockResponse);
     const event = createMockH3Event({
       method: 'POST',
       body: { creationToken: 'valid-creation-token' },

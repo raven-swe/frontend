@@ -5,22 +5,22 @@ import { useH3TestUtils } from '~~/test/mocks/h3-test-utils';
 
 useH3TestUtils();
 
-const mockServerApiFetchRaw = vi.fn(async (url: string, options: { method: string }) => {
-  if (url === '/auth/logout' && options.method === 'POST') {
-    return {
-      _data: {
-        success: true,
-        message: 'Logged out successfully',
-      },
-    };
-  }
-});
-vi.stubGlobal('serverApiFetch', { raw: mockServerApiFetchRaw });
+const mockServerApiFetchRaw = vi.fn();
+vi.stubGlobal('serverApiFetch', () => ({
+  raw: mockServerApiFetchRaw,
+}));
 
 describe('server/api/auth/logout.post', () => {
   it('should return 200 for valid requests', async () => {
     const event = createMockH3Event({
       method: 'POST',
+    });
+
+    mockServerApiFetchRaw.mockResolvedValueOnce({
+      _data: {
+        success: true,
+        message: 'Logged out successfully',
+      },
     });
 
     const response = await logoutPostEventHander(event);
