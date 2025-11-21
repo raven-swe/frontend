@@ -10,18 +10,18 @@ export const profileInteractionService = {
   },
 
   blockUser: async (username: string) => {
-    return await apiFetch(`/api/users/${username}/blocking`, { method: 'POST' });
+    return await apiFetch(`/api/me/blocks/${username}`, { method: 'POST' });
   },
 
   unblockUser: async (username: string) => {
-    return await apiFetch(`/api/users/${username}/blocking`, { method: 'DELETE' });
+    return await apiFetch(`/api/me/blocks/${username}`, { method: 'DELETE' });
   },
 
   muteUser: async (username: string) => {
-    return await apiFetch(`/api/users/${username}/muting`, { method: 'POST' });
+    return await apiFetch(`/api/me/mutes/${username}`, { method: 'POST' });
   },
 
   unmuteUser: async (username: string) => {
-    return await apiFetch(`/api/users/${username}/muting`, { method: 'DELETE' });
+    return await apiFetch(`/api/me/mutes/${username}`, { method: 'DELETE' });
   },
 };
