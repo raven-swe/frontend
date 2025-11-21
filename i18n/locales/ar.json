@@ -137,7 +137,11 @@
       "media": "الوسائط",
       "gif": "GIF صور متحركة",
       "emoji": "رموز ايموجي",
-      "profile-alt": "{name}الصورة الرمزية لـ "
+      "profile-alt": "{name}الصورة الرمزية لـ ",
+      "loading": {
+        "uploading-media": "جارٍ تحميل الوسائط {progress}%...",
+        "posting-tweet": "جارٍ نشر التغريدة..."
+      }
     }
   },
   "ui": {

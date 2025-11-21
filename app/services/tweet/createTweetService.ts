@@ -4,6 +4,7 @@ import { apiFetch } from '~/api';
 
 export async function createTweetService(payload: CreateTweetRequest): Promise<Tweet> {
   try {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     const response = await apiFetch<ApiSuccessResponse<Tweet>>('/api/tweets', {
       method: 'POST',
       body: payload,

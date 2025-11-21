@@ -7,6 +7,7 @@ export const uploadMediaService = () => {
       const form = new FormData();
       form.append('file', file);
       form.append('folder', folder);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const response = await apiFetch<{ data: { id: string } }>('/api/media/upload/image', {
         method: 'POST',
