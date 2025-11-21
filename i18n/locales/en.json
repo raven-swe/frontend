@@ -175,6 +175,8 @@
     "RECAPTCHA_REQUIRED": "Please complete the reCAPTCHA challenge",
     "ACCOUNT_NOT_FOUND": "This account doesn't \nexist",
     "TRY_SEARCHING": "Try searching for another one",
+    "TWEET_NOT_FOUND": "Sorry, this tweet \ndoesn't exist",
+    "GO_BACK_HOME": "Go back home",
     "OTP_RESEND_LIMIT_EXCEEDED": "OTP resend limit reached. Please try again in {seconds}.",
     "otp": {
       "INVALID_TOKEN": "The OTP you entered is invalid",
@@ -205,7 +207,8 @@
       "IS_EMPTY": "Please enter your password",
       "TOO_SHORT": "Password must be at least 10 characters long",
       "INVALID_FORMAT": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
-      "UNAUTHORIZED": "The password you entered is incorrect"
+      "UNAUTHORIZED": "The password you entered is incorrect",
+      "INVALID_PASSWORD": "You entered a wrong password"
     },
     "UNSUPPORTED-IMAGE-TYPE": "Only images of type {types} are supported.",
     "identifier": {
@@ -362,6 +365,10 @@
     },
     "checkUser": {
       "error": "Failed to check user existence"
+    },
+    "tweet-page": {
+      "tweet-load-error": "Failed to load the tweet. Please try again.",
+      "user-error": "Failed to load user data. Please try again."
     }
   },
   "icons": {
