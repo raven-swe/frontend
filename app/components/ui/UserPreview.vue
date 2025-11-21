@@ -44,6 +44,7 @@ const handleCardClick = () => {
     :class="{
       'cursor-pointer': isOnboarding,
     }"
+    data-test="user-preview"
     @click="handleCardClick"
   >
     <UiHoverCard v-if="!isOnboarding">
@@ -62,10 +63,10 @@ const handleCardClick = () => {
         <UiHoverCard v-if="!isOnboarding">
           <UiHoverCardTrigger>
             <NuxtLink :to="`users/${user.username}`">
-              <div class="text-sm font-bold hover:underline">{{ user.displayName }}</div>
-              <div class="text-muted-foreground text-sm">
+              <p class="text-sm font-bold hover:underline">{{ user.displayName }}</p>
+              <p class="text-muted-foreground text-sm">
                 {{ '@' + user.username }}
-              </div>
+              </p>
             </NuxtLink>
           </UiHoverCardTrigger>
           <UiHoverCardContent :align-offset="20" class="w-80">
@@ -83,14 +84,20 @@ const handleCardClick = () => {
             v-if="isFollowing"
             variant="outline-destructive"
             size="md"
+            data-test="unfollow-button"
             @mouseenter="isHovered = true"
             @mouseleave="isHovered = false"
             @click.stop="handleUnfollow"
             >{{ isHovered ? $t('testing.unfollow') : $t('testing.following') }}</Button
           >
-          <Button v-else variant="default" size="md" @click.stop="handleFollow">{{
-            $t('testing.follow')
-          }}</Button>
+          <Button
+            v-else
+            variant="default"
+            size="md"
+            data-test="follow-button"
+            @click.stop="handleFollow"
+            >{{ $t('testing.follow') }}</Button
+          >
         </div>
       </div>
       <div>
