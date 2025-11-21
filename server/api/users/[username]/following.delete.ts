@@ -7,10 +7,8 @@ export default defineWrappedResponseHandler(async (event) => {
   );
   const fetcher = serverApiFetch(event);
 
-  const response = await fetcher<ApiSuccessResponse<User>>(`/users/${username}/profile`, {
-    method: 'GET',
+  const response = await fetcher<ApiResponseBase>(`/users/${username}/following`, {
+    method: 'DELETE',
   });
-
-  console.log(response.data);
   return response;
 });
