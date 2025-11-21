@@ -2,7 +2,6 @@ import { http, HttpResponse } from 'msw';
 import type { Tweet, CreateTweetRequest } from '../../shared/types/tweets';
 import tweetsData from '../data/mock-tweets.json' assert { type: 'json' };
 import type { ApiSuccessResponse } from '#shared/types/api';
-import { useUserStore } from '../../app/stores/user';
 
 const API_URL = process.env.BACKEND_URL;
 const initialTweets = (tweetsData as unknown as Tweet[]) || [];
@@ -41,10 +40,6 @@ const unretweet = (t: Tweet) => {
 };
 
 export const handlers = [
-  // post media upload image: /media/upload/image
-  // request body: form-data(file: File, folder: string)
-  // response: { success: boolean; message: string; data: { url: string, id: string, message: string } }
-
   // POST /media/upload/image
   http.post(`${API_URL}/media/upload/image`, async ({ request }) => {
     const formData = await request.formData();
@@ -73,10 +68,6 @@ export const handlers = [
       { status: 200 },
     );
   }),
-
-  // post media upload image: /media/upload/video
-  // request body: form-data(file: File, folder: string)
-  // response: { success: boolean; message: string; data: { url: string, id: string, message: string } }
 
   // POST /media/upload/video
   http.post(`${API_URL}/media/upload/video`, async ({ request }) => {
@@ -148,16 +139,15 @@ export const handlers = [
     // create tweet instance
     const id = genId();
     const createdAt = new Date().toISOString();
-    const userStore = useUserStore();
 
     const newTweet: Tweet = {
       id,
       content,
       createdAt,
       author: {
-        username: userStore.user.username,
-        displayName: userStore.user.displayName,
-        avatarUrl: userStore.user.avatarUrl,
+        username: 'johndoe',
+        displayName: 'John Doe',
+        avatarUrl: 'https://cdn.raven.cmp27.space/default_avatar.png',
         isFollowing: true,
         isFollower: false,
       },
