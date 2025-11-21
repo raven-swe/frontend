@@ -8,7 +8,7 @@ import { useQuery } from '@tanstack/vue-query';
 import type { FetchError } from 'ofetch';
 
 const route = useRoute();
-const username = computed(() => route.params.username as string);
+const username = computed(() => (route.params.username as string).toLowerCase());
 const profilePath = computed(() => `/profile/${username.value}`);
 
 const queryKey = computed(() => ['profile', username.value]);
@@ -50,7 +50,7 @@ onServerPrefetch(async () => {
       class="flex flex-col items-center justify-center p-8 text-center"
     >
       <h1 class="mb-2 text-3xl font-bold">{{ $t('errors.ACCOUNT_NOT_FOUND') }}</h1>
-      <p class="text-gray-600 dark:text-gray-400">{{ $t('errors.TRY_SEARCHING') }}</p>
+      <p class="text-muted-foreground">{{ $t('errors.TRY_SEARCHING') }}</p>
     </div>
 
     <!-- Profile content -->

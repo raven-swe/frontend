@@ -78,7 +78,7 @@ const { mutate: muteUser } = useProfileMutation<'mute' | 'unmute'>({
       </UiDropdownMenu>
 
       <ProfileActionsFollowToggleButton
-        v-if="!isCurrentUser"
+        v-if="!isCurrentUser && !user?.relationship.blockedBy"
         :username="user?.username || ''"
         :follower="isFollower"
         :following="isFollowing"

@@ -4,6 +4,9 @@ import { formatMonthYear } from '~/utils/date';
 
 const userProfile = inject<ComputedRef<User>>('user-data');
 
+const isMuted = computed(() => userProfile?.value.relationship.muted || false);
+const isBlocking = computed(() => userProfile?.value.relationship.blocking || false);
+
 const displayUsername = computed(() => '@' + userProfile?.value.username);
 const displayUrl = computed(() => {
   if (userProfile?.value?.websiteUrl) {
@@ -19,9 +22,11 @@ const displayUrl = computed(() => {
     <div class="px-4">
       <h2 class="text-foreground pb-0 text-2xl font-bold">{{ userProfile?.displayName }}</h2>
       <p class="text-muted-foreground text-md">{{ displayUsername }}</p>
-      <p class="text-muted-foreground mt-2 whitespace-pre-line">{{ userProfile?.bio }}</p>
+      <p v-if="!isBlocking" class="text-muted-foreground mt-2 whitespace-pre-line">
+        {{ userProfile?.bio }}
+      </p>
 
-      <div class="mt-2 flex flex-wrap gap-2">
+      <div v-if="!isBlocking" class="mt-2 flex flex-wrap gap-2">
         <!-- location -->
         <p
           v-if="userProfile?.location"
@@ -69,7 +74,7 @@ const displayUrl = computed(() => {
           <span class="text-muted-foreground ms-1"> {{ $t('profile-info.followers') }} </span>
         </span>
       </div>
-      <div v-if="userProfile?.relationship.muted" class="mt-4">
+      <div v-if="isMuted" class="mt-4">
         <p class="text-muted-foreground text-sm">
           {{ $t('profile-info.user-muted') }}
         </p>
