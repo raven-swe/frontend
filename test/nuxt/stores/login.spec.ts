@@ -2,16 +2,22 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { mockNuxtImport, registerEndpoint } from '@nuxt/test-utils/runtime';
 import { useLoginStore } from '@/stores/auth/login';
+import { useRegisterStore } from '@/stores/register';
 
-const { navigateToMock } = vi.hoisted(() => {
+const { navigateToMock, showToasterMock } = vi.hoisted(() => {
   return {
     navigateToMock: vi.fn(() => ({ value: 'mocked navigation' })),
+    showToasterMock: vi.fn(),
   };
 });
 
 mockNuxtImport('navigateTo', () => {
   return navigateToMock;
 });
+
+vi.mock('@/utils/showToaster', () => ({
+  showToaster: showToasterMock,
+}));
 
 describe('Login Store', () => {
   beforeEach(() => {
@@ -69,37 +75,46 @@ describe('Login Store', () => {
     expect(store.type).toBe('');
   });
 
-  it('checkUserExists handles server error with data.message', async () => {
+  it('checkUserExists handles validation errors (422)', async () => {
     registerEndpoint('/api/auth/check-identifier', {
       method: 'GET',
       handler: () => {
-        const err = new Error('Internal Server Error');
-        err.data = { message: 'Unexpected error occurred' };
-        throw err;
+        throw createError({
+          statusCode: 422,
+          data: {
+            success: false,
+            error: {
+              code: 'VALIDATION_ERROR',
+              errors: [{ field: 'identifier', code: 'INVALID_FORMAT' }],
+            },
+          },
+        });
       },
     });
 
     const store = useLoginStore();
+    const result = await store.checkUserExists('invalid');
 
-    await expect(store.checkUserExists('trigger500@example.com')).rejects.toThrow(
-      'Unexpected error occurred',
-    );
+    expect(result).toEqual([{ field: 'identifier', code: 'INVALID_FORMAT' }]);
+    expect(store.step).toBe(0);
   });
 
-  it('checkUserExists handles error without data.message', async () => {
+  it('checkUserExists handles internal server error (500)', async () => {
     registerEndpoint('/api/auth/check-identifier', {
       method: 'GET',
       handler: () => {
-        const err = new Error('Internal Server Error');
-        throw err;
+        throw createError({
+          statusCode: 500,
+          statusMessage: 'Internal Server Error',
+        });
       },
     });
 
     const store = useLoginStore();
+    await store.checkUserExists('test@example.com');
 
-    await expect(store.checkUserExists('trigger500@example.com')).rejects.toThrow(
-      'Unexpected error occurred',
-    );
+    expect(showToasterMock).toHaveBeenCalledWith('error', 'toaster.checkUser.error');
+    expect(store.loading).toBe(false);
   });
 
   it('handles unsuccessful checkUserExists response', async () => {
@@ -117,7 +132,7 @@ describe('Login Store', () => {
     expect(result).toBe(false);
   });
 
-  it('submitLogin stores tokens and navigates on success', async () => {
+  it('login stores tokens and navigates on success', async () => {
     registerEndpoint('/api/auth/login', {
       method: 'POST',
       handler: () => ({
@@ -130,24 +145,81 @@ describe('Login Store', () => {
 
     const store = useLoginStore();
     const payload = { identifier: 'user@example.com', password: 'Password@123' };
-    await store.submitLogin(payload);
+    await store.login(payload);
+
     expect(navigateToMock).toHaveBeenCalledWith('/home');
+    expect(store.open).toBe(false);
+    expect(showToasterMock).toHaveBeenCalledWith('success', 'toaster.login.success');
   });
 
-  it('submitLogin handles invalid credentials gracefully', async () => {
+  it('login handles validation errors (422)', async () => {
     registerEndpoint('/api/auth/login', {
       method: 'POST',
       handler: () => {
-        const err = new Error('Invalid credentials');
-        err.data = { error: { message: 'Invalid credentials' } };
-        throw err;
+        throw createError({
+          statusCode: 422,
+          data: {
+            success: false,
+            error: {
+              code: 'VALIDATION_ERROR',
+              errors: [{ field: 'password', code: 'TOO_SHORT' }],
+            },
+          },
+        });
+      },
+    });
+
+    const store = useLoginStore();
+    const payload = { identifier: 'user@example.com', password: '123' };
+    const result = await store.login(payload);
+
+    expect(result).toEqual([{ field: 'password', code: 'TOO_SHORT' }]);
+    expect(navigateToMock).not.toHaveBeenCalled();
+  });
+
+  it('login handles invalid credentials (401)', async () => {
+    registerEndpoint('/api/auth/login', {
+      method: 'POST',
+      handler: () => {
+        throw createError({
+          statusCode: 401,
+          data: {
+            success: false,
+            error: {
+              code: 'INVALID_CREDENTIALS',
+              message: 'Invalid credentials',
+            },
+          },
+        });
       },
     });
 
     const store = useLoginStore();
     const payload = { identifier: 'bad@example.com', password: 'wrong' };
+    const result = await store.login(payload);
 
-    await expect(store.submitLogin(payload)).rejects.toThrow('Invalid credentials');
+    expect(result).toEqual([{ field: 'password', code: 'INVALID_CREDENTIALS' }]);
+    expect(navigateToMock).not.toHaveBeenCalled();
+  });
+
+  it('login handles internal server error (500)', async () => {
+    registerEndpoint('/api/auth/login', {
+      method: 'POST',
+      handler: () => {
+        throw createError({
+          statusCode: 500,
+          statusMessage: 'Internal Server Error',
+        });
+      },
+    });
+
+    const store = useLoginStore();
+    const payload = { identifier: 'user@example.com', password: 'Password@123' };
+    await store.login(payload);
+
+    expect(showToasterMock).toHaveBeenCalledWith('error', 'toaster.login.error');
+    expect(navigateToMock).not.toHaveBeenCalled();
+    expect(store.loading).toBe(false);
   });
 
   it('openForgotPasswordDialog navigates without identifier when step is 0', () => {
@@ -170,5 +242,23 @@ describe('Login Store', () => {
 
     expect(navigateToMock).toHaveBeenCalledWith('/password-reset?identifier=test@example.com');
     expect(store.open).toBe(false);
+  });
+
+  it('openSignupDialog closes login dialog and opens register dialog', () => {
+    const store = useLoginStore();
+    const registerStore = useRegisterStore();
+
+    store.open = true;
+    store.step = 1;
+    store.identifier = 'test@example.com';
+
+    vi.spyOn(registerStore, 'openDialog');
+
+    store.openSignupDialog();
+
+    expect(store.open).toBe(false);
+    expect(store.step).toBe(0);
+    expect(store.identifier).toBe('');
+    expect(registerStore.openDialog).toHaveBeenCalled();
   });
 });
