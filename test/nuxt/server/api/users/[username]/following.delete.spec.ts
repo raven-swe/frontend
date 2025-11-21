@@ -23,20 +23,19 @@ describe('DELETE /api/users/[username]/following', () => {
     };
     mockServerApiFetch.mockResolvedValueOnce(mockResponse);
     const event = createMockH3Event({
-      method: 'POST',
+      method: 'DELETE',
       params: { username: 'johndoe' },
     });
     const response = await followingDeleteEventHandler(event);
-    expect(response.status).toBe(200);
-    expect(response.data).toEqual({
-      success: true,
-      message: 'Following updated successfully',
+    expect(mockServerApiFetch).toHaveBeenCalledWith('/users/johndoe/following', {
+      method: 'DELETE',
     });
+    expect(response).toEqual(mockResponse);
   });
 
   it('throws error for invalid username parameter', async () => {
     const emptyUsernameEvent = createMockH3Event({
-      method: 'GET',
+      method: 'DELETE',
       params: {},
     });
 
@@ -53,7 +52,7 @@ describe('DELETE /api/users/[username]/following', () => {
     expect(mockServerApiFetch).not.toHaveBeenCalled();
 
     const shortUsernameEvent = createMockH3Event({
-      method: 'GET',
+      method: 'DELETE',
       params: { username: 'a' },
     });
 

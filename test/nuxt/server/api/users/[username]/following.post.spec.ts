@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import followingPostEventHandler from '~~/server/api/users/[username]/following.post';
 import { createMockH3Event } from '~~/test/mocks/h3-event';
 import { useH3TestUtils } from '~~/test/mocks/h3-test-utils';
@@ -10,6 +10,9 @@ const mockServerApiFetch = vi.fn();
 vi.stubGlobal('serverApiFetch', () => mockServerApiFetch);
 
 describe('POST /api/users/[username]/following', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
   it('should return 200 for valid requests', async () => {
     const mockResponse = {
       status: 200,
@@ -24,16 +27,15 @@ describe('POST /api/users/[username]/following', () => {
       params: { username: 'johndoe' },
     });
     const response = await followingPostEventHandler(event);
-    expect(response.status).toBe(200);
-    expect(response.data).toEqual({
-      success: true,
-      message: 'Following updated successfully',
+    expect(mockServerApiFetch).toHaveBeenCalledWith('/users/johndoe/following', {
+      method: 'POST',
     });
+    expect(response).toEqual(mockResponse);
   });
 
   it('throws error for invalid username parameter', async () => {
     const emptyUsernameEvent = createMockH3Event({
-      method: 'GET',
+      method: 'POST',
       params: {},
     });
 
@@ -50,7 +52,7 @@ describe('POST /api/users/[username]/following', () => {
     expect(mockServerApiFetch).not.toHaveBeenCalled();
 
     const shortUsernameEvent = createMockH3Event({
-      method: 'GET',
+      method: 'POST',
       params: { username: 'a' },
     });
 
