@@ -85,7 +85,7 @@ describe('POST /api/auth/password/reset', () => {
     const mockResponse = {
       success: true,
       message: 'Password reset successfully.',
-      data: { accessToken: 'access_token_123', refreshToken: 'refresh_token_123' },
+      data: { accessToken: 'access_token_123', refreshToken: 'refreshToken_123' },
     };
     fetchMock.mockResolvedValueOnce(mockResponse);
 

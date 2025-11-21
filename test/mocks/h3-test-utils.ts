@@ -6,6 +6,7 @@ type Handler = (event: H3Event<EventHandlerRequest>) => Promise<unknown>;
 export function useH3TestUtils() {
   const h3 = vi.hoisted(() => ({
     defineEventHandler: vi.fn((handler: Handler) => handler),
+    defineWrappedResponseHandler: vi.fn((handler: Handler) => handler),
     readBody: vi.fn(async (event: H3Event) => {
       if (event._requestBody && typeof event._requestBody === 'string') {
         return JSON.parse(event._requestBody);
@@ -35,6 +36,7 @@ export function useH3TestUtils() {
 
   // Stub global functions to emulate Nuxt auto-imports
   vi.stubGlobal('defineEventHandler', h3.defineEventHandler);
+  vi.stubGlobal('defineWrappedResponseHandler', h3.defineWrappedResponseHandler);
   vi.stubGlobal('readBody', h3.readBody);
   vi.stubGlobal('getRouterParams', h3.getRouterParams);
   vi.stubGlobal('getQuery', h3.getQuery);
