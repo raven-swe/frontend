@@ -99,7 +99,7 @@ describe('Settings Account Page', () => {
       birthDate: '2010-01-01T00:00:00.000Z',
     };
     store = { user } as MockStore;
-    localeRef.value = 'ar';
+    localeRef.value = 'ar-EG';
 
     const wrapper = await mountSuspended(AccountPage, {
       global: {
