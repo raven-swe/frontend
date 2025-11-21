@@ -356,5 +356,11 @@
     "checkUser": {
       "error": "فشل في التحقق من وجود المستخدم"
     }
+  },
+  "hashtag": {
+    "placeholder": {
+      "not-implemented": " المسار غير متاحة بعد",
+      "path": "المسار: {path}"
+    }
   }
 }

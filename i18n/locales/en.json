@@ -358,5 +358,11 @@
     "checkUser": {
       "error": "Failed to check user existence"
     }
+  },
+  "hashtag": {
+    "placeholder": {
+      "not-implemented": "Route is not implemented yet",
+      "path": "Path: {path}"
+    }
   }
 }
