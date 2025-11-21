@@ -56,7 +56,7 @@ vi.mock('vee-validate', () => ({
 
 // Import after mocks
 /* eslint-disable import/first */
-import ChangePasswordEditor from '@/pages/settings/changePasswordEditor.vue';
+import ChangePasswordEditor from '@/pages/settings/account/changePasswordEditor.vue';
 /* eslint-enable import/first */
 
 // Lightweight stubs to avoid deep mounting

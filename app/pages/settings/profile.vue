@@ -92,6 +92,13 @@ const handleRemoveHeaderImage = () => {
   }
 };
 
+const handleRemoveProfileImage = () => {
+  selectedProfileImage.value = null;
+  if (profileFileInput.value) {
+    profileFileInput.value.value = '';
+  }
+};
+
 // Normalize empty values to null
 const normalize = (v: unknown): string | null =>
   v === undefined || v === null || v === '' ? null : String(v);
@@ -150,6 +157,7 @@ const handleSubmit = async () => {
     websiteUrl: normalize(website.value),
     birthDate: formattedBirthDate,
     deleteBanner: !selectedImage.value && !!userStore.user.bannerUrl,
+    deleteAvatar: !selectedProfileImage.value && !!userStore.user.avatarUrl,
   };
   // Get files
   const bannerFile = bannerFileInput.value?.files?.[0];
@@ -196,7 +204,13 @@ const handleDialogClose = () => {
             </UiButton>
             <h2 class="text-xl font-bold">{{ $t('profile.edit.edit-profile') }}</h2>
           </div>
-          <UiButton class="w-16" size="xs" :disabled="!isFormValid" @click="handleSubmit">
+          <UiButton
+            class="w-16"
+            size="xs"
+            :disabled="!isFormValid"
+            data-cy="profile-save-btn"
+            @click="handleSubmit"
+          >
             {{ $t('ui.save') }}
           </UiButton>
         </template>
@@ -254,13 +268,23 @@ const handleDialogClose = () => {
                 class="h-30 w-30 cursor-pointer rounded-full border-3 border-white object-cover"
                 @click="handleProfileImageClick"
               />
-              <button
-                type="button"
-                class="bg-foreground/60 hover:bg-foreground/80 absolute start-1/2 top-1/2 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full transition-colors"
-                @click="handleProfileImageClick"
-              >
-                <Icon name="lucide:camera" class="text-white" size="1rem" />
-              </button>
+              <div class="absolute start-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 gap-2">
+                <button
+                  type="button"
+                  class="bg-foreground/60 hover:bg-foreground/80 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+                  @click="handleProfileImageClick"
+                >
+                  <Icon name="lucide:camera" class="text-white" size="1rem" />
+                </button>
+                <button
+                  v-if="selectedProfileImage"
+                  type="button"
+                  class="bg-foreground/60 hover:bg-foreground/80 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+                  @click="handleRemoveProfileImage"
+                >
+                  <Icon name="lucide:x" class="text-white" size="0.9rem" />
+                </button>
+              </div>
               <input
                 ref="profileFileInput"
                 type="file"
@@ -311,7 +335,7 @@ const handleDialogClose = () => {
             />
 
             <!-- Birth Date Section -->
-            <div class="mb-10">
+            <div class="mb-10" data-cy="birth-date-select">
               <h3 class="mb-2 font-medium">{{ $t('profile.edit.birth-date') }}</h3>
               <div class="flex gap-2">
                 <uiSelect
@@ -320,6 +344,7 @@ const handleDialogClose = () => {
                   :options="dateSelect.months.value"
                   placeholder="Month"
                   name="birth-month"
+                  data-cy="birth-month-select"
                 />
                 <uiSelect
                   v-model="dateSelect.selectedDay.value"
@@ -327,6 +352,7 @@ const handleDialogClose = () => {
                   :options="dateSelect.days.value"
                   placeholder="Day"
                   name="birth-day"
+                  data-cy="birth-day-select"
                 />
                 <uiSelect
                   v-model="dateSelect.selectedYear.value"
@@ -334,6 +360,7 @@ const handleDialogClose = () => {
                   :options="dateSelect.years.value"
                   placeholder="Year"
                   name="birth-year"
+                  data-cy="birth-year-select"
                 />
               </div>
             </div>

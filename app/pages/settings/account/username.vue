@@ -10,7 +10,7 @@ import { useUserStore } from '~/stores/user';
 import { apiFetch } from '~/api';
 
 definePageMeta({
-  layout: 'settings',
+  layout: false,
 });
 
 const router = useRouter();
