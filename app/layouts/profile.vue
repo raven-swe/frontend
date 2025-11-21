@@ -29,7 +29,6 @@ const { isCurrentUser } = useIsCurrentUser();
 
 const isUserNotFound = computed(() => {
   if (!isError.value || !error.value) return false;
-  return false;
   const errorData = error.value;
   return errorData?.data?.data?.error.code === 'USER_NOT_FOUND' || errorData?.statusCode === 404;
 });
