@@ -6,7 +6,7 @@ import FieldInput from '~/components/ui/form/FieldInput.vue';
 import Button from '~/components/ui/Button.vue';
 import { apiFetch } from '~/api';
 definePageMeta({
-  layout: 'settings',
+  layout: false,
 });
 const router = useRouter();
 

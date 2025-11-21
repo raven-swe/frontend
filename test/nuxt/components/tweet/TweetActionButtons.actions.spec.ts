@@ -116,7 +116,7 @@ describe('TweetActionButtons actions', () => {
     await Promise.resolve();
   });
 
-  it('handles like error path without emitting success', async () => {
+  it('handles like error path with optimistic emit then revert', async () => {
     mocks.svc.likeTweet.mockRejectedValueOnce(new Error('like-err'));
     const tweet = makeTweet({ isLiked: false });
     const wrapper = await mountSuspended(TweetActionButtons, {
@@ -128,10 +128,13 @@ describe('TweetActionButtons actions', () => {
 
     await likeBtn.trigger('click');
     await Promise.resolve();
-    expect(wrapper.emitted()['like-success']).toBeUndefined();
+    // Optimistic success fired
+    expect(wrapper.emitted()['like-success']).toHaveLength(1);
+    // Revert fired on error
+    expect(wrapper.emitted()['unlike-success']).toHaveLength(1);
   });
 
-  it('does not emit like-success when service returns success=false', async () => {
+  it('reverts like when service returns success=false (optimistic then revert)', async () => {
     mocks.svc.likeTweet.mockResolvedValueOnce({ success: false });
     const tweet = makeTweet({ isLiked: false });
     const wrapper = await mountSuspended(TweetActionButtons, {
@@ -143,7 +146,8 @@ describe('TweetActionButtons actions', () => {
 
     await likeBtn.trigger('click');
     await Promise.resolve();
-    expect(wrapper.emitted()['like-success']).toBeUndefined();
+    expect(wrapper.emitted()['like-success']).toHaveLength(1);
+    expect(wrapper.emitted()['unlike-success']).toHaveLength(1);
   });
 
   it('clicking retweet calls retweetTweet; pending prevents double; emits retweet-success', async () => {
@@ -201,7 +205,7 @@ describe('TweetActionButtons actions', () => {
     await Promise.resolve();
   });
 
-  it('handles unlike error path without emitting success', async () => {
+  it('handles unlike error path with optimistic emit then revert', async () => {
     mocks.svc.unLikeTweet.mockRejectedValueOnce(new Error('unlike-err'));
     const tweet = makeTweet({ isLiked: true });
     const wrapper = await mountSuspended(TweetActionButtons, {
@@ -213,10 +217,11 @@ describe('TweetActionButtons actions', () => {
 
     await unlikeBtn.trigger('click');
     await Promise.resolve();
-    expect(wrapper.emitted()['unlike-success']).toBeUndefined();
+    expect(wrapper.emitted()['unlike-success']).toHaveLength(1);
+    expect(wrapper.emitted()['like-success']).toHaveLength(1);
   });
 
-  it('does not emit unlike-success when service returns success=false', async () => {
+  it('reverts unlike when service returns success=false (optimistic then revert)', async () => {
     mocks.svc.unLikeTweet.mockResolvedValueOnce({ success: false });
     const tweet = makeTweet({ isLiked: true });
     const wrapper = await mountSuspended(TweetActionButtons, {
@@ -228,10 +233,11 @@ describe('TweetActionButtons actions', () => {
 
     await unlikeBtn.trigger('click');
     await Promise.resolve();
-    expect(wrapper.emitted()['unlike-success']).toBeUndefined();
+    expect(wrapper.emitted()['unlike-success']).toHaveLength(1);
+    expect(wrapper.emitted()['like-success']).toHaveLength(1);
   });
 
-  it('handles retweet error path without emitting success', async () => {
+  it('handles retweet error path with optimistic emit then revert', async () => {
     mocks.svc.retweetTweet.mockRejectedValueOnce(new Error('retweet-err'));
     const tweet = makeTweet({ isRetweeted: false });
     const wrapper = await mountSuspended(TweetActionButtons, {
@@ -243,10 +249,11 @@ describe('TweetActionButtons actions', () => {
 
     await retweetBtn.trigger('click');
     await Promise.resolve();
-    expect(wrapper.emitted()['retweet-success']).toBeUndefined();
+    expect(wrapper.emitted()['retweet-success']).toHaveLength(1);
+    expect(wrapper.emitted()['undo-retweet-success']).toHaveLength(1);
   });
 
-  it('does not emit retweet-success when service returns success=false', async () => {
+  it('reverts retweet when service returns success=false (optimistic then revert)', async () => {
     mocks.svc.retweetTweet.mockResolvedValueOnce({ success: false });
     const tweet = makeTweet({ isRetweeted: false });
     const wrapper = await mountSuspended(TweetActionButtons, {
@@ -258,10 +265,11 @@ describe('TweetActionButtons actions', () => {
 
     await retweetBtn.trigger('click');
     await Promise.resolve();
-    expect(wrapper.emitted()['retweet-success']).toBeUndefined();
+    expect(wrapper.emitted()['retweet-success']).toHaveLength(1);
+    expect(wrapper.emitted()['undo-retweet-success']).toHaveLength(1);
   });
 
-  it('handles undo-retweet error path without emitting success', async () => {
+  it('handles undo-retweet error path with optimistic emit then revert', async () => {
     mocks.svc.undoRetweetTweet.mockRejectedValueOnce(new Error('undo-err'));
     const tweet = makeTweet({ isRetweeted: true });
     const wrapper = await mountSuspended(TweetActionButtons, {
@@ -273,10 +281,11 @@ describe('TweetActionButtons actions', () => {
 
     await undoBtn.trigger('click');
     await Promise.resolve();
-    expect(wrapper.emitted()['undo-retweet-success']).toBeUndefined();
+    expect(wrapper.emitted()['undo-retweet-success']).toHaveLength(1);
+    expect(wrapper.emitted()['retweet-success']).toHaveLength(1);
   });
 
-  it('does not emit undo-retweet-success when service returns success=false', async () => {
+  it('reverts undo-retweet when service returns success=false (optimistic then revert)', async () => {
     mocks.svc.undoRetweetTweet.mockResolvedValueOnce({ success: false });
     const tweet = makeTweet({ isRetweeted: true });
     const wrapper = await mountSuspended(TweetActionButtons, {
@@ -288,7 +297,8 @@ describe('TweetActionButtons actions', () => {
 
     await undoBtn.trigger('click');
     await Promise.resolve();
-    expect(wrapper.emitted()['undo-retweet-success']).toBeUndefined();
+    expect(wrapper.emitted()['undo-retweet-success']).toHaveLength(1);
+    expect(wrapper.emitted()['retweet-success']).toHaveLength(1);
   });
 
   it('share copies link to clipboard and shows success toaster', async () => {

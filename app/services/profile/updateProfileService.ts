@@ -3,11 +3,26 @@ import type { ApiSuccessResponse } from '~~/shared/types/api';
 import { apiFetch } from '~/api';
 
 export const updateProfileService = () => {
-  const updateProfile = async (profileData: UpdateProfileRequest): Promise<UserData> => {
+  const updateProfile = async (
+    profileData: UpdateProfileRequest,
+    profilePicture?: File,
+    bannerPicture?: File,
+  ): Promise<UserData> => {
     try {
+      const formData = new FormData();
+
+      // 'data': json, 'avatar': file, 'banner': file
+      formData.append('data', JSON.stringify(profileData));
+      if (profilePicture) {
+        formData.append('avatar', profilePicture);
+      }
+      if (bannerPicture) {
+        formData.append('banner', bannerPicture);
+      }
+
       const response = await apiFetch<ApiSuccessResponse<UserData>>('/api/me', {
         method: 'PATCH',
-        body: profileData,
+        body: formData,
       });
 
       return response.data;

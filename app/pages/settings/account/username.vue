@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
+// Removed explicit vue-router import to allow Nuxt auto-import & test mocking of useRouter
 import * as yup from 'yup';
 import { useForm } from 'vee-validate';
 import FieldInput from '~/components/ui/form/FieldInput.vue';
@@ -10,7 +10,7 @@ import { useUserStore } from '~/stores/user';
 import { apiFetch } from '~/api';
 
 definePageMeta({
-  layout: 'settings',
+  layout: false,
 });
 
 const router = useRouter();

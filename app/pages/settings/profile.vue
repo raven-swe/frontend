@@ -14,8 +14,7 @@ const isDialogOpen = computed(() => route.path === '/settings/profile');
 const openDiscardDialog = ref(false);
 
 const userStore = useUserStore();
-const { updateProfile, updateProfilePicture, updateHeaderImage, removeHeaderImage } =
-  updateProfileService();
+const { updateProfile } = updateProfileService();
 
 const bannerFileInput = ref<HTMLInputElement | null>(null);
 const profileFileInput = ref<HTMLInputElement | null>(null);
@@ -93,6 +92,13 @@ const handleRemoveHeaderImage = () => {
   }
 };
 
+const handleRemoveProfileImage = () => {
+  selectedProfileImage.value = null;
+  if (profileFileInput.value) {
+    profileFileInput.value.value = '';
+  }
+};
+
 // Normalize empty values to null
 const normalize = (v: unknown): string | null =>
   v === undefined || v === null || v === '' ? null : String(v);
@@ -139,28 +145,25 @@ const handleSubmit = async () => {
   router.push(`/profile/${userStore.user.username}`);
   await nextTick(); // allow DOM and route to update
 
-  // Handle uploads and updates
-  if (!selectedImage.value && userStore.user.bannerUrl) {
-    await removeHeaderImage();
-  } else if (bannerFileInput.value?.files?.[0]) {
-    await updateHeaderImage(bannerFileInput.value.files[0]);
-  }
-
-  if (profileFileInput.value?.files?.[0]) {
-    await updateProfilePicture(profileFileInput.value.files[0]);
-  }
-
   const formattedBirthDate = birthDate.value
     ? birthDate.value.toISOString().split('T')[0]
     : undefined;
 
-  await updateProfile({
+  // Prepare profile data
+  const profileData = {
     displayName: name.value,
     bio: normalize(bio.value),
     location: normalize(location.value),
     websiteUrl: normalize(website.value),
     birthDate: formattedBirthDate,
-  });
+    deleteBanner: !selectedImage.value && !!userStore.user.bannerUrl,
+    deleteAvatar: !selectedProfileImage.value && !!userStore.user.avatarUrl,
+  };
+  // Get files
+  const bannerFile = bannerFileInput.value?.files?.[0];
+  const profileFile = profileFileInput.value?.files?.[0];
+
+  await updateProfile(profileData, profileFile, bannerFile);
 
   // refresh data
   queryClient.invalidateQueries({ queryKey: ['layout-data'] });
@@ -265,13 +268,23 @@ const handleDialogClose = () => {
                 class="h-30 w-30 cursor-pointer rounded-full border-3 border-white object-cover"
                 @click="handleProfileImageClick"
               />
-              <button
-                type="button"
-                class="bg-foreground/60 hover:bg-foreground/80 absolute start-1/2 top-1/2 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full transition-colors"
-                @click="handleProfileImageClick"
-              >
-                <Icon name="lucide:camera" class="text-white" size="1rem" />
-              </button>
+              <div class="absolute start-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 gap-2">
+                <button
+                  type="button"
+                  class="bg-foreground/60 hover:bg-foreground/80 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+                  @click="handleProfileImageClick"
+                >
+                  <Icon name="lucide:camera" class="text-white" size="1rem" />
+                </button>
+                <button
+                  v-if="selectedProfileImage"
+                  type="button"
+                  class="bg-foreground/60 hover:bg-foreground/80 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+                  @click="handleRemoveProfileImage"
+                >
+                  <Icon name="lucide:x" class="text-white" size="0.9rem" />
+                </button>
+              </div>
               <input
                 ref="profileFileInput"
                 type="file"
