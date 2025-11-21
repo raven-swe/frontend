@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { useIsCurrentUser } from '@/composables/useIsCurrentUser';
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { profileInteractionService } from '~/services/profile/profileInteractionService';
 
 const userStore = useUserStore();
@@ -12,109 +11,37 @@ const user = inject<ComputedRef<User>>('user-data');
 const isFollower = computed(() => user?.value.relationship.follower || false);
 const isFollowing = computed(() => user?.value.relationship.following || false);
 
-const queryClient = useQueryClient();
-
-const { mutate: blockUser } = useMutation({
-  mutationFn: async (action: 'block' | 'unblock') => {
+const { mutate: blockUser } = useProfileMutation<'block' | 'unblock'>({
+  mutationFn: async (action) => {
     if (!user?.value) return;
     return action === 'block'
       ? profileInteractionService.blockUser(user.value.username)
       : profileInteractionService.unblockUser(user.value.username);
   },
-
-  onMutate: async (action: 'block' | 'unblock') => {
-    const queryKey = ['profile', user?.value.username];
-
-    // Cancel outgoing refetches
-    await queryClient.cancelQueries({ queryKey });
-
-    // Get previous data
-    const previousData = queryClient.getQueryData<ApiSuccessResponse<User>>(queryKey);
-
-    if (previousData?.data) {
-      const updatedUser = { ...previousData.data };
-
-      // Optimistic update
-      if (action === 'block') {
-        updatedUser.relationship.blocking = true;
-      } else {
-        updatedUser.relationship.blocking = false;
-      }
-
-      queryClient.setQueryData(queryKey, {
-        ...previousData,
-        data: updatedUser,
-      });
+  username: user?.value.username,
+  optimisticUpdateFn: (data, action) => {
+    if (action === 'block') {
+      data.relationship.blocking = true;
+    } else {
+      data.relationship.blocking = false;
     }
-
-    return { previousData };
-  },
-
-  // Rollback on error
-  onError: (_err, _action, ctx) => {
-    if (ctx?.previousData) {
-      queryClient.setQueryData(['profile', user?.value.username], ctx.previousData);
-    }
-  },
-
-  // Invalidate queries on success
-  // To sync up with the backend
-  onSuccess: () => {
-    queryClient.invalidateQueries({
-      queryKey: ['profile', user?.value.username],
-    });
   },
 });
 
-const { mutate: muteUser } = useMutation({
-  mutationFn: async (action: 'mute' | 'unmute') => {
+const { mutate: muteUser } = useProfileMutation<'mute' | 'unmute'>({
+  mutationFn: async (action) => {
     if (!user?.value) return;
     return action === 'mute'
       ? profileInteractionService.muteUser(user.value.username)
       : profileInteractionService.unmuteUser(user.value.username);
   },
-
-  onMutate: async (action: 'mute' | 'unmute') => {
-    const queryKey = ['profile', user?.value.username];
-
-    // Cancel outgoing refetches
-    await queryClient.cancelQueries({ queryKey });
-
-    // Get previous data
-    const previousData = queryClient.getQueryData<ApiSuccessResponse<User>>(queryKey);
-
-    if (previousData?.data) {
-      const updatedUser = { ...previousData.data };
-
-      // Optimistic update
-      if (action === 'mute') {
-        updatedUser.relationship.muted = true;
-      } else {
-        updatedUser.relationship.muted = false;
-      }
-
-      queryClient.setQueryData(queryKey, {
-        ...previousData,
-        data: updatedUser,
-      });
+  username: user?.value.username,
+  optimisticUpdateFn: (data, action) => {
+    if (action === 'mute') {
+      data.relationship.muted = true;
+    } else {
+      data.relationship.muted = false;
     }
-
-    return { previousData };
-  },
-
-  // Rollback on error
-  onError: (_err, _action, ctx) => {
-    if (ctx?.previousData) {
-      queryClient.setQueryData(['profile', user?.value.username], ctx.previousData);
-    }
-  },
-
-  // Invalidate queries on success
-  // To sync up with the backend
-  onSuccess: () => {
-    queryClient.invalidateQueries({
-      queryKey: ['profile', user?.value.username],
-    });
   },
 });
 </script>

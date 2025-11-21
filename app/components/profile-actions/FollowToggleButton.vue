@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { profileInteractionService } from '~/services/profile/profileInteractionService';
 
 const props = defineProps<{
@@ -8,68 +7,31 @@ const props = defineProps<{
   follower: boolean;
 }>();
 
-const queryClient = useQueryClient();
-
-const { mutate } = useMutation({
-  mutationFn: (action: 'follow' | 'unfollow') => {
+const { mutate: followUser } = useProfileMutation<'follow' | 'unfollow'>({
+  mutationFn: async (action) => {
     return action === 'follow'
       ? profileInteractionService.followUser(props.username)
       : profileInteractionService.unfollowUser(props.username);
   },
-
-  onMutate: async (action) => {
-    const queryKey = ['profile', props.username];
-
-    // Cancel outgoing refetches
-    await queryClient.cancelQueries({ queryKey });
-
-    // Get previous data
-    const previousData = queryClient.getQueryData<ApiSuccessResponse<User>>(queryKey);
-
-    if (previousData?.data) {
-      const updatedUser = { ...previousData.data };
-
-      // Optimistic update
-      if (action === 'follow') {
-        updatedUser.relationship.following = true;
-        updatedUser.followersCount += 1;
-      } else {
-        updatedUser.relationship.following = false;
-        updatedUser.followersCount -= 1;
-      }
-
-      queryClient.setQueryData(queryKey, {
-        ...previousData,
-        data: updatedUser,
-      });
+  username: props.username,
+  optimisticUpdateFn: (data, action) => {
+    if (action === 'follow') {
+      data.relationship.following = true;
+      data.followersCount += 1;
+    } else {
+      data.relationship.following = false;
+      data.followersCount -= 1;
     }
-
-    return { previousData };
-  },
-
-  // Rollback on error
-  onError: (_err, _action, ctx) => {
-    if (ctx?.previousData) {
-      queryClient.setQueryData(['profile', props.username], ctx.previousData);
-    }
-  },
-
-  // Invalidate queries on success
-  // To sync up with the backend
-  onSuccess: () => {
-    queryClient.invalidateQueries({
-      queryKey: ['profile', props.username],
-    });
   },
 });
 </script>
 
 <template>
-  <UiButton v-if="!props.following" @click="mutate('follow')">
+  <UiButton v-if="!props.following" @click="followUser('follow')">
     {{ props.follower ? $t('ui.follow-back') : $t('ui.follow') }}
   </UiButton>
 
-  <UiButton v-else-if="props.following" variant="outline" @click="mutate('unfollow')">
+  <UiButton v-else-if="props.following" variant="outline" @click="followUser('unfollow')">
     {{ $t('ui.unfollow') }}
   </UiButton>
 </template>
