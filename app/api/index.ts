@@ -24,8 +24,6 @@ export const apiFetch: $Fetch<unknown, NitroFetchRequest> = $fetch.create({
       } catch {
         options.retry = 0; // prevent further retries
         clearAccessToken();
-        navigateTo('/');
-        console.error('[fetch] Token refresh failed, redirecting to login');
       }
     }
   },

@@ -1,13 +1,9 @@
-export default defineEventHandler(async (event) => {
+import { defineWrappedResponseHandler } from '~~/server/utils/handler';
+
+export default defineWrappedResponseHandler(async (event) => {
   // This is a dummy protected resource that requires authentication
-  const authHeader = getHeader(event, 'authorization');
-  return await serverApiFetch<ApiSuccessResponse<{ data: string }>>(
-    '/auth/dummy-protected-resource',
-    {
-      method: 'GET',
-      headers: {
-        Authorization: authHeader || '',
-      },
-    },
-  );
+  const fetcher = serverApiFetch(event);
+  return await fetcher<ApiSuccessResponse<{ data: string }>>('/auth/dummy-protected-resource', {
+    method: 'GET',
+  });
 });

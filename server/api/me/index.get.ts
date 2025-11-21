@@ -1,9 +1,8 @@
+import { defineWrappedResponseHandler } from '~~/server/utils/handler';
+
 export default defineWrappedResponseHandler(async (event) => {
-  const authHeader = getHeader(event, 'authorization');
-  const response = await serverApiFetch<ApiSuccessResponse<User>>(`/me`, {
-    headers: {
-      authorization: authHeader || '',
-    },
-  });
+  const fetcher = serverApiFetch(event);
+
+  const response = await fetcher<ApiSuccessResponse<User>>(`/me`);
   return response;
 });
