@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { useIsCurrentUser } from '@/composables/useIsCurrentUser';
+import { useIsCurrentUser } from '~/composables/useIsCurrentUser';
 import { profileInteractionService } from '~/services/profile/profileInteractionService';
-
+import { useProfileMutation } from '~/composables/useProfileMutation';
 const userStore = useUserStore();
 
 const { isCurrentUser } = useIsCurrentUser();
@@ -55,7 +55,7 @@ const { mutate: muteUser } = useProfileMutation<'mute' | 'unmute'>({
         loading="eager"
       />
     </div>
-    <div v-if="!isCurrentUser" class="flex items-center gap-2">
+    <div v-if="!isCurrentUser" class="flex items-center gap-2" data-test="profile-action-buttons">
       <UiDropdownMenu>
         <UiDropdownMenuTrigger as-child>
           <UiButton variant="outline" size="icon-lg">
@@ -84,12 +84,16 @@ const { mutate: muteUser } = useProfileMutation<'mute' | 'unmute'>({
         :following="isFollowing"
       />
     </div>
-    <UiButton v-else-if="!userStore.isProfileSetup && isCurrentUser" variant="outline">
+    <UiButton
+      v-else-if="!userStore.isProfileSetup && isCurrentUser"
+      data-test="setup-profile-button"
+      variant="outline"
+    >
       <NuxtLink to="/setup/profile">
         {{ $t('profile.setup.setup-profile') }}
       </NuxtLink>
     </UiButton>
-    <UiButton v-else-if="isCurrentUser" variant="outline">
+    <UiButton v-else-if="isCurrentUser" data-test="edit-profile-button" variant="outline">
       <NuxtLink to="/settings/profile">
         {{ $t('profile-info.edit-profile') }}
       </NuxtLink>

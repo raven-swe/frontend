@@ -3,6 +3,7 @@ import { mountSuspended } from '@nuxt/test-utils/runtime';
 import { setActivePinia, createPinia } from 'pinia';
 import { computed } from 'vue';
 import ProfileAvatarSection from '@/components/profile/ProfileAvatarSection.vue';
+import type { User } from '~~/shared/types/user';
 
 // Mock the composable
 vi.mock('@/composables/useIsCurrentUser', () => ({
@@ -16,6 +17,35 @@ vi.mock('@/stores/user', () => ({
   })),
 }));
 
+const mockUser: User = {
+  joinedAt: '2020-07-15T12:34:56Z',
+  bioEntities: {
+    mentions: [],
+    hashtags: [],
+  },
+  username: 'testuser',
+  email: 'testemail@gmail.com',
+  avatarUrl: '/avatar.jpg',
+  bannerUrl: '/banner.jpg',
+  bio: 'This is a test bio',
+  location: 'Test Location',
+  birthDate: '1990-01-01',
+  websiteUrl: 'https://testwebsite.com',
+  followersCount: 0,
+  followingCount: 0,
+  languageCode: 'en',
+  displayName: 'Test User',
+  phone: '',
+  mutualsCount: 0,
+  relationship: {
+    blocking: false,
+    blockedBy: false,
+    following: false,
+    follower: false,
+    muted: false,
+  },
+};
+
 describe('ProfileAvatarSection Component', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
@@ -23,9 +53,7 @@ describe('ProfileAvatarSection Component', () => {
   });
 
   it('renders the container with correct layout classes', async () => {
-    const wrapper = await mountSuspended(ProfileAvatarSection, {
-      props: { profileImg: '/profile.jpg' },
-    });
+    const wrapper = await mountSuspended(ProfileAvatarSection, {});
 
     const container = wrapper.find('.mx-4.flex.flex-wrap');
     expect(container.exists()).toBe(true);
@@ -34,9 +62,7 @@ describe('ProfileAvatarSection Component', () => {
   });
 
   it('renders profile image', async () => {
-    const wrapper = await mountSuspended(ProfileAvatarSection, {
-      props: { profileImg: '/profile.jpg' },
-    });
+    const wrapper = await mountSuspended(ProfileAvatarSection, {});
 
     const profileImage = wrapper.find('img');
     expect(profileImage.exists()).toBe(true);
@@ -44,16 +70,24 @@ describe('ProfileAvatarSection Component', () => {
 
   it('has correct profile image source', async () => {
     const wrapper = await mountSuspended(ProfileAvatarSection, {
-      props: { profileImg: '/profile.jpg' },
+      global: {
+        provide: {
+          'user-data': computed(() => mockUser),
+        },
+      },
     });
 
     const profileImage = wrapper.find('img');
-    expect(profileImage.attributes('src')).toContain('profile.jpg');
+    expect(profileImage.attributes('src')).toContain('avatar.jpg');
   });
 
   it('has correct profile image alt text', async () => {
     const wrapper = await mountSuspended(ProfileAvatarSection, {
-      props: { profileImg: '/profile.jpg' },
+      global: {
+        provide: {
+          'user-data': computed(() => mockUser),
+        },
+      },
     });
 
     const profileImage = wrapper.find('img');
@@ -89,8 +123,11 @@ describe('ProfileAvatarSection Component', () => {
       props: { profileImg: '/profile.jpg' },
     });
 
-    const button = wrapper.find('button');
-    expect(button.exists()).toBe(false);
+    const setupProfileButton = wrapper.find('button[data-test="setup-profile-button"]');
+    expect(setupProfileButton.exists()).toBe(false);
+
+    const editProfileButton = wrapper.find('button[data-test="edit-profile-button"]');
+    expect(editProfileButton.exists()).toBe(false);
   });
 
   it('shows setup profile button when current user and profile not setup', async () => {
@@ -103,11 +140,15 @@ describe('ProfileAvatarSection Component', () => {
     } as ReturnType<typeof useUserStore>);
 
     const wrapper = await mountSuspended(ProfileAvatarSection, {
-      props: { profileImg: '/profile.jpg' },
+      global: {
+        provide: {
+          'user-data': computed(() => mockUser),
+        },
+      },
     });
 
-    const button = wrapper.find('button');
-    expect(button.exists()).toBe(true);
+    const setupButton = wrapper.find('button[data-test="setup-profile-button"]');
+    expect(setupButton.exists()).toBe(true);
 
     const link = wrapper.find('a[href="/setup/profile"]');
     expect(link.exists()).toBe(true);
@@ -118,13 +159,24 @@ describe('ProfileAvatarSection Component', () => {
     const { useIsCurrentUser } = await import('@/composables/useIsCurrentUser');
     const { useUserStore } = await import('@/stores/user');
 
+    vi.doMock('~/composables/useProfileMutation', () => ({
+      useProfileMutation: vi.fn(() => ({
+        mutate: vi.fn(),
+      })),
+    }));
+
     vi.mocked(useIsCurrentUser).mockReturnValue({ isCurrentUser: computed(() => true) });
     vi.mocked(useUserStore).mockReturnValue({
       isProfileSetup: true,
     } as ReturnType<typeof useUserStore>);
 
+    const mockUserRef = computed(() => mockUser);
     const wrapper = await mountSuspended(ProfileAvatarSection, {
-      props: { profileImg: '/profile.jpg' },
+      global: {
+        provide: {
+          'user-data': mockUserRef,
+        },
+      },
     });
 
     const button = wrapper.find('button');
@@ -143,9 +195,14 @@ describe('ProfileAvatarSection Component', () => {
     vi.mocked(useUserStore).mockReturnValue({
       isProfileSetup: false,
     } as ReturnType<typeof useUserStore>);
+    const mockUserRef = computed(() => mockUser);
 
     const wrapper = await mountSuspended(ProfileAvatarSection, {
-      props: { profileImg: '/profile.jpg' },
+      global: {
+        provide: {
+          'user-data': mockUserRef,
+        },
+      },
     });
 
     const button = wrapper.find('button');
@@ -162,8 +219,13 @@ describe('ProfileAvatarSection Component', () => {
       isProfileSetup: true,
     } as ReturnType<typeof useUserStore>);
 
+    const mockUserRef = computed(() => mockUser);
     const wrapper = await mountSuspended(ProfileAvatarSection, {
-      props: { profileImg: '/profile.jpg' },
+      global: {
+        provide: {
+          'user-data': mockUserRef,
+        },
+      },
     });
 
     const button = wrapper.find('button');

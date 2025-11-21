@@ -4,8 +4,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query';
 import ProfileLayout from '@/layouts/profile.vue';
-import type { ApiSuccessResponse } from '~~/shared/types/api';
+import type { ApiErrorResponse, ApiSuccessResponse } from '~~/shared/types/api';
 import type { User } from '~~/shared/types/user';
+import type { FetchError } from 'ofetch';
 
 // Create a shared mock route object
 const mockRoute = {
@@ -24,7 +25,8 @@ const mockQueryData = {
   data: ref<ApiSuccessResponse<User> | null>(null),
   isLoading: ref(false),
   isError: ref(false),
-  error: ref<{ data?: { code?: string }; statusCode?: number } | null>(null),
+  error: ref<FetchError<FetchError<ApiErrorResponse>> | null>(null),
+  suspense: ref<(() => null) | null>(() => null),
 };
 
 vi.mock('@tanstack/vue-query', async () => {
@@ -139,7 +141,16 @@ describe('ProfileLayout.vue', () => {
     mockQueryData.isError.value = true;
 
     mockQueryData.error.value = {
-      data: { code: 'USER_NOT_FOUND' },
+      message: 'User not found',
+      name: 'FetchError',
+      data: {
+        message: 'User not found',
+        name: 'FetchError',
+        data: {
+          success: false,
+          error: { code: 'USER_NOT_FOUND', message: 'User not found' },
+        },
+      },
       statusCode: 404,
     };
 
@@ -168,6 +179,13 @@ describe('ProfileLayout.vue', () => {
       followingCount: 150,
       followersCount: 200,
       mutualsCount: 5,
+      relationship: {
+        blocking: false,
+        muted: false,
+        following: true,
+        follower: false,
+        blockedBy: false,
+      },
     };
 
     mockQueryData.data.value = { success: true, data: mockUser };
@@ -197,6 +215,13 @@ describe('ProfileLayout.vue', () => {
       followingCount: 0,
       followersCount: 0,
       mutualsCount: 0,
+      relationship: {
+        blocking: false,
+        muted: false,
+        following: true,
+        follower: false,
+        blockedBy: false,
+      },
     };
 
     mockQueryData.data.value = { success: true, data: mockUser };

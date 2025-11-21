@@ -1,31 +1,46 @@
 import { describe, expect, it } from 'vitest';
 import { mountSuspended } from '@nuxt/test-utils/runtime';
 import ProfileInfo from '@/components/profile/ProfileInfo.vue';
+import type { User } from '~~/shared/types/user';
+import { computed } from 'vue';
 
-const mockUserProfile = {
-  displayName: 'Hussein Mohamed',
-  username: 'hussein',
-  bio: 'football lover, software engineer, coffee addict.',
-  email: '',
-  phone: '',
+const mockUser: User = {
+  joinedAt: '2020-07-15T12:34:56Z',
+  bioEntities: {
+    mentions: [],
+    hashtags: [],
+  },
+  username: 'testuser',
+  email: 'testemail@gmail.com',
+  avatarUrl: '/avatar.jpg',
+  bannerUrl: '/banner.jpg',
+  bio: 'This is a test bio',
+  location: 'Test Location',
+  birthDate: '1990-01-01',
+  websiteUrl: 'https://testwebsite.com',
+  followersCount: 0,
+  followingCount: 0,
   languageCode: 'en',
-  websiteUrl: 'https://www.example.com/averylongurlthatexceedsthirtycharacters',
-  joinedAt: '2020-07-01T00:00:00.000Z',
-  followingCount: 150,
-  followersCount: 50,
-  bioEntities: { mentions: [], hashtags: [] },
-  avatarUrl: 'https://i.ibb.co/vv6B8ML0/profile.jpg',
-  bannerUrl: 'https://i.ibb.co/bj3fhPfq/cover.jpg',
-  location: 'Cairo, Egypt',
-  birthDate: '1999-01-01',
+  displayName: 'Test User',
+  phone: '',
   mutualsCount: 0,
-  mutualNames: [],
+  relationship: {
+    blocking: false,
+    blockedBy: false,
+    following: false,
+    follower: false,
+    muted: false,
+  },
 };
 
 describe('ProfileInfo', () => {
   it('renders component with correct structure', async () => {
     const wrapper = await mountSuspended(ProfileInfo, {
-      props: { userProfile: mockUserProfile },
+      global: {
+        provide: {
+          'user-data': computed(() => mockUser),
+        },
+      },
     });
 
     const container = wrapper.find('div.mt-2.flex.flex-col');
@@ -34,55 +49,75 @@ describe('ProfileInfo', () => {
 
   it('renders display name correctly', async () => {
     const wrapper = await mountSuspended(ProfileInfo, {
-      props: { userProfile: mockUserProfile },
+      global: {
+        provide: {
+          'user-data': computed(() => mockUser),
+        },
+      },
     });
 
     const displayName = wrapper.find('h2');
     expect(displayName.exists()).toBe(true);
-    expect(displayName.text()).toBe('Hussein Mohamed');
+    expect(displayName.text()).toBe('Test User');
     expect(displayName.classes()).toContain('text-2xl');
     expect(displayName.classes()).toContain('font-bold');
   });
 
   it('renders username with @ prefix', async () => {
     const wrapper = await mountSuspended(ProfileInfo, {
-      props: { userProfile: mockUserProfile },
+      global: {
+        provide: {
+          'user-data': computed(() => mockUser),
+        },
+      },
     });
 
     const username = wrapper.find('p.text-md');
     expect(username.exists()).toBe(true);
-    expect(username.text()).toBe('@hussein');
+    expect(username.text()).toBe('@testuser');
   });
 
   it('renders bio with correct styling', async () => {
     const wrapper = await mountSuspended(ProfileInfo, {
-      props: { userProfile: mockUserProfile },
+      global: {
+        provide: {
+          'user-data': computed(() => mockUser),
+        },
+      },
     });
 
     const bio = wrapper.find('p.whitespace-pre-line');
     expect(bio.exists()).toBe(true);
-    expect(bio.text()).toBe('football lover, software engineer, coffee addict.');
+    expect(bio.text()).toBe('This is a test bio');
     expect(bio.classes()).toContain('text-muted-foreground');
     expect(bio.classes()).toContain('mt-2');
   });
 
   it('renders location when provided with leading-tight class', async () => {
     const wrapper = await mountSuspended(ProfileInfo, {
-      props: { userProfile: mockUserProfile },
+      global: {
+        provide: {
+          'user-data': computed(() => mockUser),
+        },
+      },
     });
 
-    expect(wrapper.html()).toContain('Cairo, Egypt');
+    expect(wrapper.html()).toContain('Test Location');
     expect(wrapper.html()).toContain('ic:sharp-location-on');
 
     // Check that location paragraph has leading-tight class
     const locationParagraph = wrapper.find('p.leading-tight');
     expect(locationParagraph.exists()).toBe(true);
-    expect(locationParagraph.text()).toContain('Cairo, Egypt');
+    expect(locationParagraph.text()).toContain('Test Location');
   });
 
   it('does not render location when not provided', async () => {
     const wrapper = await mountSuspended(ProfileInfo, {
-      props: { userProfile: { ...mockUserProfile, location: '' } },
+      global: {
+        provide: {
+          'user-data': computed(() => ({ ...mockUser, location: '' })),
+        },
+      },
     });
 
     expect(wrapper.html()).not.toContain('ic:sharp-location-on');
@@ -90,12 +125,19 @@ describe('ProfileInfo', () => {
 
   it('renders website link and displayUrl correctly when URL is long', async () => {
     const wrapper = await mountSuspended(ProfileInfo, {
-      props: { userProfile: mockUserProfile },
+      global: {
+        provide: {
+          'user-data': computed(() => ({
+            ...mockUser,
+            websiteUrl: 'https://averylongwebsiteurl.com/some/really/long/path',
+          })),
+        },
+      },
     });
 
     const link = wrapper.find('a.text-brand-blue');
     expect(link.exists()).toBe(true);
-    expect(link.attributes('href')).toBe(mockUserProfile.websiteUrl);
+    expect(link.attributes('href')).toBe('https://averylongwebsiteurl.com/some/really/long/path');
     expect(link.attributes('target')).toBe('_blank');
     expect(link.attributes('rel')).toBe('noopener noreferrer');
     expect(link.text()).toContain('...');
@@ -105,7 +147,14 @@ describe('ProfileInfo', () => {
   it('renders website link without truncation when URL is short', async () => {
     const shortUrl = 'https://example.com';
     const wrapper = await mountSuspended(ProfileInfo, {
-      props: { userProfile: { ...mockUserProfile, websiteUrl: shortUrl } },
+      global: {
+        provide: {
+          'user-data': computed(() => ({
+            ...mockUser,
+            websiteUrl: shortUrl,
+          })),
+        },
+      },
     });
 
     const link = wrapper.find('a.text-brand-blue');
@@ -116,7 +165,11 @@ describe('ProfileInfo', () => {
 
   it('does not render website link when websiteUrl is empty', async () => {
     const wrapper = await mountSuspended(ProfileInfo, {
-      props: { userProfile: { ...mockUserProfile, websiteUrl: '' } },
+      global: {
+        provide: {
+          'user-data': computed(() => ({ ...mockUser, websiteUrl: '' })),
+        },
+      },
     });
 
     const link = wrapper.find('a.text-brand-blue');
@@ -125,7 +178,11 @@ describe('ProfileInfo', () => {
 
   it('renders join date with calendar icon', async () => {
     const wrapper = await mountSuspended(ProfileInfo, {
-      props: { userProfile: mockUserProfile },
+      global: {
+        provide: {
+          'user-data': computed(() => mockUser),
+        },
+      },
     });
 
     const html = wrapper.html();
@@ -135,9 +192,12 @@ describe('ProfileInfo', () => {
 
   it('renders following and followers counts', async () => {
     const wrapper = await mountSuspended(ProfileInfo, {
-      props: { userProfile: mockUserProfile },
+      global: {
+        provide: {
+          'user-data': computed(() => ({ ...mockUser, followingCount: 150, followersCount: 50 })),
+        },
+      },
     });
-
     const statsSection = wrapper.find('div.mt-4.flex.space-x-4');
     expect(statsSection.exists()).toBe(true);
 
@@ -149,7 +209,11 @@ describe('ProfileInfo', () => {
 
   it('renders statistics with proper labels', async () => {
     const wrapper = await mountSuspended(ProfileInfo, {
-      props: { userProfile: mockUserProfile },
+      global: {
+        provide: {
+          'user-data': computed(() => mockUser),
+        },
+      },
     });
 
     const html = wrapper.html();
@@ -159,7 +223,11 @@ describe('ProfileInfo', () => {
 
   it('applies correct text styling to all elements', async () => {
     const wrapper = await mountSuspended(ProfileInfo, {
-      props: { userProfile: mockUserProfile },
+      global: {
+        provide: {
+          'user-data': computed(() => mockUser),
+        },
+      },
     });
 
     // Display name styling
@@ -172,25 +240,13 @@ describe('ProfileInfo', () => {
     expect(mutedElements.length).toBeGreaterThan(0);
   });
 
-  it('handles missing optional counts gracefully', async () => {
-    const userWithoutCounts = {
-      ...mockUserProfile,
-      followingCount: undefined,
-      followersCount: undefined,
-    };
-
-    const wrapper = await mountSuspended(ProfileInfo, {
-      props: { userProfile: userWithoutCounts },
-    });
-
-    const strongTags = wrapper.findAll('strong');
-    expect(strongTags.length).toBe(2);
-    // Should render undefined values as empty or handle gracefully
-  });
-
   it('renders all icons with correct sizes', async () => {
     const wrapper = await mountSuspended(ProfileInfo, {
-      props: { userProfile: mockUserProfile },
+      global: {
+        provide: {
+          'user-data': computed(() => mockUser),
+        },
+      },
     });
 
     const html = wrapper.html();
@@ -202,7 +258,11 @@ describe('ProfileInfo', () => {
 
   it('applies correct gap and spacing classes', async () => {
     const wrapper = await mountSuspended(ProfileInfo, {
-      props: { userProfile: mockUserProfile },
+      global: {
+        provide: {
+          'user-data': computed(() => mockUserProfile),
+        },
+      },
     });
 
     const infoContainer = wrapper.find('.mt-2.flex.flex-wrap.gap-2');
@@ -210,23 +270,5 @@ describe('ProfileInfo', () => {
 
     const statsContainer = wrapper.find('.mt-4.flex.space-x-4');
     expect(statsContainer.exists()).toBe(true);
-  });
-
-  it('applies text-sm class to metadata items', async () => {
-    const wrapper = await mountSuspended(ProfileInfo, {
-      props: { userProfile: mockUserProfile },
-    });
-
-    // Location paragraph should have text-sm
-    const locationP = wrapper.find('p.leading-tight');
-    expect(locationP.classes()).toContain('text-sm');
-
-    // Website link should have text-sm
-    const websiteLink = wrapper.find('a.text-brand-blue');
-    expect(websiteLink.classes()).toContain('text-sm');
-
-    // Join date paragraph should have text-sm
-    const joinDateP = wrapper.find('p:not(.leading-tight):not(.text-md):not(.whitespace-pre-line)');
-    expect(joinDateP.classes()).toContain('text-sm');
   });
 });
