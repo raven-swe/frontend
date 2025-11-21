@@ -112,4 +112,64 @@ describe('useRecaptcha', () => {
       }),
     );
   });
+
+  describe('reset', () => {
+    const mockReset = vi.fn();
+
+    beforeEach(() => {
+      mockReset.mockClear();
+    });
+
+    it('calls grecaptcha.reset with element id when grecaptcha is available', () => {
+      window.grecaptcha = {
+        render: mockRender,
+        reset: mockReset,
+      };
+
+      const { reset } = useRecaptcha();
+      reset('captcha-element');
+
+      expect(mockReset).toHaveBeenCalledWith('captcha-element');
+      expect(mockReset).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not throw error when grecaptcha is not available', () => {
+      window.grecaptcha = undefined;
+
+      const { reset } = useRecaptcha();
+
+      expect(() => reset('captcha-element')).not.toThrow();
+      expect(mockReset).not.toHaveBeenCalled();
+    });
+
+    it('calls grecaptcha.reset with undefined element id', () => {
+      window.grecaptcha = {
+        render: mockRender,
+        reset: mockReset,
+      };
+
+      const { reset } = useRecaptcha();
+      reset(undefined);
+
+      expect(mockReset).toHaveBeenCalledWith(undefined);
+      expect(mockReset).toHaveBeenCalledTimes(1);
+    });
+
+    it('handles multiple reset calls', () => {
+      window.grecaptcha = {
+        render: mockRender,
+        reset: mockReset,
+      };
+
+      const { reset } = useRecaptcha();
+      reset('captcha-1');
+      reset('captcha-2');
+      reset('captcha-3');
+
+      expect(mockReset).toHaveBeenCalledTimes(3);
+      expect(mockReset).toHaveBeenNthCalledWith(1, 'captcha-1');
+      expect(mockReset).toHaveBeenNthCalledWith(2, 'captcha-2');
+      expect(mockReset).toHaveBeenNthCalledWith(3, 'captcha-3');
+    });
+  });
 });

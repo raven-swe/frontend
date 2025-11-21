@@ -16,6 +16,7 @@ declare global {
           hl?: string;
         },
       ) => void;
+      reset: (widgetId: string | undefined) => void;
     };
   }
 }
