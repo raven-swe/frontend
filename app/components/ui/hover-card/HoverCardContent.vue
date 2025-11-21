@@ -13,11 +13,10 @@ const props = withDefaults(
   defineProps<HoverCardContentProps & { class?: HTMLAttributes['class'] }>(),
   {
     sideOffset: 4,
+    class: '',
   },
 );
-
 const delegatedProps = reactiveOmit(props, 'class');
-
 const forwardedProps = useForwardProps(delegatedProps);
 </script>
 
