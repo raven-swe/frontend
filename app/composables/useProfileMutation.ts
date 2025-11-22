@@ -41,9 +41,9 @@ export function useProfileMutation<T>({
       }
     },
 
-    // Invalidate queries on success
+    // Invalidate queries on finishing request
     // To sync up with the backend
-    onSuccess: () => {
+    onSettled: () => {
       queryClient.invalidateQueries({
         queryKey: ['profile', username],
       });
