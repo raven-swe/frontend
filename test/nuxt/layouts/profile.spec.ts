@@ -1,4 +1,3 @@
-import { mount } from '@vue/test-utils';
 import { ref } from 'vue';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
@@ -7,18 +6,17 @@ import ProfileLayout from '@/layouts/profile.vue';
 import type { ApiErrorResponse, ApiSuccessResponse } from '~~/shared/types/api';
 import type { User } from '~~/shared/types/user';
 import type { FetchError } from 'ofetch';
+import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime';
 
 // Create a shared mock route object
 const mockRoute = {
-  path: '/profile/hussein',
-  params: { username: 'hussein' },
+  path: '/profile/testuser',
+  params: { username: 'testuser' },
 };
 
-// Mock useRoute composable
-vi.mock('#app', () => ({
-  useRoute: () => mockRoute,
-  useFetch: vi.fn(),
-}));
+mockNuxtImport('useRoute', () => {
+  return () => mockRoute;
+});
 
 // Mock Vue Query composables
 const mockQueryData = {
@@ -93,10 +91,6 @@ describe('ProfileLayout.vue', () => {
     });
     vi.clearAllMocks();
 
-    // Reset mock route to default
-    mockRoute.path = '/profile/hussein';
-    mockRoute.params = { username: 'hussein' };
-
     // Reset mock query data
     mockQueryData.data.value = null;
     mockQueryData.isLoading.value = false;
@@ -104,12 +98,12 @@ describe('ProfileLayout.vue', () => {
     mockQueryData.error.value = null;
   });
 
-  const createWrapper = (username = 'hussein', routePath = '/profile/hussein') => {
+  const createWrapper = async (username = 'hussein', routePath = '/profile/hussein') => {
     // Update the mock route before mounting
     mockRoute.path = routePath;
     mockRoute.params = { username };
 
-    return mount(ProfileLayout, {
+    return await mountSuspended(ProfileLayout, {
       global: {
         plugins: [[VueQueryPlugin, { queryClient }]],
         mocks: {
@@ -123,15 +117,15 @@ describe('ProfileLayout.vue', () => {
     });
   };
 
-  it('mounts successfully', () => {
-    const wrapper = createWrapper();
+  it('mounts successfully', async () => {
+    const wrapper = await createWrapper();
     expect(wrapper.exists()).toBe(true);
   });
 
   it('shows skeleton when loading', async () => {
     mockQueryData.isLoading.value = true;
 
-    const wrapper = createWrapper();
+    const wrapper = await createWrapper();
     await wrapper.vm.$nextTick();
 
     expect(wrapper.findComponent({ name: 'ProfileDetailsSkeleton' }).exists()).toBe(true);
@@ -154,7 +148,7 @@ describe('ProfileLayout.vue', () => {
       statusCode: 404,
     };
 
-    const wrapper = createWrapper();
+    const wrapper = await createWrapper();
     await wrapper.vm.$nextTick();
 
     expect(wrapper.text()).toContain('errors.ACCOUNT_NOT_FOUND');
@@ -190,7 +184,7 @@ describe('ProfileLayout.vue', () => {
 
     mockQueryData.data.value = { success: true, data: mockUser };
 
-    const wrapper = createWrapper();
+    const wrapper = await createWrapper();
     await wrapper.vm.$nextTick();
 
     expect(wrapper.findComponent({ name: 'ProfileDetails' }).exists()).toBe(true);
@@ -226,7 +220,7 @@ describe('ProfileLayout.vue', () => {
 
     mockQueryData.data.value = { success: true, data: mockUser };
 
-    const wrapper = createWrapper();
+    const wrapper = await createWrapper();
     await wrapper.vm.$nextTick();
 
     const tabs = wrapper.findAllComponents({ name: 'Tab' });
