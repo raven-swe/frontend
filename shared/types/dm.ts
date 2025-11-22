@@ -43,3 +43,64 @@ export interface DmMessage {
   createdAt: string;
   isMine: boolean;
 }
+
+// WebSocket Types
+export interface DmWsSendMessagePayload {
+  type: 'send_message';
+  conversationId: string;
+  clientMessageId: string;
+  body: string;
+}
+
+export interface DmWsMarkSeenPayload {
+  type: 'mark_seen';
+  conversationId: string;
+  lastSeenMessageId: string;
+}
+
+export type DmWsClientMessage = DmWsSendMessagePayload | DmWsMarkSeenPayload;
+
+export interface DmWsMessageReceived {
+  type: 'message_received';
+  conversationId: string;
+  message: {
+    id: string;
+    sender: {
+      id: string;
+      username: string;
+      displayName: string;
+      avatarUrl: string | null;
+    };
+    clientMessageId: string;
+    body: string;
+    createdAt: string;
+  };
+}
+
+export interface DmWsMessageDeleted {
+  type: 'message_deleted';
+  conversationId: string;
+  messageId: string;
+  deletedAt: string;
+}
+
+export interface DmWsConversationSeenUpdate {
+  type: 'conversation_seen_update';
+  conversationId: string;
+  username: string;
+  lastSeenMessageId: string;
+  seenAt: string;
+}
+
+export interface DmWsError {
+  type: 'error';
+  clientMessageId: string;
+  code: string;
+  message: string;
+}
+
+export type DmWsServerMessage =
+  | DmWsMessageReceived
+  | DmWsMessageDeleted
+  | DmWsConversationSeenUpdate
+  | DmWsError;

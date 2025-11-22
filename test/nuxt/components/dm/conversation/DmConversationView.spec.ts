@@ -8,6 +8,22 @@ vi.mock('vue-router', () => ({
   useRoute: () => ({ params: { conversationId: '1' } }),
 }));
 
+// Mock the WebSocket composable
+vi.mock('@/composables/useDmWebSocket', () => ({
+  useDmWebSocket: () => ({
+    isConnected: { value: false },
+    isConnecting: { value: false },
+    currentConversationId: { value: null },
+    connect: vi.fn(),
+    disconnect: vi.fn(),
+    sendMessage: vi.fn(),
+    markSeen: vi.fn(),
+    switchConversation: vi.fn(),
+    onMessage: vi.fn(),
+    onError: vi.fn(),
+  }),
+}));
+
 async function mountAndResolve() {
   const wrapper = await mountSuspended(DmConversationView);
   // resolve any pending async data

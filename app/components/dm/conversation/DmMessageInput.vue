@@ -3,6 +3,8 @@ import MessageAttachmentPreview from './input/MessageAttachmentPreview.vue';
 import MessageSendButton from './input/MessageSendButton.vue';
 import MessageTextField from './input/MessageTextField.vue';
 import MessageToolbar from './input/MessageToolbar.vue';
+import { showToaster } from '@/utils/showToaster';
+import type { useDmWebSocket } from '@/composables/useDmWebSocket';
 
 const message = ref('');
 const imageFile = ref<File | null>(null);
@@ -10,14 +12,41 @@ const fileInputRef = ref<HTMLInputElement | null>(null);
 const imageMeta = ref<{ width: number; height: number } | null>(null);
 const previewUrl = computed(() => (imageFile.value ? URL.createObjectURL(imageFile.value) : ''));
 
-const emit = defineEmits<{ send: [payload: { text: string; image?: File | null }] }>();
+const route = useRoute();
+const conversationId = computed(() => route.params.conversationId as string);
+
+const ws = inject<ReturnType<typeof useDmWebSocket>>('dmWebSocket');
 
 const canSend = computed(() => message.value.trim().length > 0 || !!imageFile.value);
 
 function handleSend() {
   const text = message.value.trim();
-  if (!text && !imageFile.value) return;
-  emit('send', { text, image: imageFile.value });
+
+  if (!text) {
+    if (imageFile.value) {
+      showToaster('error', 'Image upload is not yet supported via WebSocket');
+    }
+    return;
+  }
+
+  if (!ws) {
+    showToaster('error', 'WebSocket not initialized');
+    return;
+  }
+
+  if (!ws.isConnected.value) {
+    showToaster('error', 'WebSocket not connected');
+    return;
+  }
+
+  if (!conversationId.value) {
+    showToaster('error', 'No conversation selected');
+    return;
+  }
+
+  // Send message via WebSocket
+  ws.sendMessage(conversationId.value, text);
+
   message.value = '';
   if (imageFile.value) URL.revokeObjectURL(previewUrl.value);
   imageFile.value = null;
