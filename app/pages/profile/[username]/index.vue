@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { useInfiniteQuery } from '@tanstack/vue-query';
 import { apiFetch } from '~/api';
-import { useInfiniteScroll } from '@vueuse/core';
 import { DEFAULT_PAGE_SIZE } from '~/constants/pagination';
-import { useVirtualizer } from '@tanstack/vue-virtual';
+import { useWindowVirtualizer } from '@tanstack/vue-virtual';
 
 definePageMeta({
   layout: 'profile',
@@ -44,16 +43,21 @@ const tweets = computed(() => {
 
 const parentRef = ref<HTMLElement | null>(null);
 
+const parentOffsetRef = ref(0);
+
+onMounted(() => {
+  parentOffsetRef.value = parentRef.value?.offsetTop ?? 0;
+});
 const rowVirtualizerOptions = computed(() => {
   return {
     count: hasNextPage ? tweets.value.length + 1 : tweets.value.length,
-    getScrollElement: () => parentRef.value,
-    estimateSize: () => 100,
-    overscan: 5,
+    estimateSize: () => 120,
+    overscan: 3,
+    scrollMargin: parentOffsetRef.value,
   };
 });
 
-const rowVirtualizer = useVirtualizer(rowVirtualizerOptions);
+const rowVirtualizer = useWindowVirtualizer(rowVirtualizerOptions);
 
 const virtualRows = computed(() => rowVirtualizer.value.getVirtualItems());
 
@@ -65,16 +69,28 @@ const measureElement = (el: Element | ComponentPublicInstance | null) => {
   rowVirtualizer.value.measureElement(element);
 };
 
-const sentinel = ref<HTMLElement | null>(null);
-useInfiniteScroll(
-  sentinel,
-  async () => {
-    if (hasNextPage.value && !isFetchingNextPage.value) {
-      await fetchNextPage();
-    }
-  },
-  { distance: 1000 },
-);
+watchEffect(() => {
+  const [lastItem] = [...virtualRows.value].reverse();
+
+  if (!lastItem) {
+    return;
+  }
+
+  if (lastItem.index >= tweets.value.length - 3 && hasNextPage.value && !isFetchingNextPage.value) {
+    fetchNextPage();
+  }
+});
+
+// const sentinel = ref<HTMLElement | null>(null);
+// useInfiniteScroll(
+//   sentinel,
+//   async () => {
+//     if (hasNextPage.value && !isFetchingNextPage.value) {
+//       await fetchNextPage();
+//     }
+//   },
+//   { distance: 1000 },
+// );
 
 onServerPrefetch(async () => {
   await suspense();
