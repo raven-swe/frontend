@@ -123,6 +123,9 @@ describe('Tweet Detail Page', () => {
 
     const wrapper = mount(TweetDetailPage, {
       global: {
+        provide: {
+          registerNewTweetHandler: vi.fn(() => vi.fn()),
+        },
         stubs: {
           TweetView: true,
           TweetComposer: true,
@@ -135,14 +138,19 @@ describe('Tweet Detail Page', () => {
       },
     });
 
-    await nextTick();
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    // Wait for all promises to resolve
+    await vi.waitFor(
+      () => {
+        expect(mockTweetsService.tweet).toHaveBeenCalledWith('123');
+        expect(mockTweetsService.replies).toHaveBeenCalledWith('123', {
+          limit: 10,
+          cursor: null,
+        });
+      },
+      { timeout: 3000 },
+    );
 
-    expect(mockTweetsService.tweet).toHaveBeenCalledWith('123');
-    expect(mockTweetsService.replies).toHaveBeenCalledWith('123', {
-      limit: 10,
-      cursor: null,
-    });
+    await nextTick();
 
     const vm = wrapper.vm as unknown as TweetDetailPageVM;
     expect(vm.tweetData).toEqual(mockTweet);
@@ -155,6 +163,9 @@ describe('Tweet Detail Page', () => {
 
     const wrapper = mount(TweetDetailPage, {
       global: {
+        provide: {
+          registerNewTweetHandler: vi.fn(() => vi.fn()),
+        },
         stubs: {
           TweetView: true,
           TweetComposer: true,
@@ -186,6 +197,9 @@ describe('Tweet Detail Page', () => {
 
     const wrapper = mount(TweetDetailPage, {
       global: {
+        provide: {
+          registerNewTweetHandler: vi.fn(() => vi.fn()),
+        },
         stubs: {
           TweetView: true,
           TweetComposer: true,
@@ -216,6 +230,9 @@ describe('Tweet Detail Page', () => {
 
     mount(TweetDetailPage, {
       global: {
+        provide: {
+          registerNewTweetHandler: vi.fn(() => vi.fn()),
+        },
         stubs: {
           TweetView: true,
           TweetComposer: true,
@@ -250,6 +267,9 @@ describe('Tweet Detail Page', () => {
 
     mount(TweetDetailPage, {
       global: {
+        provide: {
+          registerNewTweetHandler: vi.fn(() => vi.fn()),
+        },
         stubs: {
           TweetView: true,
           TweetComposer: true,
@@ -274,6 +294,9 @@ describe('Tweet Detail Page', () => {
 
     const wrapper = mount(TweetDetailPage, {
       global: {
+        provide: {
+          registerNewTweetHandler: vi.fn(() => vi.fn()),
+        },
         stubs: {
           TweetView: true,
           TweetComposer: true,
@@ -306,6 +329,9 @@ describe('Tweet Detail Page', () => {
 
     const wrapper = mount(TweetDetailPage, {
       global: {
+        provide: {
+          registerNewTweetHandler: vi.fn(() => vi.fn()),
+        },
         stubs: {
           TweetView: true,
           TweetComposer: true,
@@ -335,6 +361,9 @@ describe('Tweet Detail Page', () => {
 
     const wrapper = mount(TweetDetailPage, {
       global: {
+        provide: {
+          registerNewTweetHandler: vi.fn(() => vi.fn()),
+        },
         stubs: {
           TweetView: true,
           TweetComposer: true,
@@ -360,6 +389,9 @@ describe('Tweet Detail Page', () => {
 
     const wrapper = mount(TweetDetailPage, {
       global: {
+        provide: {
+          registerNewTweetHandler: vi.fn(() => vi.fn()),
+        },
         stubs: {
           TweetView: true,
           TweetComposer: true,
@@ -391,6 +423,9 @@ describe('Tweet Detail Page', () => {
 
     const wrapper = mount(TweetDetailPage, {
       global: {
+        provide: {
+          registerNewTweetHandler: vi.fn(() => vi.fn()),
+        },
         stubs: {
           TweetView: true,
           TweetComposer: true,
@@ -427,6 +462,9 @@ describe('Tweet Detail Page', () => {
 
     const wrapper = mount(TweetDetailPage, {
       global: {
+        provide: {
+          registerNewTweetHandler: vi.fn(() => vi.fn()),
+        },
         stubs: {
           TweetView: true,
           TweetComposer: true,
