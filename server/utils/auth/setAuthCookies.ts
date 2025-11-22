@@ -1,6 +1,6 @@
 import * as cookie from 'cookie';
 import * as jwt from 'jsonwebtoken';
-import { type H3Event, setCookie } from 'h3';
+import type { H3Event } from 'h3';
 import type { FetchResponse } from 'ofetch';
 
 export function setAuthCookies(
