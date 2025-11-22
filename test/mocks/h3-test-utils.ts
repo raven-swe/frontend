@@ -52,6 +52,29 @@ export function useH3TestUtils() {
         return (event.req.context?.clientAddress as string) || event.req.ip || undefined;
       },
     ),
+    setCookie: vi.fn(
+      (event: H3Event, name: string, value: string, options?: Record<string, unknown>) => {
+        let cookieString = `${name}=${value}; Path=${options?.path || '/'}`;
+        if (options) {
+          if (options.httpOnly) {
+            cookieString += '; HttpOnly';
+          }
+          if (options.secure) {
+            cookieString += '; Secure';
+          }
+          if (options.sameSite) {
+            cookieString += `; SameSite=${options.sameSite}`;
+          }
+          if (options.maxAge) {
+            cookieString += `; Max-Age=${options.maxAge}`;
+          }
+          if (options.expires && options.expires instanceof Date) {
+            cookieString += `; Expires=${options.expires.toUTCString()}`;
+          }
+        }
+        event.headers.append('Set-Cookie', cookieString);
+      },
+    ),
   }));
 
   // Stub global functions to emulate Nuxt auto-imports
@@ -65,6 +88,7 @@ export function useH3TestUtils() {
   vi.stubGlobal('deleteCookie', h3.deleteCookie);
   vi.stubGlobal('getValidatedRouterParams', h3.getValidatedRouterParams);
   vi.stubGlobal('getRequestIP', h3.getRequestIP);
+  vi.stubGlobal('setCookie', h3.setCookie);
 
   return h3;
 }
