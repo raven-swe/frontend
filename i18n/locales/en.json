@@ -235,7 +235,14 @@
       "IS_EMPTY": "Please enter your password",
       "TOO_SHORT": "Password must be at least 10 characters long",
       "INVALID_FORMAT": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
-    }
+    },
+    "CANNOT_BLOCK_USER": "You cannot block this user.",
+    "ALREADY_NOT_FOLLOWING": "You are already not following this user.",
+    "ALREADY_FOLLOWING": "You are already following this user.",
+    "ALREADY_BLOCKED": "You have already blocked this user.",
+    "ALREADY_UNBLOCKED": "You have already unblocked this user.",
+    "ALREADY_MUTED": "You have already muted this user.",
+    "ALREADY_UNMUTED": "You have already unmuted this user."
   },
   "register": {
     "register-info": {
@@ -377,7 +384,6 @@
     "placeholder-search": "Search Direct Messages",
     "header-title": "Messages",
     "placeholder-start-message": "Start a new message",
-
     "attachedImage": "Attached image"
   },
   "toaster": {

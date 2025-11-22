@@ -1,17 +1,26 @@
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
+import type { FetchError } from 'ofetch';
 
-export function useProfileMutation<T>({
+export function useProfileMutation<T, Q = void>({
   mutationFn,
   username,
   optimisticUpdateFn,
 }: {
-  mutationFn: (action: T) => Promise<unknown>;
+  mutationFn: (action: T) => Promise<Q>;
   username: string;
   optimisticUpdateFn: (data: User, action: T) => void;
 }) {
   const queryClient = useQueryClient();
+  const { t } = useI18n();
 
-  return useMutation({
+  return useMutation<
+    Q,
+    FetchError<FetchError<ApiErrorResponse>>,
+    T,
+    {
+      previousData?: ApiSuccessResponse<User>;
+    }
+  >({
     mutationFn,
     onMutate: async (action: T) => {
       const queryKey = ['profile', username];
@@ -39,6 +48,7 @@ export function useProfileMutation<T>({
       if (ctx?.previousData) {
         queryClient.setQueryData(['profile', username], ctx.previousData);
       }
+      showToaster('error', t(`errors.${_err?.data?.data?.error.code || 'UNKNOWN_ERROR'}`));
     },
 
     // Invalidate queries on finishing request
