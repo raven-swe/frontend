@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, computed } from 'vue';
 import Avatar from '~/components/ui/Avatar.vue';
 import type { Tweet } from '~~/shared/types/tweets';
 import TweetMedia from './TweetMedia.vue';
@@ -8,12 +9,45 @@ interface Props {
 }
 const props = defineProps<Props>();
 
+const tweet = ref(props.tweet);
+
+// Update local tweet state when like/unlike succeeds
+const onLikeSuccess = () => {
+  if (!tweet.value.isLiked) {
+    tweet.value.isLiked = true;
+    tweet.value.likeCount = (tweet.value.likeCount ?? 0) + 1;
+  }
+};
+
+const onUnlikeSuccess = () => {
+  if (tweet.value.isLiked) {
+    tweet.value.isLiked = false;
+    const next = (tweet.value.likeCount ?? 0) - 1;
+    tweet.value.likeCount = next < 0 ? 0 : next;
+  }
+};
+
+const onRetweetSuccess = () => {
+  if (!tweet.value.isRetweeted) {
+    tweet.value.isRetweeted = true;
+    tweet.value.retweetCount += 1;
+  }
+};
+
+const onUndoRetweetSuccess = () => {
+  if (tweet.value.isRetweeted) {
+    tweet.value.isRetweeted = false;
+    const next = (tweet.value.retweetCount ?? 0) - 1;
+    tweet.value.retweetCount = next < 0 ? 0 : next;
+  }
+};
+
 type Segment = { type: 'text' | 'mention' | 'hashtag'; text: string; href?: string };
 
 const contentSegments = computed<Segment[]>(() => {
   const segments: Segment[] = [];
-  const content = props.tweet.content || '';
-  const { entities } = props.tweet;
+  const content = tweet.value.content || '';
+  const { entities } = tweet.value;
   if (!entities || (!entities.mentions?.length && !entities.hashtags?.length)) {
     return [{ type: 'text', text: content }];
   }
@@ -72,15 +106,15 @@ const contentSegments = computed<Segment[]>(() => {
     <div class="flex w-full items-center justify-between">
       <div class="flex">
         <Avatar
-          :img="props.tweet.author.avatarUrl || '/default_profile.png'"
+          :img="tweet.author.avatarUrl || '/default_profile.png'"
           size="sm"
           variant="primary"
         />
         <div class="ms-2 flex flex-col">
           <span class="cursor-pointer font-semibold hover:underline">{{
-            props.tweet.author.displayName
+            tweet.author.displayName
           }}</span>
-          <span class="text-muted-foreground" v-text="'@' + props.tweet.author.username" />
+          <span class="text-muted-foreground" v-text="'@' + tweet.author.username" />
         </div>
       </div>
       <div class="flex">
@@ -102,28 +136,34 @@ const contentSegments = computed<Segment[]>(() => {
           </NuxtLink>
         </template>
       </p>
-      <TweetMedia :media="props.tweet.media" />
+      <TweetMedia :media="tweet.media" />
 
       <div class="mt-2">
         <time
-          :title="formatDate(props.tweet.createdAt)"
-          :datetime="props.tweet.createdAt"
+          :title="formatDate(tweet.createdAt)"
+          :datetime="tweet.createdAt"
           class="text-muted-foreground hover:cursor-pointer hover:underline"
-          >{{ formatDate(props.tweet.createdAt) }}</time
+          >{{ formatDate(tweet.createdAt) }}</time
         >
       </div>
     </div>
-    <TweetActionButtons :tweet="props.tweet" />
+    <TweetActionButtons
+      :tweet="tweet"
+      @like-success="onLikeSuccess"
+      @unlike-success="onUnlikeSuccess"
+      @retweet-success="onRetweetSuccess"
+      @undo-retweet-success="onUndoRetweetSuccess"
+    />
 
     <div v-if="false" class="min-w-0 flex-1">
       <div class="flex flex-wrap items-center gap-x-1 text-sm">
-        <span class="text-muted-foreground" v-text="'@' + props.tweet.author.username" />
+        <span class="text-muted-foreground" v-text="'@' + tweet.author.username" />
         <span class="text-muted-foreground">·</span>
         <time
-          :title="formatDate(props.tweet.createdAt)"
-          :datetime="props.tweet.createdAt"
+          :title="formatDate(tweet.createdAt)"
+          :datetime="tweet.createdAt"
           class="text-muted-foreground hover:cursor-pointer hover:underline"
-          >{{ relativeTime(props.tweet.createdAt) }}</time
+          >{{ relativeTime(tweet.createdAt) }}</time
         >
       </div>
 
@@ -140,10 +180,16 @@ const contentSegments = computed<Segment[]>(() => {
       </p>
 
       <!-- Media (single image basic layout) -->
-      <TweetMedia :media="props.tweet.media" />
+      <TweetMedia :media="tweet.media" />
 
       <!-- Actions -->
-      <TweetActionButtons :tweet="props.tweet" />
+      <TweetActionButtons
+        :tweet="tweet"
+        @like-success="onLikeSuccess"
+        @unlike-success="onUnlikeSuccess"
+        @retweet-success="onRetweetSuccess"
+        @undo-retweet-success="onUndoRetweetSuccess"
+      />
     </div>
   </article>
 </template>
