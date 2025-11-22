@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { useInfiniteQuery } from '@tanstack/vue-query';
-import { apiFetch } from '~/api';
-import { DEFAULT_PAGE_SIZE } from '~/constants/pagination';
 import { useWindowVirtualizer } from '@tanstack/vue-virtual';
+import { profileTabsService } from '~/services/profile/profileTabsService';
 
 definePageMeta({
   layout: 'profile',
@@ -20,17 +19,8 @@ const {
 } = useInfiniteQuery({
   queryKey: ['profile', user?.value.username, 'tweets'],
   initialPageParam: null as string | null,
-  queryFn: async ({ pageParam = null }) => {
-    const params: Record<string, string> = { limit: DEFAULT_PAGE_SIZE.toString() };
-    if (pageParam) params.cursor = pageParam;
-
-    const res = await apiFetch(`/api/users/${user?.value.username}/tweets`, {
-      method: 'GET',
-      params,
-    });
-
-    return res;
-  },
+  queryFn: async ({ pageParam = null }) =>
+    await profileTabsService.getProfileTweetsPaginated(user?.value.username || '', pageParam),
 
   getNextPageParam: (lastPage) => {
     return lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined;
