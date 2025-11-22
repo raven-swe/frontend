@@ -78,7 +78,6 @@ const handleInput = (event: Event) => {
 const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
 const handlePaste = (e: ClipboardEvent) => {
   const items = e.clipboardData?.items;
-  e.preventDefault();
   if (!items) return;
 
   const files: File[] = [];
@@ -89,6 +88,13 @@ const handlePaste = (e: ClipboardEvent) => {
       if (!file) continue;
 
       if (allowedTypes.includes(file.type)) {
+        if (file.size > MAX_IMAGE_SIZE_BYTES) {
+          showToaster(
+            'warning',
+            `Image "${file.name}" size exceeds the maximum limit of ${MAX_IMAGE_SIZE_MB} MB.`,
+          );
+          continue; // Skip this file
+        }
         files.push(file);
       } else {
         showToaster(
@@ -100,20 +106,13 @@ const handlePaste = (e: ClipboardEvent) => {
       }
 
       if (files.length >= 4) break;
-
-      if (file.size > MAX_IMAGE_SIZE_BYTES) {
-        showToaster(
-          'warning',
-          `Image "${file.name}" size exceeds the maximum limit of ${MAX_IMAGE_SIZE_MB} MB.`,
-        );
-        continue; // Skip this file
-      }
     }
+  }
 
-    if (files.length > 0) {
-      e.preventDefault(); // Prevent text insertion of the image name
-      emit('paste-media', files);
-    }
+  // Only prevent default and emit if we have files to add
+  if (files.length > 0) {
+    e.preventDefault(); // Prevent text insertion of the image name
+    emit('paste-media', files);
   }
 };
 

@@ -96,7 +96,7 @@ const handleFileSelect = (event: Event) => {
 </script>
 
 <template>
-  <div class="toolbar border-border ms-[60px] flex items-center justify-between border-t pt-1.5">
+  <div class="toolbar border-border ms-[60px] flex items-center justify-between pt-1.5">
     <div class="flex gap-2">
       <UiButton
         variant="tweet-icon-blue"
