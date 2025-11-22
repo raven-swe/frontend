@@ -4,7 +4,7 @@ import ProfileDetailsSkeleton from '~/components/profile/skeletons/ProfileDetail
 import Tabs from '@/components/ui/Tabs.vue';
 import Tab from '@/components/ui/Tab.vue';
 import { apiFetch } from '~/api';
-import { useQuery } from '@tanstack/vue-query';
+import { useQuery, useQueryClient } from '@tanstack/vue-query';
 import type { FetchError } from 'ofetch';
 
 const route = useRoute();
@@ -32,6 +32,17 @@ const isUserNotFound = computed(() => {
   const errorData = error.value;
   return errorData?.data?.data?.error.code === 'USER_NOT_FOUND' || errorData?.statusCode === 404;
 });
+const queryClient = useQueryClient();
+watch(
+  () => route.fullPath,
+  () => {
+    if (!user.value) return;
+
+    queryClient.invalidateQueries({
+      queryKey: ['profile', username.value],
+    });
+  },
+);
 
 onServerPrefetch(async () => {
   await suspense();
