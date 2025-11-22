@@ -6,7 +6,7 @@ import forYouEventHandler from '~~/server/api/timeline/for-you.get';
 useH3TestUtils();
 
 const mockServerApiFetch = vi.fn();
-vi.stubGlobal('serverApiFetch', mockServerApiFetch);
+vi.stubGlobal('serverApiFetch', () => mockServerApiFetch);
 
 describe('GET /api/timeline/for-you', () => {
   it('returns success response with tweets data', async () => {

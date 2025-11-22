@@ -23,6 +23,12 @@ export const createMockH3Event = (
   const headerMap = new Map<string, string>(headerEntries);
   const event = {
     headers: headerMap,
+    req: {
+      ip: '123.456.789.000',
+      context: {
+        clientAddress: '123.456.789.000',
+      },
+    },
     node: {
       req: {
         headers: Object.fromEntries(headerMap),

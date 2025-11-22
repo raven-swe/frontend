@@ -2,11 +2,12 @@ import { describe, it, expect, vi } from 'vitest';
 import { createMockH3Event } from '~~/test/mocks/h3-event';
 import { useH3TestUtils } from '~~/test/mocks/h3-test-utils';
 import checkIdentifierEventHandler from '~~/server/api/auth/check-identifier.get';
+import { createError } from '#app';
 
 useH3TestUtils();
 
 const mockServerApiFetch = vi.fn();
-vi.stubGlobal('serverApiFetch', mockServerApiFetch);
+vi.stubGlobal('serverApiFetch', () => mockServerApiFetch);
 
 describe('GET /api/auth/check-identifier', () => {
   it('returns success response when identifier exists', async () => {

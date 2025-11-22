@@ -402,7 +402,7 @@ export const handlers = [
   }),
 
   http.post(`${API_URL}/me/email/resend-otp`, async ({ request }) => {
-    console.log('Resend OTP request received');
+    console.warn('Resend OTP request received');
     try {
       const body = (await request.json()) as { confirmationToken: string };
       if (body.confirmationToken === 'mock-confirmation-token-12345') {

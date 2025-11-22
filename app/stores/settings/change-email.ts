@@ -16,11 +16,7 @@ export const useChangeEmailStore = defineStore('changeEmail', () => {
 
   const handleEmailSubmit = async (newEmail: string) => {
     try {
-      const response = await apiFetch<
-        ApiSuccessResponse<{
-          confirmationToken: 'string';
-        }>
-      >('/api/settings/email', {
+      const response = await apiFetch('/api/settings/email', {
         method: 'PUT',
         body: {
           newEmail: newEmail,
@@ -36,7 +32,7 @@ export const useChangeEmailStore = defineStore('changeEmail', () => {
 
   const handleOtpSubmit = async (otp: string): Promise<boolean> => {
     try {
-      await apiFetch<ApiResponseBase>('/api/settings/email/verify', {
+      await apiFetch('/api/settings/email/verify', {
         method: 'POST',
         body: {
           otp: otp,
@@ -57,7 +53,7 @@ export const useChangeEmailStore = defineStore('changeEmail', () => {
 
   const handleResendOtp = async (): Promise<boolean> => {
     try {
-      await apiFetch<ApiResponseBase>('/api/settings/email/resend-otp', {
+      await apiFetch('/api/settings/email/resend-otp', {
         method: 'POST',
         body: {
           confirmationToken: confirmationToken.value,

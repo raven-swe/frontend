@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
 import { usePasswordStore } from '~/stores/auth/password';
-import { showToaster } from '@/utils/showToaster';
+import { backendValidationToFormErrors } from '~/utils/errorUtils';
 import { createOtpSchema } from '~/schemas/auth';
+import FieldInput from '~/components/ui/form/FieldInput.vue';
+import { useI18n } from 'vue-i18n';
 
 const passwordStore = usePasswordStore();
 const { t } = useI18n();
 
-const { defineField, handleSubmit, isSubmitting, meta } = useForm({
+const { defineField, handleSubmit, isSubmitting, meta, setErrors } = useForm({
   validationSchema: createOtpSchema(t),
   initialValues: { otp: '' },
   validateOnMount: false,
@@ -15,13 +17,44 @@ const { defineField, handleSubmit, isSubmitting, meta } = useForm({
 
 const [_otp, otpAttrs] = defineField('otp');
 
-const onSubmit = handleSubmit(async (values) => {
-  try {
-    await passwordStore.verifyUser(values.otp.trim());
-  } catch (err: unknown) {
-    showToaster('error', (err as Error)?.message || t('errors.GENERIC_ERROR'));
+const onSubmit = handleSubmit(async (values, actions) => {
+  const errors = await passwordStore.verifyUser(values.otp.trim());
+  if (errors) {
+    actions.setErrors(backendValidationToFormErrors(errors, t));
   }
 });
+
+const retryOtpTimeout = ref<number | null>(null);
+
+const onResendOtp = async () => {
+  const retryAfter = await passwordStore.resendOtp();
+  if (!retryAfter) return;
+  retryOtpTimeout.value = retryAfter;
+  setErrors({ otp: t('errors.OTP_RESEND_LIMIT_EXCEEDED', { seconds: retryAfter }) });
+  startCountdown();
+};
+
+let countdownInterval: ReturnType<typeof setInterval> | null = null;
+
+const startCountdown = () => {
+  if (countdownInterval) clearInterval(countdownInterval);
+  countdownInterval = setInterval(() => {
+    if (retryOtpTimeout.value && retryOtpTimeout.value > 0) {
+      retryOtpTimeout.value -= 1;
+      if (retryOtpTimeout.value > 0)
+        setErrors({
+          otp: t('errors.OTP_RESEND_LIMIT_EXCEEDED', { seconds: retryOtpTimeout.value }),
+        });
+      if (retryOtpTimeout.value === 0) {
+        setErrors({ otp: undefined });
+      }
+    } else {
+      if (countdownInterval) clearInterval(countdownInterval);
+      setErrors({ otp: undefined });
+      countdownInterval = null;
+    }
+  }, 1000);
+};
 </script>
 
 <template>
@@ -37,21 +70,26 @@ const onSubmit = handleSubmit(async (values) => {
 
     <div class="mx-auto mt-7 px-8">
       <section class="flex flex-col">
-        <UiFormFieldInput
+        <FieldInput
           :placeholder="$t('forgot-password.otp.label')"
+          inputmode="numeric"
           type="text"
           name="otp"
           v-bind="otpAttrs"
           data-testid="otp-input"
           data-cy="forgot-pwd-otp-input"
         />
-        <p
-          class="text-primary ms-1 mt-2 block w-fit cursor-pointer text-sm"
+        <UiButton
+          class="ms-1 mt-2 block w-fit"
+          type="button"
+          variant="link"
+          size="link"
           data-testid="resend-link"
-          @click.prevent="passwordStore.resendOtp()"
+          :disabled="retryOtpTimeout !== null && retryOtpTimeout > 0"
+          @click="onResendOtp"
         >
           {{ $t('forgot-password.otp.resend-code') }}
-        </p>
+        </UiButton>
       </section>
     </div>
 
