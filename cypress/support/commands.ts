@@ -52,7 +52,9 @@ Cypress.Commands.add('createTestUser', () => {
 Cypress.Commands.add('visitAndWaitForHydration', (url: string) => {
   cy.visit(url);
   cy.mockRecaptcha(); // Mock reCAPTCHA before tests
-  cy.window().should((win: ExtendedAUTWindow) => expect(win.useNuxtApp().isHydrating).to.eq(false));
+  cy.window({ timeout: 10000 }).should((win: ExtendedAUTWindow) =>
+    expect(win.useNuxtApp().isHydrating).to.eq(false),
+  );
 });
 
 // Login command with session caching

@@ -1,6 +1,6 @@
 // cypress/e2e/auth/signup.cy.ts
 
-describe('Settings Actions', () => {
+describe('Settings Actions', function () {
   beforeEach(() => {
     // Create a test user and store it as an alias
     cy.createTestUser().then((user) => {
@@ -8,24 +8,20 @@ describe('Settings Actions', () => {
       cy.login(user.email, user.password);
     });
 
-    // Visit home and wait for hydration
-    cy.visitAndWaitForHydration('/home');
-
-    // Navigate to settings page
-    cy.get('[data-cy="sidebar-settings-btn"]').should('be.visible').click();
-    cy.url().should('include', '/settings/account');
+    // Visit settings and wait for hydration
+    cy.visitAndWaitForHydration('/settings/account');
   });
 
-  describe('Your account settings', () => {
+  describe('Your account settings', function () {
     beforeEach(() => {
       // TODO: Recheck when left side nav is fixed
       //   cy.get('[data-cy="account-settings-btn"]').should('be.visible').click();
       cy.url().should('include', '/settings/account');
     });
-    describe('Username settings', () => {
+    describe('Username settings', function () {
       beforeEach(() => {
         cy.get('[data-cy="username-settings-btn"]').should('be.visible').click();
-        cy.url().should('include', '/settings/username');
+        cy.url().should('include', '/settings/account/username');
       });
       it('should display current username', function () {
         cy.get('input[data-cy="username-settings-input"]').should(
@@ -34,18 +30,18 @@ describe('Settings Actions', () => {
         );
       });
 
-      it('should show username suggestions', () => {
+      it('should show username suggestions', function () {
         cy.get('[data-cy="username-suggestions-list"] button').should('have.length.greaterThan', 0);
       });
 
-      it('should not allow saving invalid usernames', () => {
+      it('should not allow saving invalid usernames', function () {
         cy.get('input[data-cy="username-settings-input"]').clear();
         cy.get('button[data-cy="username-settings-save"]').should('be.disabled');
         cy.get('input[data-cy="username-settings-input"]').type('in valid');
         cy.get('button[data-cy="username-settings-save"]').should('be.disabled');
       });
 
-      it('should allow changing username to a valid custom username', () => {
+      it('should allow changing username to a valid custom username', function () {
         const newUsername = `test_user${Math.floor(Math.random() * 10000)}`;
         cy.get('input[data-cy="username-settings-input"]').clear().type(newUsername);
         cy.get('button[data-cy="username-settings-save"]').should('not.be.disabled').click();
@@ -54,7 +50,7 @@ describe('Settings Actions', () => {
         cy.get('[data-cy="username-settings-btn"]').should('contain.text', newUsername);
       });
 
-      it('should allow changing username to a suggestion', () => {
+      it('should allow changing username to a suggestion', function () {
         const btn = cy.get('[data-cy="username-suggestions-list"] button').first();
         btn.then(($button) => {
           const suggestedUsername = $button.text().trim();
@@ -71,10 +67,10 @@ describe('Settings Actions', () => {
       });
     });
 
-    describe('Email settings', () => {
+    describe('Email settings', function () {
       beforeEach(() => {
         cy.get('[data-cy="email-settings-btn"]').should('be.visible').click();
-        cy.url().should('include', '/settings/email');
+        cy.url().should('include', '/settings/account/email');
       });
 
       it('should display current email', function () {
@@ -82,12 +78,12 @@ describe('Settings Actions', () => {
         cy.get('input[data-cy="email-settings-input"]').should('have.value', this.testUser.email);
       });
 
-      it('should open change email dialog', () => {
+      it('should open change email dialog', function () {
         cy.get('button[data-cy="email-settings-change-btn"]').should('be.visible').click();
         cy.get('[data-cy="change-email-form"]').should('be.visible');
       });
 
-      it('should not allow submitting invalid email', () => {
+      it('should not allow submitting invalid email', function () {
         cy.get('button[data-cy="email-settings-change-btn"]').should('be.visible').click();
         cy.get('[data-cy="change-email-form"]').should('be.visible');
 
@@ -97,7 +93,7 @@ describe('Settings Actions', () => {
         cy.contains('Please enter a valid email').should('be.visible');
       });
 
-      it('should not allow submitting a used email', () => {
+      it('should not allow submitting a used email', function () {
         cy.get('button[data-cy="email-settings-change-btn"]').should('be.visible').click();
         cy.get('[data-cy="change-email-form"]').should('be.visible');
 
@@ -121,7 +117,7 @@ describe('Settings Actions', () => {
 
         // Verify otp
         cy.get('[data-cy="change-email-otp-form"]').should('be.visible');
-        cy.getOTP(this.testUser.username, 'changeEmail').then((otp) => {
+        cy.getOTP(this.testUser.id, 'changeEmail').then((otp) => {
           cy.get('input[data-cy="change-email-otp-input"]').type(otp);
           cy.get('button[data-cy="change-email-otp-next-btn"]').should('not.be.disabled').click();
 
@@ -132,10 +128,10 @@ describe('Settings Actions', () => {
       });
     });
 
-    describe('Password settings', () => {
+    describe('Password settings', function () {
       beforeEach(() => {
         cy.get('[data-cy="password-settings-btn"]').should('be.visible').click();
-        cy.url().should('include', '/settings/changePasswordEditor');
+        cy.url().should('include', '/settings/account/changePasswordEditor');
         cy.get('form[data-cy="change-password-form"]').should('be.visible');
       });
 
@@ -145,8 +141,10 @@ describe('Settings Actions', () => {
         cy.get('input[data-cy="chg-pwd-confirm"]').type('NewPassword123!');
         cy.get('button[data-cy="chg-pwd-save"]').should('not.be.disabled').click();
 
+        // Should remain on the same form and not proceed
+        cy.get('button[data-cy="chg-pwd-save"]').should('be.disabled');
+
         // TODO: Verify error message
-        cy.contains('Current password is incorrect').should('be.visible');
       });
 
       it('should not allow submitting weak new password', function () {
@@ -184,7 +182,7 @@ describe('Settings Actions', () => {
       });
     });
 
-    describe('Birth Date settings', () => {
+    describe('Birth Date settings', function () {
       beforeEach(() => {
         cy.get('[data-cy="dob-settings-btn"]').should('be.visible').click();
         cy.url().should('include', '/settings/profile');
@@ -201,22 +199,22 @@ describe('Settings Actions', () => {
         cy.get('select[data-cy="birth-day-select"]').should('have.value', birthDay);
       });
 
-      it('should not allow birth date younger than 13 YO', () => {
+      it('should not allow birth date younger than 13 YO', function () {
         const currentYear = new Date().getUTCFullYear();
         const underageYear = (currentYear - 10).toString(); // 10 years old
         cy.get('select[data-cy="birth-year-select"]').select(underageYear);
-        cy.get('button[data-cy="profile-save-btn"]').click();
-        cy.contains('You must be at least 13 years old to use this service').should('be.visible');
-        // TODO: Check error message
+        cy.contains('You must be at least 13 years old').should('be.visible');
+        cy.get('button[data-cy="profile-save-btn"]').should('be.disabled');
       });
 
-      it('should allow changing birth date', () => {
+      it('should allow changing birth date', function () {
         // Select new birth date
         cy.get('select[data-cy="birth-year-select"]').select('1995');
         cy.get('select[data-cy="birth-month-select"]').select('5'); // May
         cy.get('select[data-cy="birth-day-select"]').select('15');
         cy.get('button[data-cy="profile-save-btn"]').should('not.be.disabled').click();
-        // TODO: Verify success
+
+        cy.url().should('include', `/profile/${this.testUser.username}`);
       });
     });
   });

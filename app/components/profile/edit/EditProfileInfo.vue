@@ -107,7 +107,7 @@ watch(
     <!-- Birth Date Section -->
     <div class="mb-10">
       <h3 class="mb-2 font-medium">{{ $t('profile.edit.birth-date') }}</h3>
-      <div class="flex gap-2">
+      <div class="flex gap-2" data-cy="birth-date-select">
         <uiSelect
           v-model="dateSelect.selectedMonth.value"
           class="flex-1"
