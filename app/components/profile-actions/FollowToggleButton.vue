@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { profileInteractionService } from '~/services/profile/profileInteractionService';
+import { useProfileMutation } from '~/composables/useProfileMutation';
 
 const props = defineProps<{
   username: string;
@@ -7,28 +8,31 @@ const props = defineProps<{
   follower: boolean;
 }>();
 
+function mutationFn(action: 'follow' | 'unfollow') {
+  return action === 'follow'
+    ? profileInteractionService.followUser(props.username)
+    : profileInteractionService.unfollowUser(props.username);
+}
+function optimisticUpdateFn(data: User, action: 'follow' | 'unfollow') {
+  if (action === 'follow') {
+    data.relationship.following = true;
+    data.followersCount += 1;
+  } else {
+    data.relationship.following = false;
+    data.followersCount -= 1;
+  }
+}
+
 const { mutate: followUser } = useProfileMutation<'follow' | 'unfollow'>({
-  mutationFn: async (action) => {
-    return action === 'follow'
-      ? profileInteractionService.followUser(props.username)
-      : profileInteractionService.unfollowUser(props.username);
-  },
+  mutationFn,
   username: props.username,
-  optimisticUpdateFn: (data, action) => {
-    if (action === 'follow') {
-      data.relationship.following = true;
-      data.followersCount += 1;
-    } else {
-      data.relationship.following = false;
-      data.followersCount -= 1;
-    }
-  },
+  optimisticUpdateFn,
 });
 const isHovered = ref(false);
 </script>
 
 <template>
-  <UiButton v-if="!props.following" @click="followUser('follow')">
+  <UiButton v-if="!props.following" data-test="follow-button" @click="followUser('follow')">
     {{ props.follower ? $t('ui.follow-back') : $t('ui.follow') }}
   </UiButton>
 
@@ -40,6 +44,6 @@ const isHovered = ref(false);
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
     @click.stop="followUser('unfollow')"
-    >{{ isHovered ? $t('testing.unfollow') : $t('testing.following') }}</UiButton
+    >{{ isHovered ? $t('ui.unfollow') : $t('ui.following') }}</UiButton
   >
 </template>
