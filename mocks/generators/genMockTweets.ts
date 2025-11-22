@@ -16,9 +16,9 @@ type TweetAuthor = {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-function makeAuthorFromUser(user: User | undefined, index: number) {
+function makeAuthorFromUser(user: Partial<User> | undefined) {
   const rawName = user?.username ?? faker.internet.username();
-  const username = (String(rawName).toLowerCase() + index).replace(/\s+/g, '');
+  const username = String(rawName).toLowerCase();
   return {
     username,
     displayName: user?.displayName ?? faker.person.fullName(),
@@ -97,7 +97,11 @@ function makeBaseTweet(id: string, content?: string, author?: TweetAuthor): Twee
     id,
     content: content ?? faker.lorem.sentences({ min: 1, max: 3 }),
     createdAt: new Date().toISOString(),
-    author: author ?? makeAuthorFromUser(undefined, faker.number.int({ min: 1, max: 999 })),
+    author:
+      author ??
+      makeAuthorFromUser({
+        username: faker.internet.username().toLowerCase() + faker.number.int({ min: 1, max: 9999 }),
+      }),
     replyCount: 0,
     retweetCount: faker.number.int({ min: 0, max: 100 }),
     likeCount: faker.number.int({ min: 0, max: 500 }),
@@ -120,10 +124,18 @@ function makeData() {
   }
 
   const tweets: Tweet[] = [];
-  for (let i = 0; i < NUM_TWEETS; i++) {
+  for (let i = 0; i < 100; i++) {
+    const id = 'tw-' + faker.string.nanoid(8);
+    const chosenUser = users[0];
+    const author = makeAuthorFromUser(chosenUser as Partial<User>);
+    const t: Tweet = makeBaseTweet(id, 'This is a pinned tweet example.', author);
+    tweets.push(t);
+  }
+
+  for (let i = 0; i < NUM_TWEETS - 100; i++) {
     const id = 'tw-' + faker.string.nanoid(8);
     const chosenUser = users.length ? faker.helpers.arrayElement(users) : undefined;
-    const author = makeAuthorFromUser(chosenUser as User | undefined, i + 1);
+    const author = makeAuthorFromUser(chosenUser as Partial<User>);
     const t: Tweet = makeBaseTweet(id, undefined, author);
     tweets.push(t);
   }

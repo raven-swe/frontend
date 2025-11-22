@@ -1,18 +1,23 @@
 <script setup lang="ts">
-import type { Tweet } from '~~/shared/types/tweets';
+import { useQuery } from '@tanstack/vue-query';
+import { apiFetch } from '~/api';
 definePageMeta({
   layout: 'profile',
 });
 
 const user = inject<ComputedRef<User>>('user-data');
 const isBlockedBy = computed(() => user?.value.relationship.blockedBy || false);
-
-const tweets = ref<Tweet[]>([]);
-
-const { data: tweetsData, error } = await useFetch<{ data: Tweet[] }>('/api/tweets');
-tweets.value = tweetsData.value?.data || [];
-
-if (error.value) console.error(error.value);
+const { data: response, suspense } = useQuery({
+  queryKey: ['profile', user?.value.username, 'tweets'],
+  queryFn: async () =>
+    await apiFetch(`/api/users/${user?.value.username}/tweets`, {
+      method: 'GET',
+    }),
+});
+const tweets = computed(() => response.value?.data || []);
+onServerPrefetch(async () => {
+  await suspense();
+});
 </script>
 
 <template>
