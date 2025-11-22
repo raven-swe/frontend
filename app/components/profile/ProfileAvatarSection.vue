@@ -2,6 +2,7 @@
 import { useIsCurrentUser } from '~/composables/useIsCurrentUser';
 import { profileInteractionService } from '~/services/profile/profileInteractionService';
 import { useProfileMutation } from '~/composables/useProfileMutation';
+import { useUserStore } from '~/stores/user';
 const userStore = useUserStore();
 
 const { isCurrentUser } = useIsCurrentUser();
@@ -10,6 +11,8 @@ const user = inject<ComputedRef<User>>('user-data');
 
 const isFollower = computed(() => user?.value.relationship.follower || false);
 const isFollowing = computed(() => user?.value.relationship.following || false);
+const isMuted = computed(() => user?.value.relationship.muted || false);
+const isBlocked = computed(() => user?.value.relationship.blocking || false);
 
 const { mutate: blockUser } = useProfileMutation<'block' | 'unblock'>({
   mutationFn: async (action) => {
@@ -18,7 +21,7 @@ const { mutate: blockUser } = useProfileMutation<'block' | 'unblock'>({
       ? profileInteractionService.blockUser(user.value.username)
       : profileInteractionService.unblockUser(user.value.username);
   },
-  username: user?.value.username,
+  username: user?.value.username ?? '',
   optimisticUpdateFn: (data, action) => {
     if (action === 'block') {
       data.relationship.blocking = true;
@@ -35,7 +38,7 @@ const { mutate: muteUser } = useProfileMutation<'mute' | 'unmute'>({
       ? profileInteractionService.muteUser(user.value.username)
       : profileInteractionService.unmuteUser(user.value.username);
   },
-  username: user?.value.username,
+  username: user?.value.username ?? '',
   optimisticUpdateFn: (data, action) => {
     if (action === 'mute') {
       data.relationship.muted = true;
@@ -58,21 +61,24 @@ const { mutate: muteUser } = useProfileMutation<'mute' | 'unmute'>({
     <div v-if="!isCurrentUser" class="flex items-center gap-2" data-test="profile-action-buttons">
       <UiDropdownMenu>
         <UiDropdownMenuTrigger as-child>
-          <UiButton variant="outline" size="icon-lg">
+          <UiButton data-test="profile-actions-trigger" variant="outline" size="icon-lg">
             <Icon name="lucide:more-horizontal" size="20" />
           </UiButton>
         </UiDropdownMenuTrigger>
         <UiDropdownMenuContent align="end">
-          <UiDropdownMenuItem @click="muteUser(user?.relationship.muted ? 'unmute' : 'mute')">
-            <Icon
-              :name="user?.relationship.muted ? 'lucide:volume' : 'lucide:volume-off'"
-              size="18"
-            />
-            {{ user?.relationship.muted ? $t('ui.unmute') : $t('ui.mute') }}
+          <UiDropdownMenuItem
+            data-test="mute-button"
+            @click="muteUser(isMuted ? 'unmute' : 'mute')"
+          >
+            <Icon :name="isMuted ? 'lucide:volume' : 'lucide:volume-off'" size="18" />
+            {{ isMuted ? $t('ui.unmute') : $t('ui.mute') }}
           </UiDropdownMenuItem>
-          <UiDropdownMenuItem @click="blockUser(user?.relationship.blocking ? 'unblock' : 'block')">
+          <UiDropdownMenuItem
+            data-test="block-button"
+            @click="blockUser(isBlocked ? 'unblock' : 'block')"
+          >
             <Icon name="lucide:ban" size="18" class="text-foreground" />
-            {{ user?.relationship.blocking ? $t('ui.unblock') : $t('ui.block') }}
+            {{ isBlocked ? $t('ui.unblock') : $t('ui.block') }}
           </UiDropdownMenuItem>
         </UiDropdownMenuContent>
       </UiDropdownMenu>
