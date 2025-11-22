@@ -114,6 +114,7 @@ watch(
           :options="dateSelect.months.value"
           placeholder="Month"
           name="birth-month"
+          data-cy="birth-month-select"
         />
         <uiSelect
           v-model="dateSelect.selectedDay.value"
@@ -121,6 +122,7 @@ watch(
           :options="dateSelect.days.value"
           placeholder="Day"
           name="birth-day"
+          data-cy="birth-day-select"
         />
         <uiSelect
           v-model="dateSelect.selectedYear.value"
@@ -128,6 +130,7 @@ watch(
           :options="dateSelect.years.value"
           placeholder="Year"
           name="birth-year"
+          data-cy="birth-year-select"
         />
       </div>
       <p

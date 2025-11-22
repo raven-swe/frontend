@@ -1,15 +1,8 @@
-// cypress/e2e/auth/signup.cy.ts
-
-import type { ExtendedAUTWindow } from '../../types/ExtendedAUTWindow';
-// import { createTestUser } from '../../support/helpers/createTestUser';
+// cypress/e2e/auth/login.cy.ts
 
 describe('Login Flow', () => {
   beforeEach(() => {
-    cy.visit('/');
-    // cy.window().its('grecaptcha', { timeout: 10000 }).should('have.property', 'render');
-    cy.window().should((win: ExtendedAUTWindow) =>
-      expect(win.useNuxtApp().isHydrating).to.eq(false),
-    ); // Wait for hydration
+    cy.visitAndWaitForHydration('/');
     cy.get('button[data-cy="signin-start-button"]').should('be.visible').click();
     cy.get('[data-cy="signin-email-form"]').should('be.visible');
   });
@@ -106,13 +99,8 @@ describe('Login Flow', () => {
   describe('Test Logout', () => {
     it('should logout successfully', () => {
       cy.fixture('auth/existingUser.json').then((user) => {
-        // Proceed to password step
-        cy.get('input[data-cy="signin-identifier-input"]').type(user.email);
-        cy.get('button[data-cy="signin-next-button"]').click();
-        // Enter valid password
-        cy.get('[data-cy="signin-password-input"] input').type(user.password);
-        cy.get('button[data-cy="signin-next-button"]').should('not.be.disabled');
-        cy.get('button[data-cy="signin-next-button"]').click();
+        cy.login(user.email, user.password);
+        cy.visitAndWaitForHydration('/home/for-you');
         // Verify url redirection to home page
         cy.url({ timeout: 10000 }).should('eq', `${Cypress.config().baseUrl}/home/for-you`);
         // Click logout button

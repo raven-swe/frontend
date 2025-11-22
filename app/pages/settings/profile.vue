@@ -81,7 +81,13 @@ const handleDialogClose = () => {
             </UiButton>
             <h2 class="text-xl font-bold">{{ $t('profile.edit.edit-profile') }}</h2>
           </div>
-          <UiButton class="w-16" size="xs" :disabled="!isFormValid" @click="handleSubmit">
+          <UiButton
+            class="w-16"
+            size="xs"
+            :disabled="!isFormValid"
+            data-cy="profile-save-btn"
+            @click="handleSubmit"
+          >
             {{ $t('ui.save') }}
           </UiButton>
         </template>

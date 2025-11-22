@@ -34,10 +34,56 @@ Cypress.Commands.add('mockRecaptcha', () => {
 });
 
 // Get OTP from test endpoint
-Cypress.Commands.add('getOTP', (identifier: string, type: 'registration' | 'password-reset') => {
-  return cy
-    .request(`${Cypress.env('API_URL')}/test/otp?identifier=${identifier}&type=${type}`)
-    .its('body.data.otp');
+Cypress.Commands.add(
+  'getOTP',
+  (identifier: string, type: 'registration' | 'forgotPassword' | 'changeEmail') => {
+    return cy
+      .request(`${Cypress.env('API_URL')}/test/otp?identifier=${identifier}&type=${type}`)
+      .its('body.data.otp');
+  },
+);
+
+// Create a test user and retrieve its info
+Cypress.Commands.add('createTestUser', () => {
+  return cy.request('POST', `${Cypress.env('API_URL')}/test/users`).its('body.data');
+});
+
+// Visit a page and wait for Nuxt hydration to complete
+Cypress.Commands.add('visitAndWaitForHydration', (url: string) => {
+  cy.visit(url);
+  cy.mockRecaptcha(); // Mock reCAPTCHA before tests
+  cy.window().should((win: ExtendedAUTWindow) => expect(win.useNuxtApp().isHydrating).to.eq(false));
+});
+
+// Login command with session caching
+Cypress.Commands.add('login', (email: string, password: string) => {
+  cy.session(
+    [email, password], // unique identifier for this session
+    () => {
+      // This function only runs if session doesn't exist
+      cy.visitAndWaitForHydration('/');
+
+      cy.get('button[data-cy="signin-start-button"]').should('be.visible').click();
+      cy.get('[data-cy="signin-email-form"]').should('be.visible');
+
+      // Enter email
+      cy.get('input[data-cy="signin-identifier-input"]').type(email);
+      cy.get('button[data-cy="signin-next-button"]').click();
+
+      // Enter password
+      cy.get('[data-cy="signin-password-input"] input').type(password);
+      cy.get('button[data-cy="signin-next-button"]').should('not.be.disabled').click();
+
+      // Wait for redirect to home
+      cy.url({ timeout: 10000 }).should('include', '/home');
+    },
+    {
+      validate() {
+        // Validates session is still valid - check for auth cookie
+        cy.getCookie('access_token').should('exist');
+      },
+    },
+  );
 });
 
 //

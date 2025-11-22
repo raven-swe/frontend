@@ -136,6 +136,7 @@ const onSubmit = handleSubmit(async (values) => {
     <div class="flex flex-1 flex-col">
       <div class="border-border border-b px-4 pb-8">
         <FieldInput
+          data-cy="username-settings-input"
           name="username"
           :placeholder="$t('setting.username.username')"
           v-bind="usernameAttrs"
@@ -144,7 +145,7 @@ const onSubmit = handleSubmit(async (values) => {
 
       <div class="border-border border-b px-4 py-8">
         <h2 class="mb-4 text-2xl font-bold">{{ $t('setting.username.suggestions') }}</h2>
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2" data-cy="username-suggestions-list">
           <button
             v-for="suggestion in suggestions"
             :key="suggestion"
@@ -159,6 +160,7 @@ const onSubmit = handleSubmit(async (values) => {
 
       <div class="flex justify-end px-4 py-8">
         <Button
+          data-cy="username-settings-save"
           type="submit"
           :disabled="
             Object.entries(errors).length > 0 || isSubmitting || isChecking || usernameExists
