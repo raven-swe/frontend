@@ -2,8 +2,8 @@
 import DmMessagesList from './DmMessagesList.vue';
 import { useRoute } from 'vue-router';
 import { useDmMessages } from '@/composables/useDmMessages';
-
-import { useDmSocketIO } from '@/composables/useDmSocketIO';
+import { useDmConversation } from '@/composables/useDmConversation';
+import { useDmWebSocket } from '@/composables/useDmWebSocket';
 import { showToaster } from '@/utils/showToaster';
 import Spinner from '~/components/ui/Spinner.vue';
 import type { DmMessage } from '~~/shared/types/dm';
