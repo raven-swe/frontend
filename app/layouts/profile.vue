@@ -77,18 +77,18 @@ onServerPrefetch(async () => {
           <Tab
             :label="$t('profile.tabs.replies')"
             :route="`${profilePath}/replies`"
-            :is-active="$route.path === `${profilePath}/replies`"
+            :is-active="$route.path.toLowerCase() === `${profilePath}/replies`"
           />
           <Tab
             :label="$t('profile.tabs.media')"
             :route="`${profilePath}/media`"
-            :is-active="$route.path === `${profilePath}/media`"
+            :is-active="$route.path.toLowerCase() === `${profilePath}/media`"
           />
           <Tab
             v-if="isCurrentUser"
             :label="$t('profile.tabs.likes')"
             :route="`${profilePath}/likes`"
-            :is-active="$route.path === `${profilePath}/likes`"
+            :is-active="$route.path.toLowerCase() === `${profilePath}/likes`"
           />
         </Tabs>
 
