@@ -72,7 +72,7 @@ export function useH3TestUtils() {
             cookieString += `; Expires=${options.expires.toUTCString()}`;
           }
         }
-        event.headers.set('Set-Cookie', cookieString);
+        event.headers.append('Set-Cookie', cookieString);
       },
     ),
   }));

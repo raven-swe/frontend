@@ -42,7 +42,7 @@ export function setAuthCookies(
 }
 
 export function isOAuthResponseWithAccessToken(
-  response: FetchResponse<ApiSuccessResponse<object>>,
+  response: FetchResponse<ApiSuccessResponse<object>> | null | undefined,
 ): response is FetchResponse<ApiSuccessResponse<{ accessToken: string }>> {
   if (!response || !response._data || !response._data.data) return false;
   return 'accessToken' in response._data.data;
