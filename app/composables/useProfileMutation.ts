@@ -6,7 +6,7 @@ export function useProfileMutation<T>({
   optimisticUpdateFn,
 }: {
   mutationFn: (action: T) => Promise<unknown>;
-  username?: string;
+  username: string;
   optimisticUpdateFn: (data: User, action: T) => void;
 }) {
   const queryClient = useQueryClient();
@@ -21,12 +21,10 @@ export function useProfileMutation<T>({
 
       // Get previous data
       const previousData = queryClient.getQueryData<ApiSuccessResponse<User>>(queryKey);
-
       if (previousData?.data) {
         const updatedUser = { ...previousData.data };
 
         optimisticUpdateFn(updatedUser, action);
-
         queryClient.setQueryData(queryKey, {
           ...previousData,
           data: updatedUser,
