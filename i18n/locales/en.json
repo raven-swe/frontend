@@ -242,7 +242,9 @@
     "ALREADY_BLOCKED": "You have already blocked this user.",
     "ALREADY_UNBLOCKED": "You have already unblocked this user.",
     "ALREADY_MUTED": "You have already muted this user.",
-    "ALREADY_UNMUTED": "You have already unmuted this user."
+    "NOT_MUTED": "You have already unmuted this user.",
+    "CANNOT_MUTE_USER": "You cannot mute this user.",
+    "CANNOT_UNMUTE_USER": "You cannot unmute this user."
   },
   "register": {
     "register-info": {

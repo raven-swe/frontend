@@ -18,7 +18,7 @@ export function useProfileMutation<T, Q = void>({
     FetchError<FetchError<ApiErrorResponse>>,
     T,
     {
-      previousData?: ApiSuccessResponse<User>;
+      previousData?: User;
     }
   >({
     mutationFn,
@@ -29,15 +29,12 @@ export function useProfileMutation<T, Q = void>({
       await queryClient.cancelQueries({ queryKey });
 
       // Get previous data
-      const previousData = queryClient.getQueryData<ApiSuccessResponse<User>>(queryKey);
-      if (previousData?.data) {
-        const updatedUser = { ...previousData.data };
+      const previousData = queryClient.getQueryData<User>(queryKey);
+      if (previousData) {
+        const updatedUser = { ...previousData };
 
         optimisticUpdateFn(updatedUser, action);
-        queryClient.setQueryData(queryKey, {
-          ...previousData,
-          data: updatedUser,
-        });
+        queryClient.setQueryData(queryKey, updatedUser);
       }
 
       return { previousData };

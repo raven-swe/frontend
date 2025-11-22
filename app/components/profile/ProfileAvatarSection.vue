@@ -17,9 +17,11 @@ const isBlocked = computed(() => user?.value.relationship.blocking || false);
 const { mutate: blockUser } = useProfileMutation<'block' | 'unblock'>({
   mutationFn: async (action) => {
     if (!user?.value) return;
-    return action === 'block'
-      ? profileInteractionService.blockUser(user.value.username)
-      : profileInteractionService.unblockUser(user.value.username);
+    if (action === 'block') {
+      await profileInteractionService.blockUser(user.value.username);
+    } else {
+      await profileInteractionService.unblockUser(user.value.username);
+    }
   },
   username: user?.value.username ?? '',
   optimisticUpdateFn: (data, action) => {
@@ -34,9 +36,11 @@ const { mutate: blockUser } = useProfileMutation<'block' | 'unblock'>({
 const { mutate: muteUser } = useProfileMutation<'mute' | 'unmute'>({
   mutationFn: async (action) => {
     if (!user?.value) return;
-    return action === 'mute'
-      ? profileInteractionService.muteUser(user.value.username)
-      : profileInteractionService.unmuteUser(user.value.username);
+    if (action === 'mute') {
+      await profileInteractionService.muteUser(user.value.username);
+    } else {
+      await profileInteractionService.unmuteUser(user.value.username);
+    }
   },
   username: user?.value.username ?? '',
   optimisticUpdateFn: (data, action) => {
@@ -68,14 +72,14 @@ const { mutate: muteUser } = useProfileMutation<'mute' | 'unmute'>({
         <UiDropdownMenuContent align="end">
           <UiDropdownMenuItem
             data-test="mute-button"
-            @click="muteUser(isMuted ? 'unmute' : 'mute')"
+            @click="() => muteUser(isMuted ? 'unmute' : 'mute')"
           >
             <Icon :name="isMuted ? 'lucide:volume' : 'lucide:volume-off'" size="18" />
             {{ isMuted ? $t('ui.unmute') : $t('ui.mute') }}
           </UiDropdownMenuItem>
           <UiDropdownMenuItem
             data-test="block-button"
-            @click="blockUser(isBlocked ? 'unblock' : 'block')"
+            @click="() => blockUser(isBlocked ? 'unblock' : 'block')"
           >
             <Icon name="lucide:ban" size="18" class="text-foreground" />
             {{ isBlocked ? $t('ui.unblock') : $t('ui.block') }}

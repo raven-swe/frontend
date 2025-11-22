@@ -13,17 +13,22 @@ const profilePath = computed(() => `/profile/${username.value}`);
 
 const queryKey = computed(() => ['profile', username.value]);
 
-const { data, isLoading, isError, error, suspense } = useQuery<
-  ApiSuccessResponse<User>,
-  FetchError<FetchError<ApiErrorResponse>>
->({
+const {
+  data: user,
+  isLoading,
+  isError,
+  error,
+  suspense,
+} = useQuery<User, FetchError<FetchError<ApiErrorResponse>>>({
   queryKey,
-  queryFn: async () => await apiFetch(`/api/users/${username.value}/profile`),
+  queryFn: async () => {
+    return (await apiFetch(`/api/users/${username.value}/profile`)).data;
+  },
   staleTime: 1000 * 60 * 5, // 5min cache
   retry: false, // Don't retry on 404
+  structuralSharing: false, // Disable structural sharing to ensure reactivity
 });
 
-const user = computed(() => (data.value && data.value.success ? data.value.data : null));
 provide('user-data', user);
 const { isCurrentUser } = useIsCurrentUser();
 
