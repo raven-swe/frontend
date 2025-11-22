@@ -46,7 +46,7 @@ describe('Login Flow', () => {
         cy.get('button[data-cy="signin-next-button"]').should('not.be.disabled');
         cy.get('button[data-cy="signin-next-button"]').click();
 
-        cy.contains('wrong credentials');
+        cy.contains('The password you entered is incorrect');
 
         cy.get('[data-cy="signin-password-form"]').should('be.visible');
         cy.get('[data-cy="signin-password-input"] input').should('be.empty');
