@@ -1,20 +1,57 @@
 <script setup lang="ts">
-import { useQuery } from '@tanstack/vue-query';
+import { useInfiniteQuery } from '@tanstack/vue-query';
 import { apiFetch } from '~/api';
+import { useInfiniteScroll } from '@vueuse/core';
+import { DEFAULT_PAGE_SIZE } from '~/constants/pagination';
+
 definePageMeta({
   layout: 'profile',
 });
 
 const user = inject<ComputedRef<User>>('user-data');
 const isBlockedBy = computed(() => user?.value.relationship.blockedBy || false);
-const { data: response, suspense } = useQuery({
+
+const {
+  data: response,
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage,
+  suspense,
+} = useInfiniteQuery({
   queryKey: ['profile', user?.value.username, 'tweets'],
-  queryFn: async () =>
-    await apiFetch(`/api/users/${user?.value.username}/tweets`, {
+  initialPageParam: null as string | null,
+  queryFn: async ({ pageParam = null }) => {
+    const params: Record<string, string> = { limit: DEFAULT_PAGE_SIZE.toString() };
+    if (pageParam) params.cursor = pageParam;
+
+    const res = await apiFetch(`/api/users/${user?.value.username}/tweets`, {
       method: 'GET',
-    }),
+      params,
+    });
+
+    return res;
+  },
+
+  getNextPageParam: (lastPage) => {
+    return lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined;
+  },
 });
-const tweets = computed(() => response.value?.data || []);
+
+const tweets = computed(() => {
+  return response.value?.pages.flatMap((page) => page.data) || [];
+});
+
+const sentinel = ref<HTMLElement | null>(null);
+useInfiniteScroll(
+  sentinel,
+  async () => {
+    if (hasNextPage.value && !isFetchingNextPage.value) {
+      await fetchNextPage();
+    }
+  },
+  { distance: 1000 },
+);
+
 onServerPrefetch(async () => {
   await suspense();
 });
@@ -33,6 +70,15 @@ onServerPrefetch(async () => {
     <div v-if="tweets.length > 0" class="mb-4">
       <div class="mt-4 flex w-full max-w-[700px] flex-col gap-4">
         <TweetDefaultCard v-for="tweet in tweets" :key="tweet.id" :tweet="tweet" />
+      </div>
+
+      <!-- sentinel element for infinite scroll -->
+      <div ref="sentinel" class="h-4"></div>
+      <div
+        v-if="hasNextPage && isFetchingNextPage"
+        class="text-primary flex shrink-0 items-center justify-center py-4"
+      >
+        <UiSpinner />
       </div>
     </div>
     <div v-else data-testid="empty-state" class="text-muted-foreground mt-10 text-center">
