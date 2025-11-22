@@ -25,6 +25,7 @@ try {
     '/api/settings/username/suggestions',
     {
       method: 'GET',
+      query: { baseUsername: userStore.user?.username || '' },
     },
   );
   if (data.suggestions) {
@@ -81,6 +82,25 @@ const checkUsernameAvailability = useDebounceFn(async (username: string) => {
     isChecking.value = false;
   }
 }, 300);
+const dynamicUsernameSuggestions = useDebounceFn(async (username: string) => {
+  if (!username || errors.value.username) return;
+
+  try {
+    const { data } = await apiFetch<ApiSuccessResponse<{ suggestions: string[] }>>(
+      '/api/settings/username/suggestions',
+      {
+        method: 'GET',
+        query: { baseUsername: username },
+      },
+    );
+    if (data.suggestions) {
+      suggestions.value = data.suggestions;
+    }
+  } catch (error) {
+    // Silently handle 404 or any other errors - just show no suggestions
+    console.error('Could not load username suggestions:', error);
+  }
+}, 300);
 
 watch(
   () => values.username,
@@ -90,6 +110,7 @@ watch(
     if (!newUsername || errors.value.username) return;
 
     checkUsernameAvailability(newUsername);
+    dynamicUsernameSuggestions(newUsername);
   },
 );
 
