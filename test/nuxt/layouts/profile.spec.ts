@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query';
 import ProfileLayout from '@/layouts/profile.vue';
-import type { ApiErrorResponse, ApiSuccessResponse } from '~~/shared/types/api';
+import type { ApiErrorResponse } from '~~/shared/types/api';
 import type { User } from '~~/shared/types/user';
 import type { FetchError } from 'ofetch';
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime';
@@ -20,7 +20,7 @@ mockNuxtImport('useRoute', () => {
 
 // Mock Vue Query composables
 const mockQueryData = {
-  data: ref<ApiSuccessResponse<User> | null>(null),
+  data: ref<User | null>(null),
   isLoading: ref(false),
   isError: ref(false),
   error: ref<FetchError<FetchError<ApiErrorResponse>> | null>(null),
@@ -182,7 +182,7 @@ describe('ProfileLayout.vue', () => {
       },
     };
 
-    mockQueryData.data.value = { success: true, data: mockUser };
+    mockQueryData.data.value = mockUser;
 
     const wrapper = await createWrapper();
     await wrapper.vm.$nextTick();
@@ -218,7 +218,7 @@ describe('ProfileLayout.vue', () => {
       },
     };
 
-    mockQueryData.data.value = { success: true, data: mockUser };
+    mockQueryData.data.value = mockUser;
 
     const wrapper = await createWrapper();
     await wrapper.vm.$nextTick();

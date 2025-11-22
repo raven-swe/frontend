@@ -3,6 +3,8 @@ import { mountSuspended } from '@nuxt/test-utils/runtime';
 import ProfileDetails from '@/components/profile/ProfileDetails.vue';
 import type { User } from '~~/shared/types/user';
 import { computed } from 'vue';
+import { createI18n } from 'vue-i18n';
+import messages from '~~/i18n/locales/en.json';
 
 const mockUser: User = {
   joinedAt: '2020-07-15T12:34:56Z',
@@ -33,6 +35,13 @@ const mockUser: User = {
   },
 };
 
+const i18n = createI18n({
+  locale: 'en',
+  messages: {
+    en: messages,
+  },
+});
+
 describe('ProfileDetails Component', () => {
   it('renders ProfileCover component', async () => {
     const wrapper = await mountSuspended(ProfileDetails, {
@@ -40,6 +49,7 @@ describe('ProfileDetails Component', () => {
         provide: {
           'user-data': computed(() => mockUser),
         },
+        plugins: [i18n],
       },
     });
 
@@ -53,6 +63,7 @@ describe('ProfileDetails Component', () => {
         provide: {
           'user-data': computed(() => mockUser),
         },
+        plugins: [i18n],
       },
     });
 
@@ -66,6 +77,7 @@ describe('ProfileDetails Component', () => {
         provide: {
           'user-data': computed(() => mockUser),
         },
+        plugins: [i18n],
       },
     });
 
@@ -79,6 +91,7 @@ describe('ProfileDetails Component', () => {
         provide: {
           'user-data': computed(() => mockUser),
         },
+        plugins: [i18n],
       },
     });
 
@@ -92,6 +105,7 @@ describe('ProfileDetails Component', () => {
         provide: {
           'user-data': computed(() => mockUser),
         },
+        plugins: [i18n],
       },
     });
 
@@ -105,6 +119,7 @@ describe('ProfileDetails Component', () => {
         provide: {
           'user-data': computed(() => mockUser),
         },
+        plugins: [i18n],
       },
     });
 

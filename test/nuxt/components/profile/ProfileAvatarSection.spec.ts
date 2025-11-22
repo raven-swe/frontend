@@ -3,6 +3,8 @@ import { mountSuspended } from '@nuxt/test-utils/runtime';
 import { computed, nextTick, ref } from 'vue';
 import type { User } from '~~/shared/types/user';
 import { flushPromises } from '@vue/test-utils';
+import { createI18n } from 'vue-i18n';
+import messages from '~~/i18n/locales/en.json' assert { type: 'json' };
 
 const mockUser: User = {
   joinedAt: '2020-07-15T12:34:56Z',
@@ -33,6 +35,13 @@ const mockUser: User = {
   },
 };
 
+const i18n = createI18n({
+  locale: 'en',
+  messages: {
+    en: messages,
+  },
+});
+
 describe('ProfileAvatarSection Component', () => {
   beforeEach(() => {
     vi.resetModules();
@@ -50,6 +59,7 @@ describe('ProfileAvatarSection Component', () => {
         provide: {
           'user-data': computed(() => mockUser),
         },
+        plugins: [i18n],
       },
     });
 
@@ -68,6 +78,7 @@ describe('ProfileAvatarSection Component', () => {
         provide: {
           'user-data': computed(() => mockUser),
         },
+        plugins: [i18n],
       },
     });
 
@@ -99,6 +110,7 @@ describe('ProfileAvatarSection Component', () => {
         provide: {
           'user-data': computed(() => mockUser),
         },
+        plugins: [i18n],
       },
     });
 
@@ -129,8 +141,12 @@ describe('ProfileAvatarSection Component', () => {
         provide: {
           'user-data': computed(() => mockUser),
         },
+        plugins: [i18n],
       },
     });
+
+    // console.log(i18n.global.t('profile.setup.setup-profile'))
+    console.log(messages.profile.setup['setup-profile']);
 
     const setupButton = wrapper.find('button[data-test="setup-profile-button"]');
     expect(setupButton.exists()).toBe(true);
@@ -159,6 +175,7 @@ describe('ProfileAvatarSection Component', () => {
         provide: {
           'user-data': computed(() => mockUser),
         },
+        plugins: [i18n],
       },
     });
 
@@ -183,6 +200,7 @@ describe('ProfileAvatarSection Component', () => {
         provide: {
           'user-data': computed(() => mockUser),
         },
+        plugins: [i18n],
       },
     });
 
@@ -206,6 +224,7 @@ describe('ProfileAvatarSection Component', () => {
         provide: {
           'user-data': computed(() => mockUser),
         },
+        plugins: [i18n],
       },
     });
 
@@ -229,6 +248,7 @@ describe('ProfileAvatarSection Component', () => {
         provide: {
           'user-data': computed(() => mockUser),
         },
+        plugins: [i18n],
       },
     });
 
@@ -257,6 +277,7 @@ describe('ProfileAvatarSection Component', () => {
         provide: {
           'user-data': computed(() => followedUser),
         },
+        plugins: [i18n],
       },
     });
 
@@ -277,6 +298,7 @@ describe('ProfileAvatarSection Component', () => {
         provide: {
           'user-data': computed(() => mockUser),
         },
+        plugins: [i18n],
       },
     });
 
@@ -342,6 +364,7 @@ describe('ProfileAvatarSection Component', () => {
         provide: {
           'user-data': user,
         },
+        plugins: [i18n],
       },
     });
 
@@ -409,6 +432,7 @@ describe('ProfileAvatarSection Component', () => {
         provide: {
           'user-data': user,
         },
+        plugins: [i18n],
       },
     });
 
@@ -477,6 +501,7 @@ describe('ProfileAvatarSection Component', () => {
         provide: {
           'user-data': user,
         },
+        plugins: [i18n],
       },
     });
 
@@ -545,6 +570,7 @@ describe('ProfileAvatarSection Component', () => {
         provide: {
           'user-data': user,
         },
+        plugins: [i18n],
       },
     });
 

@@ -260,7 +260,7 @@ describe('ProfileInfo', () => {
     const wrapper = await mountSuspended(ProfileInfo, {
       global: {
         provide: {
-          'user-data': computed(() => mockUserProfile),
+          'user-data': computed(() => mockUser),
         },
       },
     });
