@@ -3,6 +3,7 @@ import { useInfiniteQuery } from '@tanstack/vue-query';
 import { apiFetch } from '~/api';
 import { useInfiniteScroll } from '@vueuse/core';
 import { DEFAULT_PAGE_SIZE } from '~/constants/pagination';
+import { useVirtualizer } from '@tanstack/vue-virtual';
 
 definePageMeta({
   layout: 'profile',
@@ -41,6 +42,29 @@ const tweets = computed(() => {
   return response.value?.pages.flatMap((page) => page.data) || [];
 });
 
+const parentRef = ref<HTMLElement | null>(null);
+
+const rowVirtualizerOptions = computed(() => {
+  return {
+    count: hasNextPage ? tweets.value.length + 1 : tweets.value.length,
+    getScrollElement: () => parentRef.value,
+    estimateSize: () => 100,
+    overscan: 5,
+  };
+});
+
+const rowVirtualizer = useVirtualizer(rowVirtualizerOptions);
+
+const virtualRows = computed(() => rowVirtualizer.value.getVirtualItems());
+
+const totalSize = computed(() => rowVirtualizer.value.getTotalSize());
+
+const measureElement = (el: Element | ComponentPublicInstance | null) => {
+  if (!el) return;
+  const element = 'nodeType' in el ? (el as HTMLElement) : (el as ComponentPublicInstance).$el;
+  rowVirtualizer.value.measureElement(element);
+};
+
 const sentinel = ref<HTMLElement | null>(null);
 useInfiniteScroll(
   sentinel,
@@ -67,19 +91,45 @@ onServerPrefetch(async () => {
         {{ $t('profile.messages.blocked-by.description', { username: user?.username || '' }) }}
       </p>
     </div>
-    <div v-if="tweets.length > 0" class="mb-4">
-      <div class="mt-4 flex w-full max-w-[700px] flex-col gap-4">
-        <TweetDefaultCard v-for="tweet in tweets" :key="tweet.id" :tweet="tweet" />
-      </div>
 
-      <!-- sentinel element for infinite scroll -->
-      <div ref="sentinel" class="h-4"></div>
+    <div v-if="tweets" ref="parentRef">
       <div
-        v-if="hasNextPage && isFetchingNextPage"
-        class="text-primary flex shrink-0 items-center justify-center py-4"
+        :style="{
+          height: `${totalSize}px`,
+          width: '100%',
+          position: 'relative',
+        }"
       >
-        <UiSpinner />
+        <div
+          :style="{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            transform: `translateY(${
+              virtualRows[0] ? virtualRows[0].start - rowVirtualizer.options.scrollMargin : 0
+            }px)`,
+          }"
+        >
+          <div
+            v-for="virtualRow in virtualRows"
+            :key="String(virtualRow.key)"
+            :ref="measureElement"
+            :data-index="virtualRow.index"
+          >
+            <TweetDefaultCard v-if="tweets[virtualRow.index]" :tweet="tweets[virtualRow.index]!" />
+          </div>
+        </div>
       </div>
+    </div>
+
+    <!-- sentinel element for infinite scroll -->
+    <div ref="sentinel" class="h-4"></div>
+    <div
+      v-if="hasNextPage && isFetchingNextPage"
+      class="text-primary flex shrink-0 items-center justify-center py-4"
+    >
+      <UiSpinner />
     </div>
     <div v-else data-testid="empty-state" class="text-muted-foreground mt-10 text-center">
       <h1 class="text-xl font-semibold">{{ $t('testing.tweets.tweet-not-found') }}</h1>
