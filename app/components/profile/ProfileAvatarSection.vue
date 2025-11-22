@@ -65,7 +65,7 @@ const { mutate: muteUser } = useProfileMutation<'mute' | 'unmute'>({
     <div v-if="!isCurrentUser" class="flex items-center gap-2" data-test="profile-action-buttons">
       <UiDropdownMenu>
         <UiDropdownMenuTrigger as-child>
-          <UiButton data-test="profile-actions-trigger" variant="outline" size="icon-lg">
+          <UiButton data-test="profile-actions-trigger" variant="outline" size="icon-md">
             <Icon name="lucide:more-horizontal" size="20" />
           </UiButton>
         </UiDropdownMenuTrigger>
