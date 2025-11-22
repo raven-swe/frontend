@@ -1,13 +1,24 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, defineEmits } from 'vue';
 import { useUserStore } from '@/stores/user';
 import TweetEditor from './TweetEditor.vue';
 import Toolbar from './Toolbar.vue';
 import MediaSlideshow from './MediaSlideshow.vue';
 import type { MediaItem } from '~~/shared/types/shared';
+import type { Tweet } from '~~/shared/types/tweets';
 import { uploadMediaService } from '@/services/tweet/uploadMediaService';
 import { createTweetService } from '@/services/tweet/createTweetService';
 import { showToaster } from '@/utils/showToaster';
+
+interface Props {
+  replyToTweetId?: string | null;
+  placeholder?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  replyToTweetId: null,
+  placeholder: undefined,
+});
 
 const tweetContent = ref('');
 const tweetEditorRef = ref<InstanceType<typeof TweetEditor> | null>(null);
@@ -36,6 +47,10 @@ const loadingMessage = computed(() => {
 });
 
 const { uploadImage, uploadVideo } = uploadMediaService();
+
+const emit = defineEmits<{
+  (e: 'posted', tweet: Tweet): void;
+}>();
 
 const handlePost = async () => {
   if (!tweetContent.value.trim() && media.value.length === 0) return;
@@ -73,13 +88,16 @@ const handlePost = async () => {
     const newTweet = await createTweetService({
       content: tweetContent.value,
       media: mediaIds,
-      isReplyToTweetId: null,
+      isReplyToTweetId: props.replyToTweetId,
     });
 
     // eslint-disable-next-line no-console
     console.log('Tweet created:', newTweet);
 
     showToaster('success', 'Tweet posted successfully!');
+
+    // Emit the created tweet so parent can handle it appropriately
+    emit('posted', newTweet);
 
     // Cleanup
     media.value.forEach((item) => URL.revokeObjectURL(item.url));
@@ -120,7 +138,7 @@ const handleRemoveMedia = (id: string) => {
 </script>
 
 <template>
-  <div class="bg-background border-border max-w-[598px] rounded-lg border p-4">
+  <div class="bg-background max-w-[598px] p-4">
     <div class="mb-3 flex gap-3">
       <div class="flex-shrink-0">
         <img
@@ -132,7 +150,7 @@ const handleRemoveMedia = (id: string) => {
       <TweetEditor
         ref="tweetEditorRef"
         v-model="tweetContent"
-        :placeholder="$t('tweet.composer.placeholder')"
+        :placeholder="placeholder || $t('tweet.composer.placeholder')"
         :max-length="MAX_LENGTH"
         @paste-media="handleAddMedia"
       />
