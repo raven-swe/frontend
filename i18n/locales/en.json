@@ -367,7 +367,10 @@
   },
   "dm": {
     "placeholder-search": "Search Direct Messages",
-    "header-title": "Messages"
+    "header-title": "Messages",
+    "placeholder-start-message": "Start a new message",
+
+    "attachedImage": "Attached image"
   },
   "toaster": {
     "login": {
@@ -397,5 +400,11 @@
   },
   "icons": {
     "back-button-icon": "material-symbols:arrow-back"
+  },
+  "hashtag": {
+    "placeholder": {
+      "not-implemented": "Route is not implemented yet",
+      "path": "Path: {path}"
+    }
   }
 }

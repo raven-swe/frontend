@@ -12,3 +12,34 @@ export interface DmConversation {
   };
   isMuted: boolean;
 }
+
+export interface DmMessageEntityMention {
+  username: string;
+  startPosition: number;
+}
+
+export interface DmMessageEntityHashtag {
+  hashtag: string;
+  startPosition: number;
+}
+
+export interface DmMessageEntities {
+  mentions: DmMessageEntityMention[];
+  hashtags: DmMessageEntityHashtag[];
+}
+
+export interface DmMessageSender {
+  username: string;
+  displayName: string;
+  avatarUrl: string;
+}
+
+export interface DmMessage {
+  id: string;
+  sender: DmMessageSender;
+  content: string;
+  entities: DmMessageEntities;
+  mediaUrl?: string | null;
+  createdAt: string;
+  isMine: boolean;
+}

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import Avatar from '~/components/ui/Avatar.vue';
 import type { Tweet } from '~~/shared/types/tweets';
-import { relativeTime, formatDate } from '~/utils/time';
 import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
 import { useRouter } from 'vue-router';
@@ -70,7 +69,7 @@ const contentSegments = computed<Segment[]>(() => {
       end: start + text.length,
       type: 'mention',
       text,
-      href: `/@${m.username}`,
+      href: `/profile/${m.username}`,
     });
   }
   for (const h of entities.hashtags || []) {
@@ -132,13 +131,13 @@ function goToTweet() {
           <span class="cursor-pointer font-semibold hover:underline">{{
             props.tweet.author.displayName
           }}</span>
+          <span
+            class="text-muted-foreground"
+            @click.stop
+            v-text="'@' + props.tweet.author.username"
+          />
+          <span class="text-muted-foreground">·</span>
         </NuxtLink>
-        <span
-          class="text-muted-foreground"
-          @click.stop
-          v-text="'@' + props.tweet.author.username"
-        />
-        <span class="text-muted-foreground">·</span>
         <time
           :title="formatDate(tweet.createdAt, $i18n.locale)"
           :datetime="tweet.createdAt"

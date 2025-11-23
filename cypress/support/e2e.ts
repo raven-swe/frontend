@@ -15,3 +15,13 @@
 
 // Import commands.js using ES2015 syntax:
 import './commands';
+
+// Handle Vite HMR errors during development
+Cypress.on('uncaught:exception', (err) => {
+  // Ignore HMR/dynamic import errors from Vite/Nuxt
+  if (err.message.includes('Failed to fetch dynamically imported module')) {
+    return false;
+  }
+  // Let other errors fail the test
+  return true;
+});

@@ -68,7 +68,11 @@ const onSubmit = handleSubmit(async (values) => {
 </script>
 
 <template>
-  <form class="flex min-h-screen flex-col" @submit.prevent="onSubmit">
+  <form
+    class="flex min-h-screen flex-col"
+    data-cy="change-password-form"
+    @submit.prevent="onSubmit"
+  >
     <div class="mb-4 flex items-center gap-4 p-4">
       <Icon
         :name="$t('setting.back-button-icon')"
@@ -86,6 +90,7 @@ const onSubmit = handleSubmit(async (values) => {
           <FieldInput
             type="password"
             name="currentPassword"
+            data-cy="chg-pwd-current"
             :placeholder="$t('setting.password.current-password')"
             v-bind="currentPasswordAttrs"
           />
@@ -102,6 +107,7 @@ const onSubmit = handleSubmit(async (values) => {
         <FieldInput
           type="password"
           name="newPassword"
+          data-cy="chg-pwd-new"
           :placeholder="$t('setting.password.new-password')"
           v-bind="newPasswordAttrs"
         />
@@ -110,6 +116,7 @@ const onSubmit = handleSubmit(async (values) => {
       <div class="border-border border-b px-4 py-8">
         <FieldInput
           type="password"
+          data-cy="chg-pwd-confirm"
           name="confirmPassword"
           :placeholder="$t('setting.password.confirm-password')"
           v-bind="confirmPasswordAttrs"
@@ -119,6 +126,7 @@ const onSubmit = handleSubmit(async (values) => {
       <div class="flex justify-end px-4 py-8">
         <Button
           type="submit"
+          data-cy="chg-pwd-save"
           :disabled="Object.entries(errors).length > 0 || isSubmitting"
           variant="primary"
           size="md"

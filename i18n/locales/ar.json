@@ -367,7 +367,9 @@
   },
   "dm": {
     "placeholder-search": "ابحث في الرسائل المباشرة",
-    "header-title": "الرسائل"
+    "header-title": "الرسائل",
+    "placeholder-start-message": "ابدأ رسالة جديدة",
+    "attachedImage": "صورة مرفقة"
   },
   "toaster": {
     "login": {
@@ -397,5 +399,11 @@
   },
   "icons": {
     "back-button-icon": "material-symbols:arrow-forward"
+  },
+  "hashtag": {
+    "placeholder": {
+      "not-implemented": " المسار غير متاحة بعد",
+      "path": "المسار: {path}"
+    }
   }
 }
