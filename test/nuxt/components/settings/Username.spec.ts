@@ -545,7 +545,15 @@ describe('Settings Username Page', () => {
       global: { stubs: { FieldInput: FieldInputStub, Button: ButtonStub, Icon: IconStub } },
     });
     const submitBtn = wrapper.get('[data-testid="submit"]');
-    // Initially enabled
+    // Initially disabled because username is unchanged (isUnchangedUsername computed)
+    expect(submitBtn.attributes('disabled')).toBeDefined();
+    // Change username to enable button
+    const field = wrapper.get('[data-testid="field"]');
+    await field.setValue('different');
+    await wrapper.vm.$nextTick();
+    // wait for availability & suggestions async to finish
+    await new Promise((r) => setTimeout(r, 15));
+    await wrapper.vm.$nextTick();
     expect(submitBtn.attributes('disabled')).toBeUndefined();
     // Simulate internal isSubmitting state true
     // @ts-expect-error test-side mutation of internal ref
@@ -555,6 +563,24 @@ describe('Settings Username Page', () => {
     // Reset
     // @ts-expect-error test-side mutation of internal ref
     wrapper.vm.isSubmitting.value = false;
+    await wrapper.vm.$nextTick();
+    expect(submitBtn.attributes('disabled')).toBeUndefined();
+  });
+
+  it('disables submit button and skips availability check when username unchanged', async () => {
+    const wrapper = await mountSuspended(UsernamePage, {
+      global: { stubs: { FieldInput: FieldInputStub, Button: ButtonStub, Icon: IconStub } },
+    });
+    const submitBtn = wrapper.get('[data-testid="submit"]');
+    // Unchanged from original -> disabled
+    expect(submitBtn.attributes('disabled')).toBeDefined();
+    // Availability check should not have been called
+    expect(globalThis.$fetch).not.toHaveBeenCalled();
+    // Change to a new username -> availability check will run and button may enable
+    const field = wrapper.get('[data-testid="field"]');
+    await field.setValue('new_unique_name');
+    await wrapper.vm.$nextTick();
+    await new Promise((r) => setTimeout(r, 15));
     await wrapper.vm.$nextTick();
     expect(submitBtn.attributes('disabled')).toBeUndefined();
   });
