@@ -219,6 +219,9 @@
       "IS_EMPTY": "Please enter your password",
       "TOO_SHORT": "Password must be at least 10 characters long",
       "INVALID_FORMAT": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+    },
+    "username": {
+      "RATE_LIMIT_EXCEEDED": "Too many requests. Please try again later."
     }
   },
   "register": {
