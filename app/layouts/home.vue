@@ -45,7 +45,7 @@ provide('registerNewTweetHandler', registerNewTweetHandler);
         :is-active="$route.path === '/home/following'"
       />
     </Tabs>
-    <TweetComposer class="mt-10" @posted="emitNewTweet" />
+    <TweetComposer class="mt-15" @posted="emitNewTweet" />
 
     <slot />
   </NuxtLayout>

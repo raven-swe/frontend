@@ -71,11 +71,11 @@ const handlePost = async () => {
         const item = media.value[i];
 
         if (item?.type === 'image') {
-          const id = await uploadImage(item.file, 'tweets');
-          mediaIds.push(id);
+          const result = await uploadImage(item.file, 'tweets');
+          mediaIds.push(result.id);
         } else if (item?.type === 'video') {
-          const id = await uploadVideo(item?.file, 'tweets');
-          mediaIds.push(id);
+          const result = await uploadVideo(item?.file, 'tweets');
+          mediaIds.push(result.id);
         }
 
         // Update progress
@@ -88,7 +88,7 @@ const handlePost = async () => {
     const newTweet = await createTweetService({
       content: tweetContent.value,
       media: mediaIds,
-      isReplyToTweetId: props.replyToTweetId,
+      replyToTweetId: props.replyToTweetId,
     });
 
     // eslint-disable-next-line no-console
