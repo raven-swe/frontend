@@ -2,24 +2,44 @@
 import { useInfiniteQuery } from '@tanstack/vue-query';
 import { useWindowVirtualizer } from '@tanstack/vue-virtual';
 import { profileTabsService } from '~/services/profile/profileTabsService';
+import { validProfileTabs } from '~~/shared/types/profile-tabs';
+import type { Tab } from '~~/shared/types/profile-tabs';
+
+function isTab(value: unknown): value is Tab {
+  return typeof value === 'string' && validProfileTabs.includes(value as Tab);
+}
 
 definePageMeta({
   layout: 'profile',
+  validate: (ctx) => isTab(ctx.params.tab),
 });
 
+const route = useRoute();
+const tab = computed(() => route.params.tab as Tab);
+
 const user = inject<ComputedRef<User>>('user-data');
+const isBlockedBy = computed(() => user?.value.relationship.blockedBy || false);
 
 const {
   data: response,
   fetchNextPage,
   hasNextPage,
   isFetchingNextPage,
+  isLoading,
   suspense,
 } = useInfiniteQuery({
-  queryKey: ['profile', user?.value.username, 'likes'],
+  queryKey: [
+    'profile',
+    user?.value.username,
+    'tweets'.concat(tab.value.length > 0 ? `-${tab.value}` : ''),
+  ],
   initialPageParam: null as string | null,
   queryFn: async ({ pageParam = null }) =>
-    await profileTabsService.getProfileLikedTweetsPaginated(user?.value.username || '', pageParam),
+    await profileTabsService.getProfileTweetsPaginated(
+      user?.value.username || '',
+      tab.value,
+      pageParam,
+    ),
 
   getNextPageParam: (lastPage) =>
     lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined,
@@ -27,13 +47,13 @@ const {
 
 const tweets = computed(() => response.value?.pages.flatMap((page) => page.data) || []);
 
+//  Virtualization setup
 const parentRef = ref<HTMLElement | null>(null);
-
 const parentOffsetRef = ref(0);
-
 onMounted(() => {
   parentOffsetRef.value = parentRef.value?.offsetTop ?? 0;
 });
+
 const rowVirtualizerOptions = computed(() => {
   return {
     count: hasNextPage ? tweets.value.length + 1 : tweets.value.length,
@@ -44,9 +64,7 @@ const rowVirtualizerOptions = computed(() => {
 });
 
 const rowVirtualizer = useWindowVirtualizer(rowVirtualizerOptions);
-
 const virtualRows = computed(() => rowVirtualizer.value.getVirtualItems());
-
 const totalSize = computed(() => rowVirtualizer.value.getTotalSize());
 
 const measureElement = (el: Element | ComponentPublicInstance | null) => {
@@ -74,44 +92,62 @@ onServerPrefetch(async () => {
 
 <template>
   <div>
-    <div v-if="tweets" ref="parentRef">
-      <div
-        :style="{
-          height: `${totalSize}px`,
-          width: '100%',
-          position: 'relative',
-        }"
-      >
+    <div v-if="isBlockedBy && tab === ''" class="border-b-1 p-8">
+      <h1 class="text-2xl font-semibold">
+        {{ $t('profile.messages.blocked-by.title', { username: user?.username || '' }) }}
+      </h1>
+      <p class="text-muted-foreground">
+        {{ $t('profile.messages.blocked-by.description', { username: user?.username || '' }) }}
+      </p>
+    </div>
+
+    <ClientOnly>
+      <div v-if="tweets" ref="parentRef">
         <div
           :style="{
-            position: 'absolute',
-            top: 0,
-            left: 0,
+            height: `${totalSize}px`,
             width: '100%',
-            transform: `translateY(${
-              virtualRows[0] ? virtualRows[0].start - rowVirtualizer.options.scrollMargin : 0
-            }px)`,
+            position: 'relative',
           }"
         >
           <div
-            v-for="virtualRow in virtualRows"
-            :key="String(virtualRow.key)"
-            :ref="measureElement"
-            :data-index="virtualRow.index"
+            :style="{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              transform: `translateY(${
+                virtualRows[0] ? virtualRows[0].start - rowVirtualizer.options.scrollMargin : 0
+              }px)`,
+            }"
           >
-            <TweetDefaultCard v-if="tweets[virtualRow.index]" :tweet="tweets[virtualRow.index]!" />
+            <div
+              v-for="virtualRow in virtualRows"
+              :key="String(virtualRow.key)"
+              :ref="measureElement"
+              :data-index="virtualRow.index"
+            >
+              <TweetDefaultCard
+                v-if="tweets[virtualRow.index]"
+                :tweet="tweets[virtualRow.index]!"
+              />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </ClientOnly>
 
     <div
-      v-if="hasNextPage && isFetchingNextPage"
+      v-if="(hasNextPage && isFetchingNextPage) || isLoading"
       class="text-primary flex shrink-0 items-center justify-center py-4"
     >
       <UiSpinner />
     </div>
-    <div v-else data-testid="empty-state" class="text-muted-foreground mt-10 text-center">
+    <div
+      v-if="tweets.length === 0 && !isFetchingNextPage && !isLoading"
+      data-testid="empty-state"
+      class="text-muted-foreground mt-10 text-center"
+    >
       <h1 class="text-xl font-semibold">{{ $t('testing.tweets.tweet-not-found') }}</h1>
     </div>
   </div>
