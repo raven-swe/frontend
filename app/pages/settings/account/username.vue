@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 // Removed explicit vue-router import to allow Nuxt auto-import & test mocking of useRouter
 import * as yup from 'yup';
 import { useForm } from 'vee-validate';
@@ -17,6 +17,7 @@ const router = useRouter();
 const userStore = useUserStore();
 
 const suggestions = ref<string[]>([]);
+const originalUsername = ref<string>(userStore.user?.username || '');
 const usernameExists = ref(false);
 const isChecking = ref(false);
 
@@ -56,7 +57,9 @@ const { errors, values, defineField, handleSubmit, isSubmitting, setFieldError, 
 const [_username, usernameAttrs] = defineField('username');
 
 const checkUsernameAvailability = useDebounceFn(async (username: string) => {
+  // Guard: skip network call if unchanged or invalid
   if (!username || errors.value.username) return;
+  if (username === originalUsername.value) return;
 
   try {
     isChecking.value = true;
@@ -87,7 +90,9 @@ const checkUsernameAvailability = useDebounceFn(async (username: string) => {
   }
 }, 300);
 const dynamicUsernameSuggestions = useDebounceFn(async (username: string) => {
+  // Guard: skip suggestions fetch if unchanged or invalid
   if (!username || errors.value.username) return;
+  if (username === originalUsername.value) return;
 
   try {
     const { data } = await apiFetch<ApiSuccessResponse<{ suggestions: string[] }>>(
@@ -143,6 +148,11 @@ const onSubmit = handleSubmit(async (values) => {
     setFieldError('username', $t('setting.username.error-saving'));
   }
 });
+
+// Disable the save button if the username hasn't changed
+const isUnchangedUsername = computed(() => values.username === originalUsername.value);
+// Only treat actual non-empty error messages as errors for disabling submit
+const hasErrors = computed(() => Object.values(errors.value).some((msg) => !!msg));
 </script>
 
 <template>
@@ -181,12 +191,11 @@ const onSubmit = handleSubmit(async (values) => {
           </button>
         </div>
       </div>
-
       <div class="flex justify-end px-4 py-8">
         <Button
           type="submit"
           :disabled="
-            Object.entries(errors).length > 0 || isSubmitting || isChecking || usernameExists
+            hasErrors || isSubmitting || isChecking || usernameExists || isUnchangedUsername
           "
           variant="primary"
           size="md"
