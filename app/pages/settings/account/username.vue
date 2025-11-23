@@ -76,8 +76,12 @@ const checkUsernameAvailability = useDebounceFn(async (username: string) => {
       setFieldError('username', $t('setting.username.username-taken'));
     }
   } catch (error) {
-    console.error('Error checking username:', error);
-    setFieldError('username', $t('setting.username.error-checking'));
+    // Handle different error status codes
+    const err = error as { data?: { data: { error: { code: string } } } };
+    const code = err.data?.data?.error.code;
+    const errorKey = code ? `errors.username.${code}` : 'errors.username.error-checking';
+    console.error('Error checking username:', errorKey);
+    setFieldError('username', $t(errorKey));
   } finally {
     isChecking.value = false;
   }

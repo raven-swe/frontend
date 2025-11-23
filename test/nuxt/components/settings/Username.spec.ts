@@ -261,7 +261,7 @@ describe('Settings Username Page', () => {
     await field.setValue('someName');
     await wrapper.vm.$nextTick();
 
-    expect(setFieldErrorSpy).toHaveBeenCalledWith('username', 'setting.username.error-checking');
+    expect(setFieldErrorSpy).toHaveBeenCalledWith('username', 'errors.username.error-checking');
   });
 
   it('does not submit when username exists (early return in submit handler)', async () => {
