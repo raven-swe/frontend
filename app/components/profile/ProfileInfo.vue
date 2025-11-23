@@ -49,15 +49,15 @@ const displayUrl = computed(() => {
         </a>
 
         <!-- join date -->
-        <p class="text-muted-foreground flex items-center gap-1">
+        <p v-if="userProfile?.joinedAt" class="text-muted-foreground flex items-center gap-1">
           <Icon name="ic:sharp-calendar-month" />
           {{ $t('profile-info.joined') }}
-          {{ formatMonthYear(userProfile?.joinedAt ?? '') }}
+          {{ formatMonthYear(userProfile.joinedAt) }}
         </p>
       </div>
 
       <div class="mt-4 flex space-x-4">
-        <span
+        <span data-test="following-count"
           ><strong>{{
             $n(userProfile?.followingCount ?? 0, {
               notation: 'compact',
@@ -65,7 +65,7 @@ const displayUrl = computed(() => {
           }}</strong>
           <span class="text-muted-foreground ms-1"> {{ $t('profile-info.following') }} </span>
         </span>
-        <span
+        <span data-test="followers-count"
           ><strong>{{
             $n(userProfile?.followersCount ?? 0, {
               notation: 'compact',

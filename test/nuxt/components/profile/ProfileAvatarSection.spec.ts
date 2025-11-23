@@ -97,6 +97,27 @@ describe('ProfileAvatarSection Component', () => {
     expect(classes).toContain('size-34');
   });
 
+  it('gracefully handle missing avatar URL', async () => {
+    const { default: ProfileAvatarSection } = await import(
+      '@/components/profile/ProfileAvatarSection.vue'
+    );
+    const wrapper = await mountSuspended(ProfileAvatarSection, {
+      global: {
+        provide: {
+          'user-data': computed(() => ({
+            ...mockUser,
+            avatarUrl: null,
+          })),
+        },
+        plugins: [i18n],
+      },
+    });
+
+    const profileImage = wrapper.find('img');
+    expect(profileImage.exists()).toBe(true);
+    expect(profileImage.attributes('src')).toEqual('');
+  });
+
   it('does not show setup or edit buttons when not current user', async () => {
     vi.doMock('@/composables/useIsCurrentUser', () => ({
       useIsCurrentUser: vi.fn(() => ({ isCurrentUser: computed(() => false) })),
@@ -328,19 +349,27 @@ describe('ProfileAvatarSection Component', () => {
     const muteUserMock = vi.fn();
     const unmuteUserMock = vi.fn();
 
-    vi.doMock('~/composables/useProfileMutation', () => ({
-      useProfileMutation: ({
+    const userProfileMock = vi.fn(
+      ({
         mutationFn,
+        username: _username,
         optimisticUpdateFn,
       }: {
         mutationFn: (action: 'mute' | 'unmute') => void;
         optimisticUpdateFn: (data: User, action: 'mute' | 'unmute') => void;
-      }) => ({
-        mutate: (action: 'mute' | 'unmute') => {
-          optimisticUpdateFn(user.value, action);
-          return mutationFn(action);
-        },
-      }),
+        username: string;
+      }) => {
+        return {
+          mutate: (action: 'mute' | 'unmute') => {
+            optimisticUpdateFn(user.value, action);
+            return mutationFn(action);
+          },
+        };
+      },
+    );
+
+    vi.doMock('~/composables/useProfileMutation', () => ({
+      useProfileMutation: userProfileMock,
     }));
 
     vi.doMock('@/composables/useIsCurrentUser', () => ({
@@ -366,6 +395,18 @@ describe('ProfileAvatarSection Component', () => {
         },
         plugins: [i18n],
       },
+    });
+
+    expect(userProfileMock).toHaveBeenNthCalledWith(1, {
+      mutationFn: expect.any(Function),
+      optimisticUpdateFn: expect.any(Function),
+      username: 'testuser',
+    });
+
+    expect(userProfileMock).toHaveBeenNthCalledWith(2, {
+      mutationFn: expect.any(Function),
+      optimisticUpdateFn: expect.any(Function),
+      username: 'testuser',
     });
 
     const dropdownTrigger = wrapper.find('[data-test="profile-actions-trigger"]');
@@ -587,5 +628,106 @@ describe('ProfileAvatarSection Component', () => {
     await nextTick();
     expect(unblockUserMock).toHaveBeenCalledWith('testuser');
     expect(user.value.relationship.blocking).toBe(false);
+  });
+
+  it('mutation fn handle not exisiting user gracefully', async () => {
+    const muteUserMock = vi.fn();
+    const unmuteUserMock = vi.fn();
+    const blockUserMock = vi.fn();
+    const unblockUserMock = vi.fn();
+
+    const user = ref<User>({
+      ...mockUser,
+      relationship: {
+        ...mockUser.relationship,
+        blocking: true,
+      },
+    });
+
+    vi.doMock('~/services/profile/profileInteractionService', () => ({
+      profileInteractionService: {
+        muteUser: muteUserMock,
+        unmuteUser: unmuteUserMock,
+        blockUser: blockUserMock,
+        unblockUser: unblockUserMock,
+      },
+    }));
+
+    const userProfileMock = vi.fn(
+      ({
+        mutationFn,
+        username: _username,
+        optimisticUpdateFn,
+      }: {
+        mutationFn: (action: 'mute' | 'unmute') => void;
+        optimisticUpdateFn: (data: User, action: 'mute' | 'unmute') => void;
+        username: string;
+      }) => {
+        return {
+          mutate: (action: 'mute' | 'unmute') => {
+            optimisticUpdateFn(user.value, action);
+            return mutationFn(action);
+          },
+        };
+      },
+    );
+
+    vi.doMock('~/composables/useProfileMutation', () => ({
+      useProfileMutation: userProfileMock,
+    }));
+
+    vi.doMock('@/composables/useIsCurrentUser', () => ({
+      useIsCurrentUser: vi.fn(() => ({ isCurrentUser: computed(() => false) })),
+    }));
+
+    const { default: ProfileAvatarSection } = await import(
+      '@/components/profile/ProfileAvatarSection.vue'
+    );
+
+    const wrapper = await mountSuspended(ProfileAvatarSection, {
+      global: {
+        provide: {
+          'user-data': null,
+        },
+        plugins: [i18n],
+      },
+    });
+
+    expect(userProfileMock).toHaveBeenNthCalledWith(1, {
+      mutationFn: expect.any(Function),
+      optimisticUpdateFn: expect.any(Function),
+      username: '',
+    });
+
+    expect(userProfileMock).toHaveBeenNthCalledWith(2, {
+      mutationFn: expect.any(Function),
+      optimisticUpdateFn: expect.any(Function),
+      username: '',
+    });
+
+    const dropdownTrigger = wrapper.find('[data-test="profile-actions-trigger"]');
+    expect(dropdownTrigger.exists()).toBe(true);
+
+    await dropdownTrigger.trigger('click');
+    await nextTick();
+
+    const muteButton = document.querySelector('[data-test="mute-button"]') as HTMLElement;
+    expect(muteButton).not.toBeNull();
+
+    await muteButton.click();
+    await nextTick();
+    expect(muteUserMock).not.toHaveBeenCalled();
+    expect(unmuteUserMock).not.toHaveBeenCalled();
+
+    await dropdownTrigger.trigger('click');
+    await nextTick();
+
+    const blockButton = document.querySelector('[data-test="block-button"]') as HTMLElement;
+    expect(blockButton).not.toBeNull();
+
+    await blockButton.click();
+    await nextTick();
+    expect(blockUserMock).not.toHaveBeenCalled();
+    expect(unblockUserMock).not.toHaveBeenCalled();
   });
 });

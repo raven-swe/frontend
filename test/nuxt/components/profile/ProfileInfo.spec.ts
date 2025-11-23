@@ -45,62 +45,32 @@ describe('ProfileInfo', () => {
 
     const container = wrapper.find('div.mt-2.flex.flex-col');
     expect(container.exists()).toBe(true);
-  });
 
-  it('renders display name correctly', async () => {
-    const wrapper = await mountSuspended(ProfileInfo, {
-      global: {
-        provide: {
-          'user-data': computed(() => mockUser),
-        },
-      },
-    });
+    const infoContainer = wrapper.find('.mt-2.flex.flex-wrap.gap-2');
+    expect(infoContainer.exists()).toBe(true);
+
+    const statsContainer = wrapper.find('.mt-4.flex.space-x-4');
+    expect(statsContainer.exists()).toBe(true);
+    const html = wrapper.html();
+    expect(html).toContain('ic:sharp-location-on');
+    expect(html).toContain('ic:sharp-link');
+    expect(html).toContain('ic:sharp-calendar-month');
 
     const displayName = wrapper.find('h2');
     expect(displayName.exists()).toBe(true);
     expect(displayName.text()).toBe('Test User');
     expect(displayName.classes()).toContain('text-2xl');
     expect(displayName.classes()).toContain('font-bold');
-  });
-
-  it('renders username with @ prefix', async () => {
-    const wrapper = await mountSuspended(ProfileInfo, {
-      global: {
-        provide: {
-          'user-data': computed(() => mockUser),
-        },
-      },
-    });
 
     const username = wrapper.find('p.text-md');
     expect(username.exists()).toBe(true);
     expect(username.text()).toBe('@testuser');
-  });
-
-  it('renders bio with correct styling', async () => {
-    const wrapper = await mountSuspended(ProfileInfo, {
-      global: {
-        provide: {
-          'user-data': computed(() => mockUser),
-        },
-      },
-    });
 
     const bio = wrapper.find('p.whitespace-pre-line');
     expect(bio.exists()).toBe(true);
     expect(bio.text()).toBe('This is a test bio');
     expect(bio.classes()).toContain('text-muted-foreground');
     expect(bio.classes()).toContain('mt-2');
-  });
-
-  it('renders location when provided with leading-tight class', async () => {
-    const wrapper = await mountSuspended(ProfileInfo, {
-      global: {
-        provide: {
-          'user-data': computed(() => mockUser),
-        },
-      },
-    });
 
     expect(wrapper.html()).toContain('Test Location');
     expect(wrapper.html()).toContain('ic:sharp-location-on');
@@ -221,54 +191,100 @@ describe('ProfileInfo', () => {
     expect(html).toContain('Followers'); // Translated text
   });
 
-  it('applies correct text styling to all elements', async () => {
+  it('render section for user muted by current user', async () => {
     const wrapper = await mountSuspended(ProfileInfo, {
       global: {
         provide: {
-          'user-data': computed(() => mockUser),
+          'user-data': computed(() => ({
+            ...mockUser,
+            relationship: { ...mockUser.relationship, muted: true },
+          })),
         },
       },
     });
 
-    // Display name styling
-    const displayName = wrapper.find('h2');
-    expect(displayName.classes()).toContain('text-foreground');
-    expect(displayName.classes()).toContain('pb-0');
-
-    // Muted text elements
-    const mutedElements = wrapper.findAll('.text-muted-foreground');
-    expect(mutedElements.length).toBeGreaterThan(0);
+    expect(wrapper.html()).toContain('You have muted posts from this account.');
   });
 
-  it('renders all icons with correct sizes', async () => {
+  it('renders follower and following count correctly', async () => {
     const wrapper = await mountSuspended(ProfileInfo, {
       global: {
         provide: {
-          'user-data': computed(() => mockUser),
+          'user-data': computed(() => ({
+            ...mockUser,
+            followersCount: 1234,
+            followingCount: 100000,
+          })),
+        },
+      },
+    });
+
+    const followersCount = wrapper.find('[data-test="followers-count"]');
+    const followingCount = wrapper.find('[data-test="following-count"]');
+
+    expect(followersCount.exists()).toBe(true);
+    expect(followersCount.text()).toContain('1.2K');
+
+    expect(followingCount.exists()).toBe(true);
+    expect(followingCount.text()).toContain('100K');
+  });
+
+  it('handle missing followers and following count gracefully', async () => {
+    const wrapper = await mountSuspended(ProfileInfo, {
+      global: {
+        provide: {
+          'user-data': computed(() => ({
+            ...mockUser,
+            followersCount: undefined,
+            followingCount: undefined,
+          })),
+        },
+      },
+    });
+
+    const followersCount = wrapper.find('[data-test="followers-count"]');
+    const followingCount = wrapper.find('[data-test="following-count"]');
+
+    expect(followersCount.exists()).toBe(true);
+    expect(followersCount.text()).toContain('0');
+
+    expect(followingCount.exists()).toBe(true);
+    expect(followingCount.text()).toContain('0');
+  });
+
+  it("handle join date formatting when it's missing", async () => {
+    const wrapper = await mountSuspended(ProfileInfo, {
+      global: {
+        provide: {
+          'user-data': computed(() => ({
+            ...mockUser,
+            joinedAt: undefined,
+          })),
         },
       },
     });
 
     const html = wrapper.html();
-    // Check that icons are rendered (exact size attributes may vary based on Icon component implementation)
-    expect(html).toContain('ic:sharp-location-on');
-    expect(html).toContain('ic:sharp-link');
-    expect(html).toContain('ic:sharp-calendar-month');
+    expect(html).not.toContain('ic:sharp-calendar-month');
+    expect(html).not.toContain('Joined');
+    wrapper.unmount();
   });
 
-  it('applies correct gap and spacing classes', async () => {
+  it('correctly render formatted joined at date', async () => {
     const wrapper = await mountSuspended(ProfileInfo, {
       global: {
         provide: {
-          'user-data': computed(() => mockUser),
+          'user-data': computed(() => ({
+            ...mockUser,
+            joinedAt: '2021-03-10T08:00:00Z',
+          })),
         },
       },
     });
 
-    const infoContainer = wrapper.find('.mt-2.flex.flex-wrap.gap-2');
-    expect(infoContainer.exists()).toBe(true);
-
-    const statsContainer = wrapper.find('.mt-4.flex.space-x-4');
-    expect(statsContainer.exists()).toBe(true);
+    const html = wrapper.html();
+    expect(html).toContain('ic:sharp-calendar-month');
+    expect(html).toContain('March 2021'); // formatMonthYear output shows full month name
+    wrapper.unmount();
   });
 });
