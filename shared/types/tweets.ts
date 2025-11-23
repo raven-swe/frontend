@@ -41,14 +41,14 @@ export type Tweet = {
   isRetweeted: boolean;
   entities: TweetEntity;
   media: TweetMedia[];
-  isReplyToTweetId?: string | null;
-  quotedTweetId?: string;
+  replyToTweetId?: string | null;
+  quoteToTweetId?: string;
   quotedTweet?: Tweet;
 };
 
 export type CreateTweetRequest = {
   content: string;
   media?: string[];
-  isReplyToTweetId?: string | null;
-  quotedTweetId?: string | null;
+  replyToTweetId?: string | null;
+  quoteToTweetId?: string | null;
 };

@@ -102,7 +102,7 @@ export const handlers = [
   http.post(`${API_URL}/tweets`, async ({ request }) => {
     const body = (await request.json()) as CreateTweetRequest;
 
-    const { content, media = [], isReplyToTweetId = null } = body;
+    const { content, media = [], replyToTweetId = null } = body;
 
     // basically unreachable
     if (media.length > 4) {
@@ -157,7 +157,7 @@ export const handlers = [
         width: 0,
         height: 0,
       })),
-      isReplyToTweetId,
+      replyToTweetId,
     };
 
     tweets.set(id, newTweet);
