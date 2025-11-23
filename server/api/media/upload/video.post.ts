@@ -1,7 +1,14 @@
 export default defineWrappedResponseHandler(async (event) => {
   const fetcher = serverApiFetch(event);
 
-  const response = await fetcher<ApiResponseBase>(`/media/upload/video`, {
+  const response = await fetcher<
+    ApiSuccessResponse<{
+      items: {
+        id: string;
+        url: string;
+      };
+    }>
+  >(`/media/upload/video`, {
     method: 'POST',
     body: event.node.req,
     headers: {
