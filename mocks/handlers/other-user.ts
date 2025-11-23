@@ -137,4 +137,49 @@ export const handlers = [
       );
     }
   }),
+
+  http.get<{
+    username: string;
+  }>(`${API_URL}/users/:username/replies`, async ({ params, request }) => {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    const url = new URL(request.url);
+    const username = params.username;
+    const user = mockUserInfos[username.toLowerCase()];
+    const limit = Number(url.searchParams.get('limit') || '20');
+    if (user) {
+      const userReplies = mockTweets.filter(
+        (tweet) =>
+          tweet.author.username.toLowerCase() === username.toLowerCase() && tweet.isReplyToTweetId,
+      );
+      const cursor = url.searchParams.get('cursor') || null;
+      const startIndex = cursor ? Math.max(0, Number(cursor)) : 0;
+      const paginatedTweets = userReplies.slice(startIndex, startIndex + limit);
+      const nextIndex = startIndex + paginatedTweets.length;
+      const nextCursor = nextIndex < userReplies.length ? String(nextIndex) : null;
+      return HttpResponse.json<ApiSuccessResponse<Tweet[]>>(
+        {
+          success: true,
+          message: 'User replies fetched successfully',
+          data: paginatedTweets,
+          pagination: {
+            cursor: String(startIndex),
+            nextCursor,
+            hasNextPage: !!nextCursor,
+          },
+        },
+        { status: 200 },
+      );
+    } else {
+      return HttpResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'USER_NOT_FOUND',
+            message: 'The requested user does not exist',
+          },
+        },
+        { status: 404 },
+      );
+    }
+  }),
 ];

@@ -22,14 +22,11 @@ const {
   queryFn: async ({ pageParam = null }) =>
     await profileTabsService.getProfileTweetsPaginated(user?.value.username || '', pageParam),
 
-  getNextPageParam: (lastPage) => {
-    return lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined;
-  },
+  getNextPageParam: (lastPage) =>
+    lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined,
 });
 
-const tweets = computed(() => {
-  return response.value?.pages.flatMap((page) => page.data) || [];
-});
+const tweets = computed(() => response.value?.pages.flatMap((page) => page.data) || []);
 
 const parentRef = ref<HTMLElement | null>(null);
 
@@ -70,17 +67,6 @@ watchEffect(() => {
     fetchNextPage();
   }
 });
-
-// const sentinel = ref<HTMLElement | null>(null);
-// useInfiniteScroll(
-//   sentinel,
-//   async () => {
-//     if (hasNextPage.value && !isFetchingNextPage.value) {
-//       await fetchNextPage();
-//     }
-//   },
-//   { distance: 1000 },
-// );
 
 onServerPrefetch(async () => {
   await suspense();
@@ -129,8 +115,6 @@ onServerPrefetch(async () => {
       </div>
     </div>
 
-    <!-- sentinel element for infinite scroll -->
-    <div ref="sentinel" class="h-4"></div>
     <div
       v-if="hasNextPage && isFetchingNextPage"
       class="text-primary flex shrink-0 items-center justify-center py-4"
