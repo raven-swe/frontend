@@ -6,7 +6,7 @@ import TweetView from '~/components/tweet/TweetView.vue';
 import type { Tweet } from '~~/shared/types/tweets';
 import type { ApiSuccessResponse } from '~~/shared/types/apiResponses';
 import { tweetsService } from '~/services/tweet/tweetsService';
-import { isApiError } from '~/utils/errorUtils';
+import { isApiError, isApiValidationError } from '~/utils/errorUtils';
 import { showToaster } from '~/utils/showToaster';
 
 const route = useRoute();
@@ -34,7 +34,7 @@ async function loadMainTweet() {
       router.replace(`/profile/${tweetData.value.author.username}/status/${tweetData.value.id}`);
     }
   } catch (error) {
-    if (isApiError(error) && error.data?.statusCode === 404) {
+    if ((isApiError(error) && error.data?.statusCode === 404) || isApiValidationError(error)) {
       isMainTweetFound.value = false;
     } else {
       showToaster('error', 'toaster.tweet-page.tweet-load-error', true);
@@ -70,7 +70,7 @@ async function loadTweets(reset = false) {
       hasNextPage.value = false;
     }
   } catch (error) {
-    if (isApiError(error) && error.data?.statusCode === 404) {
+    if ((isApiError(error) && error.data?.statusCode === 404) || isApiValidationError(error)) {
       isMainTweetFound.value = false;
     } else {
       showToaster('error', 'toaster.tweet-page.tweet-load-error', true);
