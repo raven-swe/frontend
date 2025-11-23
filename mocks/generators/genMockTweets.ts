@@ -71,12 +71,21 @@ function randomMedia() {
     }
 
     case 'VIDEO': {
-      const videos = [
-        'https://sample-videos.com/video321/mp4/480/big_buck_bunny_480p_1mb.mp4',
-        'https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_1mb.mp4',
-        'https://sample-videos.com/video321/mp4/240/big_buck_bunny_240p_1mb.mp4',
+      const videoSources = [
+        'https://media.w3.org/2010/05/sintel/trailer.mp4',
+        'https://media.w3.org/2010/05/sintel/trailer_hd.mp4',
+        'https://vjs.zencdn.net/v/oceans.mp4',
+        'https://www.w3schools.com/html/mov_bbb.mp4',
+        'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+        'https://test-streams.mux.dev/x36xhzz/url_6/193039199_mp4_h264_aac_hq_7.m3u8',
+        'https://test-streams.mux.dev/test_001/stream.m3u8',
+        'https://test-streams.mux.dev/dai-discontinuity-deltatre/manifest.m3u8',
+        'https://test-streams.mux.dev/issue666/playlists/cisq0gim60007xzvi505emlxx.m3u8',
+        'https://test-streams.mux.dev/bbbAES/playlists/sample_aes/index.m3u8',
+        'https://test-streams.mux.dev/pts_shift/master.m3u8',
+        'https://test-streams.mux.dev/tos_ismc/main.m3u8',
       ];
-      url = faker.helpers.arrayElement(videos);
+      url = faker.helpers.arrayElement(videoSources);
       break;
     }
   }
