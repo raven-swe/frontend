@@ -54,6 +54,9 @@ jobs:
       APP_NUXT_PUBLIC_USE_MOCKS: ${{ secrets.NUXT_PUBLIC_USE_MOCKS }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: dev
 
       - name: Generate .env
         run: |
