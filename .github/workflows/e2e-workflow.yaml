@@ -4,7 +4,6 @@ on:
   schedule:
     - cron: "30 23 * * *" # 11:30 PM UTC
   workflow_dispatch:
-  push:
 
 jobs:
   e2e-tests:
