@@ -9,14 +9,15 @@ import type { Tweet } from '~~/shared/types/tweets';
 import { uploadMediaService } from '@/services/tweet/uploadMediaService';
 import { createTweetService } from '@/services/tweet/createTweetService';
 import { showToaster } from '@/utils/showToaster';
+import Avatar from '~/components/ui/Avatar.vue';
 
 interface Props {
   replyToTweetId?: string | null;
-  placeholder?: string;
+  type?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  placeholder: 'default',
+  type: 'default',
   replyToTweetId: null,
 });
 
@@ -141,16 +142,17 @@ const handleRemoveMedia = (id: string) => {
   <div class="bg-background max-w-[598px] p-4">
     <div class="mb-3 flex gap-3">
       <div class="flex-shrink-0">
-        <img
-          :src="userStore.user?.avatarUrl"
+        <Avatar
+          :img="userStore.user?.avatarUrl"
           :alt="$t('tweet.composer.profile-alt', { name: userStore.user?.username || '' })"
-          class="h-12 w-12 rounded-full object-cover"
+          :size="'sm'"
+          variant="primary"
         />
       </div>
       <TweetEditor
         ref="tweetEditorRef"
         v-model="tweetContent"
-        :placeholder="$t('tweet.composer.placeholder.' + props.placeholder)"
+        :placeholder="$t('tweet.composer.placeholder.' + props.type)"
         :max-length="MAX_LENGTH"
         @paste-media="handleAddMedia"
       />
@@ -173,7 +175,7 @@ const handleRemoveMedia = (id: string) => {
       :is-over-limit="isOverLimit"
       :has-media="media.length > 0"
       :can-add-media="media.length < MAX_MEDIA"
-      :button-text="props.placeholder === 'reply' ? 'Reply' : 'Post'"
+      :button-text="$t('tweet.composer.button.' + props.type)"
       :is-posting="isPosting"
       @post="handlePost"
       @add-media="handleAddMedia"
