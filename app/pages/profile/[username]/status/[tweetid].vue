@@ -258,7 +258,7 @@ function handleReplied(tweet: Tweet) {
                 >
                   <TweetDefaultCard
                     v-if="tweets[virtualRow.index]"
-                    :tweet="tweets[virtualRow.index]"
+                    :tweet="tweets[virtualRow.index]!"
                   />
                 </div>
               </div>

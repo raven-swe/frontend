@@ -1,32 +1,6 @@
 <script lang="ts" setup>
-import { provide } from 'vue';
 import Tabs from '@/components/ui/Tabs.vue';
 import Tab from '@/components/ui/Tab.vue';
-import type { Tweet } from '~~/shared/types/tweets';
-
-type NewTweetHandler = (tweet: Tweet) => void;
-
-const handlers: NewTweetHandler[] = [];
-
-const registerNewTweetHandler = (cb: NewTweetHandler) => {
-  handlers.push(cb);
-  return () => {
-    const idx = handlers.indexOf(cb);
-    if (idx !== -1) handlers.splice(idx, 1);
-  };
-};
-
-const emitNewTweet = (tweet: Tweet) => {
-  handlers.forEach((h) => {
-    try {
-      h(tweet);
-    } catch {
-      // ignore handler errors
-    }
-  });
-};
-
-provide('registerNewTweetHandler', registerNewTweetHandler);
 </script>
 
 <template>
@@ -45,8 +19,6 @@ provide('registerNewTweetHandler', registerNewTweetHandler);
         :is-active="$route.path === '/home/following'"
       />
     </Tabs>
-    <TweetComposer class="mt-15" @posted="emitNewTweet" />
-
     <slot />
   </NuxtLayout>
 </template>

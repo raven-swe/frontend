@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted, watch, inject, onBeforeUnmount } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import TweetDefaultCard from '~/components/tweet/TweetDefaultCard.vue';
 import { homeService } from '~/services/home/homeService';
-import { useInfiniteQuery } from '@tanstack/vue-query';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/vue-query';
 import { useWindowVirtualizer } from '@tanstack/vue-virtual';
 
 function isTab(value: unknown): value is HomeTab {
@@ -32,6 +32,7 @@ const {
     await homeService.getHomeTab({ limit: 10, cursor: pageParam }, tab.value),
   getNextPageParam: (lastPage) =>
     lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined,
+  structuralSharing: false,
 });
 
 const tweets = computed(() => response.value?.pages.flatMap((page) => page.data) || []);
@@ -49,6 +50,7 @@ const rowVirtualizerOptions = computed(() => {
     estimateSize: () => 120,
     overscan: 3,
     scrollMargin: parentOffsetRef.value,
+    getItemKey: (index: number) => tweets.value[index]?.id || index,
   };
 });
 
@@ -77,35 +79,55 @@ watchEffect(() => {
 onServerPrefetch(async () => {
   await suspense();
 });
-const registerNewTweetHandler = inject<((cb: (t: Tweet) => void) => () => void) | undefined>(
-  'registerNewTweetHandler',
-);
 
-let unregister: (() => void) | undefined;
+const queryClient = useQueryClient();
 
-if (registerNewTweetHandler) {
-  unregister = registerNewTweetHandler((tweet: Tweet) => {
-    if (tweet.replyToTweetId) return;
-    if (route.params.tab !== 'for-you') return;
-
-    if (tweets.value.find((t) => t.id === tweet.id)) return;
-
-    tweets.value = [tweet, ...tweets.value];
+function handlePost(tweet: Tweet) {
+  // Optimistically add the new tweet to the top of the list
+  if (!tab.value) return;
+  queryClient.setQueryData<{
+    pages: Array<{ data: Tweet[]; pagination?: CursorPagination }>;
+    pageParams: Array<string | null>;
+  }>([tab.value], (oldData) => {
+    if (!oldData) return oldData;
+    const newData = {
+      ...oldData,
+      pages: [
+        {
+          data: [tweet, ...(oldData.pages[0]?.data || [])],
+          pagination: oldData.pages[0]?.pagination,
+        },
+        ...oldData.pages.slice(1),
+      ],
+    };
+    return newData;
   });
 }
 
-onBeforeUnmount(() => {
-  if (unregister) unregister();
-});
+watch(
+  () => tweets.value.length,
+  () => {
+    setTimeout(() => {
+      if (parentRef.value) {
+        parentOffsetRef.value = parentRef.value.offsetTop;
+      }
+    }, 100);
+  },
+  { flush: 'post' },
+);
 
 watch(
-  () => route.params.tab,
-  () => loadTweets(true),
+  () => tab.value,
+  () => {
+    // Invalidate and refetch tweets when tab changes
+    queryClient.invalidateQueries({ queryKey: [tab.value] });
+  },
 );
 </script>
 
 <template>
   <div class="border-border mx-auto max-w-[700px] border-y">
+    <TweetComposer class="mt-15 border-b-1" @posted="handlePost" />
     <ClientOnly>
       <div v-if="tweets" ref="parentRef">
         <div
@@ -128,7 +150,7 @@ watch(
           >
             <div
               v-for="virtualRow in virtualRows"
-              :key="String(virtualRow.key)"
+              :key="tweets[virtualRow.index]?.id || String(virtualRow.key)"
               :ref="measureElement"
               :data-index="virtualRow.index"
             >
