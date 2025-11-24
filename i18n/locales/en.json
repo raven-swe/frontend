@@ -389,5 +389,11 @@
       "success": "Password reset successful",
       "error": "Failed to reset password"
     }
+  },
+  "hashtag": {
+    "placeholder": {
+      "not-implemented": "Route is not implemented yet",
+      "path": "Path: {path}"
+    }
   }
 }

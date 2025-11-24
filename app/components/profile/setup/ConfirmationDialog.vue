@@ -7,24 +7,40 @@ const props = defineProps<{
 
 interface Emits {
   (e: 'submit'): void;
+  (e: 'update:open', value: boolean): void;
 }
 const emit = defineEmits<Emits>();
 
 const handleSubmit = () => {
   emit('submit');
 };
+
+const handleOpenChange = (value: boolean) => {
+  emit('update:open', value);
+};
 </script>
 
 <template>
   <div>
-    <UiDialog :open="props.open">
+    <UiDialog :open="props.open" @update:open="handleOpenChange">
       <UiDialogContent class="h-auto">
+        <template #dialog-close>
+          <Button
+            variant="ghost-default"
+            size="icon-xs"
+            class="absolute inset-2"
+            @click="handleOpenChange(false)"
+          >
+            <Icon name="lucide:x" class="size-5" />
+            <span class="sr-only">{{ $t('ui.close') }}</span>
+          </Button>
+        </template>
         <UiDialogTitle>
           <VisuallyHidden>{{ $t('profile.setup.confirmation-dialog') }}</VisuallyHidden>
         </UiDialogTitle>
         <UiDialogDescription aria-describedby="undefined" />
         <div class="m-auto flex flex-col items-center justify-center gap-6">
-          <img src="https://placehold.co/48" />
+          <LogoRaven class="h-40 w-40" />
           <p class="text-2xl font-bold">{{ $t('profile.setup.click-to-save') }}</p>
           <UiButton class="w-65" size="xl" @click="handleSubmit">
             {{ $t('ui.save') }}

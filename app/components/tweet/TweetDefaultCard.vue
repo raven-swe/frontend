@@ -69,7 +69,7 @@ const contentSegments = computed<Segment[]>(() => {
       end: start + text.length,
       type: 'mention',
       text,
-      href: `/@${m.username}`,
+      href: `/profile/${m.username}`,
     });
   }
   for (const h of entities.hashtags || []) {
@@ -103,11 +103,13 @@ const contentSegments = computed<Segment[]>(() => {
 
 <template>
   <article class="border-b-border flex w-full max-w-[700px] gap-3 border-b-1 p-2">
-    <Avatar
-      :img="props.tweet.author.avatarUrl || '/default_profile.png'"
-      size="sm"
-      variant="primary"
-    />
+    <NuxtLink :to="`/profile/${props.tweet.author.username}`">
+      <Avatar
+        :img="props.tweet.author.avatarUrl || '/default_profile.png'"
+        size="sm"
+        variant="primary"
+      />
+    </NuxtLink>
 
     <!-- Main -->
     <div class="min-w-0 flex-1">
@@ -117,9 +119,9 @@ const contentSegments = computed<Segment[]>(() => {
           <span class="cursor-pointer font-semibold hover:underline">{{
             props.tweet.author.displayName
           }}</span>
+          <span class="text-muted-foreground" v-text="'@' + props.tweet.author.username" />
+          <span class="text-muted-foreground">·</span>
         </NuxtLink>
-        <span class="text-muted-foreground" v-text="'@' + props.tweet.author.username" />
-        <span class="text-muted-foreground">·</span>
         <time
           :title="formatDate(tweet.createdAt, $i18n.locale)"
           :datetime="tweet.createdAt"
@@ -134,9 +136,11 @@ const contentSegments = computed<Segment[]>(() => {
           <span v-if="seg.type === 'text'" class="inline">
             {{ seg.text }}
           </span>
-          <a v-else :href="seg.href" class="text-primary inline font-medium hover:underline">
-            {{ seg.text }}
-          </a>
+          <NuxtLink v-else :to="seg.href">
+            <a class="text-primary inline font-medium hover:underline">
+              {{ seg.text }}
+            </a>
+          </NuxtLink>
         </template>
       </p>
 
