@@ -23,8 +23,7 @@ export function useProfileMutation<T, Q = void>({
   >({
     mutationFn,
     onMutate: async (action: T) => {
-      const queryKey = ['profile', username];
-
+      const queryKey = ['profile', username.toLowerCase()];
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey });
 
