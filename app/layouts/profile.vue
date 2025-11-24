@@ -7,8 +7,12 @@ import { apiFetch } from '~/api';
 import { useQuery, useQueryClient } from '@tanstack/vue-query';
 import type { FetchError } from 'ofetch';
 
-const route = useRoute();
-const username = computed(() => (route.params.username as string).toLowerCase());
+const route = useRouter().currentRoute.value;
+
+const username = computed(() => {
+  const val = route.params.username;
+  return typeof val === 'string' ? val.toLowerCase() : null;
+});
 const profilePath = computed(() => `/profile/${username.value}`);
 
 const queryKey = computed(() => ['profile', username.value]);
@@ -27,6 +31,7 @@ const {
   staleTime: 1000 * 60 * 5, // 5min cache
   retry: false, // Don't retry on 404
   structuralSharing: false, // Disable structural sharing to ensure reactivity
+  enabled: computed(() => Boolean(username.value)),
 });
 
 provide('user-data', user);
@@ -35,7 +40,7 @@ const { isCurrentUser } = useIsCurrentUser();
 const isUserNotFound = computed(() => {
   if (!isError.value || !error.value) return false;
   const errorData = error.value;
-  return errorData?.data?.data?.error.code === 'USER_NOT_FOUND' || errorData?.statusCode === 404;
+  return errorData?.data?.data?.error?.code === 'USER_NOT_FOUND' || errorData?.statusCode === 404;
 });
 const queryClient = useQueryClient();
 watch(
