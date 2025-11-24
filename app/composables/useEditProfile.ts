@@ -147,7 +147,7 @@ export const useEditProfile = () => {
 
     // refresh data
     queryClient.invalidateQueries({ queryKey: ['layout-data'] });
-    queryClient.invalidateQueries({ queryKey: ['profile', userStore.user.username] });
+    queryClient.invalidateQueries({ queryKey: ['profile', userStore.user.username.toLowerCase()] });
   };
 
   return {

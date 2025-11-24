@@ -12,6 +12,7 @@ export function useProfileMutation<T, Q = void>({
 }) {
   const queryClient = useQueryClient();
   const { t } = useI18n();
+  const loweredUsername = username.toLowerCase();
 
   return useMutation<
     Q,
@@ -23,7 +24,7 @@ export function useProfileMutation<T, Q = void>({
   >({
     mutationFn,
     onMutate: async (action: T) => {
-      const queryKey = ['profile', username.toLowerCase()];
+      const queryKey = ['profile', loweredUsername];
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey });
 
@@ -42,7 +43,7 @@ export function useProfileMutation<T, Q = void>({
     // Rollback on error
     onError: (_err, _action, ctx) => {
       if (ctx?.previousData) {
-        queryClient.setQueryData(['profile', username], ctx.previousData);
+        queryClient.setQueryData(['profile', loweredUsername], ctx.previousData);
       }
       showToaster('error', t(`errors.${_err?.data?.data?.error.code || 'UNKNOWN_ERROR'}`));
     },
@@ -51,7 +52,7 @@ export function useProfileMutation<T, Q = void>({
     // To sync up with the backend
     onSettled: () => {
       queryClient.invalidateQueries({
-        queryKey: ['profile', username],
+        queryKey: ['profile', loweredUsername],
       });
     },
   });
