@@ -1,18 +1,11 @@
 import { http, HttpResponse } from 'msw';
 import type { UpdateProfileRequest, UserData } from '~~/shared/types/shared';
 import type { ApiSuccessResponse, ApiErrorResponse } from '~~/shared/types/api';
-import rawUsers from '../data/mock-users.json' assert { type: 'json' };
 import type { User } from '#shared/types/user';
 import jwt from 'jsonwebtoken';
+import { mockUserInfos } from './mockUserDB';
 
 const API_URL = process.env.BACKEND_URL;
-const mockUsers = rawUsers as User[];
-// Create a mapping of username to user info for easy lookup
-const mockUserInfos: Record<string, User> = {};
-mockUsers.forEach((user) => {
-  mockUserInfos[user.username] = user;
-});
-
 // Mock user data that will be updated
 const mockUserData: UserData = {
   username: 'johndoe',
@@ -230,7 +223,7 @@ export const handlers = [
     try {
       const decoded = jwt.verify(accessToken, 'refresh_secret') as { username: string };
       // search for user by username in mockUsers
-      const user = mockUserInfos[decoded.username];
+      const user = mockUserInfos[decoded.username.toLowerCase()];
       if (!user) throw new Error('User not found');
 
       const response: ApiSuccessResponse<User> = {

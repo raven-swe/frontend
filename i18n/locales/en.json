@@ -83,6 +83,13 @@
       "birth-date": "Birth date",
       "discard-changes": "Discard changes?",
       "discard-changes-desc": "This can't be undone and you'll lose your changes."
+    },
+    "messages": {
+      "blocked": "{'@'}{username} is blocked. You can unblock to view their profile.",
+      "blocked-by": {
+        "title": "{'@'}{username} has blocked you",
+        "description": "You can view public posts from {'@'}{username}, but you are blocked from engaging with them. You also cannot follow or message {'@'}{username}."
+      }
     }
   },
   "home": {
@@ -107,7 +114,8 @@
     "edit-profile": "Edit Profile",
     "joined": "Joined",
     "following": "Following",
-    "followers": "Followers"
+    "followers": "Followers",
+    "user-muted": "You have muted posts from this account."
   },
   "root": {
     "hero": {
@@ -148,7 +156,15 @@
     "save": "Save",
     "cancel": "Cancel",
     "discard": "Discard",
-    "post": "Post"
+    "post": "Post",
+    "follow": "Follow",
+    "unfollow": "Unfollow",
+    "following": "Following",
+    "follow-back": "Follow back",
+    "mute": "Mute",
+    "block": "Block",
+    "unmute": "Unmute",
+    "unblock": "Unblock"
   },
   "errors": {
     "INVALID_EMAIL": "Please enter a valid email.",
@@ -222,7 +238,16 @@
     },
     "username": {
       "RATE_LIMIT_EXCEEDED": "Too many requests. Please try again later."
-    }
+    },
+    "CANNOT_BLOCK_USER": "You cannot block this user.",
+    "ALREADY_NOT_FOLLOWING": "You are already not following this user.",
+    "ALREADY_FOLLOWING": "You are already following this user.",
+    "ALREADY_BLOCKED": "You have already blocked this user.",
+    "ALREADY_UNBLOCKED": "You have already unblocked this user.",
+    "ALREADY_MUTED": "You have already muted this user.",
+    "NOT_MUTED": "You have already unmuted this user.",
+    "CANNOT_MUTE_USER": "You cannot mute this user.",
+    "CANNOT_UNMUTE_USER": "You cannot unmute this user."
   },
   "register": {
     "register-info": {
@@ -294,15 +319,15 @@
       "save": "Save",
       "password-invalid-length": "Password must be at least 10 characters long",
       "errors": {
+        "401": "You are not authorized to change the password",
+        "422": "Current password is incorrect",
         "current-password-required": "Current password is required",
         "new-password-required": "New password is required",
         "password-too-short": "Password must be at least 8 characters long",
         "password-invalid": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
         "confirm-password-required": "Please confirm your password",
         "passwords-do-not-match": "Passwords do not match",
-        "error-saving": "An error occurred while saving the password. Please try again.",
-        "401": "You are not authorized to change the password",
-        "422": "Current password is incorrect"
+        "error-saving": "An error occurred while saving the password. Please try again."
       }
     },
     "change-email": {
@@ -364,7 +389,6 @@
     "placeholder-search": "Search Direct Messages",
     "header-title": "Messages",
     "placeholder-start-message": "Start a new message",
-
     "attachedImage": "Attached image"
   },
   "toaster": {
