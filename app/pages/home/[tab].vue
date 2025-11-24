@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, inject, onBeforeUnmount } from 'vue';
 import { useRoute } from 'vue-router';
 import { useInfiniteScroll, useVirtualList } from '@vueuse/core';
 import TweetDefaultCard from '~/components/tweet/TweetDefaultCard.vue';
@@ -71,6 +71,31 @@ useInfiniteScroll(
 );
 
 onMounted(loadTweets);
+
+// Register handler to receive posted tweets
+const registerNewTweetHandler = inject<((cb: (t: Tweet) => void) => () => void) | undefined>(
+  'registerNewTweetHandler',
+);
+
+let unregister: (() => void) | undefined;
+
+if (registerNewTweetHandler) {
+  unregister = registerNewTweetHandler((tweet: Tweet) => {
+    // Only handle if it's a top-level tweet (not a reply) and we're on for-you tab
+    if (tweet.replyToTweetId) return;
+    if (route.params.tab !== 'for-you') return;
+
+    // Avoid duplicates
+    if (tweets.value.find((t) => t.id === tweet.id)) return;
+
+    // Add the tweet to the top of the list
+    tweets.value = [tweet, ...tweets.value];
+  });
+}
+
+onBeforeUnmount(() => {
+  if (unregister) unregister();
+});
 
 watch(
   () => route.params.tab,

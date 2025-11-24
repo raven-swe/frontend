@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import type { Tweet } from '../../shared/types/tweets';
+import type { Tweet, CreateTweetRequest } from '../../shared/types/tweets';
 import tweetsData from '../data/mock-tweets.json' assert { type: 'json' };
 import type { ApiSuccessResponse } from '#shared/types/api';
 
@@ -8,6 +8,8 @@ const initialTweets = (tweetsData as unknown as Tweet[]) || [];
 const tweets = new Map<string, Tweet>(initialTweets.map((t) => [t.id, { ...t }]));
 
 const getTweet = (id: string) => tweets.get(id);
+const genId = () => Math.random().toString(36).slice(2, 10);
+const mediaStore = new Map<string, { id: string; url: string; type: 'IMAGE' | 'VIDEO' | 'GIF' }>();
 
 const likeTweet = (t: Tweet) => {
   if (!t.isLiked) {
@@ -38,6 +40,138 @@ const unretweet = (t: Tweet) => {
 };
 
 export const handlers = [
+  // POST /media/upload/image
+  http.post(`${API_URL}/media/upload/image`, async ({ request }) => {
+    const formData = await request.formData();
+    const file = formData.get('file') as File | null;
+    const folder = formData.get('folder') as string | null;
+
+    if (!file) {
+      return HttpResponse.json({ success: false, message: 'No file provided.' }, { status: 400 });
+    }
+
+    const id = genId();
+    const url = `/mock/media/images/${folder}/${id}/${file.name}`;
+
+    mediaStore.set(id, { id, url, type: 'IMAGE' });
+
+    return HttpResponse.json(
+      {
+        success: true,
+        message: 'Image uploaded successfully.',
+        data: {
+          id,
+          url,
+          message: 'File stored in media store (mock).',
+        },
+      },
+      { status: 200 },
+    );
+  }),
+
+  // POST /media/upload/video
+  http.post(`${API_URL}/media/upload/video`, async ({ request }) => {
+    const formData = await request.formData();
+    const file = formData.get('file') as File | null;
+    const folder = formData.get('folder') as string | null;
+
+    if (!file) {
+      return HttpResponse.json({ success: false, message: 'No file provided.' }, { status: 400 });
+    }
+
+    const id = genId();
+    const url = `/mock/media/videos/${folder}/${id}/${file.name}`;
+
+    mediaStore.set(id, { id, url, type: 'VIDEO' });
+
+    return HttpResponse.json(
+      {
+        success: true,
+        message: 'Video uploaded successfully.',
+        data: {
+          id,
+          url,
+          message: 'File stored in media store (mock).',
+        },
+      },
+      { status: 200 },
+    );
+  }),
+
+  // POST /tweets
+  http.post(`${API_URL}/tweets`, async ({ request }) => {
+    const body = (await request.json()) as CreateTweetRequest;
+
+    const { content, media = [], replyToTweetId = null } = body;
+
+    // basically unreachable
+    if (media.length > 4) {
+      return HttpResponse.json(
+        { success: false, message: 'You can attach up to 4 media items only.' },
+        { status: 400 },
+      );
+    }
+
+    // Validate media IDs
+    const storedMedia = [];
+    for (const m of media) {
+      const found = mediaStore.get(m);
+      if (!found) {
+        return HttpResponse.json(
+          { success: false, message: `Media ID "${m}" not found.` },
+          { status: 400 },
+        );
+      }
+      storedMedia.push(found);
+    }
+
+    // create tweet instance
+    const id = genId();
+    const createdAt = new Date().toISOString();
+
+    const newTweet: Tweet = {
+      id,
+      content,
+      createdAt,
+      author: {
+        username: 'johndoe',
+        displayName: 'John Doe',
+        avatarUrl: 'https://cdn.raven.cmp27.space/default_avatar.png',
+        isFollowing: true,
+        isFollower: false,
+      },
+      replyCount: 0,
+      retweetCount: 0,
+      likeCount: 0,
+      isLiked: false,
+      isRetweeted: false,
+      entities: {
+        mentions: [],
+        hashtags: [],
+      },
+      media: storedMedia.map((m) => ({
+        id: m.id,
+        type: m.type,
+        url: m.url,
+        altText: '',
+        width: 0,
+        height: 0,
+      })),
+      replyToTweetId,
+    };
+
+    tweets.set(id, newTweet);
+
+    return HttpResponse.json(
+      {
+        success: true,
+        message: 'Tweet posted successfully.',
+        data: newTweet,
+      },
+      { status: 201 },
+    );
+  }),
+
   // Get All Tweets
   http.get(`${API_URL}/tweets`, () => {
     return HttpResponse.json(

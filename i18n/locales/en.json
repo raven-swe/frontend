@@ -145,7 +145,13 @@
       "media": "Media",
       "gif": "GIF",
       "emoji": "Emoji",
-      "profile-alt": "Avatar of {name}"
+      "profile-alt": "Avatar of {name}",
+      "loading": {
+        "uploading": "Uploading media... {progress}%",
+        "posting": "Posting tweet..."
+      },
+      "upload-limit-image": "Image {file} size exceeds the maximum limit of {size} MB.",
+      "upload-limit-video": "Video {file} size exceeds the maximum limit of {size} MB."
     }
   },
   "ui": {

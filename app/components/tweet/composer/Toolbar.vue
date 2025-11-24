@@ -1,5 +1,14 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import {
+  MAX_IMAGE_SIZE_BYTES,
+  MAX_IMAGE_SIZE_MB,
+  MAX_VIDEO_SIZE_BYTES,
+  MAX_VIDEO_SIZE_MB,
+  ALLOWED_IMAGE_TYPES_FOR_HTML,
+  ALLOWED_VIDEO_TYPES_FOR_HTML,
+} from '~/constants/files';
+import { showToaster } from '@/utils/showToaster';
 
 interface Props {
   disabled?: boolean;
@@ -52,8 +61,33 @@ const handleFileSelect = (event: Event) => {
   const target = event.target as HTMLInputElement;
   const files = Array.from(target.files || []);
 
-  if (files.length > 0) {
-    emit('add-media', files);
+  // filter valid files based on size
+  const validFiles: File[] = [];
+
+  for (const file of files) {
+    if (file.type.startsWith('image/')) {
+      if (file.size > MAX_IMAGE_SIZE_BYTES) {
+        showToaster(
+          'warning',
+          $t('tweet.composer.upload-limit-image', { file: file.name, size: MAX_IMAGE_SIZE_MB }),
+        );
+        continue; // Skip this file
+      }
+    } else if (file.type.startsWith('video/')) {
+      if (file.size > MAX_VIDEO_SIZE_BYTES) {
+        showToaster(
+          'warning',
+          $t('tweet.composer.upload-limit-video', { file: file.name, size: MAX_VIDEO_SIZE_MB }),
+        );
+        continue; // Skip this file
+      }
+    }
+
+    validFiles.push(file);
+  }
+
+  if (validFiles.length > 0) {
+    emit('add-media', validFiles);
   }
 
   // Reset input
@@ -64,7 +98,7 @@ const handleFileSelect = (event: Event) => {
 </script>
 
 <template>
-  <div class="toolbar border-border ms-[60px] flex items-center justify-between border-t pt-1.5">
+  <div class="toolbar border-border ms-[60px] flex items-center justify-between pt-1.5">
     <div class="flex gap-2">
       <UiButton
         variant="tweet-icon-blue"
@@ -154,7 +188,7 @@ const handleFileSelect = (event: Event) => {
     <input
       ref="fileInputRef"
       type="file"
-      accept="image/png,image/jpg,image/jpeg"
+      :accept="ALLOWED_IMAGE_TYPES_FOR_HTML + ',' + ALLOWED_VIDEO_TYPES_FOR_HTML"
       multiple
       class="hidden"
       @change="handleFileSelect"
