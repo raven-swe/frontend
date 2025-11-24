@@ -142,7 +142,8 @@
         "uploading-media": "جارٍ تحميل الوسائط {progress}%...",
         "posting-tweet": "جارٍ نشر التغريدة..."
       }
-    }
+    },
+    "retweetedByYou": "لقد أعدتَ النشر"
   },
   "ui": {
     "close": "إغلاق",

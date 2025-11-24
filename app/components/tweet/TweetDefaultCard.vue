@@ -102,6 +102,15 @@ const contentSegments = computed<Segment[]>(() => {
 </script>
 
 <template>
+  <div
+    v-if="props.tweet.isRetweeted"
+    class="text-muted-foreground ms-2 mt-1 flex items-center gap-1 px-6"
+  >
+    <Icon name="tabler:repeat" size="1.2rem" />
+    <span class="text-muted-foreground text-sm">
+      {{ $t('tweet.retweetedByYou') }}
+    </span>
+  </div>
   <article class="border-b-border flex w-full max-w-[700px] gap-3 border-b-1 p-2">
     <NuxtLink :to="`/profile/${props.tweet.author.username}`">
       <Avatar
