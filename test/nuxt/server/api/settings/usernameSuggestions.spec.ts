@@ -21,13 +21,19 @@ describe('server/api/settings/username/suggestions.get', () => {
 
     const event = createMockH3Event({
       method: 'GET',
+      query: {
+        baseUsername: 'ahmedamr',
+      },
     });
 
     const response = await usernameSuggestionsHandler(event);
 
-    expect(mockServerApiFetch).toHaveBeenCalledWith('/onboarding/username-suggestions', {
-      method: 'GET',
-    });
+    expect(mockServerApiFetch).toHaveBeenCalledWith(
+      `/onboarding/username-suggestions?typed=ahmedamr`,
+      {
+        method: 'GET',
+      },
+    );
 
     expect(response).toEqual({
       success: true,
