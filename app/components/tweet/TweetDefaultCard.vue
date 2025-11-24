@@ -114,24 +114,24 @@ const contentSegments = computed<Segment[]>(() => {
         />
       </NuxtLink>
 
-    <!-- Main -->
-    <div class="min-w-0 flex-1">
-      <!-- Header: display name, username, time -->
-      <div class="flex flex-wrap items-center gap-x-1 text-sm">
-        <NuxtLink :to="`/profile/${props.tweet.author.username}`">
-          <span class="cursor-pointer font-semibold hover:underline">{{
-            props.tweet.author.displayName
-          }}</span>
-          <span class="text-muted-foreground ms-1" v-text="'@' + props.tweet.author.username" />
-          <span class="text-muted-foreground">·</span>
-        </NuxtLink>
-        <time
-          :title="formatDate(tweet.createdAt, $i18n.locale)"
-          :datetime="tweet.createdAt"
-          class="text-muted-foreground hover:cursor-pointer hover:underline"
-          >{{ relativeTime(tweet.createdAt, $i18n.locale) }}</time
-        >
-      </div>
+      <!-- Main -->
+      <div class="min-w-0 flex-1">
+        <!-- Header: display name, username, time -->
+        <div class="flex flex-wrap items-center gap-x-1 text-sm">
+          <NuxtLink :to="`/profile/${props.tweet.author.username}`">
+            <span class="cursor-pointer font-semibold hover:underline">{{
+              props.tweet.author.displayName
+            }}</span>
+            <span class="text-muted-foreground ms-1" v-text="'@' + props.tweet.author.username" />
+            <span class="text-muted-foreground">·</span>
+          </NuxtLink>
+          <time
+            :title="formatDate(tweet.createdAt, $i18n.locale)"
+            :datetime="tweet.createdAt"
+            class="text-muted-foreground hover:cursor-pointer hover:underline"
+            >{{ relativeTime(tweet.createdAt, $i18n.locale) }}</time
+          >
+        </div>
 
         <!-- Content -->
         <p class="mt-1 leading-relaxed break-words whitespace-pre-wrap">
