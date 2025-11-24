@@ -1,10 +1,9 @@
 import { describe, expect, vi, it, beforeEach } from 'vitest';
-import callbackPostEventHandler from '~~/server/api/oauth/[provider]/callback/index.post';
 import { createMockH3Event } from '~~/test/mocks/h3-event';
 import { useH3TestUtils } from '~~/test/mocks/h3-test-utils';
 import * as jwt from 'jsonwebtoken';
 
-const h3 = useH3TestUtils();
+useH3TestUtils();
 
 const mockServerApiFetchRaw = vi.fn();
 vi.stubGlobal('serverApiFetch', () => ({
@@ -14,11 +13,23 @@ vi.stubGlobal('serverApiFetch', () => ({
 describe('POST /api/oauth/[provider]/callback', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.resetModules();
   });
 
   it('should return 200 for valid requests', async () => {
+    const setAuthCookiesMock = vi.fn();
+    vi.doMock('~~/server/utils/auth/setAuthCookies', async () => {
+      const actual = await vi.importActual('~~/server/utils/auth/setAuthCookies');
+      return {
+        ...actual,
+        setAuthCookies: setAuthCookiesMock,
+      };
+    });
+    const { default: callbackPostEventHandler } = await import(
+      '~~/server/api/oauth/[provider]/callback/index.post'
+    );
     const token = jwt.sign({}, 'secret');
-    mockServerApiFetchRaw.mockResolvedValueOnce({
+    const mockResponse = {
       _data: {
         success: true,
         message: 'Login successful',
@@ -29,95 +40,47 @@ describe('POST /api/oauth/[provider]/callback', () => {
       headers: {
         getSetCookie: () => ['mock-cookie=mock-value; Path=/; HttpOnly'],
       },
-    });
+    };
+    mockServerApiFetchRaw.mockResolvedValueOnce(mockResponse);
     const event = createMockH3Event({
       method: 'POST',
     });
     const response = await callbackPostEventHandler(event);
-    expect(h3.appendHeader).toHaveBeenCalledWith(
-      event,
-      'set-cookie',
-      'mock-cookie=mock-value; Path=/; HttpOnly',
-    );
-    expect(h3.appendHeader).toHaveBeenCalledWith(
-      event,
-      'set-cookie',
-      `access_token=${token}; Max-Age=300; Path=/; SameSite=Lax`,
-    );
-    expect(response).toEqual({
-      success: true,
-      message: 'Login successful',
-      data: {
-        accessToken: token,
-      },
-    });
+    expect(setAuthCookiesMock).toHaveBeenCalledWith(event, mockResponse);
+    expect(response).toEqual(mockResponse._data);
   });
 
-  it('handle not recieving accessToken in response', async () => {
-    mockServerApiFetchRaw.mockResolvedValueOnce({
+  it('should not call setAuthCookies if response has no accessToken', async () => {
+    const setAuthCookiesMock = vi.fn();
+    vi.doMock('~~/server/utils/auth/setAuthCookies', async () => {
+      const actual = await vi.importActual('~~/server/utils/auth/setAuthCookies');
+      return {
+        ...actual,
+        setAuthCookies: setAuthCookiesMock,
+      };
+    });
+    const { default: callbackPostEventHandler } = await import(
+      '~~/server/api/oauth/[provider]/callback/index.post'
+    );
+    const mockResponse = {
       _data: {
         success: true,
         message: 'Login successful',
         data: {
-          // accessToken is missing
+          // No accessToken here
+          creationToken: 'some-creation-token',
         },
       },
       headers: {
         getSetCookie: () => ['mock-cookie=mock-value; Path=/; HttpOnly'],
       },
-    });
+    };
+    mockServerApiFetchRaw.mockResolvedValueOnce(mockResponse);
     const event = createMockH3Event({
       method: 'POST',
     });
     const response = await callbackPostEventHandler(event);
-    expect(h3.appendHeader).toHaveBeenCalledWith(
-      event,
-      'set-cookie',
-      'mock-cookie=mock-value; Path=/; HttpOnly',
-    );
-    expect(response).toEqual({
-      success: true,
-      message: 'Login successful',
-      data: {},
-    });
-  });
-
-  it('handle accessToken with exp field', async () => {
-    const token = jwt.sign({}, 'secret', {
-      expiresIn: '10s',
-    });
-    mockServerApiFetchRaw.mockResolvedValueOnce({
-      _data: {
-        success: true,
-        message: 'Login successful',
-        data: {
-          accessToken: token, // Token with exp
-        },
-      },
-      headers: {
-        getSetCookie: () => ['mock-cookie=mock-value; Path=/; HttpOnly'],
-      },
-    });
-    const event = createMockH3Event({
-      method: 'POST',
-    });
-    const response = await callbackPostEventHandler(event);
-    expect(h3.appendHeader).toHaveBeenCalledWith(
-      event,
-      'set-cookie',
-      'mock-cookie=mock-value; Path=/; HttpOnly',
-    );
-    expect(h3.appendHeader).toHaveBeenCalledWith(
-      event,
-      'set-cookie',
-      'access_token=' + token + '; Max-Age=10; Path=/; SameSite=Lax',
-    );
-    expect(response).toEqual({
-      success: true,
-      message: 'Login successful',
-      data: {
-        accessToken: token,
-      },
-    });
+    expect(setAuthCookiesMock).not.toHaveBeenCalled();
+    expect(response).toEqual(mockResponse._data);
   });
 });

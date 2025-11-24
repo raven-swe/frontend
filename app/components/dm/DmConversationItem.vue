@@ -27,12 +27,12 @@ const props = defineProps<{
           {{ '@' + props.conversation.participant.username }}
         </span>
         <span class="text-muted-foreground">
-          {{ props.conversation.lastMessage.sentAt }}
+          {{ props.conversation.lastMessage?.sentAt || '' }}
         </span>
       </div>
       <div class="text-sm">
         <span class="text-muted-foreground">
-          {{ props.conversation.lastMessage.content }}
+          {{ props.conversation.lastMessage?.content || 'No messages yet' }}
         </span>
       </div>
     </div>

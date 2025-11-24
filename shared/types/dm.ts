@@ -36,7 +36,6 @@ export interface DmMessageSender {
 
 export interface DmMessage {
   id: string;
-  sender: DmMessageSender;
   content: string;
   entities: DmMessageEntities;
   mediaUrl?: string | null;
@@ -104,3 +103,11 @@ export type DmWsServerMessage =
   | DmWsMessageDeleted
   | DmWsConversationSeenUpdate
   | DmWsError;
+export interface DmConversationMessagesResponse {
+  participant: {
+    username: string;
+    displayName: string;
+    avatarUrl: string;
+  };
+  messages: DmMessage[];
+}

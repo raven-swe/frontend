@@ -13,6 +13,7 @@ const isActiveTab = (tabRoute: string) => {
       {{ $t('setting.settings') }}
     </h2>
     <div
+      data-cy="account-settings-btn"
       class="text-md mt-10 flex cursor-pointer items-center justify-between px-4 py-[10px] transition-colors"
       :class="
         isActiveTab('/settings/account')

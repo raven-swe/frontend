@@ -1,34 +1,56 @@
 import { describe, expect, it } from 'vitest';
 import { mountSuspended } from '@nuxt/test-utils/runtime';
 import ProfileDetails from '@/components/profile/ProfileDetails.vue';
+import type { User } from '~~/shared/types/user';
+import { computed } from 'vue';
+import { createI18n } from 'vue-i18n';
+import messages from '~~/i18n/locales/en.json';
 
-const mockUserProfile = {
-  username: 'hussein',
-  displayName: 'Hussein Mohamed',
-  bio: 'football lover, software engineer, coffee addict.',
+const mockUser: User = {
+  joinedAt: '2020-07-15T12:34:56Z',
   bioEntities: {
     mentions: [],
     hashtags: [],
   },
-  avatarUrl: 'https://i.ibb.co/vv6B8ML0/profile.jpg',
-  bannerUrl: 'https://i.ibb.co/bj3fhPfq/cover.jpg',
-  location: 'Cairo, Egypt',
-  websiteUrl: 'https://github.com/hussein',
-  birthDate: '1999-01-01',
-  joinedAt: '2020-07-01T00:00:00.000Z',
-  followingCount: 150,
-  followersCount: 200,
-  mutualsCount: 5,
-  mutualNames: [],
+  username: 'testuser',
+  email: 'testemail@gmail.com',
+  avatarUrl: '/avatar.jpg',
+  bannerUrl: '/banner.jpg',
+  bio: 'This is a test bio',
+  location: 'Test Location',
+  birthDate: '1990-01-01',
+  websiteUrl: 'https://testwebsite.com',
+  followersCount: 0,
+  followingCount: 0,
   languageCode: 'en',
-  email: 'tes@#gmail.com',
-  phone: '+201234567890',
+  displayName: 'Test User',
+  phone: '',
+  mutualsCount: 0,
+  relationship: {
+    blocking: false,
+    blockedBy: false,
+    following: false,
+    follower: false,
+    muted: false,
+  },
 };
+
+const i18n = createI18n({
+  locale: 'en',
+  messages: {
+    en: messages,
+  },
+});
 
 describe('ProfileDetails Component', () => {
   it('renders ProfileCover component', async () => {
     const wrapper = await mountSuspended(ProfileDetails, {
-      props: { userProfile: mockUserProfile },
+      global: {
+        provide: {
+          'user-data': computed(() => mockUser),
+        },
+        plugins: [i18n],
+      },
     });
 
     const coverImage = wrapper.find('img[alt="Profile Cover"]');
@@ -37,7 +59,12 @@ describe('ProfileDetails Component', () => {
 
   it('renders ProfileAvatarSection component', async () => {
     const wrapper = await mountSuspended(ProfileDetails, {
-      props: { userProfile: mockUserProfile },
+      global: {
+        provide: {
+          'user-data': computed(() => mockUser),
+        },
+        plugins: [i18n],
+      },
     });
 
     const profileImage = wrapper.find('img[alt="Profile picture"]');
@@ -46,7 +73,12 @@ describe('ProfileDetails Component', () => {
 
   it('renders ProfileInfo component', async () => {
     const wrapper = await mountSuspended(ProfileDetails, {
-      props: { userProfile: mockUserProfile },
+      global: {
+        provide: {
+          'user-data': computed(() => mockUser),
+        },
+        plugins: [i18n],
+      },
     });
 
     const container = wrapper.find('div.mt-2.flex.flex-col');
@@ -55,29 +87,44 @@ describe('ProfileDetails Component', () => {
 
   it('passes correct coverImg prop to ProfileCover', async () => {
     const wrapper = await mountSuspended(ProfileDetails, {
-      props: { userProfile: mockUserProfile },
+      global: {
+        provide: {
+          'user-data': computed(() => mockUser),
+        },
+        plugins: [i18n],
+      },
     });
 
     const coverImage = wrapper.find('img[alt="Profile Cover"]');
-    expect(coverImage.attributes('src')).toContain('cover.jpg');
+    expect(coverImage.attributes('src')).toContain('banner.jpg');
   });
 
   it('passes correct profileImg prop to ProfileAvatarSection', async () => {
     const wrapper = await mountSuspended(ProfileDetails, {
-      props: { userProfile: mockUserProfile },
+      global: {
+        provide: {
+          'user-data': computed(() => mockUser),
+        },
+        plugins: [i18n],
+      },
     });
 
     const profileImage = wrapper.find('img[alt="Profile picture"]');
-    expect(profileImage.attributes('src')).toContain('profile.jpg');
+    expect(profileImage.attributes('src')).toContain('avatar.jpg');
   });
 
   it('passes correct userProfile prop to ProfileInfo', async () => {
     const wrapper = await mountSuspended(ProfileDetails, {
-      props: { userProfile: mockUserProfile },
+      global: {
+        provide: {
+          'user-data': computed(() => mockUser),
+        },
+        plugins: [i18n],
+      },
     });
 
     const html = wrapper.html();
-    expect(html).toContain(mockUserProfile.displayName);
-    expect(html).toContain(mockUserProfile.username);
+    expect(html).toContain(mockUser.displayName);
+    expect(html).toContain(mockUser.username);
   });
 });

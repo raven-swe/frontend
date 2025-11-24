@@ -26,21 +26,25 @@ const birthDate = computed(() =>
         :title="t('setting.username.username')"
         :subtitle="`@${user.username}`"
         to="/settings/account/username"
+        data-cy="username-settings-btn"
       />
       <SettingsItem
         :title="t('setting.change-email.label')"
         :subtitle="`${user.email}`"
         to="/settings/account/email"
+        data-cy="email-settings-btn"
       />
       <SettingsItem
         :title="t('setting.date-of-birth')"
         :subtitle="birthDate"
         to="/settings/profile"
+        data-cy="dob-settings-btn"
       />
       <SettingsItem
         :title="t('setting.change-password')"
         to="/settings/account/changePasswordEditor"
         subtitle="Change Your Password at any time"
+        data-cy="password-settings-btn"
       />
     </div>
     <div v-else class="p-4">

@@ -4,7 +4,7 @@ import MessageSendButton from './input/MessageSendButton.vue';
 import MessageTextField from './input/MessageTextField.vue';
 import MessageToolbar from './input/MessageToolbar.vue';
 import { showToaster } from '@/utils/showToaster';
-import type { useDmWebSocket } from '@/composables/useDmWebSocket';
+import type { useDmSocketIO } from '@/composables/useDmSocketIO';
 
 const message = ref('');
 const imageFile = ref<File | null>(null);
@@ -15,7 +15,7 @@ const previewUrl = computed(() => (imageFile.value ? URL.createObjectURL(imageFi
 const route = useRoute();
 const conversationId = computed(() => route.params.conversationId as string);
 
-const ws = inject<ReturnType<typeof useDmWebSocket>>('dmWebSocket');
+const ws = inject<ReturnType<typeof useDmSocketIO>>('dmSocket');
 
 const canSend = computed(() => message.value.trim().length > 0 || !!imageFile.value);
 
@@ -35,7 +35,7 @@ function handleSend() {
   }
 
   if (!ws.isConnected.value) {
-    showToaster('error', 'WebSocket not connected');
+    showToaster('error', 'Socket not connected');
     return;
   }
 
@@ -44,7 +44,7 @@ function handleSend() {
     return;
   }
 
-  // Send message via WebSocket
+  // Send message via Socket.IO
   ws.sendMessage(conversationId.value, text);
 
   message.value = '';

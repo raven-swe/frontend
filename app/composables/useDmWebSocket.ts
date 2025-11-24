@@ -13,6 +13,10 @@ export function useDmWebSocket() {
   const currentConversationId = ref<string | null>(null);
   const userStore = useUserStore();
   const config = useRuntimeConfig();
+  // Extra debug state
+  const lastError = ref<string | null>(null);
+  const lastEvent = ref<string | null>(null);
+  const attemptedUrl = ref<string | null>(null);
 
   const onMessageCallback = ref<((message: DmMessage) => void) | null>(null);
   const onErrorCallback = ref<((error: string) => void) | null>(null);
@@ -31,12 +35,20 @@ export function useDmWebSocket() {
     }
 
     try {
-      const wsUrl = `${config.public.dmWebSocketUrl}?token=${token}`;
+      const wsUrl = `${config.public.dmWebSocketUrl}?token=${encodeURIComponent(token)}`;
+      attemptedUrl.value = wsUrl;
+      console.error('[WS DEBUG] Attempting connection', {
+        wsUrl,
+        tokenPresent: Boolean(token),
+        time: new Date().toISOString(),
+      });
       ws.value = new WebSocket(wsUrl);
 
       ws.value.onopen = () => {
         isConnected.value = true;
         isConnecting.value = false;
+        lastEvent.value = 'open';
+        console.error('[WS DEBUG] Connection opened', { url: wsUrl });
       };
 
       ws.value.onmessage = (event) => {
@@ -45,6 +57,7 @@ export function useDmWebSocket() {
           handleServerMessage(data);
         } catch (error) {
           console.error('Failed to parse WebSocket message:', error);
+          lastError.value = `parse_error: ${(error as Error)?.message}`;
         }
       };
 
@@ -53,15 +66,24 @@ export function useDmWebSocket() {
         if (onErrorCallback.value) {
           onErrorCallback.value('WebSocket connection error');
         }
+        lastError.value = 'connection_error';
+        lastEvent.value = 'error';
       };
 
-      ws.value.onclose = () => {
+      ws.value.onclose = (evt) => {
         isConnected.value = false;
         isConnecting.value = false;
+        lastEvent.value = 'close';
+        const info = { code: evt.code, reason: evt.reason, wasClean: evt.wasClean };
+        if (evt.code !== 1000) {
+          lastError.value = `close_code_${evt.code}:${evt.reason || 'no-reason'}`;
+        }
+        console.error('[WS DEBUG] Connection closed', info);
       };
     } catch (error) {
       console.error('Failed to create WebSocket connection:', error);
       isConnecting.value = false;
+      lastError.value = `creation_error: ${(error as Error)?.message}`;
     }
   }
 
@@ -82,13 +104,17 @@ export function useDmWebSocket() {
     }
 
     try {
-      ws.value.send(JSON.stringify(message));
+      const payload = JSON.stringify(message);
+      console.error('[WS DEBUG] Sending message', { payload });
+      ws.value.send(payload);
     } catch (error) {
       console.error('Failed to send WebSocket message:', error);
+      lastError.value = `send_error: ${(error as Error)?.message}`;
     }
   }
 
   function handleServerMessage(data: DmWsServerMessage) {
+    console.error('[WS DEBUG] Received server message', { type: data.type, raw: data });
     switch (data.type) {
       case 'message_received':
         handleMessageReceived(data);
@@ -104,6 +130,7 @@ export function useDmWebSocket() {
         if (onErrorCallback.value) {
           onErrorCallback.value(data.message);
         }
+        lastError.value = `server_error: ${data.message}`;
         break;
     }
   }
@@ -112,11 +139,11 @@ export function useDmWebSocket() {
     // Transform WebSocket message to DmMessage format
     const message: DmMessage = {
       id: data.message.id,
-      sender: {
-        username: data.message.sender.username,
-        displayName: data.message.sender.displayName,
-        avatarUrl: data.message.sender.avatarUrl || '',
-      },
+      // sender: {
+      //   username: data.message.sender.username,
+      //   displayName: data.message.sender.displayName,
+      //   avatarUrl: data.message.sender.avatarUrl || '',
+      // },
       content: data.message.body,
       entities: {
         mentions: [],
@@ -153,6 +180,7 @@ export function useDmWebSocket() {
 
   function switchConversation(conversationId: string, lastSeenMessageId?: string) {
     currentConversationId.value = conversationId;
+    console.error('[WS DEBUG] Switched conversation', { conversationId, lastSeenMessageId });
 
     // Mark as seen when switching conversations
     if (lastSeenMessageId) {
@@ -179,6 +207,9 @@ export function useDmWebSocket() {
     isConnected: readonly(isConnected),
     isConnecting: readonly(isConnecting),
     currentConversationId: readonly(currentConversationId),
+    lastError: readonly(lastError),
+    lastEvent: readonly(lastEvent),
+    attemptedUrl: readonly(attemptedUrl),
     connect,
     disconnect,
     sendMessage,
