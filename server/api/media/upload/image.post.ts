@@ -3,10 +3,8 @@ export default defineWrappedResponseHandler(async (event) => {
 
   const response = await fetcher<
     ApiSuccessResponse<{
-      items: {
-        id: string;
-        url: string;
-      };
+      id: string;
+      url: string;
     }>
   >(`/media/upload/image`, {
     method: 'POST',

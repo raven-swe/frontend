@@ -71,11 +71,11 @@ const handlePost = async () => {
         const item = media.value[i];
 
         if (item?.type === 'image') {
-          const result = await uploadImage(item.file, 'tweets');
-          mediaIds.push(result.id);
+          const mediaId = await uploadImage(item.file, 'tweets');
+          mediaIds.push(mediaId);
         } else if (item?.type === 'video') {
-          const result = await uploadVideo(item?.file, 'tweets');
-          mediaIds.push(result.id);
+          const mediaId = await uploadVideo(item?.file, 'tweets');
+          mediaIds.push(mediaId);
         }
 
         // Update progress

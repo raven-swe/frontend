@@ -3,7 +3,8 @@ type TweetAuthor = {
   displayName: string;
   avatarUrl: string;
   isFollowing: boolean;
-  isFollower: boolean;
+  isFollower?: boolean;
+  isBlocked?: boolean;
 };
 
 type TweetMention = {

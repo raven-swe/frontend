@@ -13,7 +13,7 @@ export const uploadMediaService = () => {
         body: form,
       });
 
-      return response.data.items.id;
+      return response.data.id;
     } catch (error) {
       console.error('Failed to upload image:', error);
       throw error;
@@ -32,7 +32,7 @@ export const uploadMediaService = () => {
         body: form,
       });
 
-      return response.data.items.id;
+      return response.data.id;
     } catch (error) {
       console.error('Failed to upload video:', error);
       throw error;

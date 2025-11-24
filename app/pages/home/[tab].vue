@@ -5,14 +5,12 @@ import { useInfiniteScroll, useVirtualList } from '@vueuse/core';
 import TweetDefaultCard from '~/components/tweet/TweetDefaultCard.vue';
 import type { Tweet } from '~~/shared/types/tweets';
 import { homeService } from '~/services/home/homeService';
-import { useUserStore } from '~/stores/user';
 
 definePageMeta({
   layout: 'home',
 });
 
 const route = useRoute();
-const userStore = useUserStore();
 
 const tweets = ref<Tweet[]>([]);
 const cursor = ref<string | null>(null);
@@ -90,38 +88,8 @@ if (registerNewTweetHandler) {
     // Avoid duplicates
     if (tweets.value.find((t) => t.id === tweet.id)) return;
 
-    // Convert media URLs to proper media objects
-    const mediaObjects =
-      Array.isArray(tweet.media) && tweet.media.length > 0
-        ? (tweet.media as unknown as string[]).map((url) => ({
-            id: '',
-            type: 'IMAGE' as const,
-            url,
-            altText: '',
-            width: 0,
-            height: 0,
-          }))
-        : [];
-
-    // Complete the tweet object with user info from store
-    const completeTweet: Tweet = {
-      ...tweet,
-      media: mediaObjects,
-      author: {
-        username: userStore.user.username,
-        displayName: userStore.user.displayName,
-        avatarUrl: userStore.user.avatarUrl,
-        isFollowing: false,
-        isFollower: false,
-      },
-      replyCount: 0,
-      retweetCount: 0,
-      likeCount: 0,
-      isLiked: false,
-      isRetweeted: false,
-    };
-
-    tweets.value = [completeTweet, ...tweets.value];
+    // Add the tweet to the top of the list
+    tweets.value = [tweet, ...tweets.value];
   });
 }
 
