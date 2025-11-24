@@ -13,7 +13,7 @@ export const profileTabsService = {
       tab === '' ? `/api/users/${username}/tweets` : `/api/users/${username}/${tab}`;
     return await apiFetch(endpoint, {
       method: 'GET',
-      params: {
+      query: {
         cursor,
         limit: (limit ?? DEFAULT_PAGE_SIZE).toString(),
       },

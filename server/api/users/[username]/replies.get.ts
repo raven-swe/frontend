@@ -6,9 +6,11 @@ export default defineWrappedResponseHandler(async (event) => {
     usernameParamsSchema.validate(data),
   );
   const fetcher = serverApiFetch(event);
+  const query = getQuery(event);
 
   const response = await fetcher<ApiSuccessResponse<Tweet[]>>(`/users/${username}/replies`, {
     method: 'GET',
+    query,
   });
   return response;
 });
