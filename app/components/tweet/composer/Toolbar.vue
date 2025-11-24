@@ -5,6 +5,8 @@ import {
   MAX_IMAGE_SIZE_MB,
   MAX_VIDEO_SIZE_BYTES,
   MAX_VIDEO_SIZE_MB,
+  ALLOWED_IMAGE_TYPES_FOR_HTML,
+  ALLOWED_VIDEO_TYPES_FOR_HTML,
 } from '~/constants/files';
 import { showToaster } from '@/utils/showToaster';
 
@@ -186,7 +188,7 @@ const handleFileSelect = (event: Event) => {
     <input
       ref="fileInputRef"
       type="file"
-      accept="image/png,image/jpg,image/jpeg,video/mp4,video/webm,video/mkv"
+      :accept="ALLOWED_IMAGE_TYPES_FOR_HTML + ',' + ALLOWED_VIDEO_TYPES_FOR_HTML"
       multiple
       class="hidden"
       @change="handleFileSelect"

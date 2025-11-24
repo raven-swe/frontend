@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { showToaster } from '@/utils/showToaster';
-import { MAX_IMAGE_SIZE_BYTES, MAX_IMAGE_SIZE_MB } from '~/constants/files';
+import {
+  MAX_IMAGE_SIZE_BYTES,
+  MAX_IMAGE_SIZE_MB,
+  ALLOWED_IMAGE_TYPES,
+  ALLOWED_VIDEO_TYPES,
+  MAX_VIDEO_SIZE_BYTES,
+  MAX_VIDEO_SIZE_MB,
+} from '~/constants/files';
 
 interface Props {
   modelValue: string;
@@ -74,8 +81,7 @@ const handleInput = (event: Event) => {
   const target = event.target as HTMLTextAreaElement;
   emit('update:modelValue', target.value);
 };
-
-const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
+const allowedTypes = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_VIDEO_TYPES];
 const handlePaste = (e: ClipboardEvent) => {
   const items = e.clipboardData?.items;
   if (!items) return;
@@ -88,10 +94,16 @@ const handlePaste = (e: ClipboardEvent) => {
       if (!file) continue;
 
       if (allowedTypes.includes(file.type)) {
-        if (file.size > MAX_IMAGE_SIZE_BYTES) {
+        if (file.type.startsWith('image/') && file.size > MAX_IMAGE_SIZE_BYTES) {
           showToaster(
             'warning',
             $t('tweet.composer.upload-limit-image', { file: file.name, size: MAX_IMAGE_SIZE_MB }),
+          );
+          continue; // Skip this file
+        } else if (file.type.startsWith('video/') && file.size > MAX_VIDEO_SIZE_BYTES) {
+          showToaster(
+            'warning',
+            $t('tweet.composer.upload-limit-video', { file: file.name, size: MAX_VIDEO_SIZE_MB }),
           );
           continue; // Skip this file
         }
