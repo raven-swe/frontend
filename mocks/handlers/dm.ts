@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import type { DmConversation, DmMessage } from '~~/shared/types/dm';
+import type { DmConversation, DmMessage, DmConversationMessagesResponse } from '~~/shared/types/dm';
 import type { ApiSuccessResponse, ApiErrorResponse } from '~~/shared/types/api';
 
 const API_URL = process.env.BACKEND_URL;
@@ -93,7 +93,6 @@ const other = {
 const messagesConv1: DmMessage[] = [
   {
     id: 'msg_1',
-    sender: { ...me },
     content: 'Hey! How are you?',
     entities: { mentions: [], hashtags: [] },
     mediaUrl: null,
@@ -102,7 +101,6 @@ const messagesConv1: DmMessage[] = [
   },
   {
     id: 'msg_2',
-    sender: { ...other },
     content: 'I’m good! Working on the project.',
     entities: { mentions: [], hashtags: [] },
     mediaUrl: null,
@@ -111,7 +109,6 @@ const messagesConv1: DmMessage[] = [
   },
   {
     id: 'msg_3',
-    sender: { ...me },
     content: `Great! Let’s push the latest changes. ${other.username}`,
     entities: {
       mentions: [{ username: other.username.replace(/^@/, ''), startPosition: 39 }],
@@ -123,7 +120,6 @@ const messagesConv1: DmMessage[] = [
   },
   {
     id: 'msg_4',
-    sender: { ...me },
     content: 'Check this out #update',
     entities: { mentions: [], hashtags: [{ hashtag: 'update', startPosition: 15 }] },
     mediaUrl: 'https://picsum.photos/seed/dm/300/200',
@@ -132,7 +128,6 @@ const messagesConv1: DmMessage[] = [
   },
   {
     id: 'msg_1',
-    sender: { ...me },
     content: 'Hey! How are you?',
     entities: { mentions: [], hashtags: [] },
     mediaUrl: null,
@@ -141,7 +136,6 @@ const messagesConv1: DmMessage[] = [
   },
   {
     id: 'msg_2',
-    sender: { ...other },
     content: 'I’m good! Working on the project.',
     entities: { mentions: [], hashtags: [] },
     mediaUrl: null,
@@ -150,7 +144,6 @@ const messagesConv1: DmMessage[] = [
   },
   {
     id: 'msg_1',
-    sender: { ...me },
     content: 'Hey! How are you?',
     entities: { mentions: [], hashtags: [] },
     mediaUrl: null,
@@ -159,7 +152,6 @@ const messagesConv1: DmMessage[] = [
   },
   {
     id: 'msg_2',
-    sender: { ...other },
     content: 'I’m good! Working on the project.',
     entities: { mentions: [], hashtags: [] },
     mediaUrl: null,
@@ -168,7 +160,6 @@ const messagesConv1: DmMessage[] = [
   },
   {
     id: 'msg_1',
-    sender: { ...me },
     content: 'Hey! How are you?',
     entities: { mentions: [], hashtags: [] },
     mediaUrl: null,
@@ -177,7 +168,6 @@ const messagesConv1: DmMessage[] = [
   },
   {
     id: 'msg_2',
-    sender: { ...other },
     content: 'I’m good! Working on the project.',
     entities: { mentions: [], hashtags: [] },
     mediaUrl: null,
@@ -190,7 +180,6 @@ const messagesConv1: DmMessage[] = [
 const messagesConv2: DmMessage[] = [
   {
     id: 'c2_msg_1',
-    sender: { ...other },
     content: 'Hey Hussein, did you review the PR?',
     entities: { mentions: [], hashtags: [] },
     mediaUrl: null,
@@ -199,7 +188,6 @@ const messagesConv2: DmMessage[] = [
   },
   {
     id: 'c2_msg_2',
-    sender: { ...me },
     content: 'Yes, left some comments. Check the performance section.',
     entities: { mentions: [], hashtags: [] },
     mediaUrl: null,
@@ -208,7 +196,6 @@ const messagesConv2: DmMessage[] = [
   },
   {
     id: 'c2_msg_3',
-    sender: { ...other },
     content: 'Great. I will push fixes now. #refactor',
     entities: { mentions: [], hashtags: [{ hashtag: 'refactor', startPosition: 37 }] },
     mediaUrl: null,
@@ -217,7 +204,6 @@ const messagesConv2: DmMessage[] = [
   },
   {
     id: 'c2_msg_4',
-    sender: { ...me },
     content: 'Cool, ping me when done so I merge.',
     entities: { mentions: [], hashtags: [] },
     mediaUrl: null,
@@ -236,7 +222,6 @@ const getParticipant = (id: string) => {
 const messagesConv3: DmMessage[] = [
   {
     id: 'c3_msg_1',
-    sender: getParticipant('3'),
     content: 'Hello Hussein! 👋',
     entities: { mentions: [], hashtags: [] },
     mediaUrl: null,
@@ -245,7 +230,6 @@ const messagesConv3: DmMessage[] = [
   },
   {
     id: 'c3_msg_2',
-    sender: { ...me },
     content: 'Hey! Long time no see.',
     entities: { mentions: [], hashtags: [] },
     mediaUrl: null,
@@ -257,7 +241,6 @@ const messagesConv3: DmMessage[] = [
 const messagesConv4: DmMessage[] = [
   {
     id: 'c4_msg_1',
-    sender: getParticipant('4'),
     content: "Let's catch up this weekend?",
     entities: { mentions: [], hashtags: [] },
     mediaUrl: null,
@@ -266,7 +249,6 @@ const messagesConv4: DmMessage[] = [
   },
   {
     id: 'c4_msg_2',
-    sender: { ...me },
     content: 'Sounds good to me 👍',
     entities: { mentions: [], hashtags: [] },
     mediaUrl: null,
@@ -278,7 +260,6 @@ const messagesConv4: DmMessage[] = [
 const messagesConv5: DmMessage[] = [
   {
     id: 'c5_msg_1',
-    sender: getParticipant('5'),
     content: 'Meeting moved to 4 PM.',
     entities: { mentions: [], hashtags: [] },
     mediaUrl: null,
@@ -287,7 +268,6 @@ const messagesConv5: DmMessage[] = [
   },
   {
     id: 'c5_msg_2',
-    sender: { ...me },
     content: 'Got it, thanks!',
     entities: { mentions: [], hashtags: [] },
     mediaUrl: null,
@@ -315,10 +295,12 @@ export const handlers = [
 
   http.get(`${API_URL}/conversations/:conversationId/messages`, ({ params }) => {
     const { conversationId } = params as { conversationId: string };
-    const data = messagesByConversation[conversationId] || [];
-    const response: ApiSuccessResponse<DmMessage[]> = {
+    const participant = getParticipant(conversationId);
+    const messages = messagesByConversation[conversationId] || [];
+    const payload: DmConversationMessagesResponse = { participant, messages };
+    const response: ApiSuccessResponse<DmConversationMessagesResponse> = {
       success: true,
-      data,
+      data: payload,
     };
     return HttpResponse.json(response, { status: 200 });
   }),

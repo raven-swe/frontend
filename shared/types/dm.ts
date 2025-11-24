@@ -36,10 +36,18 @@ export interface DmMessageSender {
 
 export interface DmMessage {
   id: string;
-  sender: DmMessageSender;
   content: string;
   entities: DmMessageEntities;
   mediaUrl?: string | null;
   createdAt: string;
   isMine: boolean;
+}
+
+export interface DmConversationMessagesResponse {
+  participant: {
+    username: string;
+    displayName: string;
+    avatarUrl: string;
+  };
+  messages: DmMessage[];
 }
