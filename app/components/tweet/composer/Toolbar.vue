@@ -67,7 +67,7 @@ const handleFileSelect = (event: Event) => {
       if (file.size > MAX_IMAGE_SIZE_BYTES) {
         showToaster(
           'warning',
-          `Image "${file.name}" size exceeds the maximum limit of ${MAX_IMAGE_SIZE_MB} MB.`,
+          $t('tweet.composer.upload-limit-image', { file: file.name, size: MAX_IMAGE_SIZE_MB }),
         );
         continue; // Skip this file
       }
@@ -75,7 +75,7 @@ const handleFileSelect = (event: Event) => {
       if (file.size > MAX_VIDEO_SIZE_BYTES) {
         showToaster(
           'warning',
-          `Video "${file.name}" size exceeds the maximum limit of ${MAX_VIDEO_SIZE_MB} MB.`,
+          $t('tweet.composer.upload-limit-video', { file: file.name, size: MAX_VIDEO_SIZE_MB }),
         );
         continue; // Skip this file
       }

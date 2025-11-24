@@ -91,7 +91,7 @@ const handlePaste = (e: ClipboardEvent) => {
         if (file.size > MAX_IMAGE_SIZE_BYTES) {
           showToaster(
             'warning',
-            `Image "${file.name}" size exceeds the maximum limit of ${MAX_IMAGE_SIZE_MB} MB.`,
+            $t('tweet.composer.upload-limit-image', { file: file.name, size: MAX_IMAGE_SIZE_MB }),
           );
           continue; // Skip this file
         }

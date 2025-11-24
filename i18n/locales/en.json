@@ -141,7 +141,9 @@
       "loading": {
         "uploading": "Uploading media... {progress}%",
         "posting": "Posting tweet..."
-      }
+      },
+      "upload-limit-image": "Image {file} size exceeds the maximum limit of {size} MB.",
+      "upload-limit-video": "Video {file} size exceeds the maximum limit of {size} MB."
     }
   },
   "ui": {
@@ -365,7 +367,6 @@
     "placeholder-search": "Search Direct Messages",
     "header-title": "Messages",
     "placeholder-start-message": "Start a new message",
-
     "attachedImage": "Attached image"
   },
   "toaster": {
