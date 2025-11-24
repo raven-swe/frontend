@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { User } from '~~/shared/types/user';
 import { formatMonthYear } from '~/utils/date';
+import { cleanUrl } from '~/utils/cleanUrl';
 
 const props = defineProps<{
   userProfile: User;
