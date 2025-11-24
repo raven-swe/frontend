@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch, inject, onBeforeUnmount } from 'vue';
 import { useRoute } from 'vue-router';
 import TweetDefaultCard from '~/components/tweet/TweetDefaultCard.vue';
 import { homeService } from '~/services/home/homeService';
@@ -77,6 +77,31 @@ watchEffect(() => {
 onServerPrefetch(async () => {
   await suspense();
 });
+const registerNewTweetHandler = inject<((cb: (t: Tweet) => void) => () => void) | undefined>(
+  'registerNewTweetHandler',
+);
+
+let unregister: (() => void) | undefined;
+
+if (registerNewTweetHandler) {
+  unregister = registerNewTweetHandler((tweet: Tweet) => {
+    if (tweet.replyToTweetId) return;
+    if (route.params.tab !== 'for-you') return;
+
+    if (tweets.value.find((t) => t.id === tweet.id)) return;
+
+    tweets.value = [tweet, ...tweets.value];
+  });
+}
+
+onBeforeUnmount(() => {
+  if (unregister) unregister();
+});
+
+watch(
+  () => route.params.tab,
+  () => loadTweets(true),
+);
 </script>
 
 <template>

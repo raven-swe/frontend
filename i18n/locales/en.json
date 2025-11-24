@@ -150,7 +150,14 @@
       "emoji": "Emoji",
       "profile-alt": "Avatar of {name}"
     },
-    "no-replies": "No replies yet"
+    "profile-alt": "Avatar of {name}",
+    "loading": {
+      "uploading": "Uploading media... {progress}%",
+      "posting": "Posting tweet..."
+    },
+    "no-replies": "No replies yet",
+    "upload-limit-image": "Image {file} size exceeds the maximum limit of {size} MB.",
+    "upload-limit-video": "Video {file} size exceeds the maximum limit of {size} MB."
   },
   "ui": {
     "close": "Close",

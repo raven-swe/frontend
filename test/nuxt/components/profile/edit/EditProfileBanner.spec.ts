@@ -15,6 +15,7 @@ vi.mock('@/utils/showToaster', () => ({
 vi.mock('~/constants/files', () => ({
   MAX_IMAGE_SIZE_BYTES: 5 * 1024 * 1024, // 5MB
   MAX_IMAGE_SIZE_MB: 5,
+  ALLOWED_IMAGE_TYPES_FOR_HTML: 'image/png,image/jpg,image/jpeg',
 }));
 
 const i18n = createI18n({
