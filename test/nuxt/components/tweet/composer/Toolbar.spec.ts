@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mountSuspended } from '@nuxt/test-utils/runtime';
+import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime';
 import TweetToolbar from '~/components/tweet/composer/Toolbar.vue';
 import {
   MAX_IMAGE_SIZE_BYTES,
@@ -8,6 +8,23 @@ import {
   MAX_VIDEO_SIZE_MB,
 } from '@/constants/files';
 import { showToaster } from '@/utils/showToaster';
+
+// Mock useI18n to avoid requiring the plugin installation
+mockNuxtImport('useI18n', () => {
+  return () => ({
+    t: (key: string, params?: Record<string, unknown>) => {
+      // Simple mock that returns the key or interpolates params if needed
+      if (params && key === 'tweet.composer.upload-limit-image') {
+        return `Image "${params.file}" size exceeds the maximum limit of ${params.size} MB.`;
+      }
+      if (params && key === 'tweet.composer.upload-limit-video') {
+        return `Video "${params.file}" size exceeds the maximum limit of ${params.size} MB.`;
+      }
+      return key;
+    },
+    locale: { value: 'en' },
+  });
+});
 
 vi.mock('@/utils/showToaster', () => ({
   showToaster: vi.fn(),
@@ -286,7 +303,7 @@ describe('TweetToolbar', () => {
 
     const fileInput = wrapper.find('input[type="file"]');
     expect(fileInput.attributes('accept')).toBe(
-      'image/png,image/jpg,image/jpeg,video/mp4,video/webm,video/mkv',
+      'image/png,image/jpg,image/jpeg,image/webp,video/mp4,video/x-matroska,video/webm,video/quicktime',
     );
     expect(fileInput.attributes('multiple')).toBeDefined();
   });
