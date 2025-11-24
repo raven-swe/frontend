@@ -199,13 +199,38 @@ export const handlers = [
   }),
 
   // Get current user profile
-  http.get(`${API_URL}/me`, () => {
-    const response: ApiSuccessResponse<UserData> = {
-      success: true,
-      data: { ...mockUserData },
-    };
+  http.get(`${API_URL}/me`, ({ request }) => {
+    const authHeader = request.headers.get('Authorization');
+    const token = authHeader?.split(' ')[1];
+    if (!token || !authHeader.startsWith('Bearer ')) {
+      return new HttpResponse(
+        JSON.stringify({ error: { message: 'No token provided' } } as ApiErrorResponse),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      );
+    }
 
-    return HttpResponse.json(response, { status: 200 });
+    try {
+      const data = jwt.verify(token, 'secret') as { username: string };
+      mockUserData.username = data.username;
+      return HttpResponse.json<ApiSuccessResponse<UserData>>(
+        {
+          success: true,
+          data: { ...mockUserData },
+        },
+        { status: 200 },
+      );
+    } catch {
+      return new HttpResponse(
+        JSON.stringify({ error: { message: 'Invalid token' } } as ApiErrorResponse),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      );
+    }
   }),
 
   http.get(`${API_URL}/me`, (req) => {

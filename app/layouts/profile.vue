@@ -82,7 +82,7 @@ onServerPrefetch(async () => {
           <Tab
             :label="$t('profile.tabs.posts')"
             :route="profilePath"
-            :is-active="$route.path === profilePath"
+            :is-active="$route.path.toLowerCase() === profilePath"
           />
           <Tab
             :label="$t('profile.tabs.replies')"

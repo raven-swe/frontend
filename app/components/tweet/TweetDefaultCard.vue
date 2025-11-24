@@ -12,7 +12,6 @@ const props = defineProps<Props>();
 const tweet = ref<Tweet>(JSON.parse(JSON.stringify(props.tweet)));
 type Segment = { type: 'text' | 'mention' | 'hashtag'; text: string; href?: string };
 
-// Update local tweet state when like/unlike succeeds
 const onLikeSuccess = () => {
   if (!tweet.value.isLiked) {
     tweet.value.isLiked = true;
@@ -42,7 +41,6 @@ const onUndoRetweetSuccess = () => {
   }
 };
 
-// Build content segments using entities positions so we can style mentions and hashtags
 const contentSegments = computed<Segment[]>(() => {
   const segments: Segment[] = [];
   const content = tweet.value.content || '';
