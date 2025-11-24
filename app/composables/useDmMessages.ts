@@ -1,5 +1,6 @@
 import type { DmMessage } from '~~/shared/types/dm';
 import type { ApiSuccessResponse } from '~~/shared/types/api';
+import { apiFetch } from '~/api';
 
 export function useDmMessages(conversationId: () => string | null) {
   const idRef = computed(() => conversationId());
@@ -10,7 +11,7 @@ export function useDmMessages(conversationId: () => string | null) {
       const id = idRef.value;
 
       if (!id) return [] as DmMessage[];
-      const resp = await $fetch<ApiSuccessResponse<DmMessage[]>>(
+      const resp = await apiFetch<ApiSuccessResponse<DmMessage[]>>(
         `/api/conversations/${id}/messages`,
       );
       return resp.data;

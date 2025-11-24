@@ -2,7 +2,7 @@
 import DmMessagesList from './DmMessagesList.vue';
 import { useRoute } from 'vue-router';
 import { useDmMessages } from '@/composables/useDmMessages';
-import { useDmConversation } from '@/composables/useDmConversation';
+
 import { showToaster } from '@/utils/showToaster';
 import Spinner from '~/components/ui/Spinner.vue';
 
@@ -10,18 +10,24 @@ const route = useRoute();
 const conversationId = computed(() => route.params.conversationId as string | null);
 
 const {
+  conversations,
+  loading: conversationsLoading,
+  error: conversationsError,
+} = useDmConversations();
+
+const conversation = computed<DmConversation | null>(() => {
+  if (!conversationId.value) return null;
+  return conversations.value.find((c) => c.id === conversationId.value) || null;
+});
+
+const {
   messages,
   loading: messagesLoading,
   error: messagesError,
 } = useDmMessages(() => conversationId.value);
-const {
-  conversation,
-  loading: convoLoading,
-  error: convoError,
-} = useDmConversation(() => conversationId.value);
 
 watch(messagesError, (val) => val && showToaster('error', 'Failed to load messages'));
-watch(convoError, (val) => val && showToaster('error', 'Failed to load conversation'));
+watch(conversationsError, (val) => val && showToaster('error', 'Failed to load conversation'));
 </script>
 <template>
   <div class="flex h-full flex-col overflow-hidden">
@@ -31,7 +37,9 @@ watch(convoError, (val) => val && showToaster('error', 'Failed to load conversat
     />
     <div class="flex-1 overflow-y-auto p-4">
       <DmConversationInfo :conversation="conversation || null" />
-      <div v-if="convoLoading || messagesLoading" class="p-4"><Spinner size="1.5rem" /></div>
+      <div v-if="conversationsLoading || messagesLoading" class="p-4">
+        <Spinner size="1.5rem" />
+      </div>
       <DmMessagesList v-else :messages="messages" />
     </div>
     <DmConversationDmMessageInput />
