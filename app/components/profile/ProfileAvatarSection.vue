@@ -59,6 +59,7 @@ const { mutate: muteUser } = useProfileMutation<'mute' | 'unmute'>({
         :src="user?.avatarUrl || ''"
         alt="Profile picture"
         class="z-20 -mt-16 size-34 rounded-full border-4 object-cover"
+        data-cy="profile-avatar"
         loading="eager"
       />
     </div>
@@ -99,12 +100,12 @@ const { mutate: muteUser } = useProfileMutation<'mute' | 'unmute'>({
       data-test="setup-profile-button"
       variant="outline"
     >
-      <NuxtLink to="/setup/profile">
+      <NuxtLink to="/setup/profile" data-cy="profile-setup-button">
         {{ $t('profile.setup.setup-profile') }}
       </NuxtLink>
     </UiButton>
     <UiButton v-else-if="isCurrentUser" data-test="edit-profile-button" variant="outline">
-      <NuxtLink to="/settings/profile">
+      <NuxtLink to="/settings/profile" data-cy="profile-edit-button">
         {{ $t('profile-info.edit-profile') }}
       </NuxtLink>
     </UiButton>

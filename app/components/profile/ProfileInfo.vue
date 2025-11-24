@@ -19,15 +19,19 @@ const displayUrl = computed(() => {
 </script>
 
 <template>
-  <div class="mt-2 flex flex-col">
+  <div class="mt-2 flex flex-col" data-cy="profile-info">
     <div class="px-4">
-      <h2 class="text-foreground line-clamp-2 pb-0 text-2xl font-bold break-words">
+      <h2
+        class="text-foreground line-clamp-2 pb-0 text-2xl font-bold break-words"
+        data-cy="profile-display-name"
+      >
         {{ userProfile?.displayName }}
       </h2>
-      <p class="text-muted-foreground text-md">{{ displayUsername }}</p>
+      <p class="text-muted-foreground text-md" data-cy="profile-user-name">{{ displayUsername }}</p>
       <p
         v-if="!isBlocking"
         class="text-muted-foreground mt-2 line-clamp-4 break-words whitespace-pre-line"
+        data-cy="profile-bio"
       >
         {{ userProfile?.bio }}
       </p>
@@ -39,7 +43,7 @@ const displayUrl = computed(() => {
           class="text-muted-foreground flex items-center gap-1 leading-tight"
         >
           <Icon name="ic:sharp-location-on" class="text-muted-foreground" size="18" />
-          {{ userProfile.location }}
+          <span data-cy="profile-location">{{ userProfile.location }}</span>
         </p>
 
         <!-- url -->
@@ -51,20 +55,20 @@ const displayUrl = computed(() => {
           class="text-brand-blue me-2 flex items-center gap-1 hover:underline"
         >
           <Icon class="text-muted-foreground" name="ic:sharp-link" size="18" />
-          {{ displayUrl }}
+          <span data-cy="profile-website-url">{{ displayUrl }}</span>
         </a>
 
         <!-- join date -->
         <p v-if="userProfile?.joinedAt" class="text-muted-foreground flex items-center gap-1">
           <Icon name="ic:sharp-calendar-month" />
           {{ $t('profile-info.joined') }}
-          {{ formatMonthYear(userProfile.joinedAt) }}
+          <span data-cy="profile-joined-at">{{ formatMonthYear(userProfile.joinedAt) }}</span>
         </p>
       </div>
 
       <div class="mt-4 flex space-x-4">
         <span data-test="following-count"
-          ><strong>{{
+          ><strong data-cy="profile-following-count">{{
             $n(userProfile?.followingCount ?? 0, {
               notation: 'compact',
             })
@@ -72,7 +76,7 @@ const displayUrl = computed(() => {
           <span class="text-muted-foreground ms-1"> {{ $t('profile-info.following') }} </span>
         </span>
         <span data-test="followers-count"
-          ><strong>{{
+          ><strong data-cy="profile-followers-count">{{
             $n(userProfile?.followersCount ?? 0, {
               notation: 'compact',
             })

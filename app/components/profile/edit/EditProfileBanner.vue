@@ -61,18 +61,21 @@ defineExpose({
     <div
       v-if="!selectedImage"
       class="bg-muted-foreground/50 h-40 w-full cursor-pointer"
+      data-cy="edit-profile-banner-image"
       @click="handleImageClick"
     />
     <img
       v-else
       :src="selectedImage"
       class="h-40 w-full cursor-pointer object-cover brightness-70 filter"
+      data-cy="edit-profile-banner-image"
       @click="handleImageClick"
     />
     <div class="absolute start-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 gap-3">
       <button
         type="button"
         class="bg-foreground/60 hover:bg-foreground/80 flex h-10 w-10 items-center justify-center rounded-full transition-colors"
+        data-cy="edit-profile-change-banner-button"
         @click="handleImageClick"
       >
         <Icon name="lucide:camera" class="text-background" size="1.2rem" />
@@ -81,6 +84,7 @@ defineExpose({
         v-if="selectedImage"
         type="button"
         class="bg-foreground/60 hover:bg-foreground/80 flex h-10 w-10 items-center justify-center rounded-full transition-colors"
+        data-cy="edit-profile-remove-banner-button"
         @click="handleRemoveHeaderImage"
       >
         <Icon name="lucide:x" class="text-background" size="1.2rem" />
@@ -91,6 +95,7 @@ defineExpose({
       type="file"
       :accept="ALLOWED_IMAGE_TYPES_FOR_HTML"
       class="hidden"
+      data-cy="edit-profile-banner-file-input"
       @change="handleFileChange"
     />
   </div>

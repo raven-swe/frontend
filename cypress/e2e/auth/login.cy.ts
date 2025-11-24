@@ -1,5 +1,3 @@
-// cypress/e2e/auth/login.cy.ts
-
 describe('Login Flow', () => {
   beforeEach(() => {
     cy.visitAndWaitForHydration('/');
