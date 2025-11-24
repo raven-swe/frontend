@@ -62,6 +62,7 @@ watch(
       placeholder="Name"
       :class="isNameValid ? 'mb-6' : 'mb-1'"
       :aria-invalid="!isNameValid"
+      data-cy="profile-name-input"
       @update:model-value="emit('update:name', $event as string)"
     />
     <p v-if="!isNameValid" class="text-destructive mb-6 text-sm" role="alert" aria-live="assertive">
@@ -75,6 +76,7 @@ watch(
       :placeholder="$t('profile.edit.bio')"
       class="mb-6 w-full"
       maxlength="160"
+      data-cy="profile-bio-input"
       @update:model-value="emit('update:bio', $event as string)"
     />
 
@@ -84,6 +86,7 @@ watch(
       :placeholder="$t('profile.edit.location')"
       class="mb-6 w-full"
       maxlength="30"
+      data-cy="profile-location-input"
       @update:model-value="emit('update:location', $event as string)"
     />
 
@@ -93,6 +96,7 @@ watch(
       :placeholder="$t('profile.edit.website')"
       :class="isWebsiteValid ? 'mb-6' : 'mb-1'"
       maxlength="100"
+      data-cy="profile-website-input"
       @update:model-value="emit('update:website', $event as string)"
     />
     <p
@@ -100,6 +104,7 @@ watch(
       class="text-destructive mb-6 text-sm"
       role="alert"
       aria-live="assertive"
+      data-cy="invalid-website-url-error"
     >
       {{ $t('errors.INVALID_WEBSITE_URL') }}
     </p>
@@ -138,6 +143,7 @@ watch(
         class="text-destructive mt-2 text-sm"
         role="alert"
         aria-live="assertive"
+        data-cy="invalid-age-error"
       >
         {{ $t('errors.birthDate.NOT_MINIMUM_AGE') }}
       </p>

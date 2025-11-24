@@ -90,15 +90,20 @@ const handleOpenChange = (value: boolean) => {
           {{ $t('profile.setup.profile-picture-desc') }}
         </UiDialogDescription>
       </UiDialogHeader>
-      <div class="mx-2 flex flex-grow items-center justify-center">
+      <div
+        class="mx-2 flex flex-grow items-center justify-center"
+        data-cy="profile-setup-avatar-dialog"
+      >
         <div class="relative">
           <img
             :src="selectedImage || 'https://cdn.raven.cmp27.space/default_avatar.png'"
             class="h-40 w-40 cursor-pointer rounded-full object-cover brightness-70 filter"
+            data-cy="profile-setup-avatar-image"
           />
           <button
             type="button"
             class="bg-foreground/60 hover:bg-foreground/80 absolute start-1/2 top-1/2 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full transition-colors"
+            data-cy="profile-setup-change-avatar-button"
             @click="handleImageClick"
           >
             <Icon name="lucide:camera" class="text-white" size="1.2rem" />
@@ -108,12 +113,19 @@ const handleOpenChange = (value: boolean) => {
             type="file"
             accept="image/png,image/jpg,image/jpeg"
             class="hidden"
+            data-cy="profile-setup-avatar-file-input"
             @change="handleFileChange"
           />
         </div>
       </div>
       <UiDialogFooter>
-        <UiButton :variant="actionButton.variant" class="w-100" size="xl" @click="handleSubmit">
+        <UiButton
+          :variant="actionButton.variant"
+          class="w-100"
+          size="xl"
+          data-cy="profile-setup-next-button"
+          @click="handleSubmit"
+        >
           {{ actionButton.text }}
         </UiButton>
       </UiDialogFooter>

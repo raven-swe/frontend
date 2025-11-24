@@ -104,7 +104,10 @@ watch(
           {{ $t('profile.setup.header-desc') }}
         </UiDialogDescription>
       </UiDialogHeader>
-      <div class="mx-2 flex flex-grow flex-col items-center justify-center gap-2">
+      <div
+        class="mx-2 flex flex-grow flex-col items-center justify-center gap-2"
+        data-cy="profile-setup-header-dialog"
+      >
         <!-- Header Image Section -->
         <div class="relative w-full max-w-md">
           <div
@@ -116,11 +119,13 @@ watch(
             v-else
             :src="selectedImage"
             class="h-40 w-full cursor-pointer rounded-lg object-cover brightness-70 filter"
+            data-cy="profile-setup-header-image"
             @click="handleImageClick"
           />
           <button
             type="button"
             class="bg-foreground/60 hover:bg-foreground/80 absolute start-1/2 top-1/2 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full transition-colors"
+            data-cy="profile-setup-change-header-button"
             @click="handleImageClick"
           >
             <Icon name="lucide:camera" class="text-white" size="1.2rem" />
@@ -130,24 +135,42 @@ watch(
             type="file"
             accept="image/png,image/jpg,image/jpeg"
             class="hidden"
+            data-cy="profile-setup-header-file-input"
             @change="handleFileChange"
           />
         </div>
 
         <!-- Profile Section -->
-        <div class="flex flex-col items-center gap-3 self-start px-10">
+        <div
+          class="flex flex-col items-center gap-3 self-start px-10"
+          data-cy="profile-setup-header-profile-preview"
+        >
           <img
             :src="formData.avatarUrl || 'https://cdn.raven.cmp27.space/default_avatar.png'"
             class="h-25 w-25 rounded-full object-cover"
+            data-cy="profile-setup-header-profile-avatar-image"
           />
           <div>
-            <div class="text-lg font-bold">{{ name }}</div>
-            <div class="text-muted-foreground text-sm">{{ username }}</div>
+            <div class="text-lg font-bold" data-cy="profile-setup-header-profile-name">
+              {{ name }}
+            </div>
+            <div
+              class="text-muted-foreground text-sm"
+              data-cy="profile-setup-header-profile-username"
+            >
+              {{ username }}
+            </div>
           </div>
         </div>
       </div>
       <UiDialogFooter>
-        <UiButton :variant="actionButton.variant" class="w-100" size="xl" @click="handleSubmit">
+        <UiButton
+          :variant="actionButton.variant"
+          class="w-100"
+          size="xl"
+          data-cy="profile-setup-next-button"
+          @click="handleSubmit"
+        >
           {{ actionButton.text }}
         </UiButton>
       </UiDialogFooter>

@@ -70,7 +70,7 @@ watch(
           {{ $t('profile.setup.bio-desc') }}
         </UiDialogDescription>
       </UiDialogHeader>
-      <div class="mx-2 mt-2 mb-auto p-4">
+      <div class="mx-2 mt-2 mb-auto p-4" data-cy="profile-setup-bio-dialog">
         <uiInput
           v-model="bio"
           type="textarea"
@@ -78,10 +78,17 @@ watch(
           placeholder="Your bio"
           class="w-full max-w-md"
           maxlength="160"
+          data-cy="profile-setup-bio-input"
         />
       </div>
       <UiDialogFooter>
-        <UiButton :variant="actionButton.variant" class="w-100" size="xl" @click="handleSubmit">
+        <UiButton
+          :variant="actionButton.variant"
+          class="w-100"
+          size="xl"
+          data-cy="profile-setup-next-button"
+          @click="handleSubmit"
+        >
           {{ actionButton.text }}
         </UiButton>
       </UiDialogFooter>

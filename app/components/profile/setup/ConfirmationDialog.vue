@@ -39,10 +39,18 @@ const handleOpenChange = (value: boolean) => {
           <VisuallyHidden>{{ $t('profile.setup.confirmation-dialog') }}</VisuallyHidden>
         </UiDialogTitle>
         <UiDialogDescription aria-describedby="undefined" />
-        <div class="m-auto flex flex-col items-center justify-center gap-6">
+        <div
+          class="m-auto flex flex-col items-center justify-center gap-6"
+          data-cy="profile-setup-confirm-dialog"
+        >
           <LogoRaven class="h-40 w-40" />
           <p class="text-2xl font-bold">{{ $t('profile.setup.click-to-save') }}</p>
-          <UiButton class="w-65" size="xl" @click="handleSubmit">
+          <UiButton
+            class="w-65"
+            size="xl"
+            data-cy="profile-setup-save-button"
+            @click="handleSubmit"
+          >
             {{ $t('ui.save') }}
           </UiButton>
         </div>

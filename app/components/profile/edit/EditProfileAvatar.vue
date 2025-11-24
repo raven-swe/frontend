@@ -58,12 +58,14 @@ defineExpose({
       <img
         :src="selectedProfileImage || 'https://cdn.raven.cmp27.space/default_avatar.png'"
         class="h-30 w-30 cursor-pointer rounded-full border-3 border-white object-cover"
+        data-cy="edit-profile-avatar-image"
         @click="handleProfileImageClick"
       />
       <div class="absolute start-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 gap-2">
         <button
           type="button"
           class="bg-foreground/60 hover:bg-foreground/80 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+          data-cy="edit-profile-change-avatar-button"
           @click="handleProfileImageClick"
         >
           <Icon name="lucide:camera" class="text-background" size="1rem" />
@@ -72,6 +74,7 @@ defineExpose({
           v-if="selectedProfileImage"
           type="button"
           class="bg-foreground/60 hover:bg-foreground/80 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+          data-cy="edit-profile-remove-avatar-button"
           @click="handleRemoveProfileImage"
         >
           <Icon name="lucide:x" class="text-background" size="0.9rem" />
@@ -82,6 +85,7 @@ defineExpose({
         type="file"
         accept="image/png,image/jpg,image/jpeg"
         class="hidden"
+        data-cy="edit-profile-avatar-file-input"
         @change="handleProfileFileChange"
       />
     </div>
