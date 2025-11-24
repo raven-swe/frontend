@@ -431,7 +431,7 @@ describe('TweetEditor', () => {
       expect(wrapper.emitted('paste-media')?.[0]?.[0]).toEqual([file]);
     });
 
-    it('accepts gif images when pasted', async () => {
+    it('accepts webp images when pasted', async () => {
       const wrapper = await mountSuspended(TweetEditor, {
         props: mockProps,
         global: {
@@ -439,12 +439,12 @@ describe('TweetEditor', () => {
         },
       });
 
-      const file = createMockFile('animation.gif', 'image/gif');
+      const file = createMockFile('image.webp', 'image/webp');
       const clipboardData = {
         items: [
           {
             kind: 'file',
-            type: 'image/gif',
+            type: 'image/webp',
             getAsFile: () => file,
           },
         ],
@@ -503,12 +503,12 @@ describe('TweetEditor', () => {
         },
       });
 
-      const file = createMockFile('video.mp4', 'video/mp4');
+      const file = createMockFile('document.pdf', 'application/pdf');
       const clipboardData = {
         items: [
           {
             kind: 'file',
-            type: 'video/mp4',
+            type: 'application/pdf',
             getAsFile: () => file,
           },
         ],

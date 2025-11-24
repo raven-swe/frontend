@@ -1,44 +1,14 @@
 import { http, HttpResponse } from 'msw';
-import rawUsers from '../data/mock-users.json' assert { type: 'json' };
-import type { User } from '#shared/types/user';
 
-const mockUsers = rawUsers as User[];
-
-const exampleUser: User = {
-  username: 'ravencmp123',
-  displayName: 'Madelyn6',
-  bio: 'Quo solio verecundia cetera testimonium ater apto vaco.',
-  bioEntities: {
-    mentions: [],
-    hashtags: [],
-  },
-  avatarUrl: 'https://cdn.jsdelivr.net/gh/faker-js/assets-person-portrait/female/512/33.jpg',
-  bannerUrl: 'https://picsum.photos/seed/n5kxRgi/128/866?blur=2',
-  location: 'Lake Grady',
-  websiteUrl: 'https://overcooked-travel.info/',
-  birthDate: '2000-12-03T15:36:35.414Z',
-  joinedAt: '2024-02-18T04:51:04.728Z',
-  email: 'Tyreek20@hotmail.com',
-  phone: '1-423-608-5792 x0859',
-  followersCount: 3091,
-  followingCount: 8869,
-  languageCode: 'en',
-};
-mockUsers.push(exampleUser);
-
-// Create a mapping of username to user info for easy lookup
-const mockUserInfos: Record<string, User> = {};
-mockUsers.forEach((user) => {
-  mockUserInfos[user.username] = user;
-});
+import { mockUserInfos } from './mockUserDB';
 
 const API_URL = process.env.BACKEND_URL;
 
 export const handlers = [
-  http.get(`${API_URL}/users/:username/profile`, ({ params }) => {
+  http.get(`${API_URL}/users/:username/profile`, async ({ params }) => {
+    await new Promise((resolve) => setTimeout(resolve, 500));
     const username = params.username as string;
-    const user = mockUserInfos[username];
-
+    const user = mockUserInfos[username.toLowerCase()];
     if (user) {
       return HttpResponse.json(
         {

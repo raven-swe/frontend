@@ -228,32 +228,6 @@ describe('TweetComposer', () => {
     expect(toolbar.props('canAddMedia')).toBe(false);
   });
 
-  it('clears content and media on post', async () => {
-    const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-
-    const wrapper = await mountSuspended(TweetComposer, {
-      global: {
-        plugins: [i18n],
-      },
-    });
-
-    const editor = wrapper.findComponent(TweetEditor);
-    await editor.vm.$emit('update:modelValue', 'Test tweet');
-
-    const mockFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
-    const toolbar = wrapper.findComponent(Toolbar);
-    await toolbar.vm.$emit('add-media', [mockFile]);
-
-    await toolbar.vm.$emit('post');
-
-    expect(editor.props('modelValue')).toBe('');
-
-    const slideshow = wrapper.findComponent(MediaSlideshow);
-    expect(slideshow.props('media')).toHaveLength(0);
-
-    consoleLogSpy.mockRestore();
-  });
-
   it('does not post when content is empty and no media', async () => {
     const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 

@@ -1,6 +1,10 @@
 <script lang="ts" setup>
 import type { buttonVariants } from '~~/shared/types/ui';
-import { MAX_IMAGE_SIZE_MB, MAX_IMAGE_SIZE_BYTES } from '@/constants/files';
+import {
+  MAX_IMAGE_SIZE_MB,
+  MAX_IMAGE_SIZE_BYTES,
+  ALLOWED_IMAGE_TYPES_FOR_HTML,
+} from '@/constants/files';
 
 const props = defineProps<{
   open: boolean;
@@ -133,7 +137,7 @@ watch(
           <input
             ref="fileInputRef"
             type="file"
-            accept="image/png,image/jpg,image/jpeg"
+            :accept="ALLOWED_IMAGE_TYPES_FOR_HTML"
             class="hidden"
             data-cy="profile-setup-header-file-input"
             @change="handleFileChange"

@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { showToaster } from '@/utils/showToaster';
-import { MAX_IMAGE_SIZE_BYTES, MAX_IMAGE_SIZE_MB } from '~/constants/files';
+import {
+  MAX_IMAGE_SIZE_BYTES,
+  MAX_IMAGE_SIZE_MB,
+  ALLOWED_IMAGE_TYPES_FOR_HTML,
+} from '~/constants/files';
 
 interface Props {
   selectedImage: string | null;
@@ -88,7 +92,7 @@ defineExpose({
     <input
       ref="bannerFileInput"
       type="file"
-      accept="image/png,image/jpg,image/jpeg"
+      :accept="ALLOWED_IMAGE_TYPES_FOR_HTML"
       class="hidden"
       data-cy="edit-profile-banner-file-input"
       @change="handleFileChange"

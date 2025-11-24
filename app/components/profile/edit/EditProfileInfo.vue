@@ -63,6 +63,7 @@ watch(
       :class="isNameValid ? 'mb-6' : 'mb-1'"
       :aria-invalid="!isNameValid"
       data-cy="profile-name-input"
+      maxlength="50"
       @update:model-value="emit('update:name', $event as string)"
     />
     <p v-if="!isNameValid" class="text-destructive mb-6 text-sm" role="alert" aria-live="assertive">
