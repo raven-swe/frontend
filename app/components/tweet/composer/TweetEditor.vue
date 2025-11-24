@@ -167,7 +167,7 @@ defineExpose({
 
       <!-- Visible content with styling -->
       <div
-        class="text-foreground min-h-[35px] w-full text-xl leading-7 break-words whitespace-pre-wrap"
+        class="text-foreground min-h-[35px] w-full text-lg leading-7 break-words whitespace-pre-wrap"
         :class="{ 'empty-placeholder': !modelValue }"
       >
         <span v-if="!modelValue" class="text-muted-foreground">{{ placeholder }}</span>
