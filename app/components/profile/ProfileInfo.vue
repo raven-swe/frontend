@@ -20,9 +20,14 @@ const displayUrl = computed(() => {
 <template>
   <div class="mt-2 flex flex-col">
     <div class="px-4">
-      <h2 class="text-foreground pb-0 text-2xl font-bold">{{ userProfile?.displayName }}</h2>
+      <h2 class="text-foreground line-clamp-2 pb-0 text-2xl font-bold break-words">
+        {{ userProfile?.displayName }}
+      </h2>
       <p class="text-muted-foreground text-md">{{ displayUsername }}</p>
-      <p v-if="!isBlocking" class="text-muted-foreground mt-2 whitespace-pre-line">
+      <p
+        v-if="!isBlocking"
+        class="text-muted-foreground mt-2 line-clamp-4 break-words whitespace-pre-line"
+      >
         {{ userProfile?.bio }}
       </p>
 
