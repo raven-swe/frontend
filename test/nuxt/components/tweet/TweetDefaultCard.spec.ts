@@ -1,11 +1,38 @@
 import { describe, it, expect } from 'vitest';
 import { nextTick } from 'vue';
-import { mountSuspended } from '@nuxt/test-utils/runtime';
+import { mount } from '@vue/test-utils';
 import TweetDefaultCard from '@/components/tweet/TweetDefaultCard.vue';
 import Avatar from '@/components/ui/Avatar.vue';
 import TweetMedia from '@/components/tweet/TweetMedia.vue';
 import TweetActionButtons from '@/components/tweet/TweetActionButtons.vue';
 import type { Tweet } from '~~/shared/types/tweets';
+
+// Mock i18n
+const i18nMock = {
+  locale: 'en',
+  t: (key: string) => key,
+};
+
+// Stub components for faster tests
+const stubs = {
+  NuxtLink: {
+    template: '<a :href="to"><slot /></a>',
+    props: ['to'],
+  },
+  NuxtImg: { template: '<img />' },
+  Icon: { template: '<i />' },
+  VideoPlayer: { template: '<div class="video-player-stub"></div>' },
+  Avatar: Avatar,
+  TweetMedia: TweetMedia,
+  TweetActionButtons: TweetActionButtons,
+};
+
+const globalConfig = {
+  stubs,
+  mocks: {
+    $i18n: i18nMock,
+  },
+};
 
 function makeTweet(overrides: Partial<Tweet> = {}): Tweet {
   const content = 'Look @john_doe and #Nuxt3 is cool';
@@ -37,14 +64,9 @@ function makeTweet(overrides: Partial<Tweet> = {}): Tweet {
 describe('TweetDefaultCard.vue', () => {
   it('renders header: avatar, display name, @username and relative time', async () => {
     const tweet = makeTweet();
-    const wrapper = await mountSuspended(TweetDefaultCard, {
+    const wrapper = mount(TweetDefaultCard, {
       props: { tweet },
-      global: {
-        stubs: {
-          NuxtImg: true,
-          Icon: true,
-        },
-      },
+      global: globalConfig,
     });
 
     // Avatar component receives proper props
@@ -66,9 +88,9 @@ describe('TweetDefaultCard.vue', () => {
     const tweet = makeTweet();
     // trigger fallback
     tweet.author.avatarUrl = '' as unknown as string;
-    const wrapper = await mountSuspended(TweetDefaultCard, {
+    const wrapper = mount(TweetDefaultCard, {
       props: { tweet },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: globalConfig,
     });
 
     const avatar = wrapper.findComponent(Avatar);
@@ -78,9 +100,9 @@ describe('TweetDefaultCard.vue', () => {
 
   it('links display name to the correct profile URL', async () => {
     const tweet = makeTweet();
-    const wrapper = await mountSuspended(TweetDefaultCard, {
+    const wrapper = mount(TweetDefaultCard, {
       props: { tweet },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: globalConfig,
     });
 
     const profileLink = wrapper.find('a[href="/profile/aestheticsguy"]');
@@ -91,9 +113,9 @@ describe('TweetDefaultCard.vue', () => {
 
   it('sets time element attributes: datetime and non-empty title', async () => {
     const tweet = makeTweet();
-    const wrapper = await mountSuspended(TweetDefaultCard, {
+    const wrapper = mount(TweetDefaultCard, {
       props: { tweet },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: globalConfig,
     });
 
     const timeEl = wrapper.find('time');
@@ -105,9 +127,9 @@ describe('TweetDefaultCard.vue', () => {
 
   it('splits content into text + mention + hashtag links with correct hrefs', async () => {
     const tweet = makeTweet();
-    const wrapper = await mountSuspended(TweetDefaultCard, {
+    const wrapper = mount(TweetDefaultCard, {
       props: { tweet },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: globalConfig,
     });
 
     // Mention link
@@ -138,9 +160,9 @@ describe('TweetDefaultCard.vue', () => {
         },
       ],
     });
-    const wrapper = await mountSuspended(TweetDefaultCard, {
+    const wrapper = mount(TweetDefaultCard, {
       props: { tweet },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: globalConfig,
     });
 
     const media = wrapper.findComponent(TweetMedia);
@@ -161,9 +183,9 @@ describe('TweetDefaultCard.vue', () => {
         hashtags: [{ hashtag: 'Nuxt3', startPosition: content.indexOf('#Nuxt3') }],
       },
     });
-    const wrapper = await mountSuspended(TweetDefaultCard, {
+    const wrapper = mount(TweetDefaultCard, {
       props: { tweet },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: globalConfig,
     });
 
     // Find links within the tweet content area (excluding author username link)
@@ -181,9 +203,9 @@ describe('TweetDefaultCard.vue', () => {
       content: 'Just a plain tweet with no entities.',
       entities: { mentions: [], hashtags: [] },
     });
-    const wrapper = await mountSuspended(TweetDefaultCard, {
+    const wrapper = mount(TweetDefaultCard, {
       props: { tweet },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: globalConfig,
     });
 
     const contentP = wrapper.find('p');
@@ -200,9 +222,9 @@ describe('TweetDefaultCard.vue', () => {
     // Force entities to be undefined to hit the first OR branch without using `any`
     const tObj = tweet as unknown as { entities?: unknown };
     delete tObj.entities;
-    const wrapper = await mountSuspended(TweetDefaultCard, {
+    const wrapper = mount(TweetDefaultCard, {
       props: { tweet: tObj as unknown as Tweet },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: globalConfig,
     });
 
     const contentP = wrapper.find('p');
@@ -220,9 +242,9 @@ describe('TweetDefaultCard.vue', () => {
       // hashtags intentionally omitted to exercise `|| []`
     } as unknown as Tweet['entities'];
     tweet.entities = entities;
-    const wrapper = await mountSuspended(TweetDefaultCard, {
+    const wrapper = mount(TweetDefaultCard, {
       props: { tweet },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: globalConfig,
     });
 
     const mention = wrapper.find('a[href="/profile/john_doe"]');
@@ -240,9 +262,9 @@ describe('TweetDefaultCard.vue', () => {
       // mentions intentionally omitted to exercise `|| []`
     } as unknown as Tweet['entities'];
     tweet.entities = entities;
-    const wrapper = await mountSuspended(TweetDefaultCard, {
+    const wrapper = mount(TweetDefaultCard, {
       props: { tweet },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: globalConfig,
     });
 
     const hashtag = wrapper.find('a[href="/hashtag/Nuxt3"]');
@@ -253,9 +275,9 @@ describe('TweetDefaultCard.vue', () => {
 
   it('updates like state on like-success when not previously liked', async () => {
     const tweet = makeTweet({ isLiked: false, likeCount: 10 });
-    const wrapper = await mountSuspended(TweetDefaultCard, {
+    const wrapper = mount(TweetDefaultCard, {
       props: { tweet },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: globalConfig,
     });
 
     const actions = wrapper.findComponent(TweetActionButtons);
@@ -275,9 +297,9 @@ describe('TweetDefaultCard.vue', () => {
     const tweet = makeTweet({ isLiked: false } as Partial<Tweet>);
     // simulate missing likeCount -> should be treated as 0
     (tweet as unknown as { likeCount?: number }).likeCount = undefined;
-    const wrapper = await mountSuspended(TweetDefaultCard, {
+    const wrapper = mount(TweetDefaultCard, {
       props: { tweet },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: globalConfig,
     });
 
     const actions = wrapper.findComponent(TweetActionButtons);
@@ -291,9 +313,9 @@ describe('TweetDefaultCard.vue', () => {
 
   it('does nothing on like-success if already liked (no-op branch)', async () => {
     const tweet = makeTweet({ isLiked: true, likeCount: 5 });
-    const wrapper = await mountSuspended(TweetDefaultCard, {
+    const wrapper = mount(TweetDefaultCard, {
       props: { tweet },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: globalConfig,
     });
 
     const actions = wrapper.findComponent(TweetActionButtons);
@@ -308,9 +330,9 @@ describe('TweetDefaultCard.vue', () => {
   it('updates like state on unlike-success and clamps likeCount at 0', async () => {
     // Case 1: normal decrement
     const tweet1 = makeTweet({ isLiked: true, likeCount: 2 });
-    const wrapper1 = await mountSuspended(TweetDefaultCard, {
+    const wrapper1 = mount(TweetDefaultCard, {
       props: { tweet: tweet1 },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: globalConfig,
     });
     const actions1 = wrapper1.findComponent(TweetActionButtons);
     actions1.vm.$emit('unlike-success');
@@ -321,9 +343,9 @@ describe('TweetDefaultCard.vue', () => {
 
     // Case 2: clamp at zero
     const tweet2 = makeTweet({ isLiked: true, likeCount: 0 });
-    const wrapper2 = await mountSuspended(TweetDefaultCard, {
+    const wrapper2 = mount(TweetDefaultCard, {
       props: { tweet: tweet2 },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: globalConfig,
     });
     const actions2 = wrapper2.findComponent(TweetActionButtons);
     actions2.vm.$emit('unlike-success');
@@ -336,9 +358,9 @@ describe('TweetDefaultCard.vue', () => {
   it('decrements likeCount from 0 when likeCount is undefined (clamp path)', async () => {
     const tweet = makeTweet({ isLiked: true } as Partial<Tweet>);
     (tweet as unknown as { likeCount?: number }).likeCount = undefined;
-    const wrapper = await mountSuspended(TweetDefaultCard, {
+    const wrapper = mount(TweetDefaultCard, {
       props: { tweet },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: globalConfig,
     });
     const actions = wrapper.findComponent(TweetActionButtons);
     actions.vm.$emit('unlike-success');
@@ -351,9 +373,9 @@ describe('TweetDefaultCard.vue', () => {
 
   it('does nothing on unlike-success if not liked (no-op branch)', async () => {
     const tweet = makeTweet({ isLiked: false, likeCount: 3 });
-    const wrapper = await mountSuspended(TweetDefaultCard, {
+    const wrapper = mount(TweetDefaultCard, {
       props: { tweet },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: globalConfig,
     });
     const actions = wrapper.findComponent(TweetActionButtons);
     actions.vm.$emit('unlike-success');
@@ -365,9 +387,9 @@ describe('TweetDefaultCard.vue', () => {
 
   it('updates retweet state on retweet-success when not previously retweeted', async () => {
     const tweet = makeTweet({ isRetweeted: false, retweetCount: 4 });
-    const wrapper = await mountSuspended(TweetDefaultCard, {
+    const wrapper = mount(TweetDefaultCard, {
       props: { tweet },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: globalConfig,
     });
     const actions = wrapper.findComponent(TweetActionButtons);
     actions.vm.$emit('retweet-success');
@@ -379,9 +401,9 @@ describe('TweetDefaultCard.vue', () => {
 
   it('does nothing on retweet-success if already retweeted (no-op branch)', async () => {
     const tweet = makeTweet({ isRetweeted: true, retweetCount: 8 });
-    const wrapper = await mountSuspended(TweetDefaultCard, {
+    const wrapper = mount(TweetDefaultCard, {
       props: { tweet },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: globalConfig,
     });
     const actions = wrapper.findComponent(TweetActionButtons);
     actions.vm.$emit('retweet-success');
@@ -394,9 +416,9 @@ describe('TweetDefaultCard.vue', () => {
   it('updates retweet state on undo-retweet-success and clamps retweetCount at 0', async () => {
     // Case 1: normal decrement
     const tweet1 = makeTweet({ isRetweeted: true, retweetCount: 2 });
-    const wrapper1 = await mountSuspended(TweetDefaultCard, {
+    const wrapper1 = mount(TweetDefaultCard, {
       props: { tweet: tweet1 },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: globalConfig,
     });
     const actions1 = wrapper1.findComponent(TweetActionButtons);
     actions1.vm.$emit('undo-retweet-success');
@@ -407,9 +429,9 @@ describe('TweetDefaultCard.vue', () => {
 
     // Case 2: clamp at zero
     const tweet2 = makeTweet({ isRetweeted: true, retweetCount: 0 });
-    const wrapper2 = await mountSuspended(TweetDefaultCard, {
+    const wrapper2 = mount(TweetDefaultCard, {
       props: { tweet: tweet2 },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: globalConfig,
     });
     const actions2 = wrapper2.findComponent(TweetActionButtons);
     actions2.vm.$emit('undo-retweet-success');
@@ -422,9 +444,9 @@ describe('TweetDefaultCard.vue', () => {
   it('decrements retweetCount from 0 when retweetCount is undefined (clamp path)', async () => {
     const tweet = makeTweet({ isRetweeted: true } as Partial<Tweet>);
     (tweet as unknown as { retweetCount?: number }).retweetCount = undefined;
-    const wrapper = await mountSuspended(TweetDefaultCard, {
+    const wrapper = mount(TweetDefaultCard, {
       props: { tweet },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: globalConfig,
     });
     const actions = wrapper.findComponent(TweetActionButtons);
     actions.vm.$emit('undo-retweet-success');
@@ -441,9 +463,9 @@ describe('TweetDefaultCard.vue', () => {
     // Remove entities to trigger early return with text segment
     const tObj = tweet as unknown as { entities?: unknown };
     delete tObj.entities;
-    const wrapper = await mountSuspended(TweetDefaultCard, {
+    const wrapper = mount(TweetDefaultCard, {
       props: { tweet: tObj as unknown as Tweet },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: globalConfig,
     });
     const contentP = wrapper.find('p');
     expect(contentP.exists()).toBe(true);
@@ -452,9 +474,9 @@ describe('TweetDefaultCard.vue', () => {
 
   it('does nothing on undo-retweet-success if not retweeted (no-op branch)', async () => {
     const tweet = makeTweet({ isRetweeted: false, retweetCount: 7 });
-    const wrapper = await mountSuspended(TweetDefaultCard, {
+    const wrapper = mount(TweetDefaultCard, {
       props: { tweet },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: globalConfig,
     });
     const actions = wrapper.findComponent(TweetActionButtons);
     actions.vm.$emit('undo-retweet-success');
