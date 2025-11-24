@@ -38,6 +38,9 @@ importers:
       '@videojs-player/vue':
         specifier: ^1.0.0
         version: 1.0.0(@types/video.js@7.3.58)(video.js@8.23.4)(vue@3.5.22(typescript@5.9.3))
+      '@tanstack/vue-virtual':
+        specifier: 3.13.12
+        version: 3.13.12(vue@3.5.22(typescript@5.9.3))
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
