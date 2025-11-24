@@ -14,8 +14,11 @@ definePageMeta({
   validate: (ctx) => isTab(ctx.params.tab),
 });
 
-const route = useRoute();
-const tab = computed(() => route.params.tab as Tab);
+const route = useRouter().currentRoute.value;
+const tab = computed(() => {
+  const t = route.params.tab;
+  return typeof t === 'string' && isTab(t) ? t : '';
+});
 
 const user = inject<ComputedRef<User>>('user-data');
 const isBlockedBy = computed(() => user?.value.relationship.blockedBy || false);
