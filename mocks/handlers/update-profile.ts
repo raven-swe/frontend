@@ -1,18 +1,11 @@
 import { http, HttpResponse } from 'msw';
 import type { UpdateProfileRequest, UserData } from '~~/shared/types/shared';
 import type { ApiSuccessResponse, ApiErrorResponse } from '~~/shared/types/api';
-import rawUsers from '../data/mock-users.json' assert { type: 'json' };
 import type { User } from '#shared/types/user';
 import jwt from 'jsonwebtoken';
+import { mockUserInfos } from './mockUserDB';
 
 const API_URL = process.env.BACKEND_URL;
-const mockUsers = rawUsers as User[];
-// Create a mapping of username to user info for easy lookup
-const mockUserInfos: Record<string, User> = {};
-mockUsers.forEach((user) => {
-  mockUserInfos[user.username] = user;
-});
-
 // Mock user data that will be updated
 const mockUserData: UserData = {
   username: 'johndoe',
@@ -38,10 +31,50 @@ export const handlers = [
   // Update profile PATCH request
   http.patch(`${API_URL}/me`, async ({ request }) => {
     try {
-      const body = (await request.json()) as UpdateProfileRequest;
+      const formData = await request.formData();
 
-      // Update the mock user data with new values
-      Object.assign(mockUserData, body);
+      // Parse the 'data' field which contains JSON
+      const dataString = formData.get('data') as string;
+      if (!dataString) {
+        return HttpResponse.json(
+          {
+            success: false,
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: 'Profile data is required',
+            },
+          },
+          { status: 400 },
+        );
+      }
+
+      const profileData = JSON.parse(dataString) as UpdateProfileRequest & {
+        deleteBanner?: boolean;
+      };
+
+      // Get files if provided
+      const profilePicture = formData.get('profilePicture') as File | null;
+      const bannerImage = formData.get('bannerImage') as File | null;
+
+      // Update profile data
+      Object.assign(mockUserData, profileData);
+
+      // Handle banner deletion
+      if (profileData.deleteBanner) {
+        mockUserData.bannerUrl = null;
+      }
+
+      // Handle profile picture upload
+      if (profilePicture) {
+        const mockProfileUrl = 'https://ibb.co/rGzj2kS4';
+        mockUserData.avatarUrl = mockProfileUrl;
+      }
+
+      // Handle banner image upload
+      if (bannerImage) {
+        const mockBannerUrl = 'https://i.ibb.co/Z1Yx04kS/dfghj.webp';
+        mockUserData.bannerUrl = mockBannerUrl;
+      }
 
       const response: ApiSuccessResponse<UserData> = {
         success: true,
@@ -166,13 +199,38 @@ export const handlers = [
   }),
 
   // Get current user profile
-  http.get(`${API_URL}/me`, () => {
-    const response: ApiSuccessResponse<UserData> = {
-      success: true,
-      data: { ...mockUserData },
-    };
+  http.get(`${API_URL}/me`, ({ request }) => {
+    const authHeader = request.headers.get('Authorization');
+    const token = authHeader?.split(' ')[1];
+    if (!token || !authHeader.startsWith('Bearer ')) {
+      return new HttpResponse(
+        JSON.stringify({ error: { message: 'No token provided' } } as ApiErrorResponse),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      );
+    }
 
-    return HttpResponse.json(response, { status: 200 });
+    try {
+      const data = jwt.verify(token, 'secret') as { username: string };
+      mockUserData.username = data.username;
+      return HttpResponse.json<ApiSuccessResponse<UserData>>(
+        {
+          success: true,
+          data: { ...mockUserData },
+        },
+        { status: 200 },
+      );
+    } catch {
+      return new HttpResponse(
+        JSON.stringify({ error: { message: 'Invalid token' } } as ApiErrorResponse),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      );
+    }
   }),
 
   http.get(`${API_URL}/me`, (req) => {
@@ -190,7 +248,7 @@ export const handlers = [
     try {
       const decoded = jwt.verify(accessToken, 'refresh_secret') as { username: string };
       // search for user by username in mockUsers
-      const user = mockUserInfos[decoded.username];
+      const user = mockUserInfos[decoded.username.toLowerCase()];
       if (!user) throw new Error('User not found');
 
       const response: ApiSuccessResponse<User> = {
@@ -362,7 +420,7 @@ export const handlers = [
   }),
 
   http.post(`${API_URL}/me/email/resend-otp`, async ({ request }) => {
-    console.log('Resend OTP request received');
+    console.warn('Resend OTP request received');
     try {
       const body = (await request.json()) as { confirmationToken: string };
       if (body.confirmationToken === 'mock-confirmation-token-12345') {

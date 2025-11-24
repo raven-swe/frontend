@@ -6,6 +6,7 @@ import {
   type ResetPasswordSchema,
   type VerifyUserSchema,
 } from '@/services/auth/passwordService';
+import { isApiError, isApiValidationError } from '@/utils/errorUtils';
 
 export const usePasswordStore = defineStore('password', () => {
   const router = useRouter();
@@ -24,8 +25,17 @@ export const usePasswordStore = defineStore('password', () => {
 
   const closeDialog = () => {
     open.value = false;
+    resetData();
     router.push('/');
   };
+
+  const resetData = () => {
+    step.value = 0;
+    identifier.value = '';
+    confirmationToken.value = '';
+    loading.value = false;
+  };
+
   const getIdentifierFromQuery = (): string => {
     const query = router.currentRoute.value.query;
     identifier.value = (query.identifier as string) ? (query.identifier as string) : '';
@@ -40,8 +50,19 @@ export const usePasswordStore = defineStore('password', () => {
       step.value = 1;
       confirmationToken.value = response.data.confirmationToken;
     } catch (error) {
-      const msg = error?.data?.message || 'Unexpected error occurred';
-      throw new Error(msg);
+      if (isApiValidationError(error)) {
+        const errors = error.data?.data?.error.errors;
+        return errors;
+      } else if (isApiError(error)) {
+        if (error.data?.statusCode === 404 || error.data?.statusCode === 400) {
+          const errorCode = error.data?.data?.error?.code;
+          return [{ field: 'identifier', code: errorCode }];
+        } else if (error.data?.statusCode === 429) {
+          showToaster('error', 'toaster.checkUser.rateLimit');
+        }
+      } else {
+        showToaster('error', 'toaster.checkUser.error');
+      }
     } finally {
       loading.value = false;
     }
@@ -57,26 +78,33 @@ export const usePasswordStore = defineStore('password', () => {
       await passwordService.verifyUser(data);
       step.value = 2;
     } catch (error) {
-      const msg = error?.data?.message || 'Unexpected error occurred';
-      console.error(msg);
-      throw new Error(msg);
+      if (isApiValidationError(error)) {
+        const errors = error.data?.data?.error.errors;
+        return errors;
+      } else {
+        showToaster('error', 'toaster.verifyUser.error');
+      }
     } finally {
       loading.value = false;
     }
   };
 
   const resendOtp = async () => {
-    loading.value = true;
     try {
       await passwordService.resendOtp(confirmationToken.value);
       step.value = 1;
-      showToaster('success', 'OTP resent successfully');
+      showToaster('success', 'toaster.resendOtp.success');
     } catch (error) {
-      const msg = error?.data?.message || 'Unexpected error occurred';
-      console.error(msg);
-      throw new Error(msg);
-    } finally {
-      loading.value = false;
+      if (isApiError(error) && error.status === 429) {
+        const apiError = error.data?.data;
+        showToaster('error', apiError?.message || 'toaster.resendOtp.rateLimit');
+        const { retryAfter } = apiError?.error as unknown as { retryAfter: number };
+        if (retryAfter) {
+          return retryAfter;
+        }
+      } else {
+        showToaster('error', 'toaster.resendOtp.error');
+      }
     }
   };
 
@@ -88,14 +116,17 @@ export const usePasswordStore = defineStore('password', () => {
     };
     try {
       await passwordService.resetPassword(data);
-      step.value = 0;
+      resetData();
       open.value = false;
-      showToaster('success', 'Password reset successful');
+      showToaster('success', 'toaster.resetPassword.success');
       router.push('/home');
     } catch (error) {
-      const msg = error?.data?.message || 'Unexpected error occurred';
-      console.error(msg);
-      throw new Error(msg);
+      if (isApiValidationError(error)) {
+        const errors = error.data?.data?.error.errors;
+        return errors;
+      } else {
+        showToaster('error', 'toaster.resetPassword.error');
+      }
     } finally {
       loading.value = false;
     }

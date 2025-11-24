@@ -1,22 +1,30 @@
 import { describe, expect, vi, it, beforeEach } from 'vitest';
-import completePostEventHandler from '~~/server/api/auth/register/complete.post';
 import { createMockH3Event } from '~~/test/mocks/h3-event';
 import { useH3TestUtils } from '~~/test/mocks/h3-test-utils';
 import * as jwt from 'jsonwebtoken';
-
-const h3 = useH3TestUtils();
+useH3TestUtils();
 
 const mockServerApiFetchRaw = vi.fn();
-vi.stubGlobal('serverApiFetch', { raw: mockServerApiFetchRaw });
+vi.stubGlobal('serverApiFetch', () => ({
+  raw: mockServerApiFetchRaw,
+}));
 
 describe('server/api/auth/register/complete.post', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.resetModules();
   });
 
   it('should return 200 for valid requests', async () => {
+    const setAuthCookiesMock = vi.fn();
+    vi.doMock('~~/server/utils/auth/setAuthCookies', () => ({
+      setAuthCookies: setAuthCookiesMock,
+    }));
+    const { default: completePostEventHandler } = await import(
+      '~~/server/api/auth/register/complete.post'
+    );
     const token = jwt.sign({}, 'secret');
-    mockServerApiFetchRaw.mockResolvedValueOnce({
+    const mockResponse = {
       _data: {
         success: true,
         message: 'Registration completed successfully',
@@ -27,95 +35,14 @@ describe('server/api/auth/register/complete.post', () => {
       headers: {
         getSetCookie: () => ['mock-cookie=mock-value; Path=/; HttpOnly'],
       },
-    });
+    };
+    mockServerApiFetchRaw.mockResolvedValueOnce(mockResponse);
     const event = createMockH3Event({
       method: 'POST',
     });
-    const response = await completePostEventHandler(event);
-    expect(h3.appendHeader).toHaveBeenCalledWith(
-      event,
-      'set-cookie',
-      'mock-cookie=mock-value; Path=/; HttpOnly',
-    );
-    expect(h3.appendHeader).toHaveBeenCalledWith(
-      event,
-      'set-cookie',
-      `access_token=${token}; Max-Age=300; Path=/; SameSite=Lax`,
-    );
-    expect(response).toEqual({
-      success: true,
-      message: 'Registration completed successfully',
-      data: {
-        accessToken: token,
-      },
-    });
-  });
 
-  it('handle not recieving accessToken in response', async () => {
-    mockServerApiFetchRaw.mockResolvedValueOnce({
-      _data: {
-        success: true,
-        message: 'Registration completed successfully',
-        data: {
-          // accessToken is missing
-        },
-      },
-      headers: {
-        getSetCookie: () => ['mock-cookie=mock-value; Path=/; HttpOnly'],
-      },
-    });
-    const event = createMockH3Event({
-      method: 'POST',
-    });
     const response = await completePostEventHandler(event);
-    expect(h3.appendHeader).toHaveBeenCalledWith(
-      event,
-      'set-cookie',
-      'mock-cookie=mock-value; Path=/; HttpOnly',
-    );
-    expect(response).toEqual({
-      success: true,
-      message: 'Registration completed successfully',
-      data: {},
-    });
-  });
-
-  it('handle accessToken with exp field', async () => {
-    const token = jwt.sign({}, 'secret', {
-      expiresIn: '10s',
-    });
-    mockServerApiFetchRaw.mockResolvedValueOnce({
-      _data: {
-        success: true,
-        message: 'Registration completed successfully',
-        data: {
-          accessToken: token, // Token with exp
-        },
-      },
-      headers: {
-        getSetCookie: () => ['mock-cookie=mock-value; Path=/; HttpOnly'],
-      },
-    });
-    const event = createMockH3Event({
-      method: 'POST',
-    });
-    const response = await completePostEventHandler(event);
-    expect(h3.appendHeader).toHaveBeenCalledWith(
-      event,
-      'set-cookie',
-      'mock-cookie=mock-value; Path=/; HttpOnly',
-    );
-    expect(h3.appendHeader).toHaveBeenCalledWith(
-      event,
-      'set-cookie',
-      'access_token=' + token + '; Max-Age=10; Path=/; SameSite=Lax',
-    );
-    expect(response).toEqual({
-      success: true,
-      message: 'Registration completed successfully',
-      data: {
-        accessToken: token,
-      },
-    });
+    expect(setAuthCookiesMock).toHaveBeenCalledWith(event, mockResponse);
+    expect(response).toEqual(mockResponse._data);
   });
 });

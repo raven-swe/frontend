@@ -83,6 +83,13 @@
       "birth-date": "Birth date",
       "discard-changes": "Discard changes?",
       "discard-changes-desc": "This can't be undone and you'll lose your changes."
+    },
+    "messages": {
+      "blocked": "{'@'}{username} is blocked. You can unblock to view their profile.",
+      "blocked-by": {
+        "title": "{'@'}{username} has blocked you",
+        "description": "You can view public posts from {'@'}{username}, but you are blocked from engaging with them. You also cannot follow or message {'@'}{username}."
+      }
     }
   },
   "home": {
@@ -107,7 +114,8 @@
     "edit-profile": "Edit Profile",
     "joined": "Joined",
     "following": "Following",
-    "followers": "Followers"
+    "followers": "Followers",
+    "user-muted": "You have muted posts from this account."
   },
   "root": {
     "hero": {
@@ -133,12 +141,26 @@
   },
   "tweet": {
     "composer": {
-      "placeholder": "What's happening?",
+      "placeholder": {
+        "default": "What's happening?",
+        "reply": "Post your reply"
+      },
+      "button": {
+        "default": "Post",
+        "reply": "Reply"
+      },
       "media": "Media",
       "gif": "GIF",
       "emoji": "Emoji",
-      "profile-alt": "Avatar of {name}"
-    }
+      "profile-alt": "Avatar of {name}",
+      "loading": {
+        "uploading": "Uploading media... {progress}%",
+        "posting": "Posting tweet..."
+      }
+    },
+    "no-replies": "No replies yet",
+    "upload-limit-image": "Image {file} size exceeds the maximum limit of {size} MB.",
+    "upload-limit-video": "Video {file} size exceeds the maximum limit of {size} MB."
   },
   "ui": {
     "close": "Close",
@@ -148,7 +170,16 @@
     "save": "Save",
     "cancel": "Cancel",
     "discard": "Discard",
-    "post": "Post"
+    "post": "Post",
+    "reply": "Reply",
+    "follow": "Follow",
+    "unfollow": "Unfollow",
+    "following": "Following",
+    "follow-back": "Follow back",
+    "mute": "Mute",
+    "block": "Block",
+    "unmute": "Unmute",
+    "unblock": "Unblock"
   },
   "errors": {
     "INVALID_EMAIL": "Please enter a valid email.",
@@ -170,6 +201,8 @@
     "RECAPTCHA_REQUIRED": "Please complete the reCAPTCHA challenge",
     "ACCOUNT_NOT_FOUND": "This account doesn't \nexist",
     "TRY_SEARCHING": "Try searching for another one",
+    "TWEET_NOT_FOUND": "Sorry, this tweet \ndoesn't exist",
+    "GO_BACK_HOME": "Go back home",
     "OTP_RESEND_LIMIT_EXCEEDED": "OTP resend limit reached. Please try again in {seconds}.",
     "otp": {
       "INVALID_TOKEN": "The OTP you entered is invalid",
@@ -193,14 +226,46 @@
     },
     "recaptchaToken": {
       "IS_EMPTY": "Verify that you are not a robot.",
-      "NOT_A_STRING": "Verify that you are not a robot."
+      "NOT_A_STRING": "Verify that you are not a robot.",
+      "INVALID_TOKEN": "reCAPTCHA verification failed. Please try again."
     },
     "password": {
       "NOT_A_STRING": "Please enter your password",
       "IS_EMPTY": "Please enter your password",
       "TOO_SHORT": "Password must be at least 10 characters long",
+      "INVALID_FORMAT": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+      "UNAUTHORIZED": "The password you entered is incorrect",
+      "INVALID_PASSWORD": "You entered a wrong password"
+    },
+    "UNSUPPORTED-IMAGE-TYPE": "Only images of type {types} are supported.",
+    "INVALID_WEBSITE_URL": "Please enter a real website URL",
+    "FILE_TOO_LARGE": "File size exceeds {size}MB limit. Please choose a smaller file.",
+    "FAILED_UPDATE_X": "Failed to update {field}. Please try again later.",
+    "identifier": {
+      "IS_EMPTY": "Please enter your email or username",
+      "NOT_A_STRING": "Please enter your email or username",
+      "INVALID_FORMAT": "Please enter a valid email or username",
+      "TOO_SHORT": "Identifier is too short",
+      "USER_NOT_FOUND": "No account found with that email or username"
+    },
+    "newPassword": {
+      "NOT_A_STRING": "Please enter your password",
+      "IS_EMPTY": "Please enter your password",
+      "TOO_SHORT": "Password must be at least 10 characters long",
       "INVALID_FORMAT": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
-    }
+    },
+    "username": {
+      "RATE_LIMIT_EXCEEDED": "Too many requests. Please try again later."
+    },
+    "CANNOT_BLOCK_USER": "You cannot block this user.",
+    "ALREADY_NOT_FOLLOWING": "You are already not following this user.",
+    "ALREADY_FOLLOWING": "You are already following this user.",
+    "ALREADY_BLOCKED": "You have already blocked this user.",
+    "ALREADY_UNBLOCKED": "You have already unblocked this user.",
+    "ALREADY_MUTED": "You have already muted this user.",
+    "NOT_MUTED": "You have already unmuted this user.",
+    "CANNOT_MUTE_USER": "You cannot mute this user.",
+    "CANNOT_UNMUTE_USER": "You cannot unmute this user."
   },
   "register": {
     "register-info": {
@@ -240,6 +305,7 @@
   },
   "setting": {
     "email": "Email",
+    "change-password-subtitle": "Change Your Password at any time",
     "change-username": "Change username",
     "suggestions": "Suggestions",
     "save": "Save Changes",
@@ -271,15 +337,15 @@
       "save": "Save",
       "password-invalid-length": "Password must be at least 10 characters long",
       "errors": {
+        "401": "You are not authorized to change the password",
+        "422": "Current password is incorrect",
         "current-password-required": "Current password is required",
         "new-password-required": "New password is required",
         "password-too-short": "Password must be at least 8 characters long",
         "password-invalid": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
         "confirm-password-required": "Please confirm your password",
         "passwords-do-not-match": "Passwords do not match",
-        "error-saving": "An error occurred while saving the password. Please try again.",
-        "401": "You are not authorized to change the password",
-        "422": "Current password is incorrect"
+        "error-saving": "An error occurred while saving the password. Please try again."
       }
     },
     "change-email": {
@@ -335,6 +401,47 @@
         "label": "Confirm your Password"
       },
       "change-password-button": "Change Password"
+    }
+  },
+  "dm": {
+    "placeholder-search": "Search Direct Messages",
+    "header-title": "Messages",
+    "placeholder-start-message": "Start a new message",
+    "attachedImage": "Attached image"
+  },
+  "toaster": {
+    "login": {
+      "success": "Login successful",
+      "error": "Failed to login"
+    },
+    "checkUser": {
+      "error": "Failed to check user existence",
+      "rateLimit": "You are making requests too frequently. Please try again later."
+    },
+    "tweet-page": {
+      "tweet-load-error": "Failed to load the tweet. Please try again.",
+      "user-error": "Failed to load user data. Please try again."
+    },
+    "verfyUser": {
+      "error": "Failed to verify user"
+    },
+    "resendOtp": {
+      "success": "OTP resent successfully",
+      "error": "Failed to resend OTP",
+      "rateLimit": "You are sending OTP requests too frequently. Please try again later."
+    },
+    "resetPassword": {
+      "success": "Password reset successful",
+      "error": "Failed to reset password"
+    }
+  },
+  "icons": {
+    "back-button-icon": "material-symbols:arrow-back"
+  },
+  "hashtag": {
+    "placeholder": {
+      "not-implemented": "Route is not implemented yet",
+      "path": "Path: {path}"
     }
   }
 }

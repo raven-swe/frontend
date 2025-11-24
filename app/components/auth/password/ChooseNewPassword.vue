@@ -2,8 +2,9 @@
 import * as yup from 'yup';
 import { useForm } from 'vee-validate';
 import { usePasswordStore } from '~/stores/auth/password';
-import { showToaster } from '@/utils/showToaster';
 import { createPasswordSchema } from '~/schemas/auth';
+import { backendValidationToFormErrors } from '~/utils/errorUtils';
+import { useI18n } from 'vue-i18n';
 
 const passwordStore = usePasswordStore();
 const { t } = useI18n();
@@ -16,7 +17,7 @@ const schema = yup.object({
   ),
 });
 
-const { defineField, handleSubmit, isSubmitting, meta } = useForm({
+const { defineField, handleSubmit, isSubmitting, meta, setErrors } = useForm({
   validationSchema: schema,
   initialValues: { newPassword: '', confirmPassword: '' },
   validateOnMount: false,
@@ -26,16 +27,15 @@ const [_newPassword, newPasswordAttrs] = defineField('newPassword');
 const [_confirmPassword, confirmPasswordAttrs] = defineField('confirmPassword');
 
 const onSubmit = handleSubmit(async (values) => {
-  try {
-    await passwordStore.resetPassword(values.newPassword.trim());
-  } catch (err: unknown) {
-    showToaster('error', (err as Error).message || t('errors.GENERIC_ERROR'));
+  const errors = await passwordStore.resetPassword(values.newPassword.trim());
+  if (errors) {
+    setErrors(backendValidationToFormErrors(errors, t));
   }
 });
 </script>
 
 <template>
-  <form @submit.prevent="onSubmit">
+  <form data-cy="forgot-pwd-new-password-form" @submit.prevent="onSubmit">
     <UiDialogHeader class="mt-3 w-fit px-8 py-4">
       <UiDialogTitle class="text-start text-3xl font-bold">
         {{ $t('forgot-password.new-password.title') }}
@@ -55,12 +55,14 @@ const onSubmit = handleSubmit(async (values) => {
           name="newPassword"
           v-bind="newPasswordAttrs"
           data-testid="new-password-input"
+          data-cy="forgot-pwd-new-password-input"
         />
         <UiFormFieldPassword
           :placeholder="$t('forgot-password.new-password.confirm-password.label')"
           name="confirmPassword"
           v-bind="confirmPasswordAttrs"
           data-testid="confirm-password-input"
+          data-cy="forgot-pwd-confirm-password-input"
         />
       </section>
     </div>
@@ -72,6 +74,7 @@ const onSubmit = handleSubmit(async (values) => {
         type="submit"
         data-testid="submit-button"
         :disabled="!meta.valid || isSubmitting"
+        data-cy="forgot-pwd-next-button"
       >
         {{ $t('forgot-password.new-password.change-password-button') }}
       </UiButton>

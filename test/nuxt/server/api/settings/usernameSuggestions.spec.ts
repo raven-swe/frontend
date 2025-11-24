@@ -6,7 +6,7 @@ import { useH3TestUtils } from '~~/test/mocks/h3-test-utils';
 useH3TestUtils();
 
 const mockServerApiFetch = vi.fn();
-vi.stubGlobal('serverApiFetch', mockServerApiFetch);
+vi.stubGlobal('serverApiFetch', () => mockServerApiFetch);
 
 describe('server/api/settings/username/suggestions.get', () => {
   beforeEach(() => {
@@ -21,41 +21,19 @@ describe('server/api/settings/username/suggestions.get', () => {
 
     const event = createMockH3Event({
       method: 'GET',
-    });
-
-    const response = await usernameSuggestionsHandler(event);
-
-    expect(mockServerApiFetch).toHaveBeenCalledWith('/onboarding/username-suggestions', {
-      method: 'GET',
-      headers: {},
-    });
-
-    expect(response).toEqual({
-      success: true,
-      data: { suggestions: ['john_doe', 'johndoe1'] },
-    });
-  });
-
-  it('should forward Authorization header to backend', async () => {
-    mockServerApiFetch.mockResolvedValueOnce({
-      success: true,
-      data: { suggestions: ['john_doe', 'johndoe1'] },
-    });
-
-    const event = createMockH3Event({
-      method: 'GET',
-    });
-
-    event.headers.set('Authorization', 'Bearer mock-token');
-
-    const response = await usernameSuggestionsHandler(event);
-
-    expect(mockServerApiFetch).toHaveBeenCalledWith('/onboarding/username-suggestions', {
-      method: 'GET',
-      headers: {
-        Authorization: 'Bearer mock-token',
+      query: {
+        baseUsername: 'ahmedamr',
       },
     });
+
+    const response = await usernameSuggestionsHandler(event);
+
+    expect(mockServerApiFetch).toHaveBeenCalledWith(
+      `/onboarding/username-suggestions?typed=ahmedamr`,
+      {
+        method: 'GET',
+      },
+    );
 
     expect(response).toEqual({
       success: true,

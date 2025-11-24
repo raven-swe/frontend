@@ -1,31 +1,14 @@
 import { apiFetch } from '~/api';
-import type { Tweet } from '~~/shared/types/tweets';
-export type timelineSchema = {
-  limit: number;
-  cursor: string | null;
-};
-export type Pagination = {
-  cursor: string | null;
-  nextCursor: string | null;
-  hasNextPage: boolean;
-};
-export const homeService = {
-  async forYou(timeline: timelineSchema) {
-    return await apiFetch<ApiSuccessResponse<Tweet[]>>('/api/timeline/for-you', {
-      method: 'GET',
-      query: {
-        limit: timeline.limit,
-        cursor: timeline.cursor,
-      },
-    });
-  },
+import type { HomeTab } from '~~/shared/types/timeline';
+import type { PaginationParams } from '~~/shared/types/pagination';
 
-  async following(timeline: timelineSchema) {
-    return await apiFetch<ApiSuccessResponse<Tweet[]>>('/api/timeline/following', {
+export const homeService = {
+  async getHomeTab(pagination: PaginationParams, tab: HomeTab) {
+    return await apiFetch(`/api/timeline/${tab}`, {
       method: 'GET',
       query: {
-        limit: timeline.limit,
-        cursor: timeline.cursor ?? undefined,
+        limit: pagination.limit,
+        cursor: pagination.cursor ?? undefined,
       },
     });
   },

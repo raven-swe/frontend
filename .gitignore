@@ -37,3 +37,4 @@ logs
 # Cypress screenshots and videos
 cypress/screenshots
 cypress/videos
+.vite-dev-cache

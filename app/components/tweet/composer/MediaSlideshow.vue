@@ -83,8 +83,13 @@ const removeMedia = (id: string) => {
           class="bg-background/50 relative aspect-[25/28] flex-shrink-0 overflow-hidden"
           :style="{ width: itemWidth }"
         >
-          <!-- Media Item -->
-          <img :src="item.url" class="h-full object-cover" />
+          <component
+            :is="item.type === 'video' ? 'video' : 'img'"
+            :src="item.url"
+            class="h-full w-full object-cover"
+            v-bind="item.type === 'video' ? { controls: true } : {}"
+          />
+
           <UiButton
             type="button"
             variant="ghost-default"

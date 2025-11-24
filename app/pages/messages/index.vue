@@ -1,8 +1,16 @@
-<script lang="ts" setup></script>
-
+<script lang="ts" setup>
+definePageMeta({
+  layout: false,
+});
+</script>
 <template>
-  <div>
-    <h1 class="p-4 text-2xl font-bold">{{ $t('leftsidebar.nav.messages') }}</h1>
-    <!-- Messages content will go here -->
-  </div>
+  <NuxtLayout name="settings">
+    <template #middle>
+      <DmConversationsSection />
+    </template>
+
+    <template #right>
+      <DmConversationView />
+    </template>
+  </NuxtLayout>
 </template>

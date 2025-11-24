@@ -1,5 +1,14 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { showToaster } from '@/utils/showToaster';
+import {
+  MAX_IMAGE_SIZE_BYTES,
+  MAX_IMAGE_SIZE_MB,
+  ALLOWED_IMAGE_TYPES,
+  ALLOWED_VIDEO_TYPES,
+  MAX_VIDEO_SIZE_BYTES,
+  MAX_VIDEO_SIZE_MB,
+} from '~/constants/files';
 
 interface Props {
   modelValue: string;
@@ -9,6 +18,7 @@ interface Props {
 
 interface Emits {
   (e: 'update:modelValue', value: string): void;
+  (e: 'paste-media', files: File[]): void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -71,6 +81,65 @@ const handleInput = (event: Event) => {
   const target = event.target as HTMLTextAreaElement;
   emit('update:modelValue', target.value);
 };
+const allowedTypes = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_VIDEO_TYPES];
+const handlePaste = (e: ClipboardEvent) => {
+  const items = e.clipboardData?.items;
+  if (!items) return;
+
+  const files: File[] = [];
+
+  for (const item of items) {
+    if (item.kind === 'file') {
+      const file = item.getAsFile();
+      if (!file) continue;
+
+      if (allowedTypes.includes(file.type)) {
+        if (file.type.startsWith('image/') && file.size > MAX_IMAGE_SIZE_BYTES) {
+          showToaster(
+            'warning',
+            $t('tweet.composer.upload-limit-image', { file: file.name, size: MAX_IMAGE_SIZE_MB }),
+          );
+          continue; // Skip this file
+        } else if (file.type.startsWith('video/') && file.size > MAX_VIDEO_SIZE_BYTES) {
+          showToaster(
+            'warning',
+            $t('tweet.composer.upload-limit-video', { file: file.name, size: MAX_VIDEO_SIZE_MB }),
+          );
+          continue; // Skip this file
+        }
+        files.push(file);
+      } else {
+        showToaster(
+          'error',
+          $t('errors.UNSUPPORTED-IMAGE-TYPE', {
+            types: allowedTypes.map((t) => t.split('/')[1]).join(', '),
+          }) as string,
+        );
+      }
+
+      if (files.length >= 4) break;
+    }
+  }
+
+  // Only prevent default and emit if we have files to add
+  if (files.length > 0) {
+    e.preventDefault(); // Prevent text insertion of the image name
+    emit('paste-media', files);
+  }
+};
+
+// Get root DOM element of this component
+const vm = getCurrentInstance();
+
+onMounted(() => {
+  const root = vm?.proxy?.$el as HTMLElement;
+  root?.addEventListener('paste', handlePaste);
+});
+
+onBeforeUnmount(() => {
+  const root = vm?.proxy?.$el as HTMLElement;
+  root?.removeEventListener('paste', handlePaste);
+});
 
 defineExpose({
   resetHeight: () => {
@@ -91,7 +160,7 @@ defineExpose({
         ref="textareaRef"
         :value="modelValue"
         :placeholder="placeholder"
-        class="caret-foreground absolute inset-0 z-10 w-full resize-none border-none bg-transparent text-xl leading-7 text-transparent outline-none"
+        class="caret-foreground absolute inset-0 z-10 w-full resize-none border-none bg-transparent text-lg leading-7 text-transparent outline-none"
         rows="1"
         @input="handleInput"
       />

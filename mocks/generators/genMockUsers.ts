@@ -31,6 +31,13 @@ export function generateMockUser(): User {
     followersCount: faker.number.int({ min: 0, max: 100000 }),
     followingCount: faker.number.int({ min: 0, max: 10000 }),
     languageCode: faker.helpers.arrayElement(['en', 'es', 'fr', 'de']),
+    relationship: {
+      blocking: faker.datatype.boolean(),
+      blockedBy: faker.datatype.boolean(),
+      muted: faker.datatype.boolean(),
+      following: faker.datatype.boolean(),
+      follower: faker.datatype.boolean(),
+    },
   };
 }
 
@@ -43,4 +50,4 @@ if (!fs.existsSync(outputDir)) {
 
 const outputPath = path.join(outputDir, 'mock-users.json');
 fs.writeFileSync(outputPath, JSON.stringify(mockUsers, null, 2));
-console.log(`Mock users written to ${outputPath}`);
+console.warn(`Mock users written to ${outputPath}`);

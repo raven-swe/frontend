@@ -6,10 +6,10 @@ export function useIsCurrentUser() {
   const route = useRoute();
   const userStore = useUserStore();
 
-  const username = computed(() => route.params.username);
+  const username = computed(() => route.params.username?.toString().toLowerCase());
 
   const isCurrentUser = computed(() => {
-    return userStore.user?.username === username.value;
+    return userStore.user?.username.toLowerCase() === username.value;
   });
 
   return { isCurrentUser };

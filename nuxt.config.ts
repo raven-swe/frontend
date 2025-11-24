@@ -3,9 +3,10 @@ import tailwindcss from '@tailwindcss/vite';
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
-  css: ['@/assets/css/main.css'],
+  css: ['@/assets/css/main.css', 'video.js/dist/video-js.css'],
   runtimeConfig: {
     public: {
+      useMocks: process.env.NUXT_PUBLIC_USE_MOCKS === 'true',
       googleClientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID || '',
       backendUrl: process.env.BACKEND_URL || '',
       githubClientId: process.env.NUXT_PUBLIC_GITHUB_CLIENT_ID || '',
@@ -56,10 +57,10 @@ export default defineNuxtConfig({
   },
   i18n: {
     strategy: 'no_prefix',
-    defaultLocale: 'en',
+    defaultLocale: 'en-US',
     locales: [
-      { code: 'en', name: 'English', file: 'en.json' },
-      { code: 'ar', name: 'العربية', file: 'ar.json', dir: 'rtl' },
+      { code: 'en-US', iso: 'en-US', name: 'English', file: 'en.json' },
+      { code: 'ar-EG', iso: 'ar-EG', name: 'العربية', file: 'ar.json', dir: 'rtl' },
     ],
   },
   hooks: {

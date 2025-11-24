@@ -7,7 +7,7 @@ import { handlers as profileHandlers } from './handlers/update-profile';
 import { handlers as authHandlers } from './handlers/auth';
 import { handlers as onboardingHandlers } from './handlers/onboarding';
 import { handlers as otherUserHandlers } from './handlers/other-user';
-// // Import more handlers as needed
+import { handlers as profileInteractionsHandlers } from './handlers/profile-interactions';
 
 export const handlers = [
   ...registerHandlers,
@@ -19,5 +19,5 @@ export const handlers = [
   ...profileHandlers,
   ...otherUserHandlers,
   ...onboardingHandlers,
-  // Add More handlers here
+  ...profileInteractionsHandlers,
 ];

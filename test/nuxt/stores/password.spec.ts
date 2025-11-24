@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { mockNuxtImport } from '@nuxt/test-utils/runtime';
+import { FetchError } from 'ofetch';
 
 const { showToasterMock, routerMock, passwordServiceMock } = vi.hoisted(() => ({
   showToasterMock: vi.fn(),
@@ -73,20 +74,67 @@ describe('Password Store', () => {
       expect(store.step).toBe(1);
     });
 
-    it('handles error gracefully', async () => {
-      passwordServiceMock.checkUser.mockRejectedValue(new Error('User not found'));
+    it('returns validation errors on 422', async () => {
+      const validationError = new FetchError('Validation error') as FetchError<{
+        statusCode: number;
+        data: { error: { errors: Array<{ field: string; code: string }> } };
+      }>;
+      validationError.data = {
+        statusCode: 422,
+        data: {
+          error: {
+            errors: [{ field: 'identifier', code: 'REQUIRED' }],
+          },
+        },
+      };
+
+      passwordServiceMock.checkUser.mockRejectedValue(validationError);
       const store = await createStore();
-      await expect(
-        store.checkUserExists({ identifier: 'fail', recaptchaToken: 'recap' }),
-      ).rejects.toThrow('Unexpected error occurred');
+      const errors = await store.checkUserExists({ identifier: '', recaptchaToken: 'recap' });
+      expect(errors).toEqual([{ field: 'identifier', code: 'REQUIRED' }]);
     });
 
-    it('handles error with custom message', async () => {
-      passwordServiceMock.checkUser.mockRejectedValue({ data: { message: 'Account locked' } });
+    it('returns formatted error for 404', async () => {
+      const notFoundError = new FetchError('Not found') as FetchError<{
+        statusCode: number;
+        data: { error: { code: string } };
+      }>;
+      notFoundError.data = {
+        statusCode: 404,
+        data: {
+          error: { code: 'USER_NOT_FOUND' },
+        },
+      };
+
+      passwordServiceMock.checkUser.mockRejectedValue(notFoundError);
       const store = await createStore();
-      await expect(
-        store.checkUserExists({ identifier: 'fail', recaptchaToken: 'recap' }),
-      ).rejects.toThrow('Account locked');
+      const errors = await store.checkUserExists({ identifier: 'fail', recaptchaToken: 'recap' });
+      expect(errors).toEqual([{ field: 'identifier', code: 'USER_NOT_FOUND' }]);
+    });
+
+    it('shows toaster for rate limit errors (429)', async () => {
+      const rateLimitError = new FetchError('Rate limit') as FetchError<{
+        statusCode: number;
+        data: { error: { code: string } };
+      }>;
+      rateLimitError.data = {
+        statusCode: 429,
+        data: {
+          error: { code: 'RATE_LIMIT_EXCEEDED' },
+        },
+      };
+
+      passwordServiceMock.checkUser.mockRejectedValue(rateLimitError);
+      const store = await createStore();
+      await store.checkUserExists({ identifier: 'test@example.com', recaptchaToken: 'recap' });
+      expect(showToasterMock).toHaveBeenCalledWith('error', 'toaster.checkUser.rateLimit');
+    });
+
+    it('shows toaster for generic errors', async () => {
+      passwordServiceMock.checkUser.mockRejectedValue(new Error('Network error'));
+      const store = await createStore();
+      await store.checkUserExists({ identifier: 'fail', recaptchaToken: 'recap' });
+      expect(showToasterMock).toHaveBeenCalledWith('error', 'toaster.checkUser.error');
     });
   });
 
@@ -100,21 +148,35 @@ describe('Password Store', () => {
       expect(store.step).toBe(2);
     });
 
-    it('handles error gracefully', async () => {
+    it('returns validation errors on failure', async () => {
+      const validationError = new FetchError('Validation error') as FetchError<{
+        statusCode: number;
+        data: { error: { errors: Array<{ field: string; code: string }> } };
+      }>;
+      validationError.data = {
+        statusCode: 422,
+        data: {
+          error: {
+            errors: [{ field: 'otp', code: 'INVALID_OTP' }],
+          },
+        },
+      };
       passwordServiceMock.checkUser.mockResolvedValue({ data: { confirmationToken: 'token' } });
-      passwordServiceMock.verifyUser.mockRejectedValue({ data: { message: 'Invalid OTP' } });
+      passwordServiceMock.verifyUser.mockRejectedValue(validationError);
       const store = await createStore();
       await store.checkUserExists({ identifier: 'a', recaptchaToken: 'b' });
-      await expect(store.verifyUser('wrong')).rejects.toThrow('Invalid OTP');
+      const errors = await store.verifyUser('wrong');
+      expect(errors).toEqual([{ field: 'otp', code: 'INVALID_OTP' }]);
       expect(store.loading).toBe(false);
     });
 
-    it('handles error without custom message', async () => {
+    it('shows toaster for generic errors', async () => {
       passwordServiceMock.checkUser.mockResolvedValue({ data: { confirmationToken: 'token' } });
       passwordServiceMock.verifyUser.mockRejectedValue(new Error('Network error'));
       const store = await createStore();
       await store.checkUserExists({ identifier: 'a', recaptchaToken: 'b' });
-      await expect(store.verifyUser('wrong')).rejects.toThrow('Unexpected error occurred');
+      await store.verifyUser('wrong');
+      expect(showToasterMock).toHaveBeenCalledWith('error', 'toaster.verifyUser.error');
     });
   });
 
@@ -126,29 +188,42 @@ describe('Password Store', () => {
       await store.checkUserExists({ identifier: 'a', recaptchaToken: 'b' });
       await store.resendOtp();
       expect(passwordServiceMock.resendOtp).toHaveBeenCalledWith('token');
-      expect(showToasterMock).toHaveBeenCalledWith('success', 'OTP resent successfully');
+      expect(showToasterMock).toHaveBeenCalledWith('success', 'toaster.resendOtp.success');
       expect(store.step).toBe(1);
     });
 
-    it('handles error gracefully', async () => {
+    it('handles rate limit errors', async () => {
+      const rateLimitError = new FetchError('Rate limit') as FetchError<{
+        data: { error: { retryAfter: number }; message: string };
+      }>;
+      rateLimitError.status = 429;
+      rateLimitError.data = {
+        data: {
+          error: { retryAfter: 60 },
+          message: 'Rate limit exceeded',
+        },
+      };
       passwordServiceMock.checkUser.mockResolvedValue({ data: { confirmationToken: 'token' } });
-      passwordServiceMock.resendOtp.mockRejectedValue({ data: { message: 'Rate limit exceeded' } });
+      passwordServiceMock.resendOtp.mockRejectedValue(rateLimitError);
       const store = await createStore();
       await store.checkUserExists({ identifier: 'a', recaptchaToken: 'b' });
-      await expect(store.resendOtp()).rejects.toThrow('Rate limit exceeded');
+      const retryAfter = await store.resendOtp();
+      expect(retryAfter).toBe(60);
+      expect(showToasterMock).toHaveBeenCalled();
     });
 
-    it('handles error without custom message', async () => {
+    it('shows toaster for generic errors', async () => {
       passwordServiceMock.checkUser.mockResolvedValue({ data: { confirmationToken: 'token' } });
       passwordServiceMock.resendOtp.mockRejectedValue(new Error('Network error'));
       const store = await createStore();
       await store.checkUserExists({ identifier: 'a', recaptchaToken: 'b' });
-      await expect(store.resendOtp()).rejects.toThrow('Unexpected error occurred');
+      await store.resendOtp();
+      expect(showToasterMock).toHaveBeenCalledWith('error', 'toaster.resendOtp.error');
     });
   });
 
   describe('resetPassword', () => {
-    it('stores tokens and navigates home on success', async () => {
+    it('resets data, navigates home and shows success on success', async () => {
       passwordServiceMock.checkUser.mockResolvedValue({ data: { confirmationToken: 'token' } });
       passwordServiceMock.resetPassword.mockResolvedValue({
         data: { accessToken: 'a', refreshToken: 'r' },
@@ -156,24 +231,41 @@ describe('Password Store', () => {
       const store = await createStore();
       await store.checkUserExists({ identifier: 'x', recaptchaToken: 'y' });
       await store.resetPassword('Pass123!');
-      expect(showToasterMock).toHaveBeenCalledWith('success', 'Password reset successful');
+      expect(showToasterMock).toHaveBeenCalledWith('success', 'toaster.resetPassword.success');
       expect(routerMock.push).toHaveBeenCalledWith('/home');
+      expect(store.step).toBe(0);
+      expect(store.open).toBe(false);
     });
 
-    it('handles error gracefully', async () => {
+    it('returns validation errors on failure', async () => {
+      const validationError = new FetchError('Validation error') as FetchError<{
+        statusCode: number;
+        data: { error: { errors: Array<{ field: string; code: string }> } };
+      }>;
+      validationError.data = {
+        statusCode: 422,
+        data: {
+          error: {
+            errors: [{ field: 'newPassword', code: 'PASSWORD_TOO_SHORT' }],
+          },
+        },
+      };
       passwordServiceMock.checkUser.mockResolvedValue({ data: { confirmationToken: 'token' } });
-      passwordServiceMock.resetPassword.mockRejectedValue(new Error('Invalid token'));
+      passwordServiceMock.resetPassword.mockRejectedValue(validationError);
       const store = await createStore();
       await store.checkUserExists({ identifier: 'x', recaptchaToken: 'y' });
-      await expect(store.resetPassword('fail')).rejects.toThrow('Unexpected error occurred');
+      const errors = await store.resetPassword('fail');
+      expect(errors).toEqual([{ field: 'newPassword', code: 'PASSWORD_TOO_SHORT' }]);
+      expect(store.loading).toBe(false);
     });
 
-    it('handles error with custom message', async () => {
+    it('shows toaster for generic errors', async () => {
       passwordServiceMock.checkUser.mockResolvedValue({ data: { confirmationToken: 'token' } });
-      passwordServiceMock.resetPassword.mockRejectedValue({ data: { message: 'Token expired' } });
+      passwordServiceMock.resetPassword.mockRejectedValue(new Error('Network error'));
       const store = await createStore();
       await store.checkUserExists({ identifier: 'x', recaptchaToken: 'y' });
-      await expect(store.resetPassword('fail')).rejects.toThrow('Token expired');
+      await store.resetPassword('fail');
+      expect(showToasterMock).toHaveBeenCalledWith('error', 'toaster.resetPassword.error');
       expect(store.loading).toBe(false);
     });
   });

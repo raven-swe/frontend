@@ -16,16 +16,23 @@ export const createMockH3Event = (
   headers?: Record<string, string>,
 ): H3Event => {
   // Properly initialize headers as a Map
-  const headerEntries = Object.entries({
+  const merged = {
     'content-type': 'application/json',
-    ...(headers || {}),
-  });
-  const headerMap = new Map<string, string>(headerEntries);
+    ...headers,
+  };
+  const h3Headers = new Headers(merged);
+
   const event = {
-    headers: headerMap,
+    headers: h3Headers,
+    req: {
+      ip: '123.456.789.000',
+      context: {
+        clientAddress: '123.456.789.000',
+      },
+    },
     node: {
       req: {
-        headers: Object.fromEntries(headerMap),
+        headers: { ...merged },
         method: 'POST',
       },
     },

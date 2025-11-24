@@ -1,5 +1,10 @@
 <script lang="ts" setup>
 import type { buttonVariants } from '~~/shared/types/ui';
+import {
+  MAX_IMAGE_SIZE_MB,
+  MAX_IMAGE_SIZE_BYTES,
+  ALLOWED_IMAGE_TYPES_FOR_HTML,
+} from '@/constants/files';
 
 const props = defineProps<{
   open: boolean;
@@ -30,6 +35,12 @@ const handleImageClick = () => {
 const handleFileChange = (event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
+
+  if (file && file.size > MAX_IMAGE_SIZE_BYTES) {
+    showToaster('error', $t('errors.FILE_TOO_LARGE', { size: MAX_IMAGE_SIZE_MB }));
+    target.value = '';
+    return;
+  }
 
   if (file && file.type.startsWith('image/')) {
     selectedFile.value = file;
@@ -64,6 +75,17 @@ const handleOpenChange = (value: boolean) => {
       <template #header>
         <LogoRaven class="h-10 w-10" />
       </template>
+      <template #dialog-close>
+        <Button
+          variant="ghost-default"
+          size="icon-xs"
+          class="absolute inset-2"
+          @click="handleOpenChange(false)"
+        >
+          <Icon name="lucide:x" class="size-5" />
+          <span class="sr-only">{{ $t('ui.close') }}</span>
+        </Button>
+      </template>
       <UiDialogHeader class="px-8 py-4">
         <UiDialogTitle class="text-3xl font-bold">{{
           $t('profile.setup.pick-profile-picture')
@@ -72,15 +94,20 @@ const handleOpenChange = (value: boolean) => {
           {{ $t('profile.setup.profile-picture-desc') }}
         </UiDialogDescription>
       </UiDialogHeader>
-      <div class="mx-2 flex flex-grow items-center justify-center">
+      <div
+        class="mx-2 flex flex-grow items-center justify-center"
+        data-cy="profile-setup-avatar-dialog"
+      >
         <div class="relative">
           <img
             :src="selectedImage || 'https://cdn.raven.cmp27.space/default_avatar.png'"
             class="h-40 w-40 cursor-pointer rounded-full object-cover brightness-70 filter"
+            data-cy="profile-setup-avatar-image"
           />
           <button
             type="button"
             class="bg-foreground/60 hover:bg-foreground/80 absolute start-1/2 top-1/2 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full transition-colors"
+            data-cy="profile-setup-change-avatar-button"
             @click="handleImageClick"
           >
             <Icon name="lucide:camera" class="text-white" size="1.2rem" />
@@ -88,14 +115,21 @@ const handleOpenChange = (value: boolean) => {
           <input
             ref="fileInputRef"
             type="file"
-            accept="image/png,image/jpg,image/jpeg"
+            :accept="ALLOWED_IMAGE_TYPES_FOR_HTML"
             class="hidden"
+            data-cy="profile-setup-avatar-file-input"
             @change="handleFileChange"
           />
         </div>
       </div>
       <UiDialogFooter>
-        <UiButton :variant="actionButton.variant" class="w-100" size="xl" @click="handleSubmit">
+        <UiButton
+          :variant="actionButton.variant"
+          class="w-100"
+          size="xl"
+          data-cy="profile-setup-next-button"
+          @click="handleSubmit"
+        >
           {{ actionButton.text }}
         </UiButton>
       </UiDialogFooter>

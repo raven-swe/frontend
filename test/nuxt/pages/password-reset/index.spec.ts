@@ -186,4 +186,63 @@ describe('PasswordResetPage', () => {
 
     expect(mockPasswordStore.open).toBe(true);
   });
+
+  it('calls closeDialog when close button is clicked', async () => {
+    const closeButton = wrapper.find('button');
+    await closeButton.trigger('click');
+    await nextTick();
+
+    expect(mockPasswordStore.closeDialog).toHaveBeenCalled();
+  });
+
+  it('shows backdrop when dialog is open', async () => {
+    mockPasswordStore.open = true;
+    await nextTick();
+
+    const backdrop = wrapper.find('[data-state="open"]');
+    expect(backdrop.exists()).toBe(true);
+  });
+
+  it('hides components when loading', async () => {
+    mockPasswordStore.loading = true;
+    mockPasswordStore.step = 0;
+
+    wrapper = mount(PasswordResetPage, {
+      global: {
+        plugins: [i18n],
+        stubs: {
+          UiDialog: {
+            template: '<div class="ui-dialog"><slot /><slot name="header" /></div>',
+            props: ['open'],
+          },
+          UiDialogContent: {
+            template: '<div class="ui-dialog-content"><slot name="header" /><slot /></div>',
+            props: ['hideCloseButton', 'headerClass'],
+          },
+          UiButton: {
+            template: '<button @click="$emit(\'click\')"><slot /></button>',
+          },
+          Icon: {
+            template: '<span class="icon" />',
+          },
+          UiSpinner: {
+            template: '<div class="spinner">Loading...</div>',
+          },
+          FindAccount: {
+            template: '<div id="find-account-stub" v-show="!loading">Find Account</div>',
+            props: ['loading'],
+          },
+          SentCode: {
+            template: '<div id="sent-code-stub">Sent Code</div>',
+          },
+          ChooseNewPassword: {
+            template: '<div id="choose-new-password-stub">Choose New Password</div>',
+          },
+        },
+      },
+    });
+
+    await nextTick();
+    expect(wrapper.find('.spinner').exists()).toBe(true);
+  });
 });

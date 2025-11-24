@@ -1,16 +1,8 @@
-// cypress/e2e/auth/signup.cy.ts
-
-import type { ExtendedAUTWindow } from '../../types/ExtendedAUTWindow';
 import { createTestUser } from '../../support/helpers/createTestUser';
 
 describe('Signup Flow', () => {
   beforeEach(() => {
-    cy.visit('/');
-    cy.mockRecaptcha(); // Mock reCAPTCHA before tests
-    // cy.window().its('grecaptcha', { timeout: 10000 }).should('have.property', 'render');
-    cy.window().should((win: ExtendedAUTWindow) =>
-      expect(win.useNuxtApp().isHydrating).to.eq(false),
-    ); // Wait for hydration
+    cy.visitAndWaitForHydration('/');
     cy.get('button[data-cy="signup-start-button"]').should('be.visible').click();
     cy.get('[data-cy="signup-info-form"]').should('be.visible');
   });
@@ -159,7 +151,6 @@ describe('Signup Flow', () => {
       cy.get('button[data-cy="signup-next-button"]').should('be.disabled');
     });
     it('should handle resend OTP', () => {
-      // TODO: Check retryAfter, error showing, time countdown, etc.
       const user = createTestUser();
 
       // Step 1: Fill registration info

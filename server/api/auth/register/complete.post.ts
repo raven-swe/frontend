@@ -1,10 +1,10 @@
-import * as cookie from 'cookie';
-import * as jwt from 'jsonwebtoken';
+import { setAuthCookies } from '~~/server/utils/auth/setAuthCookies';
 import { defineWrappedResponseHandler } from '~~/server/utils/handler';
 
 export default defineWrappedResponseHandler(async (event) => {
   const body = await readBody(event);
-  const response = await serverApiFetch.raw<ApiSuccessResponse<{ accessToken: string }>>(
+  const fetcher = serverApiFetch(event);
+  const response = await fetcher.raw<ApiSuccessResponse<{ accessToken: string }>>(
     '/auth/register/complete',
     {
       method: 'POST',
@@ -13,24 +13,6 @@ export default defineWrappedResponseHandler(async (event) => {
     },
   );
 
-  const cookies = response.headers.getSetCookie?.();
-  cookies.forEach((cookie) => {
-    appendHeader(event, 'set-cookie', cookie);
-  });
-  if (response._data?.data.accessToken) {
-    const accessTokenContent = jwt.decode(response._data.data.accessToken) as { exp?: number };
-    appendHeader(
-      event,
-      'set-cookie',
-      cookie.serialize('access_token', response._data!.data.accessToken, {
-        path: '/',
-        maxAge: accessTokenContent?.exp
-          ? accessTokenContent.exp - Math.floor(Date.now() / 1000)
-          : 60 * 5, // Default to 5 minutes if exp is missing
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-      }),
-    );
-  }
+  setAuthCookies(event, response);
   return response._data;
 });

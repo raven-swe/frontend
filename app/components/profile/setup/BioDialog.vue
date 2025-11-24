@@ -50,6 +50,17 @@ watch(
       <template #header>
         <LogoRaven class="h-10 w-10" />
       </template>
+      <template #dialog-close>
+        <Button
+          variant="ghost-default"
+          size="icon-xs"
+          class="absolute inset-2"
+          @click="handleOpenChange(false)"
+        >
+          <Icon name="lucide:x" class="size-5" />
+          <span class="sr-only">{{ $t('ui.close') }}</span>
+        </Button>
+      </template>
       <UiDialogHeader class="px-8 py-4">
         <UiDialogTitle class="text-3xl font-bold">{{
           $t('profile.setup.enter-bio')
@@ -59,7 +70,7 @@ watch(
           {{ $t('profile.setup.bio-desc') }}
         </UiDialogDescription>
       </UiDialogHeader>
-      <div class="mx-2 mt-2 mb-auto p-4">
+      <div class="mx-2 mt-2 mb-auto p-4" data-cy="profile-setup-bio-dialog">
         <uiInput
           v-model="bio"
           type="textarea"
@@ -67,10 +78,17 @@ watch(
           placeholder="Your bio"
           class="w-full max-w-md"
           maxlength="160"
+          data-cy="profile-setup-bio-input"
         />
       </div>
       <UiDialogFooter>
-        <UiButton :variant="actionButton.variant" class="w-100" size="xl" @click="handleSubmit">
+        <UiButton
+          :variant="actionButton.variant"
+          class="w-100"
+          size="xl"
+          data-cy="profile-setup-next-button"
+          @click="handleSubmit"
+        >
           {{ actionButton.text }}
         </UiButton>
       </UiDialogFooter>
