@@ -61,6 +61,7 @@ defineExpose({
     <div
       v-if="!selectedImage"
       class="bg-muted-foreground/50 h-40 w-full cursor-pointer"
+      data-cy="edit-profile-banner-image"
       @click="handleImageClick"
     />
     <img

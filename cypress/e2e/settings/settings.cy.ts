@@ -1,5 +1,3 @@
-// cypress/e2e/auth/signup.cy.ts
-
 describe('Settings Actions', function () {
   beforeEach(() => {
     // Create a test user and store it as an alias
@@ -14,7 +12,6 @@ describe('Settings Actions', function () {
 
   describe('Your account settings', function () {
     beforeEach(() => {
-      // TODO: Recheck when left side nav is fixed
       //   cy.get('[data-cy="account-settings-btn"]').should('be.visible').click();
       cy.url().should('include', '/settings/account');
     });
@@ -143,8 +140,6 @@ describe('Settings Actions', function () {
 
         // Should remain on the same form and not proceed
         cy.get('button[data-cy="chg-pwd-save"]').should('be.disabled');
-
-        // TODO: Verify error message
       });
 
       it('should not allow submitting weak new password', function () {
@@ -168,7 +163,6 @@ describe('Settings Actions', function () {
         cy.get('input[data-cy="chg-pwd-confirm"]').type(this.testUser.password);
         cy.get('button[data-cy="chg-pwd-save"]').click();
         cy.get('button[data-cy="chg-pwd-save"]').should('be.disabled');
-        // TODO: Verify appropriate error message
       });
 
       it('should allow changing password with valid inputs', function () {

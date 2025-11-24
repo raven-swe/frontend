@@ -1,5 +1,3 @@
-// cypress/e2e/auth/reset-pwd.cy.ts
-
 import type { ExtendedAUTWindow } from '../../types/ExtendedAUTWindow';
 
 describe('Reset Password Flow', () => {
