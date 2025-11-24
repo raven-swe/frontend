@@ -9,6 +9,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 
+type Segment = { type: 'text' | 'mention' | 'hashtag'; text: string; href?: string };
 const tweet = ref(props.tweet);
 
 // Update local tweet state when like/unlike succeeds
@@ -41,8 +42,6 @@ const onUndoRetweetSuccess = () => {
     tweet.value.retweetCount = next < 0 ? 0 : next;
   }
 };
-
-type Segment = { type: 'text' | 'mention' | 'hashtag'; text: string; href?: string };
 
 const contentSegments = computed<Segment[]>(() => {
   const segments: Segment[] = [];
@@ -105,17 +104,22 @@ const contentSegments = computed<Segment[]>(() => {
   <article class="border-b-border w-full max-w-[700px] gap-3 border-b-1 p-4">
     <div class="flex w-full items-center justify-between">
       <div class="flex">
-        <Avatar
-          :img="tweet.author.avatarUrl || '/default_profile.png'"
-          size="sm"
-          variant="primary"
-        />
-        <div class="ms-2 flex flex-col">
-          <span class="cursor-pointer font-semibold hover:underline">{{
-            tweet.author.displayName
-          }}</span>
-          <span class="text-muted-foreground" v-text="'@' + tweet.author.username" />
-        </div>
+        <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
+          <Avatar
+            :img="tweet.author.avatarUrl || '/default_profile.png'"
+            size="sm"
+            variant="primary"
+          />
+        </NuxtLink>
+
+        <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
+          <div class="ms-2 flex flex-col">
+            <span class="cursor-pointer font-semibold hover:underline">{{
+              tweet.author.displayName
+            }}</span>
+            <span class="text-muted-foreground" v-text="'@' + tweet.author.username" />
+          </div>
+        </NuxtLink>
       </div>
       <div class="flex">
         <Icon

@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { ref, computed } from 'vue';
 import Avatar from '~/components/ui/Avatar.vue';
 import type { Tweet } from '~~/shared/types/tweets';
 import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
-import { useRouter } from 'vue-router';
 interface Props {
   tweet: Tweet;
 }
@@ -99,82 +99,66 @@ const contentSegments = computed<Segment[]>(() => {
   }
   return segments;
 });
-
-const router = useRouter();
-
-function goToTweet() {
-  // Navigate to the tweet detail page for this author/tweet id
-  const username = props.tweet.author.username;
-  const id = props.tweet.id;
-  router.push(`/profile/${username}/status/${id}`);
-}
 </script>
 
 <template>
-  <article
-    :id="'tweet-' + props.tweet.id"
-    class="border-b-border flex w-full max-w-[700px] cursor-pointer gap-3 border-b-1 p-2"
-    @click="goToTweet"
-  >
-    <Avatar
-      :img="props.tweet.author.avatarUrl || '/default_profile.png'"
-      size="sm"
-      variant="primary"
-      @click.stop
-    />
+  <NuxtLink :to="`/profile/${props.tweet.author.username}/status/${props.tweet.id}`">
+    <article
+      :id="'tweet-' + props.tweet.id"
+      class="border-b-border flex w-full max-w-[700px] cursor-pointer gap-3 border-b-1 p-2"
+    >
+      <NuxtLink :to="`/profile/${props.tweet.author.username}`">
+        <Avatar
+          :img="props.tweet.author.avatarUrl || '/default_profile.png'"
+          size="sm"
+          variant="primary"
+        />
+      </NuxtLink>
 
-    <!-- Main -->
-    <div class="min-w-0 flex-1">
-      <!-- Header: display name, username, time -->
-      <div class="flex flex-wrap items-center gap-x-1 text-sm">
-        <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
-          <span class="cursor-pointer font-semibold hover:underline">{{
-            props.tweet.author.displayName
-          }}</span>
-          <span
-            class="text-muted-foreground"
-            @click.stop
-            v-text="'@' + props.tweet.author.username"
-          />
-          <span class="text-muted-foreground">·</span>
-        </NuxtLink>
-        <time
-          :title="formatDate(tweet.createdAt, $i18n.locale)"
-          :datetime="tweet.createdAt"
-          class="text-muted-foreground hover:cursor-pointer hover:underline"
-          >{{ relativeTime(tweet.createdAt, $i18n.locale) }}</time
-        >
-      </div>
-
-      <!-- Content -->
-      <p class="mt-1 leading-relaxed break-words whitespace-pre-wrap">
-        <template v-for="(seg, i) in contentSegments" :key="i">
-          <span v-if="seg.type === 'text'" class="inline">
-            {{ seg.text }}
-          </span>
-          <a
-            v-else
-            :href="seg.href"
-            class="text-primary inline font-medium hover:underline"
-            @click.stop
+      <!-- Main -->
+      <div class="min-w-0 flex-1">
+        <!-- Header: display name, username, time -->
+        <div class="flex flex-wrap items-center gap-x-1 text-sm">
+          <NuxtLink :to="`/profile/${props.tweet.author.username}`">
+            <span class="cursor-pointer font-semibold hover:underline">{{
+              props.tweet.author.displayName
+            }}</span>
+            <span class="text-muted-foreground" v-text="'@' + props.tweet.author.username" />
+            <span class="text-muted-foreground">·</span>
+          </NuxtLink>
+          <time
+            :title="formatDate(tweet.createdAt, $i18n.locale)"
+            :datetime="tweet.createdAt"
+            class="text-muted-foreground hover:cursor-pointer hover:underline"
+            >{{ relativeTime(tweet.createdAt, $i18n.locale) }}</time
           >
-            {{ seg.text }}
-          </a>
-        </template>
-      </p>
+        </div>
 
-      <!-- Media (single image basic layout) -->
-      <TweetMedia :media="tweet.media" />
+        <!-- Content -->
+        <p class="mt-1 leading-relaxed break-words whitespace-pre-wrap">
+          <template v-for="(seg, i) in contentSegments" :key="i">
+            <span v-if="seg.type === 'text'" class="inline">
+              {{ seg.text }}
+            </span>
+            <a v-else :href="seg.href" class="text-primary inline font-medium hover:underline">
+              {{ seg.text }}
+            </a>
+          </template>
+        </p>
 
-      <!-- Actions -->
-      <TweetActionButtons
-        :tweet="tweet"
-        @click.stop
-        @like-success="onLikeSuccess"
-        @unlike-success="onUnlikeSuccess"
-        @retweet-success="onRetweetSuccess"
-        @undo-retweet-success="onUndoRetweetSuccess"
-      />
-    </div>
-  </article>
+        <!-- Media (single image basic layout) -->
+        <TweetMedia :media="tweet.media" />
+
+        <!-- Actions -->
+        <TweetActionButtons
+          :tweet="tweet"
+          @click.stop
+          @like-success="onLikeSuccess"
+          @unlike-success="onUnlikeSuccess"
+          @retweet-success="onRetweetSuccess"
+          @undo-retweet-success="onUndoRetweetSuccess"
+        />
+      </div>
+    </article>
+  </NuxtLink>
 </template>
