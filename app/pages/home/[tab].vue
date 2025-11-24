@@ -126,7 +126,7 @@ watch(
 </script>
 
 <template>
-  <div class="border-border mx-auto max-w-[700px] border-y">
+  <div class="border-border mx-auto max-w-[700px]">
     <TweetComposer class="mt-15 border-b-1" @posted="handlePost" />
     <ClientOnly>
       <div v-if="tweets" ref="parentRef">
@@ -166,14 +166,14 @@ watch(
 
     <div
       v-if="(hasNextPage && isFetchingNextPage) || isLoading"
-      class="text-primary flex shrink-0 items-center justify-center py-4"
+      class="text-primary mt-20 flex shrink-0 items-center justify-center py-4"
     >
       <UiSpinner />
     </div>
     <div
       v-if="tweets.length === 0 && !isFetchingNextPage && !isLoading"
       data-testid="empty-state"
-      class="text-muted-foreground mt-10 text-center"
+      class="text-muted-foreground mt-20 text-center"
     >
       <h1 class="text-xl font-semibold">{{ $t('testing.tweets.tweet-not-found') }}</h1>
     </div>

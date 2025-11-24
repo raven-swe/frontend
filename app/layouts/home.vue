@@ -6,7 +6,7 @@ import Tab from '@/components/ui/Tab.vue';
 <template>
   <NuxtLayout name="default">
     <Tabs
-      class="bg-background/60 fixed top-0 z-50 inline-flex h-12 w-full max-w-[598px] cursor-pointer items-center gap-2 rounded-b-md px-3 py-1 text-sm font-medium backdrop-blur-sm"
+      class="bg-background/60 fixed top-0 z-50 inline-flex h-12 w-full max-w-[598px] cursor-pointer items-center gap-2 rounded-b-md py-1 text-sm font-medium backdrop-blur-sm"
     >
       <Tab
         :label="$t('home.tabs.for-you')"

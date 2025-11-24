@@ -193,8 +193,8 @@ function handleReplied(tweet: Tweet) {
 </script>
 
 <template>
-  <div v-if="isLoading" class="mt-10">
-    <UiSpinner class="text-primary mx-auto my-auto"></UiSpinner>
+  <div v-if="isLoading" class="flex h-full w-full items-center justify-center">
+    <UiSpinner class="text-primary"></UiSpinner>
   </div>
   <div v-else>
     <div
@@ -212,22 +212,18 @@ function handleReplied(tweet: Tweet) {
     </div>
     <div v-else>
       <button
-        class="hover:bg-muted bg-background/60 fixed top-0 z-50 inline-flex h-12 w-full max-w-[598px] cursor-pointer items-center gap-2 rounded-b-md px-3 py-1 text-sm font-medium backdrop-blur-sm"
+        class="hover:bg-muted bg-background/60 fixed top-0 z-50 inline-flex h-12 w-full max-w-[598px] cursor-pointer items-center gap-2 rounded-b-md py-1 text-sm font-medium backdrop-blur-sm"
         @click="goBackToHome"
       >
-        <Icon :name="$t('icons.back-button-icon')" size="1.3rem" />
-        <span class="ps-8 text-xl font-bold">{{ $t('ui.post') }}</span>
+        <Icon class="ms-6" :name="$t('icons.back-button-icon')" size="1.3rem" />
+        <span class="ms-5 text-xl font-bold">{{ $t('ui.post') }}</span>
       </button>
 
       <div v-if="tweetData" class="mt-10">
         <TweetView :tweet="tweetData" />
       </div>
 
-      <TweetComposer
-        :reply-to-tweet-id="tweetData?.id"
-        placeholder="reply"
-        @posted="handleReplied"
-      />
+      <TweetComposer :reply-to-tweet-id="tweetData?.id" type="reply" @posted="handleReplied" />
 
       <div ref="parentRef" class="border-border mx-auto max-w-[700px] border-y">
         <ClientOnly>
@@ -268,15 +264,9 @@ function handleReplied(tweet: Tweet) {
 
         <div
           v-if="(hasNextPage && isFetchingNextPage) || isRepliesLoading"
-          class="text-primary flex shrink-0 items-center justify-center py-4"
+          class="text-primary mt-20 flex shrink-0 items-center justify-center py-4"
         >
           <UiSpinner />
-        </div>
-        <div
-          v-if="tweets.length === 0 && !isFetchingNextPage && !isRepliesLoading"
-          class="text-muted-foreground mt-8 h-12 text-center"
-        >
-          {{ $t('tweet.no-replies') }}
         </div>
       </div>
     </div>
