@@ -4,19 +4,19 @@ import { showToaster } from '@/utils/showToaster';
 function showToasts(error: string) {
   switch (error) {
     case 'error':
-      showToaster('error', 'Something went wrong!');
+      showToaster('error', 'toaster.login.error', true);
       break;
     case 'success':
-      showToaster('success', 'Operation completed successfully!');
+      showToaster('success', 'toaster.login.success', true);
       break;
     case 'warning':
-      showToaster('warning', 'Please check your input.');
+      showToaster('warning', 'toaster.login.success');
       break;
     case 'info':
-      showToaster('info', 'Settings have been saved.');
+      showToaster('info', 'toaster.login.success');
       break;
     default:
-      showToaster('info', 'This is a default info message.');
+      showToaster('info', 'toaster.login.error');
       break;
   }
 }
