@@ -1,22 +1,14 @@
 import { apiFetch } from '~/api';
+import type { HomeTab } from '~~/shared/types/timeline';
+import type { PaginationParams } from '~~/shared/types/pagination';
 
 export const homeService = {
-  async forYou(timeline: TimelineSchema) {
-    return await apiFetch<ApiSuccessResponse<Tweet[]>>('/api/timeline/for-you', {
+  async getHomeTab(pagination: PaginationParams, tab: HomeTab) {
+    return await apiFetch(`/api/timeline/${tab}`, {
       method: 'GET',
       query: {
-        limit: timeline.limit,
-        cursor: timeline.cursor ?? undefined,
-      },
-    });
-  },
-
-  async following(timeline: TimelineSchema) {
-    return await apiFetch<ApiSuccessResponse<Tweet[]>>('/api/timeline/following', {
-      method: 'GET',
-      query: {
-        limit: timeline.limit,
-        cursor: timeline.cursor ?? undefined,
+        limit: pagination.limit,
+        cursor: pagination.cursor ?? undefined,
       },
     });
   },
