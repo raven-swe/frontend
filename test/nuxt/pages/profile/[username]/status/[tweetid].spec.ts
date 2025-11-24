@@ -1,17 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { nextTick, computed } from 'vue';
-import type { Tweet } from '~~/shared/types/tweets';
+import { nextTick } from 'vue';
 import { FetchError } from 'ofetch';
+import type { Tweet } from '~~/shared/types/tweets';
 
 interface TweetDetailPageVM {
   tweets: Tweet[];
-  cursor: string | null;
-  hasNextPage: boolean;
-  isLoading: boolean;
-  repliesIsLoading: boolean;
   tweetData: Tweet | null;
+  isLoading: boolean;
   isMainTweetFound: boolean;
+  repliesIsLoading: boolean;
+  hasNextPage: boolean;
+  cursor: string | null;
 }
 
 const mockTweet: Tweet = {
@@ -56,27 +56,21 @@ const mockReplies: Tweet[] = [
   },
 ];
 
-const mockTweetsService = {
-  tweet: vi.fn(),
-  replies: vi.fn(),
-};
+const { mockTweetsService, mockRouter, useRouteMock, mockShowToaster } = vi.hoisted(() => ({
+  mockTweetsService: {
+    tweet: vi.fn(),
+    replies: vi.fn(),
+  },
+  mockRouter: {
+    back: vi.fn(),
+    replace: vi.fn(),
+  },
+  useRouteMock: vi.fn(),
+  mockShowToaster: vi.fn(),
+}));
 
 vi.mock('~/services/tweet/tweetsService', () => ({
   tweetsService: mockTweetsService,
-}));
-
-const mockRouter = {
-  push: vi.fn(),
-  replace: vi.fn(),
-  back: vi.fn(),
-};
-
-const useRouteMock = vi.fn(() => ({
-  params: {
-    username: 'testuser',
-    tweetid: '123',
-  },
-  path: '/profile/testuser/status/123',
 }));
 
 vi.mock('vue-router', () => ({
@@ -84,21 +78,9 @@ vi.mock('vue-router', () => ({
   useRoute: useRouteMock,
 }));
 
-vi.mock('@vueuse/core', () => ({
-  useInfiniteScroll: vi.fn(),
-  useVirtualList: (list: { value: unknown[] }) => ({
-    list: computed(() => list.value.map((data: unknown, index: number) => ({ data, index }))),
-    containerProps: {},
-  }),
-}));
-
-const mockShowToaster = vi.fn();
 vi.mock('~/utils/showToaster', () => ({
   showToaster: mockShowToaster,
 }));
-
-vi.stubGlobal('definePageMeta', () => {});
-vi.stubGlobal('$t', (k: string) => k);
 
 describe('Tweet Detail Page', () => {
   beforeEach(() => {
