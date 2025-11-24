@@ -108,7 +108,7 @@ const contentSegments = computed<Segment[]>(() => {
   >
     <Icon name="tabler:repeat" size="1.2rem" />
     <span class="text-muted-foreground text-sm">
-      {{ $t('tweet.retweetedByYou') }}
+      {{ $t('tweet.retweeted-by-you') }}
     </span>
   </div>
   <article class="border-b-border flex w-full max-w-[700px] gap-3 border-b-1 p-2">

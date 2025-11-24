@@ -153,7 +153,7 @@
       "upload-limit-image": "Image {file} size exceeds the maximum limit of {size} MB.",
       "upload-limit-video": "Video {file} size exceeds the maximum limit of {size} MB."
     },
-    "retweetedByYou": "You reposted"
+    "retweeted-by-you": "You reposted"
   },
   "ui": {
     "close": "Close",
