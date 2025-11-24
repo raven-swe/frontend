@@ -143,7 +143,11 @@
     "composer": {
       "placeholder": {
         "default": "What's happening?",
-        "reply": "Post Your Reply"
+        "reply": "Post your reply"
+      },
+      "button": {
+        "default": "Post",
+        "reply": "Reply"
       },
       "media": "Media",
       "gif": "GIF",
