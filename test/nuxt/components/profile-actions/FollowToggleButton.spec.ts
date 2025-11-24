@@ -62,11 +62,14 @@ describe('FollowToggleButton', () => {
 
     const button = wrapper.find('[data-test="unfollow-button"]');
     expect(button.exists()).toBe(true);
-    expect(button.text()).toBe('Following');
-    await button.trigger('mouseenter');
-    expect(button.text()).toBe('Unfollow');
-    await button.trigger('mouseleave');
-    expect(button.text()).toBe('Following');
+
+    const spanFollowing = button.find('span.visible');
+    expect(spanFollowing.exists()).toBe(true);
+    expect(spanFollowing.text()).toBe('Following');
+
+    const spanUnfollow = button.find('span.invisible');
+    expect(spanUnfollow.exists()).toBe(true);
+    expect(spanUnfollow.text()).toBe('Unfollow');
   });
 
   it('calls followUser with correct action on button click', async () => {
