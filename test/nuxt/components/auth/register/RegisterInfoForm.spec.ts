@@ -143,9 +143,13 @@ describe('RegisterInfoForm.vue', () => {
   });
 
   it('shows validation errors on invalid name input', async () => {
-    const { default: RegisterationInfoForm } = await import(
-      '@/components/auth/register/RegisterationInfoForm.vue'
-    );
+    const registerationService = reactive({
+      checkEmail: vi.fn().mockResolvedValue(false),
+    });
+
+    vi.doMock('@/services/auth/registerationService', () => ({
+      registerationService,
+    }));
 
     vi.doMock('@/composables/useRecaptcha', () => ({
       default: () => ({
@@ -155,6 +159,10 @@ describe('RegisterInfoForm.vue', () => {
         }),
       }),
     }));
+
+    const { default: RegisterationInfoForm } = await import(
+      '@/components/auth/register/RegisterationInfoForm.vue'
+    );
 
     const wrapper = await mountSuspended(
       {

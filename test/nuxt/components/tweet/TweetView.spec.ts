@@ -51,7 +51,7 @@ describe('TweetView.vue', () => {
     const tweet = makeTweet();
     const wrapper = await mountSuspended(TweetView, {
       props: { tweet },
-      global: { stubs: { NuxtImg: true, Icon: true, NuxtLink: true } },
+      global: { stubs: { NuxtImg: true, Icon: true } },
     });
 
     const avatar = wrapper.findComponent(Avatar);

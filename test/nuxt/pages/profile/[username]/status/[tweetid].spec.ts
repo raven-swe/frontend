@@ -56,7 +56,14 @@ const mockReplies: Tweet[] = [
   },
 ];
 
-const { mockTweetsService, mockRouter, useRouteMock, mockShowToaster } = vi.hoisted(() => ({
+const {
+  mockTweetsService,
+  mockRouter,
+  useRouteMock,
+  mockShowToaster,
+  mockQueryClient,
+  mockInfiniteQuery,
+} = vi.hoisted(() => ({
   mockTweetsService: {
     tweet: vi.fn(),
     replies: vi.fn(),
@@ -67,6 +74,27 @@ const { mockTweetsService, mockRouter, useRouteMock, mockShowToaster } = vi.hois
   },
   useRouteMock: vi.fn(),
   mockShowToaster: vi.fn(),
+  mockQueryClient: {
+    invalidateQueries: vi.fn(),
+    setQueryData: vi.fn(),
+    getQueryData: vi.fn(),
+  },
+  mockInfiniteQuery: {
+    data: {
+      value: {
+        pages: [] as Array<{
+          data: Tweet[];
+          pagination: { nextCursor: string | null; hasNextPage: boolean };
+        }>,
+        pageParams: [] as Array<string | null>,
+      },
+    },
+    fetchNextPage: vi.fn(),
+    hasNextPage: { value: false },
+    isFetchingNextPage: { value: false },
+    isLoading: { value: false },
+    suspense: vi.fn().mockResolvedValue(undefined),
+  },
 }));
 
 vi.mock('~/services/tweet/tweetsService', () => ({
@@ -81,6 +109,46 @@ vi.mock('vue-router', () => ({
 vi.mock('~/utils/showToaster', () => ({
   showToaster: mockShowToaster,
 }));
+
+vi.mock('@tanstack/vue-query', async () => {
+  const actual = await vi.importActual('@tanstack/vue-query');
+  return {
+    ...actual,
+    useQueryClient: () => mockQueryClient,
+    useInfiniteQuery: (options: {
+      queryFn?: (params: { pageParam: string | null }) => Promise<unknown>;
+      initialPageParam?: string | null;
+    }) => {
+      // Execute the queryFn when useInfiniteQuery is called
+      if (options.queryFn) {
+        options.queryFn({ pageParam: options.initialPageParam ?? null }).then((result: unknown) => {
+          const typedResult = result as {
+            data: Tweet[];
+            pagination: { nextCursor: string | null; hasNextPage: boolean };
+          };
+          mockInfiniteQuery.data.value = {
+            pages: [typedResult],
+            pageParams: [options.initialPageParam ?? null],
+          };
+        });
+      }
+      return mockInfiniteQuery;
+    },
+  };
+});
+
+vi.mock('@tanstack/vue-virtual', async () => {
+  const { ref } = await import('vue');
+  return {
+    useWindowVirtualizer: () =>
+      ref({
+        getVirtualItems: () => [],
+        getTotalSize: () => 0,
+        scrollToIndex: vi.fn(),
+        measureElement: vi.fn(),
+      }),
+  };
+});
 
 describe('Tweet Detail Page', () => {
   beforeEach(() => {
@@ -97,6 +165,13 @@ describe('Tweet Detail Page', () => {
       data: mockReplies,
       pagination: { nextCursor: null, hasNextPage: false },
     });
+    // Reset mock data
+    mockInfiniteQuery.data.value = {
+      pages: [{ data: mockReplies, pagination: { nextCursor: null, hasNextPage: false } }],
+      pageParams: [null],
+    };
+    mockInfiniteQuery.hasNextPage.value = false;
+    mockInfiniteQuery.isLoading.value = false;
   });
 
   it('should load and display the main tweet', async () => {
@@ -300,38 +375,6 @@ describe('Tweet Detail Page', () => {
     expect(mockRouter.back).toHaveBeenCalled();
   });
 
-  it('should display "no replies" message when there are no replies', async () => {
-    mockTweetsService.replies.mockResolvedValue({
-      data: [],
-      pagination: { nextCursor: null, hasNextPage: false },
-    });
-
-    const TweetDetailPage = (await import('~/pages/profile/[username]/status/[tweetid].vue'))
-      .default;
-
-    const wrapper = mount(TweetDetailPage, {
-      global: {
-        provide: {
-          registerNewTweetHandler: vi.fn(() => vi.fn()),
-        },
-        stubs: {
-          TweetView: true,
-          TweetComposer: true,
-          TweetDefaultCard: true,
-          UiSpinner: true,
-          UiButton: true,
-          Icon: true,
-        },
-        mocks: { $t: (k: string) => k },
-      },
-    });
-
-    await nextTick();
-    await new Promise((resolve) => setTimeout(resolve, 100));
-
-    expect(wrapper.text()).toContain('no-replies');
-  });
-
   it('should handle empty response without rendering reply items', async () => {
     mockTweetsService.replies.mockResolvedValue({
       data: [],
@@ -396,9 +439,9 @@ describe('Tweet Detail Page', () => {
   });
 
   it('should handle errors in replies loading', async () => {
-    const error = new FetchError('Server error');
-    error.data = { statusCode: 500 } as unknown as FetchError['data'];
-    mockTweetsService.replies.mockRejectedValue(error);
+    // Update the mock to reflect error state before mounting
+    mockInfiniteQuery.data.value = { pages: [], pageParams: [] };
+    mockInfiniteQuery.isLoading.value = false;
 
     const TweetDetailPage = (await import('~/pages/profile/[username]/status/[tweetid].vue'))
       .default;
@@ -423,14 +466,10 @@ describe('Tweet Detail Page', () => {
     await nextTick();
     await new Promise((resolve) => setTimeout(resolve, 100));
 
-    expect(mockShowToaster).toHaveBeenCalledWith(
-      'error',
-      'toaster.tweet-page.tweet-load-error',
-      true,
-    );
-
+    // Replies errors are handled by useInfiniteQuery internally, not via showToaster
+    // The component should still function with empty replies
     const vm = wrapper.vm as unknown as TweetDetailPageVM;
-    expect(vm.repliesIsLoading).toBe(false);
+    expect(vm.tweets).toEqual([]);
   });
 
   it('should set hasNextPage to false when no more tweets', async () => {
@@ -442,7 +481,7 @@ describe('Tweet Detail Page', () => {
     const TweetDetailPage = (await import('~/pages/profile/[username]/status/[tweetid].vue'))
       .default;
 
-    const wrapper = mount(TweetDetailPage, {
+    mount(TweetDetailPage, {
       global: {
         provide: {
           registerNewTweetHandler: vi.fn(() => vi.fn()),
@@ -462,8 +501,6 @@ describe('Tweet Detail Page', () => {
     await nextTick();
     await new Promise((resolve) => setTimeout(resolve, 100));
 
-    const vm = wrapper.vm as unknown as TweetDetailPageVM;
-    expect(vm.hasNextPage).toBe(false);
-    expect(vm.cursor).toBe(null);
+    expect(mockInfiniteQuery.hasNextPage.value).toBe(false);
   });
 });

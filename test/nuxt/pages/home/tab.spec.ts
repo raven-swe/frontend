@@ -89,6 +89,11 @@ describe('Home [tab].vue', () => {
   it('calls homeService.getHomeTab with correct tab parameter', async () => {
     await mountSuspended(TabPage, {
       route: '/home/for-you',
+      global: {
+        stubs: {
+          TweetComposer: true,
+        },
+      },
     });
 
     expect(homeServiceMock.getHomeTab).toHaveBeenCalled();
@@ -103,6 +108,11 @@ describe('Home [tab].vue', () => {
   it('calls homeService.getHomeTab for following tab', async () => {
     await mountSuspended(TabPage, {
       route: '/home/following',
+      global: {
+        stubs: {
+          TweetComposer: true,
+        },
+      },
     });
 
     expect(homeServiceMock.getHomeTab).toHaveBeenCalled();
@@ -133,6 +143,11 @@ describe('Home [tab].vue', () => {
 
     const wrapper = await mountSuspended(TabPage, {
       route: '/home/for-you',
+      global: {
+        stubs: {
+          TweetComposer: true,
+        },
+      },
     });
 
     expect(homeServiceMock.getHomeTab).toHaveBeenCalled();
