@@ -10,6 +10,7 @@ import { isApiError, isApiValidationError } from '@/utils/errorUtils';
 
 export const usePasswordStore = defineStore('password', () => {
   const router = useRouter();
+  const { t } = useI18n();
 
   const open = ref(true);
   const step = ref(0);
@@ -118,14 +119,14 @@ export const usePasswordStore = defineStore('password', () => {
       await passwordService.resetPassword(data);
       resetData();
       open.value = false;
-      showToaster('success', 'toaster.resetPassword.success');
+      showToaster('success', t('toaster.resetPassword.success'));
       router.push('/home');
     } catch (error) {
       if (isApiValidationError(error)) {
         const errors = error.data?.data?.error.errors;
         return errors;
       } else {
-        showToaster('error', 'toaster.resetPassword.error');
+        showToaster('error', t('toaster.resetPassword.error'));
       }
     } finally {
       loading.value = false;
