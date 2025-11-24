@@ -236,6 +236,9 @@
       "TOO_SHORT": "Password must be at least 10 characters long",
       "INVALID_FORMAT": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
     },
+    "username": {
+      "RATE_LIMIT_EXCEEDED": "Too many requests. Please try again later."
+    },
     "CANNOT_BLOCK_USER": "You cannot block this user.",
     "ALREADY_NOT_FOLLOWING": "You are already not following this user.",
     "ALREADY_FOLLOWING": "You are already following this user.",
