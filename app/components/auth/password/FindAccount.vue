@@ -78,6 +78,7 @@ onMounted(async () => {
           :model-value="passwordStore.identifier"
           v-bind="identifierAttrs"
           data-testid="identifier-input"
+          data-cy="forgot-pwd-identifier-input"
         />
       </section>
 
@@ -97,6 +98,7 @@ onMounted(async () => {
         size="xl"
         type="submit"
         :disabled="!meta.valid || isSubmitting"
+        data-cy="forgot-pwd-next-button"
         data-testid="submit-button"
       >
         {{ $t('ui.next') }}

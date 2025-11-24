@@ -90,7 +90,11 @@ onMounted(() => {
       />
 
       <!-- Confirmation Dialog -->
-      <ConfirmationDialog :open="isConfirmationDialogOpen" @submit="handleConfirmationSubmit" />
+      <ConfirmationDialog
+        :open="isConfirmationDialogOpen"
+        @submit="handleConfirmationSubmit"
+        @update:open="handleDialogClose"
+      />
     </div>
   </div>
 </template>

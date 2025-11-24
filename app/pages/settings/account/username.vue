@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 // Removed explicit vue-router import to allow Nuxt auto-import & test mocking of useRouter
 import * as yup from 'yup';
 import { useForm } from 'vee-validate';
@@ -17,6 +17,7 @@ const router = useRouter();
 const userStore = useUserStore();
 
 const suggestions = ref<string[]>([]);
+const originalUsername = ref<string>(userStore.user?.username || '');
 const usernameExists = ref(false);
 const isChecking = ref(false);
 
@@ -25,6 +26,7 @@ try {
     '/api/settings/username/suggestions',
     {
       method: 'GET',
+      query: { baseUsername: userStore.user?.username || '' },
     },
   );
   if (data.suggestions) {
@@ -55,7 +57,9 @@ const { errors, values, defineField, handleSubmit, isSubmitting, setFieldError, 
 const [_username, usernameAttrs] = defineField('username');
 
 const checkUsernameAvailability = useDebounceFn(async (username: string) => {
+  // Guard: skip network call if unchanged or invalid
   if (!username || errors.value.username) return;
+  if (username === originalUsername.value) return;
 
   try {
     isChecking.value = true;
@@ -75,10 +79,35 @@ const checkUsernameAvailability = useDebounceFn(async (username: string) => {
       setFieldError('username', $t('setting.username.username-taken'));
     }
   } catch (error) {
-    console.error('Error checking username:', error);
-    setFieldError('username', $t('setting.username.error-checking'));
+    // Handle different error status codes
+    const err = error as { data?: { data: { error: { code: string } } } };
+    const code = err.data?.data?.error.code;
+    const errorKey = code ? `errors.username.${code}` : 'errors.username.error-checking';
+    console.error('Error checking username:', errorKey);
+    setFieldError('username', $t(errorKey));
   } finally {
     isChecking.value = false;
+  }
+}, 300);
+const dynamicUsernameSuggestions = useDebounceFn(async (username: string) => {
+  // Guard: skip suggestions fetch if unchanged or invalid
+  if (!username || errors.value.username) return;
+  if (username === originalUsername.value) return;
+
+  try {
+    const { data } = await apiFetch<ApiSuccessResponse<{ suggestions: string[] }>>(
+      '/api/settings/username/suggestions',
+      {
+        method: 'GET',
+        query: { baseUsername: username },
+      },
+    );
+    if (data.suggestions) {
+      suggestions.value = data.suggestions;
+    }
+  } catch (error) {
+    // Silently handle 404 or any other errors - just show no suggestions
+    console.error('Could not load username suggestions:', error);
   }
 }, 300);
 
@@ -90,6 +119,7 @@ watch(
     if (!newUsername || errors.value.username) return;
 
     checkUsernameAvailability(newUsername);
+    dynamicUsernameSuggestions(newUsername);
   },
 );
 
@@ -118,6 +148,11 @@ const onSubmit = handleSubmit(async (values) => {
     setFieldError('username', $t('setting.username.error-saving'));
   }
 });
+
+// Disable the save button if the username hasn't changed
+const isUnchangedUsername = computed(() => values.username === originalUsername.value);
+// Only treat actual non-empty error messages as errors for disabling submit
+const hasErrors = computed(() => Object.values(errors.value).some((msg) => !!msg));
 </script>
 
 <template>
@@ -136,6 +171,7 @@ const onSubmit = handleSubmit(async (values) => {
     <div class="flex flex-1 flex-col">
       <div class="border-border border-b px-4 pb-8">
         <FieldInput
+          data-cy="username-settings-input"
           name="username"
           :placeholder="$t('setting.username.username')"
           v-bind="usernameAttrs"
@@ -144,7 +180,7 @@ const onSubmit = handleSubmit(async (values) => {
 
       <div class="border-border border-b px-4 py-8">
         <h2 class="mb-4 text-2xl font-bold">{{ $t('setting.username.suggestions') }}</h2>
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2" data-cy="username-suggestions-list">
           <button
             v-for="suggestion in suggestions"
             :key="suggestion"
@@ -156,12 +192,12 @@ const onSubmit = handleSubmit(async (values) => {
           </button>
         </div>
       </div>
-
       <div class="flex justify-end px-4 py-8">
         <Button
+          data-cy="username-settings-save"
           type="submit"
           :disabled="
-            Object.entries(errors).length > 0 || isSubmitting || isChecking || usernameExists
+            hasErrors || isSubmitting || isChecking || usernameExists || isUnchangedUsername
           "
           variant="primary"
           size="md"

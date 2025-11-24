@@ -36,7 +36,11 @@ const [_otp, otpAttrs] = defineField('otp');
     @update:open="changeEmailStore.handleDialogChange"
   >
     <UiDialogContent>
-      <form class="flex h-full flex-col justify-between" @submit.prevent="onSubmit">
+      <form
+        class="flex h-full flex-col justify-between"
+        data-cy="change-email-otp-form"
+        @submit.prevent="onSubmit"
+      >
         <UiDialogHeader class="py-6">
           <UiDialogTitle class="text-4xl font-bold">{{ $t('register.otp.title') }}</UiDialogTitle>
           <UiDialogDescription>
@@ -55,12 +59,14 @@ const [_otp, otpAttrs] = defineField('otp');
             pattern="[0-9]*"
             name="otp"
             v-bind="otpAttrs"
+            data-cy="change-email-otp-input"
           />
           <Button
             type="button"
             variant="link"
             size="link"
             class="w-fit"
+            data-cy="change-email-otp-resend-btn"
             @click="changeEmailStore.handleResendOtp"
           >
             {{ $t('register.otp.resend-code') }}
@@ -72,6 +78,7 @@ const [_otp, otpAttrs] = defineField('otp');
             :disabled="Object.entries(errors).length > 0 || isSubmitting"
             size="xl"
             class="w-full"
+            data-cy="change-email-otp-next-btn"
             >{{ $t('ui.next') }}</Button
           >
         </UiDialogFooter>

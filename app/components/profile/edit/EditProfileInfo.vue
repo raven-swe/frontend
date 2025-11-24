@@ -62,6 +62,7 @@ watch(
       placeholder="Name"
       :class="isNameValid ? 'mb-6' : 'mb-1'"
       :aria-invalid="!isNameValid"
+      maxlength="50"
       @update:model-value="emit('update:name', $event as string)"
     />
     <p v-if="!isNameValid" class="text-destructive mb-6 text-sm" role="alert" aria-live="assertive">
@@ -107,13 +108,14 @@ watch(
     <!-- Birth Date Section -->
     <div class="mb-10">
       <h3 class="mb-2 font-medium">{{ $t('profile.edit.birth-date') }}</h3>
-      <div class="flex gap-2">
+      <div class="flex gap-2" data-cy="birth-date-select">
         <uiSelect
           v-model="dateSelect.selectedMonth.value"
           class="flex-1"
           :options="dateSelect.months.value"
           placeholder="Month"
           name="birth-month"
+          data-cy="birth-month-select"
         />
         <uiSelect
           v-model="dateSelect.selectedDay.value"
@@ -121,6 +123,7 @@ watch(
           :options="dateSelect.days.value"
           placeholder="Day"
           name="birth-day"
+          data-cy="birth-day-select"
         />
         <uiSelect
           v-model="dateSelect.selectedYear.value"
@@ -128,6 +131,7 @@ watch(
           :options="dateSelect.years.value"
           placeholder="Year"
           name="birth-year"
+          data-cy="birth-year-select"
         />
       </div>
       <p

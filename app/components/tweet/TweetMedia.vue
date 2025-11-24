@@ -1,54 +1,45 @@
 <script setup lang="ts">
 import type { TweetMedia } from '~~/shared/types/tweets';
+import MediaItem from './MediaItem.vue';
+// Local placeholder image to show when there is no media
 interface Props {
   media: TweetMedia[] | undefined;
 }
 const props = defineProps<Props>();
-const images = computed(() => (props.media ? props.media.filter((m) => m.type === 'IMAGE') : []));
-const gifs = computed(() => (props.media ? props.media.filter((m) => m.type === 'GIF') : []));
-const videos = computed(() => (props.media ? props.media.filter((m) => m.type === 'VIDEO') : []));
+const media = ref(props.media || []);
 // const firstImage = computed(() => props.media?.find((m) => m.type === 'IMAGE'));
 </script>
 
 <template>
-  <div class="flex w-full flex-col items-center pt-2">
-    <!-- Media (single image basic layout) -->
-    <div
-      v-for="(image, index) in images"
-      :key="index"
-      class="border-border mt-3 overflow-hidden rounded-xl border-1"
-    >
-      <!-- :alt="firstImage!.altText || 'Tweet media'" -->
-      <NuxtImg
-        :src="image.url"
-        :alt="image.altText"
-        class="h-auto w-full object-cover"
-        format="webp"
-      />
-      <!-- <NuxtImg
-        src="/oklahoma-city-thunder-black-and-gold-niwgymcycoo5z0v3.jpg"
-        class="h-auto w-full object-cover"
-        format="webp"
-      /> -->
+  <div class="w-full pt-2">
+    <!-- 0 media: placeholder 2x2 grid -->
+
+    <!-- 1 media -->
+    <div v-if="media.length === 1" class="grid overflow-hidden rounded-xl">
+      <MediaItem :media="media[0]!" />
     </div>
-    <div
-      v-for="(gif, index) in gifs"
-      :key="index"
-      class="border-border mt-3 overflow-hidden rounded-xl border-1"
-    >
-      <img :src="gif.url" class="w-full" :alt="gif.altText || 'Tweet media'" />
+
+    <!-- 2 media: side by side -->
+    <div v-else-if="media.length === 2" class="grid grid-cols-2 gap-0.5 overflow-hidden rounded-xl">
+      <MediaItem v-for="(m, i) in media" :key="i" :media="m" />
     </div>
+
+    <!-- 3 media: first spans full height on left -->
     <div
-      v-for="(video, index) in videos"
-      :key="index"
-      class="border-border mt-3 max-w-[34rem] overflow-hidden rounded-xl border-1"
+      v-else-if="media.length === 3"
+      class="grid grid-cols-2 grid-rows-2 gap-0.5 overflow-hidden rounded-xl"
     >
-      <video
-        controls
-        class="mx-auto w-80"
-        :src="video?.url"
-        :alt="video?.altText || 'Tweet media'"
-      />
+      <div class="col-span-1 row-span-2"><MediaItem :media="media[0]!" /></div>
+      <MediaItem :media="media[1]!" />
+      <MediaItem :media="media[2]!" />
+    </div>
+
+    <!-- 4 media: uniform grid -->
+    <div
+      v-else-if="media.length === 4"
+      class="grid grid-cols-2 grid-rows-2 gap-0.5 overflow-hidden rounded-xl"
+    >
+      <MediaItem v-for="(m, i) in media" :key="i" :media="m!" />
     </div>
   </div>
 </template>
