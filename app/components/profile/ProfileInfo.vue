@@ -21,11 +21,18 @@ const displayUrl = computed(() => {
 <template>
   <div class="mt-2 flex flex-col" data-cy="profile-info">
     <div class="px-4">
-      <h2 class="text-foreground pb-0 text-2xl font-bold" data-cy="profile-display-name">
+      <h2
+        class="text-foreground line-clamp-2 pb-0 text-2xl font-bold break-words"
+        data-cy="profile-display-name"
+      >
         {{ userProfile?.displayName }}
       </h2>
       <p class="text-muted-foreground text-md" data-cy="profile-user-name">{{ displayUsername }}</p>
-      <p class="text-muted-foreground mt-2 whitespace-pre-line" data-cy="profile-bio">
+      <p
+        v-if="!isBlocking"
+        class="text-muted-foreground mt-2 line-clamp-4 break-words whitespace-pre-line"
+        data-cy="profile-bio"
+      >
         {{ userProfile?.bio }}
       </p>
 
