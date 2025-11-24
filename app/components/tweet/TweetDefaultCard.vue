@@ -9,9 +9,8 @@ interface Props {
 }
 const props = defineProps<Props>();
 // Format createdAt to a short relative time like "6h", "3d", "2m"
-
+const tweet = ref<Tweet>(JSON.parse(JSON.stringify(props.tweet)));
 type Segment = { type: 'text' | 'mention' | 'hashtag'; text: string; href?: string };
-const tweet = ref(props.tweet);
 
 // Update local tweet state when like/unlike succeeds
 const onLikeSuccess = () => {
