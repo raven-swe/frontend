@@ -8,10 +8,9 @@ const props = defineProps<{
   follower: boolean;
 }>();
 
-function mutationFn(action: 'follow' | 'unfollow') {
-  return action === 'follow'
-    ? profileInteractionService.followUser(props.username)
-    : profileInteractionService.unfollowUser(props.username);
+async function mutationFn(action: 'follow' | 'unfollow') {
+  if (action == 'follow') await profileInteractionService.followUser(props.username);
+  else await profileInteractionService.unfollowUser(props.username);
 }
 function optimisticUpdateFn(data: User, action: 'follow' | 'unfollow') {
   if (action === 'follow') {
@@ -28,7 +27,6 @@ const { mutate: followUser } = useProfileMutation<'follow' | 'unfollow'>({
   username: props.username,
   optimisticUpdateFn,
 });
-const isHovered = ref(false);
 </script>
 
 <template>
@@ -41,9 +39,24 @@ const isHovered = ref(false);
     variant="outline-destructive"
     size="md"
     data-test="unfollow-button"
-    @mouseenter="isHovered = true"
-    @mouseleave="isHovered = false"
+    class="group grid-stack"
     @click.stop="followUser('unfollow')"
-    >{{ isHovered ? $t('ui.unfollow') : $t('ui.following') }}</UiButton
   >
+    <span class="invisible group-hover:visible">
+      {{ $t('ui.unfollow') }}
+    </span>
+    <span class="visible group-hover:invisible">
+      {{ $t('ui.following') }}
+    </span>
+  </UiButton>
 </template>
+
+<style scoped>
+.grid-stack {
+  display: grid;
+}
+
+.grid-stack > span {
+  grid-area: 1 / 1;
+}
+</style>
