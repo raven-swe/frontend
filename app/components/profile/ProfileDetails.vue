@@ -1,14 +1,12 @@
 <script lang="ts" setup>
 import type { User } from '~~/shared/types/user';
 
-defineProps<{
-  userProfile: User;
-}>();
+const userProfile = inject<ComputedRef<User>>('user-data');
 </script>
 <template>
   <div>
-    <ProfileCover :cover-img="userProfile.bannerUrl" />
-    <ProfileAvatarSection :profile-img="userProfile.avatarUrl" />
-    <ProfileInfo :user-profile="userProfile" />
+    <ProfileCover :cover-img="userProfile?.bannerUrl ?? ''" />
+    <ProfileAvatarSection />
+    <ProfileInfo />
   </div>
 </template>

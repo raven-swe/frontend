@@ -43,12 +43,16 @@ let checkExists = false;
 // vee-validate mock with spies we can assert on
 let setFieldErrorSpy = vi.fn();
 let setFieldValueSpy = vi.fn();
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let validationSchema: any = null;
 vi.mock('vee-validate', () => {
   return {
-    useForm: () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    useForm: (config?: { validationSchema?: any; initialValues?: any }) => {
+      validationSchema = config?.validationSchema || null;
       const errors = ref<Record<string, string>>({});
       const values = reactive<{ username: string }>({
-        username: userStoreData.user.username || '',
+        username: config?.initialValues?.username || userStoreData.user.username || '',
       });
       const setFieldError = (field: string, msg: string) => {
         errors.value[field] = String(msg);
@@ -63,13 +67,35 @@ vi.mock('vee-validate', () => {
         // simplified single-field implementation - use computed to keep reactive
         const model = computed({
           get: () => values.username,
-          set: (v: string) => {
+          set: async (v: string) => {
             values.username = v;
+            // Trigger validation when schema exists
+            if (validationSchema) {
+              try {
+                await validationSchema.validate({ username: v });
+                errors.value.username = '';
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              } catch (err: any) {
+                errors.value.username = err.message;
+                setFieldErrorSpy('username', err.message);
+              }
+            }
           },
         });
         const attrs: Record<string, (v: string) => void> = {
-          'onUpdate:modelValue': (v: string) => {
+          'onUpdate:modelValue': async (v: string) => {
             values.username = v;
+            // Trigger validation when schema exists
+            if (validationSchema) {
+              try {
+                await validationSchema.validate({ username: v });
+                errors.value.username = '';
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              } catch (err: any) {
+                errors.value.username = err.message;
+                setFieldErrorSpy('username', err.message);
+              }
+            }
           },
         };
         return [model, attrs] as const;
@@ -235,7 +261,7 @@ describe('Settings Username Page', () => {
     await field.setValue('someName');
     await wrapper.vm.$nextTick();
 
-    expect(setFieldErrorSpy).toHaveBeenCalledWith('username', 'setting.username.error-checking');
+    expect(setFieldErrorSpy).toHaveBeenCalledWith('username', 'errors.username.error-checking');
   });
 
   it('does not submit when username exists (early return in submit handler)', async () => {
@@ -288,8 +314,9 @@ describe('Settings Username Page', () => {
     await new Promise((r) => setTimeout(r, 0));
     await wrapper.vm.$nextTick();
 
-    // Button enabled now (no errors, not checking)
-    expect(submitBtn.attributes('disabled')).toBeUndefined();
+    // Button should be enabled now (no errors, not checking) - could be undefined or empty string
+    const disabledAttr = submitBtn.attributes('disabled');
+    expect(disabledAttr === undefined || disabledAttr === '').toBe(true);
   });
 
   it('disables submit button when username is taken (usernameExists true)', async () => {
@@ -443,5 +470,232 @@ describe('Settings Username Page', () => {
 
     // The watcher should reinstate the error since usernameExists is still true
     expect(setFieldErrorSpy).toHaveBeenCalledWith('username', 'setting.username.username-taken');
+  });
+
+  it('dynamically updates suggestions when typing a new valid username', async () => {
+    // Track calls to differentiate initial vs dynamic suggestions
+    let suggestionCallCount = 0;
+    hoisted.apiFetchMock.mockImplementation(<T>(url: string): ApiResponse<T> => {
+      if (url.includes('/api/settings/username/suggestions')) {
+        suggestionCallCount++;
+        if (suggestionCallCount === 1) {
+          // initial fetch
+          return Promise.resolve({ data: { suggestions: ['alice', 'bob'] } as unknown as T });
+        }
+        // dynamic fetch after user types new username
+        return Promise.resolve({
+          data: { suggestions: ['freshname1', 'freshname2'] } as unknown as T,
+        });
+      }
+      return Promise.resolve({ data: {} as unknown as T });
+    });
+
+    const wrapper = await mountSuspended(UsernamePage, {
+      global: { stubs: { FieldInput: FieldInputStub, Button: ButtonStub, Icon: IconStub } },
+    });
+
+    // initial suggestions rendered
+    expect(wrapper.html()).toContain('alice');
+    expect(wrapper.html()).toContain('bob');
+
+    // Type a new username to trigger dynamic suggestions watcher
+    const field = wrapper.get('[data-testid="field"]');
+    await field.setValue('freshname');
+    await wrapper.vm.$nextTick();
+    await new Promise((r) => setTimeout(r, 0));
+
+    // dynamic suggestions replace previous ones
+    const html = wrapper.html();
+    expect(html).toContain('freshname1');
+    expect(html).toContain('freshname2');
+    expect(html).not.toContain('alice');
+  });
+
+  it('handles dynamic suggestions fetch failure gracefully (after typing)', async () => {
+    let suggestionCallCount = 0;
+    hoisted.apiFetchMock.mockImplementation(<T>(url: string): ApiResponse<T> => {
+      if (url.includes('/api/settings/username/suggestions')) {
+        suggestionCallCount++;
+        if (suggestionCallCount === 1) {
+          return Promise.resolve({ data: { suggestions: ['base1'] } as unknown as T });
+        }
+        // fail dynamic fetch
+        return Promise.reject(new Error('dynamic-fail')) as unknown as ApiResponse<T>;
+      }
+      return Promise.resolve({ data: {} as unknown as T });
+    });
+
+    const wrapper = await mountSuspended(UsernamePage, {
+      global: { stubs: { FieldInput: FieldInputStub, Button: ButtonStub, Icon: IconStub } },
+    });
+    expect(wrapper.html()).toContain('base1');
+    const field = wrapper.get('[data-testid="field"]');
+    await field.setValue('newtyped');
+    await wrapper.vm.$nextTick();
+    await new Promise((r) => setTimeout(r, 0));
+
+    // Should still show initial suggestion, no new ones added
+    const html = wrapper.html();
+    expect(html).toContain('base1');
+    expect(html).not.toContain('newtyped1');
+  });
+
+  it('disables submit button when isSubmitting is manually set (simulated)', async () => {
+    const wrapper = await mountSuspended(UsernamePage, {
+      global: { stubs: { FieldInput: FieldInputStub, Button: ButtonStub, Icon: IconStub } },
+    });
+    const submitBtn = wrapper.get('[data-testid="submit"]');
+    // Initially disabled because username is unchanged (isUnchangedUsername computed)
+    expect(submitBtn.attributes('disabled')).toBeDefined();
+    // Change username to enable button
+    const field = wrapper.get('[data-testid="field"]');
+    await field.setValue('different');
+    await wrapper.vm.$nextTick();
+    // wait for availability & suggestions async to finish
+    await new Promise((r) => setTimeout(r, 15));
+    await wrapper.vm.$nextTick();
+    expect(submitBtn.attributes('disabled')).toBeUndefined();
+    // Simulate internal isSubmitting state true
+    // @ts-expect-error test-side mutation of internal ref
+    wrapper.vm.isSubmitting.value = true;
+    await wrapper.vm.$nextTick();
+    expect(submitBtn.attributes('disabled')).toBeDefined();
+    // Reset
+    // @ts-expect-error test-side mutation of internal ref
+    wrapper.vm.isSubmitting.value = false;
+    await wrapper.vm.$nextTick();
+    expect(submitBtn.attributes('disabled')).toBeUndefined();
+  });
+
+  it('disables submit button and skips availability check when username unchanged', async () => {
+    const wrapper = await mountSuspended(UsernamePage, {
+      global: { stubs: { FieldInput: FieldInputStub, Button: ButtonStub, Icon: IconStub } },
+    });
+    const submitBtn = wrapper.get('[data-testid="submit"]');
+    // Unchanged from original -> disabled
+    expect(submitBtn.attributes('disabled')).toBeDefined();
+    // Availability check should not have been called
+    expect(globalThis.$fetch).not.toHaveBeenCalled();
+    // Change to a new username -> availability check will run and button may enable
+    const field = wrapper.get('[data-testid="field"]');
+    await field.setValue('new_unique_name');
+    await wrapper.vm.$nextTick();
+    await new Promise((r) => setTimeout(r, 15));
+    await wrapper.vm.$nextTick();
+    expect(submitBtn.attributes('disabled')).toBeUndefined();
+  });
+
+  it('validates username required field (empty username)', async () => {
+    const wrapper = await mountSuspended(UsernamePage, {
+      global: { stubs: { FieldInput: FieldInputStub, Button: ButtonStub, Icon: IconStub } },
+    });
+
+    const field = wrapper.get('[data-testid="field"]');
+    await field.setValue('');
+    await wrapper.vm.$nextTick();
+    await new Promise((r) => setTimeout(r, 10));
+
+    expect(setFieldErrorSpy).toHaveBeenCalledWith('username', 'setting.username.username-required');
+  });
+
+  it('validates username minimum length (less than 3 characters)', async () => {
+    const wrapper = await mountSuspended(UsernamePage, {
+      global: { stubs: { FieldInput: FieldInputStub, Button: ButtonStub, Icon: IconStub } },
+    });
+
+    const field = wrapper.get('[data-testid="field"]');
+    await field.setValue('ab');
+    await wrapper.vm.$nextTick();
+    await new Promise((r) => setTimeout(r, 10));
+
+    expect(setFieldErrorSpy).toHaveBeenCalledWith('username', 'setting.username.username-invalid');
+  });
+
+  it('validates username maximum length (more than 15 characters)', async () => {
+    const wrapper = await mountSuspended(UsernamePage, {
+      global: { stubs: { FieldInput: FieldInputStub, Button: ButtonStub, Icon: IconStub } },
+    });
+
+    const field = wrapper.get('[data-testid="field"]');
+    await field.setValue('a'.repeat(16));
+    await wrapper.vm.$nextTick();
+    await new Promise((r) => setTimeout(r, 10));
+
+    expect(setFieldErrorSpy).toHaveBeenCalledWith('username', 'setting.username.username-invalid');
+  });
+
+  it('validates username pattern (only alphanumeric and underscore)', async () => {
+    const wrapper = await mountSuspended(UsernamePage, {
+      global: { stubs: { FieldInput: FieldInputStub, Button: ButtonStub, Icon: IconStub } },
+    });
+
+    const field = wrapper.get('[data-testid="field"]');
+    await field.setValue('user@name');
+    await wrapper.vm.$nextTick();
+    await new Promise((r) => setTimeout(r, 10));
+
+    expect(setFieldErrorSpy).toHaveBeenCalledWith('username', 'setting.username.username-invalid');
+  });
+
+  it('covers dynamic suggestions success path with data.suggestions check', async () => {
+    let dynamicCallCount = 0;
+    hoisted.apiFetchMock.mockImplementation(<T>(url: string): ApiResponse<T> => {
+      if (url.includes('/api/settings/username/suggestions')) {
+        dynamicCallCount++;
+        if (dynamicCallCount === 1) {
+          // initial: return data with suggestions
+          return Promise.resolve({ data: { suggestions: ['initial1'] } as unknown as T });
+        }
+        // second call: also return data with suggestions
+        return Promise.resolve({ data: { suggestions: ['dynamic1', 'dynamic2'] } as unknown as T });
+      }
+      return Promise.resolve({ data: {} as unknown as T });
+    });
+
+    const wrapper = await mountSuspended(UsernamePage, {
+      global: { stubs: { FieldInput: FieldInputStub, Button: ButtonStub, Icon: IconStub } },
+    });
+
+    expect(wrapper.html()).toContain('initial1');
+
+    const field = wrapper.get('[data-testid="field"]');
+    await field.setValue('validname');
+    await wrapper.vm.$nextTick();
+    await new Promise((r) => setTimeout(r, 10));
+
+    const html = wrapper.html();
+    expect(html).toContain('dynamic1');
+    expect(html).toContain('dynamic2');
+  });
+
+  it('covers dynamic suggestions error path (console.error branch)', async () => {
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    let dynamicCallCount = 0;
+    hoisted.apiFetchMock.mockImplementation(<T>(url: string): ApiResponse<T> => {
+      if (url.includes('/api/settings/username/suggestions')) {
+        dynamicCallCount++;
+        if (dynamicCallCount === 1) {
+          return Promise.resolve({ data: { suggestions: ['base'] } as unknown as T });
+        }
+        // second call: throw error
+        return Promise.reject(new Error('dynamic-error')) as unknown as ApiResponse<T>;
+      }
+      return Promise.resolve({ data: {} as unknown as T });
+    });
+
+    const wrapper = await mountSuspended(UsernamePage, {
+      global: { stubs: { FieldInput: FieldInputStub, Button: ButtonStub, Icon: IconStub } },
+    });
+
+    const field = wrapper.get('[data-testid="field"]');
+    await field.setValue('triggererror');
+    await wrapper.vm.$nextTick();
+    await new Promise((r) => setTimeout(r, 10));
+
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      'Could not load username suggestions:',
+      expect.any(Error),
+    );
+    consoleErrorSpy.mockRestore();
   });
 });

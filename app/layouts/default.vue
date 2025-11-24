@@ -4,11 +4,23 @@ import { meService } from '~/services/me/meService';
 
 const userStore = useUserStore();
 
+// Helper to sync query data to store
+function syncUser(dataValue: ApiSuccessResponse<User> | undefined, err: unknown, isErr: boolean) {
+  if (!dataValue) return;
+
+  if (dataValue.success) {
+    userStore.setUser(dataValue.data);
+    userStore.error = null;
+  } else if (isErr && err) {
+    userStore.error = (err as Error).message;
+  }
+}
+
 // define query key — unique and stable
 const queryKey = ['layout-data'];
 
 // Define the query
-const { data, error, isError } = useQuery({
+const { data, error, isError, suspense } = useQuery({
   queryKey,
   queryFn: async () => await meService.fetchProfile(),
   // Disable re-fetch after hydration if you want to keep SSR data
@@ -21,17 +33,15 @@ const { data, error, isError } = useQuery({
 watch(
   () => data.value,
   (newVal) => {
-    if (!newVal) return;
-
-    if (newVal.success) {
-      userStore.setUser(newVal.data);
-      userStore.error = null;
-    } else if (isError.value && error.value) {
-      userStore.error = error.value.message;
-    }
+    syncUser(newVal, error.value, isError.value);
   },
   { immediate: true },
 );
+
+onServerPrefetch(async () => {
+  await suspense();
+  syncUser(data.value, error.value, isError.value);
+});
 </script>
 
 <template>
