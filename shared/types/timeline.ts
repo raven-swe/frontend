@@ -1,4 +1,2 @@
-export type TimelineSchema = {
-  limit: number;
-  cursor: string | null;
-};
+export const validHomeTabs = ['following', 'for-you'] as const;
+export type HomeTab = (typeof validHomeTabs)[number];

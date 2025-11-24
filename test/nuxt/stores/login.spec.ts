@@ -113,7 +113,7 @@ describe('Login Store', () => {
     const store = useLoginStore();
     await store.checkUserExists('test@example.com');
 
-    expect(showToasterMock).toHaveBeenCalledWith('error', 'toaster.checkUser.error');
+    expect(showToasterMock).toHaveBeenCalledWith('error', 'toaster.checkUser.error', true);
     expect(store.loading).toBe(false);
   });
 
@@ -149,7 +149,7 @@ describe('Login Store', () => {
 
     expect(navigateToMock).toHaveBeenCalledWith('/home');
     expect(store.open).toBe(false);
-    expect(showToasterMock).toHaveBeenCalledWith('success', 'toaster.login.success');
+    expect(showToasterMock).toHaveBeenCalledWith('success', 'toaster.login.success', true);
   });
 
   it('login handles validation errors (422)', async () => {
@@ -217,7 +217,7 @@ describe('Login Store', () => {
     const payload = { identifier: 'user@example.com', password: 'Password@123' };
     await store.login(payload);
 
-    expect(showToasterMock).toHaveBeenCalledWith('error', 'toaster.login.error');
+    expect(showToasterMock).toHaveBeenCalledWith('error', 'toaster.login.error', true);
     expect(navigateToMock).not.toHaveBeenCalled();
     expect(store.loading).toBe(false);
   });

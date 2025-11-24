@@ -118,6 +118,7 @@ function makeBaseTweet(id: string, content?: string, author?: TweetAuthor): Twee
     isRetweeted: faker.datatype.boolean(),
     entities: randomEntities(),
     media: randomMedia(),
+    replyToTweetId: undefined,
   };
 }
 
@@ -150,7 +151,7 @@ function makeData() {
   }
 
   for (let i = 1; i < tweets.length; i++) {
-    if (faker.number.int({ min: 0, max: 100 }) < 12) {
+    if (faker.number.int({ min: 0, max: 100 }) < 50) {
       const targetIndex = faker.number.int({ min: 0, max: i - 1 });
       tweets[i]!.replyToTweetId = tweets[targetIndex]!.id;
       tweets[targetIndex]!.replyCount = (tweets[targetIndex]!.replyCount ?? 0) + 1;
@@ -160,8 +161,8 @@ function makeData() {
       const targetIndex = faker.number.int({ min: 0, max: i - 1 });
       const quotedLight: Partial<Tweet> = { ...tweets[targetIndex]! };
       (quotedLight as unknown as Record<string, unknown>).quotedTweet = undefined;
-      (quotedLight as unknown as Record<string, unknown>).quoteToTweetId = undefined;
-      (quotedLight as unknown as Record<string, unknown>).replyToTweetId = undefined;
+      (quotedLight as unknown as Record<string, unknown>).quotedTweetId = undefined;
+      // (quotedLight as unknown as Record<string, unknown>).isReplyToTweetId = undefined;
       tweets[i]!.quoteToTweetId = tweets[targetIndex]!.id;
       tweets[i]!.quotedTweet = quotedLight as unknown as Tweet;
     }

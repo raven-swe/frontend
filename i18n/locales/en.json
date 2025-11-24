@@ -141,7 +141,14 @@
   },
   "tweet": {
     "composer": {
-      "placeholder": "What's happening?",
+      "placeholder": {
+        "default": "What's happening?",
+        "reply": "Post your reply"
+      },
+      "button": {
+        "default": "Post",
+        "reply": "Reply"
+      },
       "media": "Media",
       "gif": "GIF",
       "emoji": "Emoji",
@@ -149,10 +156,11 @@
       "loading": {
         "uploading": "Uploading media... {progress}%",
         "posting": "Posting tweet..."
-      },
-      "upload-limit-image": "Image {file} size exceeds the maximum limit of {size} MB.",
-      "upload-limit-video": "Video {file} size exceeds the maximum limit of {size} MB."
-    }
+      }
+    },
+    "no-replies": "No replies yet",
+    "upload-limit-image": "Image {file} size exceeds the maximum limit of {size} MB.",
+    "upload-limit-video": "Video {file} size exceeds the maximum limit of {size} MB."
   },
   "ui": {
     "close": "Close",
@@ -163,6 +171,7 @@
     "cancel": "Cancel",
     "discard": "Discard",
     "post": "Post",
+    "reply": "Reply",
     "follow": "Follow",
     "unfollow": "Unfollow",
     "following": "Following",
@@ -192,6 +201,8 @@
     "RECAPTCHA_REQUIRED": "Please complete the reCAPTCHA challenge",
     "ACCOUNT_NOT_FOUND": "This account doesn't \nexist",
     "TRY_SEARCHING": "Try searching for another one",
+    "TWEET_NOT_FOUND": "Sorry, this tweet \ndoesn't exist",
+    "GO_BACK_HOME": "Go back home",
     "OTP_RESEND_LIMIT_EXCEEDED": "OTP resend limit reached. Please try again in {seconds}.",
     "otp": {
       "INVALID_TOKEN": "The OTP you entered is invalid",
@@ -223,7 +234,8 @@
       "IS_EMPTY": "Please enter your password",
       "TOO_SHORT": "Password must be at least 10 characters long",
       "INVALID_FORMAT": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
-      "UNAUTHORIZED": "The password you entered is incorrect"
+      "UNAUTHORIZED": "The password you entered is incorrect",
+      "INVALID_PASSWORD": "You entered a wrong password"
     },
     "UNSUPPORTED-IMAGE-TYPE": "Only images of type {types} are supported.",
     "INVALID_WEBSITE_URL": "Please enter a real website URL",
@@ -406,6 +418,10 @@
       "error": "Failed to check user existence",
       "rateLimit": "You are making requests too frequently. Please try again later."
     },
+    "tweet-page": {
+      "tweet-load-error": "Failed to load the tweet. Please try again.",
+      "user-error": "Failed to load user data. Please try again."
+    },
     "verfyUser": {
       "error": "Failed to verify user"
     },
@@ -418,6 +434,9 @@
       "success": "Password reset successful",
       "error": "Failed to reset password"
     }
+  },
+  "icons": {
+    "back-button-icon": "material-symbols:arrow-back"
   },
   "hashtag": {
     "placeholder": {
