@@ -179,7 +179,15 @@
     "mute": "Mute",
     "block": "Block",
     "unmute": "Unmute",
-    "unblock": "Unblock"
+    "unblock": "Unblock",
+    "search": {
+      "searchbar": {
+        "placeholder": "Search"
+      },
+      "search-list": {
+        "placeholder": "Try searching for people, lists, or keywords"
+      }
+    }
   },
   "errors": {
     "INVALID_EMAIL": "Please enter a valid email.",

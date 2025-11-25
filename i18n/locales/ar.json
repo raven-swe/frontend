@@ -163,7 +163,23 @@
     "cancel": "إلغاء",
     "discard": "تجاهل",
     "post": "نشر",
-    "reply": "رد"
+    "reply": "رد",
+    "follow": "متابعة",
+    "unfollow": "إلغاء المتابعة",
+    "following": "متابع",
+    "follow-back": "متابعة متبادلة",
+    "mute": "كتم",
+    "block": "حظر",
+    "unmute": "إلغاء الكتم",
+    "unblock": "إلغاء الحظر",
+    "search": {
+      "searchbar": {
+        "placeholder": "ابحث"
+      },
+      "search-list": {
+        "placeholder": "حاول البحث عن أشخاص أو قوائم أو كلمات رئيسية"
+      }
+    }
   },
   "errors": {
     "INVALID_EMAIL": "يرجى إدخال بريد إلكتروني صالح.",
