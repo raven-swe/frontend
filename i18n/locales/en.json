@@ -176,10 +176,12 @@
     "unfollow": "Unfollow",
     "following": "Following",
     "follow-back": "Follow back",
+    "follows-you": "Follows you",
     "mute": "Mute",
     "block": "Block",
     "unmute": "Unmute",
     "unblock": "Unblock",
+    "blocking": "Blocked",
     "search": {
       "searchbar": {
         "placeholder": "Search"
