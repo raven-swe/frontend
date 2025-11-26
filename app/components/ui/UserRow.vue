@@ -7,7 +7,7 @@ const props = defineProps<{
 }>();
 
 defineEmits<{
-  (e: 'follow' | 'unfollow' | 'unblock'): void;
+  (e: 'follow' | 'unfollow' | 'unblock' | 'block' | 'mute' | 'unmute', username: string): void;
 }>();
 const router = useRouter();
 const parsedBioTokens = computed(() =>
@@ -29,13 +29,52 @@ const isBlocked = computed(() => props.user.relationship.blocking || false);
     class="border-border hover:bg-foreground/5 flex cursor-pointer gap-2 py-3 ps-4 pe-2 transition-colors duration-100"
     @click="router.push(`/profile/${user.username}`)"
   >
-    <UiAvatar :img="user.avatarUrl" size="sm" />
+    <UiHoverCard>
+      <UiHoverCardTrigger as-child>
+        <UiAvatar :img="user.avatarUrl" size="sm" />
+      </UiHoverCardTrigger>
+      <UiHoverCardContent>
+        <UiUserMetadata
+          :relationship="user.relationship"
+          :username="user.username"
+          @follow="$emit('follow', user.username)"
+          @unfollow="$emit('unfollow', user.username)"
+          @unblock="$emit('unblock', user.username)"
+        />
+      </UiHoverCardContent>
+    </UiHoverCard>
     <div class="flex flex-1 flex-col gap-1">
       <div class="flex flex-1 items-center justify-between">
         <div>
-          <p class="text-md font-semibold">{{ user.displayName }}</p>
+          <UiHoverCard>
+            <UiHoverCardTrigger as-child>
+              <p class="text-md font-semibold">{{ user.displayName }}</p>
+            </UiHoverCardTrigger>
+            <UiHoverCardContent>
+              <UiUserMetadata
+                :relationship="user.relationship"
+                :username="user.username"
+                @follow="$emit('follow', user.username)"
+                @unfollow="$emit('unfollow', user.username)"
+                @unblock="$emit('unblock', user.username)"
+              />
+            </UiHoverCardContent>
+          </UiHoverCard>
           <p class="text-muted-foreground text-sm">
-            {{ '@' + user.username }}
+            <UiHoverCard>
+              <UiHoverCardTrigger>
+                {{ '@' + user.username + ' ' }}
+              </UiHoverCardTrigger>
+              <UiHoverCardContent>
+                <UiUserMetadata
+                  :relationship="user.relationship"
+                  :username="user.username"
+                  @follow="$emit('follow', user.username)"
+                  @unfollow="$emit('unfollow', user.username)"
+                  @unblock="$emit('unblock', user.username)"
+                />
+              </UiHoverCardContent>
+            </UiHoverCard>
             <span
               v-if="user.relationship.follower"
               class="bg-muted rounded-sm p-0.5 px-0.75 text-xs font-semibold"
@@ -47,9 +86,9 @@ const isBlocked = computed(() => props.user.relationship.blocking || false);
         <div class="flex items-center gap-1">
           <FollowToggleButton
             :relationship="user.relationship"
-            @follow="$emit('follow')"
-            @unfollow="$emit('unfollow')"
-            @unblock="$emit('unblock')"
+            @follow="$emit('follow', user.username)"
+            @unfollow="$emit('unfollow', user.username)"
+            @unblock="$emit('unblock', user.username)"
           />
           <UiDropdownMenu>
             <UiDropdownMenuTrigger as-child>
@@ -58,11 +97,17 @@ const isBlocked = computed(() => props.user.relationship.blocking || false);
               </UiButton>
             </UiDropdownMenuTrigger>
             <UiDropdownMenuContent align="end" class="bg-background">
-              <UiDropdownMenuItem data-test="mute-button">
+              <UiDropdownMenuItem
+                data-test="mute-button"
+                @click="$emit(isMuted ? 'unmute' : 'mute', user.username)"
+              >
                 <Icon :name="isMuted ? 'lucide:volume' : 'lucide:volume-off'" size="18" />
                 {{ isMuted ? $t('ui.unmute') : $t('ui.mute') }}
               </UiDropdownMenuItem>
-              <UiDropdownMenuItem data-test="block-button">
+              <UiDropdownMenuItem
+                data-test="block-button"
+                @click="$emit(isBlocked ? 'unblock' : 'block', user.username)"
+              >
                 <Icon name="lucide:ban" size="18" class="text-foreground" />
                 {{ isBlocked ? $t('ui.unblock') : $t('ui.block') }}
               </UiDropdownMenuItem>

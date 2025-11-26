@@ -15,7 +15,7 @@ defineEmits<{
     size="xs"
     data-test="unblock-button"
     class="group grid-stack"
-    @click.stop="$emit('unblock')"
+    @click.prevent.stop="$emit('unblock')"
   >
     <span class="invisible group-hover:visible">
       {{ $t('ui.unblock') }}
@@ -29,7 +29,7 @@ defineEmits<{
     v-else-if="!relationship.following"
     size="xs"
     data-test="follow-button"
-    @click="$emit('follow')"
+    @click.prevent.stop="$emit('follow')"
   >
     {{ relationship.follower ? $t('ui.follow-back') : $t('ui.follow') }}
   </UiButton>
@@ -40,7 +40,7 @@ defineEmits<{
     size="xs"
     data-test="unfollow-button"
     class="group grid-stack"
-    @click.stop="$emit('unfollow')"
+    @click.prevent.stop="$emit('unfollow')"
   >
     <span class="invisible group-hover:visible">
       {{ $t('ui.unfollow') }}

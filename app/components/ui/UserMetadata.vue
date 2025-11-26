@@ -1,49 +1,61 @@
 <script lang="ts" setup>
-import Button from '@/components/ui/Button.vue';
 import Avatar from '@/components/ui/Avatar.vue';
-import { ref } from 'vue';
-const isHovered = ref(false);
+import { useQuery } from '@tanstack/vue-query';
+import { apiFetch } from '~/api';
+import FollowToggleButton from './FollowToggleButton.vue';
 const props = defineProps<{
-  user: User;
+  username: string;
 }>();
 const emit = defineEmits<{
-  (e: 'follow' | 'unfollow', username: string): void;
+  (e: 'follow' | 'unfollow' | 'unblock'): void;
 }>();
-const isFollowing = computed(() => props.user.relationship?.following || false);
+
+const queryKey = computed(() => ['profile', props.username.toLowerCase()]);
+const { data: user, isLoading } = useQuery({
+  queryKey,
+  queryFn: async () => {
+    const response = await apiFetch(`/api/users/${props.username}/profile`);
+    return response.data;
+  },
+});
 
 const followUser = () => {
-  emit('follow', props.user.username);
+  emit('follow');
 };
 const unfollowUser = () => {
-  emit('unfollow', props.user.username);
+  emit('unfollow');
+};
+
+const unblockUser = () => {
+  emit('unblock');
 };
 </script>
 
 <template>
-  <div class="flex flex-col gap-3">
+  <div v-if="user" class="flex flex-col gap-3">
     <div class="flex flex-col gap-1">
       <header class="flex flex-1 items-start justify-between">
-        <NuxtLink :to="`users/${user.username}`">
-          <Avatar size="md" :img="user.avatarUrl" />
+        <NuxtLink :to="`/profile/${user.username}`">
+          <Avatar size="md" :img="user.avatarUrl" class="cursor-pointer" />
         </NuxtLink>
-        <Button
-          v-if="isFollowing"
-          variant="outline-destructive"
-          size="md"
-          @mouseenter="isHovered = true"
-          @mouseleave="isHovered = false"
-          @click.stop="unfollowUser"
-          >{{ isHovered ? $t('testing.unfollow') : $t('testing.following') }}</Button
-        >
-        <Button v-else variant="default" size="md" @click.stop="followUser">{{
-          $t('testing.follow')
-        }}</Button>
+        <FollowToggleButton
+          :relationship="user.relationship"
+          @follow="followUser"
+          @unfollow="unfollowUser"
+          @unblock="unblockUser"
+        />
       </header>
-      <NuxtLink :to="`users/${user.username}`">
-        <div class="text-sm font-bold hover:underline">{{ user.displayName }}</div>
-        <div class="text-muted-foreground text-sm">
+      <NuxtLink :to="`/profile/${user.username}`">
+        <p class="text-sm font-bold hover:underline">{{ user.displayName }}</p>
+        <p class="text-muted-foreground cursor-pointer text-sm">
           {{ '@' + user.username }}
-        </div>
+          <span
+            v-if="user.relationship?.follower"
+            class="bg-muted rounded-sm p-0.5 px-0.75 text-xs font-semibold"
+          >
+            {{ $t('ui.follows-you') }}
+          </span>
+        </p>
       </NuxtLink>
     </div>
     <p v-if="user.bio" class="text-sm">
@@ -63,5 +75,8 @@ const unfollowUser = () => {
         </span>
       </span>
     </div>
+  </div>
+  <div v-if="isLoading" class="flex justify-center py-12">
+    <UiSpinner class="text-primary" />
   </div>
 </template>

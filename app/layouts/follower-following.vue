@@ -13,8 +13,6 @@ const profilePath = computed(() => `/profile/${username.value}`);
 
 const queryKey = computed(() => ['profile', username.value]);
 
-// const isLoading = ref(true);
-// const user = ref<User | null>(null);
 const {
   data: user,
   isLoading,
@@ -91,6 +89,6 @@ onServerPrefetch(async () => {
         />
       </UiTabs>
     </div>
-    <NuxtPage />
+    <slot />
   </NuxtLayout>
 </template>
