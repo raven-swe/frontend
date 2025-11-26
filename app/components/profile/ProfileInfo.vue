@@ -16,6 +16,16 @@ const displayUrl = computed(() => {
   }
   return '';
 });
+
+const parsedBioTokens = computed(() =>
+  parseContentEntities(
+    userProfile?.value.bio ?? '',
+    userProfile?.value.bioEntities ?? {
+      mentions: [],
+      hashtags: [],
+    },
+  ),
+);
 </script>
 
 <template>
@@ -33,7 +43,34 @@ const displayUrl = computed(() => {
         class="text-muted-foreground mt-2 line-clamp-4 break-words whitespace-pre-line"
         data-cy="profile-bio"
       >
-        {{ userProfile?.bio }}
+        <template v-for="token in parsedBioTokens" :key="token.key">
+          <span v-if="token.type === 'text'" :key="token.key">
+            {{ token.display }}
+          </span>
+          <NuxtLink
+            v-else-if="token.type === 'mention'"
+            :to="`/profile/${token.value}`"
+            class="text-primary hover:underline"
+          >
+            {{ token.display }}
+          </NuxtLink>
+          <NuxtLink
+            v-else-if="token.type === 'hashtag'"
+            :to="`/hashtag/${token.value}`"
+            class="text-primary hover:underline"
+          >
+            {{ token.display }}
+          </NuxtLink>
+          <a
+            v-else-if="token.type === 'link'"
+            :href="token.value"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-primary hover:underline"
+          >
+            {{ token.display }}
+          </a>
+        </template>
       </p>
 
       <div v-if="!isBlocking" class="mt-2 flex flex-wrap gap-2">
@@ -67,22 +104,28 @@ const displayUrl = computed(() => {
       </div>
 
       <div class="mt-4 flex space-x-4">
-        <span data-test="following-count"
+        <NuxtLink
+          :to="`/profile/${userProfile?.username}/following`"
+          class="hover:underline"
+          data-test="following-count"
           ><strong data-cy="profile-following-count">{{
             $n(userProfile?.followingCount ?? 0, {
               notation: 'compact',
             })
           }}</strong>
-          <span class="text-muted-foreground ms-1"> {{ $t('profile-info.following') }} </span>
-        </span>
-        <span data-test="followers-count"
+          <span class="text-muted-foreground"> {{ ' ' + $t('profile-info.following') }} </span>
+        </NuxtLink>
+        <NuxtLink
+          :to="`/profile/${userProfile?.username}/followers`"
+          class="hover:underline"
+          data-test="followers-count"
           ><strong data-cy="profile-followers-count">{{
             $n(userProfile?.followersCount ?? 0, {
               notation: 'compact',
             })
           }}</strong>
           <span class="text-muted-foreground ms-1"> {{ $t('profile-info.followers') }} </span>
-        </span>
+        </NuxtLink>
       </div>
       <div v-if="isMuted" class="mt-4">
         <p class="text-muted-foreground text-sm">

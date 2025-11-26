@@ -1,17 +1,10 @@
+import type { ContentEntities } from './entity';
+
 export type User = {
   username: string;
   displayName: string;
   bio: string | null;
-  bioEntities: {
-    mentions: {
-      username: string;
-      startPosition: number;
-    }[];
-    hashtags: {
-      hashtag: string;
-      startPosition: number;
-    }[];
-  };
+  bioEntities: ContentEntities;
   avatarUrl: string;
   bannerUrl: string;
   location: string;
