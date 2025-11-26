@@ -10,6 +10,5 @@ export default defineWrappedResponseHandler(async (event) => {
   const response = await fetcher<ApiSuccessResponse<User>>(`/users/${username}/profile`, {
     method: 'GET',
   });
-
   return response;
 });
