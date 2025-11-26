@@ -8,6 +8,18 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 type BioEntity = User['bioEntities'];
+
+function generateUsername(): string {
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_';
+  const length = faker.number.int({ min: 3, max: 15 });
+
+  let username = '';
+  for (let i = 0; i < length; i++) {
+    username += chars.charAt(faker.number.int({ min: 0, max: chars.length - 1 }));
+  }
+  return username;
+}
+
 function generateBioWithEntities(): { bio: string; bioEntities: BioEntity } {
   const bioTokens: string[] = [];
   const mentions: BioEntity['mentions'] = [];
@@ -23,7 +35,7 @@ function generateBioWithEntities(): { bio: string; bioEntities: BioEntity } {
     if (rnd < 0.7) {
       token = faker.word.words(); // 70% regular word
     } else if (rnd < 0.8) {
-      const username = faker.internet.username();
+      const username = generateUsername();
       token = `@${username}`;
       mentions.push({ username, startPosition: currentPosition });
     } else if (rnd < 0.9) {
@@ -51,7 +63,7 @@ function generateBioWithEntities(): { bio: string; bioEntities: BioEntity } {
 export function generateMockUser(): User {
   const { bio, bioEntities } = generateBioWithEntities();
   return {
-    username: faker.internet.username(),
+    username: generateUsername(),
     displayName: faker.internet.displayName(),
     bio,
     bioEntities,
