@@ -53,7 +53,12 @@ onServerPrefetch(async () => {
   <NuxtLayout name="default">
     <div class="bg-background/65 sticky top-0 z-10 backdrop-blur-md">
       <header class="flex items-center gap-6 p-2">
-        <UiButton variant="ghost-default" size="icon-sm" :to="profilePath" class="bg-transparent">
+        <UiButton
+          variant="ghost-default"
+          size="icon-sm"
+          class="bg-transparent"
+          @click="route.back()"
+        >
           <Icon name="ic:round-arrow-back" size="20" />
         </UiButton>
         <div v-if="user" class="flex flex-col items-start">
