@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime';
 import SearchBar from '@/components/ui/SearchBar.vue';
 
@@ -111,5 +111,26 @@ describe('SearchBar', () => {
 
     const clearButton = wrapper.findComponent({ name: 'UiButton' });
     expect(clearButton.exists()).toBe(false);
+  });
+
+  it('calls clearInput function which clears input and refocuses', async () => {
+    const wrapper = await mountSuspended(SearchBar, {
+      props: { modelValue: 'test query' },
+      global: { stubs: { Icon: true } },
+    });
+
+    const input = wrapper.find('input');
+    const focusSpy = vi.spyOn(input.element, 'focus');
+
+    // Access the component's clearInput method directly to test lines 44-46
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (wrapper.vm as any).clearInput();
+    await wrapper.vm.$nextTick();
+
+    // Should emit update with empty string
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['']);
+
+    // Should focus the input after clearing (line 46)
+    expect(focusSpy).toHaveBeenCalled();
   });
 });
