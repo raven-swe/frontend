@@ -40,7 +40,7 @@ const parsedBioTokens = computed(() =>
       <p class="text-muted-foreground text-md" data-cy="profile-user-name">{{ displayUsername }}</p>
       <p
         v-if="!isBlocking"
-        class="text-muted-foreground mt-2 line-clamp-4 break-words whitespace-pre-line"
+        class="mt-2 line-clamp-4 break-words whitespace-pre-line"
         data-cy="profile-bio"
       >
         <template v-for="token in parsedBioTokens" :key="token.key">
