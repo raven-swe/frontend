@@ -1,8 +1,9 @@
 <script lang="ts" setup>
+import type { CompactUser } from '~~/shared/types/user';
 import FollowToggleButton from './FollowToggleButton.vue';
 
 const props = defineProps<{
-  user: User;
+  user: CompactUser;
 }>();
 
 defineEmits<{
@@ -10,7 +11,13 @@ defineEmits<{
 }>();
 
 const parsedBioTokens = computed(() =>
-  parseContentEntities(props.user.bio, props.user.bioEntities),
+  parseContentEntities(
+    props.user.bio,
+    props.user.bioEntities || {
+      mentions: [],
+      hashtags: [],
+    },
+  ),
 );
 
 const isMuted = computed(() => props.user.relationship.muted || false);
