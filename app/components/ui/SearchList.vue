@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
 
 interface Props {
   placeholder?: string;
@@ -12,8 +11,9 @@ const props = withDefaults(defineProps<Props>(), {
   maxHeight: '70vh',
 });
 
-const { t } = useI18n();
-const placeholderText = computed(() => props.placeholder || t('ui.search.search-list.placeholder'));
+const placeholderText = computed(
+  () => props.placeholder || $t('ui.search.search-list.placeholder'),
+);
 </script>
 
 <template>

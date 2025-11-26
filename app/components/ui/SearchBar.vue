@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { computed, ref, nextTick } from 'vue';
-import { useI18n } from 'vue-i18n';
 
 interface Props {
   modelValue?: string;
@@ -24,8 +23,7 @@ const emit = defineEmits<Emits>();
 const isFocused = ref(props.isFocused);
 const inputRef = ref<HTMLInputElement | null>(null);
 
-const { t } = useI18n();
-const placeholderText = computed(() => props.placeholder || t('ui.search.searchbar.placeholder'));
+const placeholderText = computed(() => props.placeholder || $t('ui.search.searchbar.placeholder'));
 
 function handleInput(event: Event) {
   const target = event.target as HTMLInputElement;
