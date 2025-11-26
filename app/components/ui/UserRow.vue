@@ -9,7 +9,7 @@ const props = defineProps<{
 defineEmits<{
   (e: 'follow' | 'unfollow' | 'unblock'): void;
 }>();
-
+const router = useRouter();
 const parsedBioTokens = computed(() =>
   parseContentEntities(
     props.user.bio,
@@ -25,7 +25,10 @@ const isBlocked = computed(() => props.user.relationship.blocking || false);
 </script>
 
 <template>
-  <div class="border-border flex gap-2 border-b py-3 ps-4 pe-2">
+  <div
+    class="border-border hover:bg-foreground/5 flex cursor-pointer gap-2 py-3 ps-4 pe-2 transition-colors duration-100"
+    @click="router.push(`/profile/${user.username}`)"
+  >
     <UiAvatar :img="user.avatarUrl" size="sm" />
     <div class="flex flex-1 flex-col gap-1">
       <div class="flex flex-1 items-center justify-between">
@@ -50,7 +53,7 @@ const isBlocked = computed(() => props.user.relationship.blocking || false);
           />
           <UiDropdownMenu>
             <UiDropdownMenuTrigger as-child>
-              <UiButton variant="ghost-default" size="icon-sm">
+              <UiButton variant="ghost-default" class="bg-transparent" size="icon-sm" @click.stop>
                 <Icon class="text-muted-foreground" name="lucide:more-horizontal" />
               </UiButton>
             </UiDropdownMenuTrigger>
