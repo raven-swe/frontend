@@ -77,9 +77,12 @@ const onSubmit = handleSubmit(async (values, actions) => {
   };
   const backendErrors = await registerStore.submitRegisterationInfo(vals);
   if (backendErrors) {
-    actions.setErrors(backendValidationToFormErrors(backendErrors, t));
+    const formErrors = backendValidationToFormErrors(backendErrors, t);
+    actions.setErrors(formErrors);
     resetRecaptcha(undefined);
-    setFieldValue('recaptchaToken', '', true);
+    // only revalidate if there is no error from the backend
+    // if there are backend errors, they take precedence
+    setFieldValue('recaptchaToken', '', formErrors.recaptchaToken ? false : true);
   }
 });
 
