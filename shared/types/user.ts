@@ -14,9 +14,6 @@ export type CompactUser = {
   bio: string | null;
   bioEntities: ContentEntities | null;
   avatarUrl: string;
-  // isFollowing: boolean;
-  // followsYou: boolean;
-  // isBlocked: boolean;
   relationship: UserRelationship;
 };
 
