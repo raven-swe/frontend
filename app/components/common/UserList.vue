@@ -12,6 +12,7 @@ const props = defineProps<{
   emptyTitle: string;
   emptyDescription: string;
   currentUsername: string | null;
+  showDropdown?: boolean;
 }>();
 
 const username = computed(() => {
@@ -112,6 +113,7 @@ watchEffect(() => {
               <UserRow
                 v-if="users[virtualRow.index]"
                 :user="users[virtualRow.index]!"
+                show-dropdown
                 @follow="
                   followUser({ username: users[virtualRow.index]!.username, action: 'follow' })
                 "

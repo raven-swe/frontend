@@ -1,10 +1,20 @@
 <script lang="ts" setup>
 import type { CompactUser } from '~~/shared/types/user';
 import FollowToggleButton from './FollowToggleButton.vue';
+import MuteToggleButton from './MuteToggleButton.vue';
+import BlockToggleButton from './BlockToggleButton.vue';
 
-const props = defineProps<{
-  user: CompactUser;
-}>();
+const props = withDefaults(
+  defineProps<{
+    user: CompactUser;
+    primaryAction?: 'mute' | 'follow' | 'block';
+    showDropdown?: boolean;
+  }>(),
+  {
+    primaryAction: 'follow',
+    showDropdown: false,
+  },
+);
 
 defineEmits<{
   (e: 'follow' | 'unfollow' | 'unblock' | 'block' | 'mute' | 'unmute', username: string): void;
@@ -28,6 +38,7 @@ const relationship = computed(() => props.user.relationship);
 <template>
   <div
     class="border-border hover:bg-foreground/5 flex cursor-pointer gap-2 py-3 ps-4 pe-2 transition-colors duration-100"
+    :class="{ 'pe-3': !props.showDropdown }"
     @click="router.push(`/profile/${user.username}`)"
   >
     <UiHoverCard>
@@ -83,12 +94,26 @@ const relationship = computed(() => props.user.relationship);
         </div>
         <div class="flex items-center gap-1">
           <FollowToggleButton
+            v-if="primaryAction === 'follow'"
             :relationship="relationship"
             @follow="$emit('follow', user.username)"
             @unfollow="$emit('unfollow', user.username)"
             @unblock="$emit('unblock', user.username)"
           />
-          <UiDropdownMenu>
+          <MuteToggleButton
+            v-else-if="primaryAction === 'mute'"
+            :relationship="relationship"
+            @mute="$emit('mute', user.username)"
+            @unmute="$emit('unmute', user.username)"
+          />
+
+          <BlockToggleButton
+            v-else-if="primaryAction === 'block'"
+            :relationship="relationship"
+            @block="$emit('block', user.username)"
+            @unblock="$emit('unblock', user.username)"
+          />
+          <UiDropdownMenu v-if="showDropdown">
             <UiDropdownMenuTrigger as-child>
               <UiButton variant="ghost-default" class="bg-transparent" size="icon-sm" @click.stop>
                 <Icon class="text-muted-foreground" name="lucide:more-horizontal" />
