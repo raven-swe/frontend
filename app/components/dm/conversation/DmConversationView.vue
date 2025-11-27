@@ -37,7 +37,10 @@ watch(conversationsError, (val) => val && showToaster('error', 'Failed to load c
     />
     <div class="flex-1 overflow-y-auto p-4">
       <DmConversationInfo :conversation="conversation || null" />
-      <div v-if="conversationsLoading || messagesLoading" class="p-4">
+      <div
+        v-if="conversationsLoading || messagesLoading"
+        class="flex items-center justify-center p-4"
+      >
         <Spinner size="1.5rem" />
       </div>
       <DmMessagesList v-else :messages="messages" />

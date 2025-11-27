@@ -4,7 +4,7 @@ definePageMeta({ layout: false });
 useRoute();
 </script>
 <template>
-  <NuxtLayout name="settings">
+  <NuxtLayout name="settings" :hide-middle-on-mobile="true">
     <template #middle>
       <DmConversationsSection />
     </template>
