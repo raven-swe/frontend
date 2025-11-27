@@ -83,57 +83,69 @@ watchEffect(() => {
 </script>
 
 <template>
-  <ClientOnly>
-    <div v-if="users && users.length !== 0" ref="parentRef">
-      <div
-        :style="{
-          height: `${totalSize}px`,
-          width: '100%',
-          position: 'relative',
-        }"
-      >
+  <div>
+    <ClientOnly>
+      <div v-if="users && users.length !== 0" ref="parentRef">
         <div
           :style="{
-            position: 'absolute',
-            top: 0,
-            left: 0,
+            height: `${totalSize}px`,
             width: '100%',
-            transform: `translateY(${
-              virtualRows[0] ? virtualRows[0].start - rowVirtualizer.options.scrollMargin : 0
-            }px)`,
+            position: 'relative',
           }"
         >
           <div
-            v-for="virtualRow in virtualRows"
-            :key="users[virtualRow.index]?.username || String(virtualRow.key)"
-            :ref="measureElement"
-            :data-index="virtualRow.index"
+            :style="{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              transform: `translateY(${
+                virtualRows[0] ? virtualRows[0].start - rowVirtualizer.options.scrollMargin : 0
+              }px)`,
+            }"
           >
-            <UserRow
-              v-if="users[virtualRow.index]"
-              :user="users[virtualRow.index]!"
-              @follow="
-                followUser({ username: users[virtualRow.index]!.username, action: 'follow' })
-              "
-              @unfollow="
-                followUser({ username: users[virtualRow.index]!.username, action: 'unfollow' })
-              "
-              @block="blockUser({ username: users[virtualRow.index]!.username, action: 'block' })"
-              @mute="muteUser({ username: users[virtualRow.index]!.username, action: 'mute' })"
-              @unblock="
-                blockUser({ username: users[virtualRow.index]!.username, action: 'unblock' })
-              "
-              @unmute="muteUser({ username: users[virtualRow.index]!.username, action: 'unmute' })"
-            />
+            <div
+              v-for="virtualRow in virtualRows"
+              :key="users[virtualRow.index]?.username || String(virtualRow.key)"
+              :ref="measureElement"
+              :data-index="virtualRow.index"
+            >
+              <UserRow
+                v-if="users[virtualRow.index]"
+                :user="users[virtualRow.index]!"
+                @follow="
+                  followUser({ username: users[virtualRow.index]!.username, action: 'follow' })
+                "
+                @unfollow="
+                  followUser({ username: users[virtualRow.index]!.username, action: 'unfollow' })
+                "
+                @block="blockUser({ username: users[virtualRow.index]!.username, action: 'block' })"
+                @mute="muteUser({ username: users[virtualRow.index]!.username, action: 'mute' })"
+                @unblock="
+                  blockUser({ username: users[virtualRow.index]!.username, action: 'unblock' })
+                "
+                @unmute="
+                  muteUser({ username: users[virtualRow.index]!.username, action: 'unmute' })
+                "
+              />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </ClientOnly>
     <div
       v-if="(hasNextPage && isFetchingNextPage) || isLoading"
       class="text-primary flex shrink-0 items-center justify-center py-4"
     >
       <UiSpinner />
     </div>
-  </ClientOnly>
+    <div v-if="!isLoading && users.length === 0" class="mx-auto my-10 max-w-90 px-8 text-start">
+      <h2 class="text-[2rem] leading-tight font-black">
+        {{ $t('profile.followers.messages.empty.title') }}
+      </h2>
+      <p class="text-muted-foreground leading-tight">
+        {{ $t('profile.followers.messages.empty.description') }}
+      </p>
+    </div>
+  </div>
 </template>

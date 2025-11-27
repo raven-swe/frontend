@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useInfiniteQuery } from '@tanstack/vue-query';
+import { useWindowVirtualizer } from '@tanstack/vue-virtual';
 import { apiFetch } from '~/api';
 import UserRow from '~/components/ui/UserRow.vue';
 
@@ -13,7 +14,13 @@ const username = computed(() => {
 });
 
 const queryKey = computed(() => ['user-list', username.value, 'following']);
-const { data: usersPaginated } = useInfiniteQuery({
+const {
+  data: usersPaginated,
+  hasNextPage,
+  fetchNextPage,
+  isFetchingNextPage,
+  isLoading,
+} = useInfiniteQuery({
   queryKey,
   initialPageParam: null as string | null,
   queryFn: async ({ signal, pageParam }) => {
@@ -32,28 +39,113 @@ const { data: usersPaginated } = useInfiniteQuery({
 
 const users = computed(() => usersPaginated.value?.pages.flatMap((page) => page.data) || []);
 const { mutate: followUser } = useFollowMutation(username.value || '');
+const { mutate: blockUser } = useBlockMutation(username.value || '');
+const { mutate: muteUser } = useMuteMutation(username.value || '');
 
-const handleFollow = (targetUsername: string, action: 'follow' | 'unfollow') => {
-  followUser({ username: targetUsername, action });
+//  Virtualization setup
+const parentRef = ref<HTMLElement | null>(null);
+const parentOffsetRef = ref(0);
+onMounted(() => {
+  parentOffsetRef.value = parentRef.value?.offsetTop ?? 0;
+});
+
+const rowVirtualizerOptions = computed(() => {
+  return {
+    count: hasNextPage ? users.value.length + 1 : users.value.length,
+    estimateSize: () => 95.95, // Approximate height of UserRow component with one line of bio
+    overscan: 3,
+    scrollMargin: parentOffsetRef.value,
+    getItemKey: (index: number) => users.value[index]?.username || index,
+  };
+});
+
+const rowVirtualizer = useWindowVirtualizer(rowVirtualizerOptions);
+const virtualRows = computed(() => rowVirtualizer.value.getVirtualItems());
+const totalSize = computed(() => rowVirtualizer.value.getTotalSize());
+
+const measureElement = (el: Element | ComponentPublicInstance | null) => {
+  if (!el) return;
+  const element = 'nodeType' in el ? (el as HTMLElement) : (el as ComponentPublicInstance).$el;
+  rowVirtualizer.value.measureElement(element);
 };
+
+watchEffect(() => {
+  const [lastItem] = [...virtualRows.value].reverse();
+
+  if (!lastItem) {
+    return;
+  }
+
+  if (lastItem.index >= users.value.length - 3 && hasNextPage.value && !isFetchingNextPage.value) {
+    fetchNextPage();
+  }
+});
 </script>
 
 <template>
   <div>
-    <UserRow
-      v-for="user in users"
-      :key="user.username"
-      :user="user"
-      @follow="
-        (username) => {
-          handleFollow(username, 'follow');
-        }
-      "
-      @unfollow="
-        (username) => {
-          handleFollow(username, 'unfollow');
-        }
-      "
-    />
+    <ClientOnly>
+      <div v-if="users && users.length !== 0" ref="parentRef">
+        <div
+          :style="{
+            height: `${totalSize}px`,
+            width: '100%',
+            position: 'relative',
+          }"
+        >
+          <div
+            :style="{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              transform: `translateY(${
+                virtualRows[0] ? virtualRows[0].start - rowVirtualizer.options.scrollMargin : 0
+              }px)`,
+            }"
+          >
+            <div
+              v-for="virtualRow in virtualRows"
+              :key="users[virtualRow.index]?.username || String(virtualRow.key)"
+              :ref="measureElement"
+              :data-index="virtualRow.index"
+            >
+              <UserRow
+                v-if="users[virtualRow.index]"
+                :user="users[virtualRow.index]!"
+                @follow="
+                  followUser({ username: users[virtualRow.index]!.username, action: 'follow' })
+                "
+                @unfollow="
+                  followUser({ username: users[virtualRow.index]!.username, action: 'unfollow' })
+                "
+                @block="blockUser({ username: users[virtualRow.index]!.username, action: 'block' })"
+                @mute="muteUser({ username: users[virtualRow.index]!.username, action: 'mute' })"
+                @unblock="
+                  blockUser({ username: users[virtualRow.index]!.username, action: 'unblock' })
+                "
+                @unmute="
+                  muteUser({ username: users[virtualRow.index]!.username, action: 'unmute' })
+                "
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </ClientOnly>
+    <div
+      v-if="(hasNextPage && isFetchingNextPage) || isLoading"
+      class="text-primary flex shrink-0 items-center justify-center py-4"
+    >
+      <UiSpinner />
+    </div>
+    <div v-if="!isLoading && users.length === 0" class="mx-auto my-10 max-w-90 px-8 text-start">
+      <h2 class="text-[2rem] leading-tight font-black">
+        {{ $t('profile.following.messages.empty.title') }}
+      </h2>
+      <p class="text-muted-foreground leading-tight">
+        {{ $t('profile.following.messages.empty.description') }}
+      </p>
+    </div>
   </div>
 </template>

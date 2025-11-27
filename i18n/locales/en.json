@@ -90,6 +90,22 @@
         "title": "{'@'}{username} has blocked you",
         "description": "You can view public posts from {'@'}{username}, but you are blocked from engaging with them. You also cannot follow or message {'@'}{username}."
       }
+    },
+    "following": {
+      "messages": {
+        "empty": {
+          "title": "Be in the know",
+          "description": "Following accounts is an easy way to curate your timeline and know what's happening with the topics and people you're interested in."
+        }
+      }
+    },
+    "followers": {
+      "messages": {
+        "empty": {
+          "title": "Looking for followers?",
+          "description": "When someone follows this account, they'll show up here. Posting and interacting with others helps boost followers."
+        }
+      }
     }
   },
   "home": {
