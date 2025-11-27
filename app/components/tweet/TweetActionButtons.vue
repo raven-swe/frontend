@@ -117,32 +117,32 @@ const handleShare = async () => {
     </label>
 
     <label
-      v-if="props.tweet.isRetweeted"
-      class="hover:text-brand-turquoise text-brand-turquoise relative flex items-center justify-center gap-[1px]"
-    >
-      <Button
-        variant="tweet-icon-turquoise-active"
-        size="icon-md"
-        @click.prevent.stop="handleUndoRetweet"
-      >
-        <Icon name="tabler:repeat" size="1.2rem" />
-      </Button>
-      <span class="absolute start-8">{{ props.tweet.retweetCount }}</span>
-    </label>
-    <label
-      v-else
-      class="hover:text-brand-turquoise relative flex items-center justify-center gap-[1px]"
+      :class="[
+        'relative flex items-center justify-center gap-[1px]',
+        props.tweet.isRetweeted
+          ? 'hover:text-brand-turquoise text-brand-turquoise'
+          : 'hover:text-brand-turquoise',
+      ]"
     >
       <UiDropdownMenu>
         <UiDropdownMenuTrigger as-child>
-          <Button variant="tweet-icon-turquoise" size="icon-md">
+          <Button
+            :variant="
+              props.tweet.isRetweeted ? 'tweet-icon-turquoise-active' : 'tweet-icon-turquoise'
+            "
+            size="icon-md"
+          >
             <Icon name="tabler:repeat" size="1.2rem" />
           </Button>
         </UiDropdownMenuTrigger>
         <UiDropdownMenuContent align="center">
-          <UiDropdownMenuItem @click.prevent.stop="handleRetweet">
+          <UiDropdownMenuItem
+            @click.prevent.stop="props.tweet.isRetweeted ? handleUndoRetweet() : handleRetweet()"
+          >
             <Icon name="tabler:repeat" size="18" />
-            {{ $t('tweet.actions.repost') }}
+            {{
+              props.tweet.isRetweeted ? $t('tweet.actions.unrepost') : $t('tweet.actions.repost')
+            }}
           </UiDropdownMenuItem>
           <UiDropdownMenuItem @click.prevent.stop="$emit('open-quote-tweet-dialog')">
             <Icon name="tabler:pencil" size="18" />
