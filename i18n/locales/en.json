@@ -359,7 +359,9 @@
     },
     "blocked": {
       "title": "Blocked accounts",
-      "description": "When you block someone, that person won't be able to follow or message you, and you won't see notifications from them."
+      "description": "When you block someone, that person won't be able to follow or message you, and you won't see notifications from them.",
+      "empty-title": "Block unwanted accounts",
+      "empty-description": "When you block someone, they won't be able to follow or message you, and you won't see notifications from them."
     },
     "account-information-details": "See information about your account, download an archive of your data, or learn about your account deactivation options.",
     "username": {

@@ -1,8 +1,14 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import UserList from '~/components/common/UserList.vue';
+import { settingsService } from '~/services/settingsService';
+
+const userStore = useUserStore();
+const username = computed(() => userStore.user?.username.toLowerCase() || null);
+</script>
 
 <template>
-  <div>
-    <div class="p-4">
+  <div class="scroll-y-auto">
+    <div class="border-b-border border-b-1 p-4">
       <header class="flex flex-row gap-4">
         <UiButton
           variant="ghost-default"
@@ -18,6 +24,20 @@
         {{ $t('setting.blocked.description') }}
       </p>
     </div>
-    <div class="mt-3 flex flex-col overflow-hidden"></div>
+    <UserList
+      :fetcher-fn="
+        async (cursor, signal) =>
+          await settingsService.getBlockedPaginated({
+            cursor,
+            signal,
+          })
+      "
+      :current-username="username"
+      :show-dropdown="false"
+      primary-action="block"
+      query-key-suffix="blocked"
+      :empty-title="$t('setting.blocked.empty-title')"
+      :empty-description="$t('setting.blocked.empty-description')"
+    />
   </div>
 </template>
