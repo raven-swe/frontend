@@ -267,6 +267,7 @@
     "username": {
       "RATE_LIMIT_EXCEEDED": "Too many requests. Please try again later."
     },
+    "RATE_LIMIT_EXCEEDED": "Too many requests. Please try again later.",
     "CANNOT_BLOCK_USER": "You cannot block this user.",
     "ALREADY_NOT_FOLLOWING": "You are already not following this user.",
     "ALREADY_FOLLOWING": "You are already following this user.",

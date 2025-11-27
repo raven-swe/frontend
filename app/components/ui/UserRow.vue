@@ -22,6 +22,7 @@ const parsedBioTokens = computed(() =>
 
 const isMuted = computed(() => props.user.relationship.muted || false);
 const isBlocked = computed(() => props.user.relationship.blocking || false);
+const relationship = computed(() => props.user.relationship);
 </script>
 
 <template>
@@ -35,7 +36,6 @@ const isBlocked = computed(() => props.user.relationship.blocking || false);
       </UiHoverCardTrigger>
       <UiHoverCardContent>
         <UiUserMetadata
-          :relationship="user.relationship"
           :username="user.username"
           @follow="$emit('follow', user.username)"
           @unfollow="$emit('unfollow', user.username)"
@@ -52,7 +52,6 @@ const isBlocked = computed(() => props.user.relationship.blocking || false);
             </UiHoverCardTrigger>
             <UiHoverCardContent>
               <UiUserMetadata
-                :relationship="user.relationship"
                 :username="user.username"
                 @follow="$emit('follow', user.username)"
                 @unfollow="$emit('unfollow', user.username)"
@@ -67,7 +66,6 @@ const isBlocked = computed(() => props.user.relationship.blocking || false);
               </UiHoverCardTrigger>
               <UiHoverCardContent>
                 <UiUserMetadata
-                  :relationship="user.relationship"
                   :username="user.username"
                   @follow="$emit('follow', user.username)"
                   @unfollow="$emit('unfollow', user.username)"
@@ -85,7 +83,7 @@ const isBlocked = computed(() => props.user.relationship.blocking || false);
         </div>
         <div class="flex items-center gap-1">
           <FollowToggleButton
-            :relationship="user.relationship"
+            :relationship="relationship"
             @follow="$emit('follow', user.username)"
             @unfollow="$emit('unfollow', user.username)"
             @unblock="$emit('unblock', user.username)"

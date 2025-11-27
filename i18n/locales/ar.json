@@ -256,7 +256,8 @@
     },
     "username": {
       "RATE_LIMIT_EXCEEDED": "طلبات كثيرة جدًا. يرجى المحاولة لاحقًا."
-    }
+    },
+    "RATE_LIMIT_EXCEEDED": "طلبات كثيرة جدًا. يرجى المحاولة لاحقًا."
   },
   "register": {
     "register-info": {
