@@ -353,7 +353,9 @@
     },
     "muted": {
       "title": "Muted accounts",
-      "description": "Here's everyone you muted. You can add or remove them from this list."
+      "description": "Here's everyone you muted. You can add or remove them from this list.",
+      "empty-title": "Muted accounts",
+      "empty-description": "Posts from muted accounts won't show up in your Home timeline. Mute accounts directly from their profile or post."
     },
     "blocked": {
       "title": "Blocked accounts",

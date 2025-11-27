@@ -198,4 +198,49 @@ export const handlers = [
       message: `Successfully unblocked user "${username}".`,
     });
   }),
+
+  http.get(`${API_URL}/me/settings/mutes`, ({ request }) => {
+    const url = new URL(request.url);
+    const cursor = url.searchParams.get('cursor') || null;
+    const limit = Number(url.searchParams.get('limit') || '20');
+    console.log('Fetching muted users with cursor:', cursor, 'and limit:', limit);
+
+    const mutedUsers = users;
+    const startIndex = cursor ? Math.max(0, Number(cursor)) : 0;
+    const paginatedMutedUsers = mutedUsers.slice(startIndex, startIndex + limit);
+    const nextIndex = startIndex + paginatedMutedUsers.length;
+    const nextCursor = nextIndex < mutedUsers.length ? String(nextIndex) : null;
+
+    return HttpResponse.json<ApiSuccessResponse<User[]>>({
+      success: true,
+      data: paginatedMutedUsers,
+      pagination: {
+        cursor: String(startIndex),
+        nextCursor,
+        hasNextPage: !!nextCursor,
+      },
+    });
+  }),
+
+  http.get(`${API_URL}/me/settings/blocks`, ({ request }) => {
+    const url = new URL(request.url);
+    const cursor = url.searchParams.get('cursor') || null;
+    const limit = Number(url.searchParams.get('limit') || '20');
+
+    const blockedUsers = users;
+    const startIndex = cursor ? Math.max(0, Number(cursor)) : 0;
+    const paginatedBlockedUsers = blockedUsers.slice(startIndex, startIndex + limit);
+    const nextIndex = startIndex + paginatedBlockedUsers.length;
+    const nextCursor = nextIndex < blockedUsers.length ? String(nextIndex) : null;
+
+    return HttpResponse.json<ApiSuccessResponse<User[]>>({
+      success: true,
+      data: paginatedBlockedUsers,
+      pagination: {
+        cursor: String(startIndex),
+        nextCursor,
+        hasNextPage: !!nextCursor,
+      },
+    });
+  }),
 ];

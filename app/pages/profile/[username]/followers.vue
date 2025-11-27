@@ -22,6 +22,7 @@ const username = computed(() => {
           signal,
         })
     "
+    show-dropdown
     :current-username="username"
     query-key-suffix="followers"
     :empty-title="$t('profile.followers.messages.empty.title')"
