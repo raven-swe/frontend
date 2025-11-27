@@ -21,7 +21,7 @@ const localOpen = computed({
 <template>
   <UiDialog v-model:open="localOpen" class="h[500]">
     <UiDialogContent class="h-auto max-w-lg" content-height="h-auto max-h-[90vh]">
-      <TweetComposer :reply-to-tweet-id="replyToTweet.id">
+      <TweetComposer :reply-to-tweet-id="replyToTweet.id" @posted="emit('update:open', false)">
         <template #reposted-tweet>
           <div class="border-foreground/15 rounded-lg border-1">
             <TweetDefaultCard
