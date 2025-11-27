@@ -19,4 +19,46 @@ export const profileTabsService = {
       },
     });
   },
+
+  getFollowersPaginated: async ({
+    username,
+    cursor,
+    limit,
+    signal,
+  }: {
+    username: string;
+    cursor: string | null;
+    limit?: number;
+    signal?: AbortSignal;
+  }) => {
+    return await apiFetch(`/api/users/${username}/followers`, {
+      method: 'GET',
+      query: {
+        cursor,
+        limit: (limit ?? DEFAULT_PAGE_SIZE).toString(),
+      },
+      signal,
+    });
+  },
+
+  getFollowingPaginated: async ({
+    username,
+    cursor,
+    limit,
+    signal,
+  }: {
+    username: string;
+    cursor: string | null;
+    limit?: number;
+    signal?: AbortSignal;
+  }) => {
+    return await apiFetch(`/api/users/${username}/following`, {
+      method: 'GET',
+      query: {
+        cursor,
+        limit: (limit ?? DEFAULT_PAGE_SIZE).toString(),
+      },
+      signal,
+    });
+  },
 };
