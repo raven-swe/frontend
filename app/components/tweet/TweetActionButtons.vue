@@ -7,6 +7,7 @@ import {
   unLikeTweet,
   undoRetweetTweet,
 } from '~/services/tweet/actionButtonsService';
+import QuoteTweetDialog from './composer/QuoteTweetDialog.vue';
 import { showToaster } from '~/utils/showToaster';
 import { buildTweetLink } from '~/utils/tweetLink';
 
@@ -17,17 +18,11 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  (
-    e:
-      | 'like-success'
-      | 'unlike-success'
-      | 'retweet-success'
-      | 'undo-retweet-success'
-      | 'open-quote-tweet-dialog',
-  ): void;
+  (e: 'like-success' | 'unlike-success' | 'retweet-success' | 'undo-retweet-success'): void;
 }>();
 
 const pendingLike = ref(false);
+const showQuoteDialog = ref(false);
 
 const handleLike = async () => {
   if (pendingLike.value) return;
@@ -144,7 +139,7 @@ const handleShare = async () => {
               props.tweet.isRetweeted ? $t('tweet.actions.unrepost') : $t('tweet.actions.repost')
             }}
           </UiDropdownMenuItem>
-          <UiDropdownMenuItem @click.prevent.stop="$emit('open-quote-tweet-dialog')">
+          <UiDropdownMenuItem @click="showQuoteDialog = true">
             <Icon name="tabler:pencil" size="18" />
             {{ $t('tweet.actions.quote') }}
           </UiDropdownMenuItem>
@@ -178,5 +173,8 @@ const handleShare = async () => {
     >
       <Icon name="lucide:share" size="1.2rem" />
     </Button>
+
+    <!-- Place dialog outside dropdown structure -->
+    <QuoteTweetDialog v-model:open="showQuoteDialog" />
   </div>
 </template>
