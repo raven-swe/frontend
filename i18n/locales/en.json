@@ -343,6 +343,22 @@
     "failed-to-load-user": "Failed to load user data.",
     "back-button-icon": "material-symbols:arrow-back",
     "account-information": "Your account",
+    "privacy-settings": {
+      "title": "Privacy and safety",
+      "description": "Manage what information you see and share on Raven."
+    },
+    "mute-and-block": {
+      "title": "Mute and block",
+      "description": "Manage your muted and blocked accounts."
+    },
+    "muted": {
+      "title": "Muted accounts",
+      "description": "Here's everyone you muted. You can add or remove them from this list."
+    },
+    "blocked": {
+      "title": "Blocked accounts",
+      "description": "When you block someone, that person won't be able to follow or message you, and you won't see notifications from them."
+    },
     "account-information-details": "See information about your account, download an archive of your data, or learn about your account deactivation options.",
     "username": {
       "username-taken": "That username has been taken. Please choose another.",
