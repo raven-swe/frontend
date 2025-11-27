@@ -82,7 +82,7 @@ const handleCardClick = () => {
         <div class="ms-auto">
           <Button
             v-if="isFollowing"
-            variant="outline-destructive"
+            variant="outline-destructive-hover"
             size="md"
             data-test="unfollow-button"
             @mouseenter="isHovered = true"

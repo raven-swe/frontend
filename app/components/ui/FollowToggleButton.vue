@@ -36,7 +36,7 @@ defineEmits<{
 
   <UiButton
     v-else-if="relationship.following"
-    variant="outline-destructive"
+    variant="outline-destructive-hover"
     size="xs"
     data-test="unfollow-button"
     class="group grid-stack"
