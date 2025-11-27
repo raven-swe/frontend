@@ -240,7 +240,8 @@
       "search-list": {
         "placeholder": "Try searching for people, lists, or keywords"
       }
-    }
+    },
+    "logout": "Log out {'@'}{username}"
   },
   "errors": {
     "INVALID_EMAIL": "Please enter a valid email.",
