@@ -17,7 +17,14 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  (e: 'like-success' | 'unlike-success' | 'retweet-success' | 'undo-retweet-success'): void;
+  (
+    e:
+      | 'like-success'
+      | 'unlike-success'
+      | 'retweet-success'
+      | 'undo-retweet-success'
+      | 'open-quote-tweet-dialog',
+  ): void;
 }>();
 
 const pendingLike = ref(false);
@@ -126,9 +133,23 @@ const handleShare = async () => {
       v-else
       class="hover:text-brand-turquoise relative flex items-center justify-center gap-[1px]"
     >
-      <Button variant="tweet-icon-turquoise" size="icon-md" @click.prevent.stop="handleRetweet">
-        <Icon name="tabler:repeat" size="1.2rem" />
-      </Button>
+      <UiDropdownMenu>
+        <UiDropdownMenuTrigger as-child>
+          <Button variant="tweet-icon-turquoise" size="icon-md">
+            <Icon name="tabler:repeat" size="1.2rem" />
+          </Button>
+        </UiDropdownMenuTrigger>
+        <UiDropdownMenuContent align="center">
+          <UiDropdownMenuItem @click.prevent.stop="handleRetweet">
+            <Icon name="tabler:repeat" size="18" />
+            {{ $t('tweet.actions.repost') }}
+          </UiDropdownMenuItem>
+          <UiDropdownMenuItem @click.prevent.stop="$emit('open-quote-tweet-dialog')">
+            <Icon name="tabler:pencil" size="18" />
+            {{ $t('tweet.actions.quote') }}
+          </UiDropdownMenuItem>
+        </UiDropdownMenuContent>
+      </UiDropdownMenu>
       <span class="absolute start-8">{{ props.tweet.retweetCount }}</span>
     </label>
 
