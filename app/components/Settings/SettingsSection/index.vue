@@ -1,10 +1,9 @@
 <script lang="ts" setup>
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 const router = useRouter();
-const route = useRoute();
 
 const isActiveTab = (tabRoute: string) => {
-  return route.path === tabRoute;
+  return router.currentRoute.value.path === tabRoute;
 };
 
 const settingSections = [
