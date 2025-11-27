@@ -12,7 +12,7 @@ const username = computed(() => {
   return typeof val === 'string' ? val.toLowerCase() : null;
 });
 
-const queryKey = computed(() => ['followers', username.value]);
+const queryKey = computed(() => ['user-list', username.value, 'followers']);
 const { data: usersPaginated } = useInfiniteQuery({
   queryKey,
   initialPageParam: null as string | null,

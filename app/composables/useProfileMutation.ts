@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
+import { useMutation } from '@tanstack/vue-query';
 import type { FetchError } from 'ofetch';
 import { profileInteractionService } from '~/services/profile/profileInteractionService';
 
@@ -33,7 +33,6 @@ export function useProfileMutation<ActionType extends Actions, Q = void>({
   username: string;
   optimisticUpdateFn: (data: CompactUser | User, action: ActionType) => void;
 }) {
-  const queryClient = useQueryClient();
   const { t } = useI18n();
   const lowercaseUsername = username.toLowerCase();
   return useMutation<
@@ -54,38 +53,41 @@ export function useProfileMutation<ActionType extends Actions, Q = void>({
     }
   >({
     mutationFn,
-    onMutate: async ({ username, action }: { username: string; action: ActionType }) => {
+    onMutate: async (
+      { username, action }: { username: string; action: ActionType },
+      { client },
+    ) => {
       const usernameToMutate = username.toLowerCase();
       const profileQueryKey = ['profile', usernameToMutate];
-      const followersQueryKey = ['followers', lowercaseUsername];
-      const followingQueryKey = ['following', lowercaseUsername];
-      const followSuggestionsQueryKey = ['follow-suggestions'];
+      const followersQueryKey = ['user-list', 'followers', lowercaseUsername];
+      const followingQueryKey = ['user-list', 'following', lowercaseUsername];
+      const followSuggestionsQueryKey = ['user-list', 'follow-suggestions'];
       await Promise.all([
-        queryClient.cancelQueries({ queryKey: profileQueryKey }),
-        queryClient.cancelQueries({ queryKey: followersQueryKey }),
-        queryClient.cancelQueries({ queryKey: followingQueryKey }),
-        queryClient.cancelQueries({ queryKey: followSuggestionsQueryKey }),
+        client.cancelQueries({ queryKey: profileQueryKey }),
+        client.cancelQueries({ queryKey: followersQueryKey }),
+        client.cancelQueries({ queryKey: followingQueryKey }),
+        client.cancelQueries({ queryKey: followSuggestionsQueryKey }),
       ]);
 
       // Get previous data
-      const previousUser = queryClient.getQueryData<User>(profileQueryKey);
+      const previousUser = client.getQueryData<User>(profileQueryKey);
 
-      const previousFollowers = queryClient.getQueryData<{
+      const previousFollowers = client.getQueryData<{
         pages: ApiSuccessResponse<CompactUser[]>[];
       }>(followersQueryKey);
 
-      const previousFollowing = queryClient.getQueryData<{
+      const previousFollowing = client.getQueryData<{
         pages: ApiSuccessResponse<CompactUser[]>[];
       }>(followingQueryKey);
 
-      const previousFollowSuggestions = queryClient.getQueryData<{
+      const previousFollowSuggestions = client.getQueryData<{
         pages: ApiSuccessResponse<CompactUser[]>[];
       }>(followSuggestionsQueryKey);
 
       if (previousUser) {
         const updatedUser = { ...previousUser };
         optimisticUpdateFn(updatedUser, action);
-        queryClient.setQueryData(profileQueryKey, updatedUser);
+        client.setQueryData(profileQueryKey, updatedUser);
       }
 
       if (previousFollowers && previousFollowers.pages) {
@@ -101,7 +103,7 @@ export function useProfileMutation<ActionType extends Actions, Q = void>({
           return { ...page, data: updatedData };
         });
 
-        queryClient.setQueryData(followersQueryKey, {
+        client.setQueryData(followersQueryKey, {
           ...previousFollowers,
           pages: updatedFollowersPages,
         });
@@ -120,7 +122,7 @@ export function useProfileMutation<ActionType extends Actions, Q = void>({
           return { ...page, data: updatedData };
         });
 
-        queryClient.setQueryData(followingQueryKey, {
+        client.setQueryData(followingQueryKey, {
           ...previousFollowing,
           pages: updatedFollowingPages,
         });
@@ -140,7 +142,7 @@ export function useProfileMutation<ActionType extends Actions, Q = void>({
           return { ...page, data: updatedData };
         });
 
-        queryClient.setQueryData(followSuggestionsQueryKey, {
+        client.setQueryData(followSuggestionsQueryKey, {
           ...previousFollowSuggestions,
           pages: updatedFollowSuggestionsPages,
         });
@@ -155,22 +157,22 @@ export function useProfileMutation<ActionType extends Actions, Q = void>({
     },
 
     // Rollback on error
-    onError: (err, { username, action }, ctx) => {
+    onError: (err, { username, action }, mutationResult, ctx) => {
       const usernameToMutate = username.toLowerCase();
       if (isNoOpError(action, err)) {
         return;
       }
-      if (ctx?.previousUser) {
-        queryClient.setQueryData(['profile', usernameToMutate], ctx.previousUser);
+      if (mutationResult?.previousUser) {
+        ctx.client.setQueryData(['profile', usernameToMutate], mutationResult.previousUser);
       }
-      if (ctx?.previousFollowers) {
-        queryClient.setQueryData(['followers', lowercaseUsername], ctx.previousFollowers);
+      if (mutationResult?.previousFollowers) {
+        ctx.client.setQueryData(['followers', lowercaseUsername], mutationResult.previousFollowers);
       }
-      if (ctx?.previousFollowing) {
-        queryClient.setQueryData(['following', lowercaseUsername], ctx.previousFollowing);
+      if (mutationResult?.previousFollowing) {
+        ctx.client.setQueryData(['following', lowercaseUsername], mutationResult.previousFollowing);
       }
-      if (ctx?.previousFollowSuggestions) {
-        queryClient.setQueryData(['follow-suggestions'], ctx.previousFollowSuggestions);
+      if (mutationResult?.previousFollowSuggestions) {
+        ctx.client.setQueryData(['follow-suggestions'], mutationResult.previousFollowSuggestions);
       }
 
       showToaster('error', t(`errors.${err?.data?.data?.error.code || 'UNKNOWN_ERROR'}`));
@@ -178,9 +180,9 @@ export function useProfileMutation<ActionType extends Actions, Q = void>({
 
     // Invalidate queries on finishing request
     // To sync up with the backend
-    onSettled: (_data, _err, { username }) => {
+    onSettled: (_data, _err, { username }, mutationResult, { client }) => {
       const loweredUsername = username.toLowerCase();
-      queryClient.invalidateQueries({
+      client.invalidateQueries({
         queryKey: ['profile', loweredUsername],
       });
     },
