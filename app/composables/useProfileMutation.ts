@@ -204,7 +204,9 @@ export function useBlockMutation(username: string) {
       const newUser = structuredClone(user);
       if (action === 'block') {
         newUser.relationship.blocking = true;
+        newUser.relationship.following = false;
       } else {
+        newUser.relationship.following = false;
         newUser.relationship.blocking = false;
       }
       return newUser;
