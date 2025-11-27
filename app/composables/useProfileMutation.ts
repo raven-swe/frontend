@@ -31,7 +31,7 @@ export function useProfileMutation<ActionType extends Actions, Q = void>({
 }: {
   mutationFn: ({ username, action }: { username: string; action: ActionType }) => Promise<Q>;
   username: string;
-  optimisticUpdateFn: (data: CompactUser | User, action: ActionType) => void;
+  optimisticUpdateFn: (data: CompactUser | User, action: ActionType) => CompactUser | User;
 }) {
   const { t } = useI18n();
   const lowercaseUsername = username.toLowerCase();
@@ -40,15 +40,15 @@ export function useProfileMutation<ActionType extends Actions, Q = void>({
     FetchError<FetchError<ApiErrorResponse>>,
     { username: string; action: ActionType },
     {
-      previousFollowers?: {
-        pages: ApiSuccessResponse<CompactUser[]>[];
-      };
-      previousFollowing?: {
-        pages: ApiSuccessResponse<CompactUser[]>[];
-      };
-      previousFollowSuggestions?: {
-        pages: ApiSuccessResponse<CompactUser[]>[];
-      };
+      previousLists?: [
+        readonly unknown[],
+        (
+          | {
+              pages: ApiSuccessResponse<CompactUser[]>[];
+            }
+          | undefined
+        ),
+      ][];
       previousUser?: User;
     }
   >({
@@ -59,123 +59,74 @@ export function useProfileMutation<ActionType extends Actions, Q = void>({
     ) => {
       const usernameToMutate = username.toLowerCase();
       const profileQueryKey = ['profile', usernameToMutate];
-      const followersQueryKey = ['user-list', 'followers', lowercaseUsername];
-      const followingQueryKey = ['user-list', 'following', lowercaseUsername];
-      const followSuggestionsQueryKey = ['user-list', 'follow-suggestions'];
-      await Promise.all([
-        client.cancelQueries({ queryKey: profileQueryKey }),
-        client.cancelQueries({ queryKey: followersQueryKey }),
-        client.cancelQueries({ queryKey: followingQueryKey }),
-        client.cancelQueries({ queryKey: followSuggestionsQueryKey }),
-      ]);
+      await client.cancelQueries({ predicate: (query) => query.queryKey[0] === 'user-list' });
 
       // Get previous data
       const previousUser = client.getQueryData<User>(profileQueryKey);
-
-      const previousFollowers = client.getQueryData<{
-        pages: ApiSuccessResponse<CompactUser[]>[];
-      }>(followersQueryKey);
-
-      const previousFollowing = client.getQueryData<{
-        pages: ApiSuccessResponse<CompactUser[]>[];
-      }>(followingQueryKey);
-
-      const previousFollowSuggestions = client.getQueryData<{
-        pages: ApiSuccessResponse<CompactUser[]>[];
-      }>(followSuggestionsQueryKey);
-
       if (previousUser) {
-        const updatedUser = { ...previousUser };
-        optimisticUpdateFn(updatedUser, action);
-        client.setQueryData(profileQueryKey, updatedUser);
+        client.setQueryData(profileQueryKey, optimisticUpdateFn(previousUser, action));
       }
 
-      if (previousFollowers && previousFollowers.pages) {
-        const updatedFollowersPages = previousFollowers.pages.map((page) => {
-          const updatedData = page.data.map((user) => {
-            if (user.username.toLowerCase() === usernameToMutate) {
-              const updatedUser = { ...user };
-              optimisticUpdateFn(updatedUser, action);
-              return updatedUser;
-            }
-            return user;
+      const previousLists = client.getQueriesData<{
+        pages: ApiSuccessResponse<CompactUser[]>[];
+      }>({
+        predicate: (query) =>
+          query.queryKey[0] === 'user-list' && query.queryKey[1] === lowercaseUsername,
+      });
+
+      // Optimistically update all user-lists
+      client.setQueriesData<{
+        pages: ApiSuccessResponse<CompactUser[]>[];
+      }>(
+        {
+          predicate: (query) =>
+            query.queryKey[0] === 'user-list' && query.queryKey[1] === lowercaseUsername,
+        },
+        (oldData) => {
+          if (!oldData) return oldData;
+          const updatedPages = oldData.pages.map((page) => {
+            const updatedData = page.data.map((user) => {
+              if (user.username.toLowerCase() === usernameToMutate) {
+                return optimisticUpdateFn(user, action);
+              }
+              return user;
+            });
+            return { ...page, data: updatedData };
           });
-          return { ...page, data: updatedData };
-        });
-
-        client.setQueryData(followersQueryKey, {
-          ...previousFollowers,
-          pages: updatedFollowersPages,
-        });
-      }
-
-      if (previousFollowing && previousFollowing.pages) {
-        const updatedFollowingPages = previousFollowing.pages.map((page) => {
-          const updatedData = page.data.map((user) => {
-            if (user.username.toLowerCase() === usernameToMutate) {
-              const updatedUser = { ...user };
-              optimisticUpdateFn(updatedUser, action);
-              return updatedUser;
-            }
-            return user;
-          });
-          return { ...page, data: updatedData };
-        });
-
-        client.setQueryData(followingQueryKey, {
-          ...previousFollowing,
-          pages: updatedFollowingPages,
-        });
-      }
-
-      // Optimistic update for follow suggestions (if applicable)
-      if (previousFollowSuggestions && previousFollowSuggestions.pages) {
-        const updatedFollowSuggestionsPages = previousFollowSuggestions.pages.map((page) => {
-          const updatedData = page.data.map((user) => {
-            if (user.username.toLowerCase() === usernameToMutate) {
-              const updatedUser = { ...user };
-              optimisticUpdateFn(updatedUser, action);
-              return updatedUser;
-            }
-            return user;
-          });
-          return { ...page, data: updatedData };
-        });
-
-        client.setQueryData(followSuggestionsQueryKey, {
-          ...previousFollowSuggestions,
-          pages: updatedFollowSuggestionsPages,
-        });
-      }
+          return { ...oldData, pages: updatedPages };
+        },
+      );
 
       return {
-        previousFollowers,
-        previousFollowing,
-        previousFollowSuggestions,
+        previousLists,
         previousUser,
       };
     },
 
     // Rollback on error
-    onError: (err, { username, action }, mutationResult, ctx) => {
+    onError: (err, { username, action }, mutationResult, { client }) => {
       const usernameToMutate = username.toLowerCase();
       if (isNoOpError(action, err)) {
         return;
       }
+
       if (mutationResult?.previousUser) {
-        ctx.client.setQueryData(['profile', usernameToMutate], mutationResult.previousUser);
+        const profileQueryKey = ['profile', usernameToMutate];
+        client.setQueryData(profileQueryKey, mutationResult.previousUser);
       }
-      if (mutationResult?.previousFollowers) {
-        ctx.client.setQueryData(['followers', lowercaseUsername], mutationResult.previousFollowers);
-      }
-      if (mutationResult?.previousFollowing) {
-        ctx.client.setQueryData(['following', lowercaseUsername], mutationResult.previousFollowing);
-      }
-      if (mutationResult?.previousFollowSuggestions) {
-        ctx.client.setQueryData(['follow-suggestions'], mutationResult.previousFollowSuggestions);
+      // Rollback all previous user-lists
+      if (mutationResult?.previousLists) {
+        mutationResult.previousLists.forEach(([queryKey, previousData]) => {
+          client.setQueryData(queryKey, previousData);
+        });
       }
 
-      showToaster('error', t(`errors.${err?.data?.data?.error.code || 'UNKNOWN_ERROR'}`));
+      const errorCode = err?.data?.data?.error?.code;
+
+      showToaster(
+        'error',
+        t(`errors.${errorCode}`, err.data?.data?.error.message || t('errors.UNKNOWN_ERROR')),
+      );
     },
 
     // Invalidate queries on finishing request
@@ -200,19 +151,19 @@ export function useFollowMutation(username: string) {
     },
     username: username.toLowerCase(),
     optimisticUpdateFn: (user, action) => {
-      const relationship = { ...user.relationship };
+      const newUser = structuredClone(user);
       if (action === 'follow') {
-        relationship.following = true;
-        if ('followersCount' in user) {
-          user.followersCount += 1;
+        newUser.relationship.following = true;
+        if ('followersCount' in newUser) {
+          newUser.followersCount += 1;
         }
       } else {
-        relationship.following = false;
-        if ('followersCount' in user) {
-          user.followersCount -= 1;
+        newUser.relationship.following = false;
+        if ('followersCount' in newUser) {
+          newUser.followersCount -= 1;
         }
       }
-      user.relationship = relationship;
+      return newUser;
     },
   });
 }
@@ -228,13 +179,13 @@ export function useMuteMutation(username: string) {
     },
     username: username.toLowerCase(),
     optimisticUpdateFn: (user, action) => {
-      const relationship = { ...user.relationship };
+      const newUser = structuredClone(user);
       if (action === 'mute') {
-        relationship.muted = true;
+        newUser.relationship.muted = true;
       } else {
-        relationship.muted = false;
+        newUser.relationship.muted = false;
       }
-      user.relationship = relationship;
+      return newUser;
     },
   });
 }
@@ -250,13 +201,13 @@ export function useBlockMutation(username: string) {
     },
     username: username.toLowerCase(),
     optimisticUpdateFn: (user, action) => {
-      const relationship = { ...user.relationship };
+      const newUser = structuredClone(user);
       if (action === 'block') {
-        relationship.blocking = true;
+        newUser.relationship.blocking = true;
       } else {
-        relationship.blocking = false;
+        newUser.relationship.blocking = false;
       }
-      user.relationship = relationship;
+      return newUser;
     },
   });
 }
