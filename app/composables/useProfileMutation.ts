@@ -54,17 +54,20 @@ export function useProfileMutation<ActionType extends Actions, Q = void>({
   >({
     mutationFn,
     onMutate: async (
-      { username, action }: { username: string; action: ActionType },
+      { username: usenameMutate, action }: { username: string; action: ActionType },
       { client },
     ) => {
-      const usernameToMutate = username.toLowerCase();
+      const usernameToMutate = usenameMutate.toLowerCase();
       const profileQueryKey = ['profile', usernameToMutate];
       await client.cancelQueries({ predicate: (query) => query.queryKey[0] === 'user-list' });
-
       // Get previous data
       const previousUser = client.getQueryData<User>(profileQueryKey);
       if (previousUser) {
-        client.setQueryData(profileQueryKey, optimisticUpdateFn(previousUser, action));
+        client.setQueryData<User>(profileQueryKey, (old) => {
+          if (!old) return old;
+          const prevUser = toRaw(old);
+          return optimisticUpdateFn(prevUser, action) as User;
+        });
       }
 
       const previousLists = client.getQueriesData<{
