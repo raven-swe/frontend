@@ -17,7 +17,7 @@ const {
 
 const conversation = computed<DmConversation | null>(() => {
   if (!conversationId.value) return null;
-  return conversations.value.find((c) => c.id === conversationId.value) || null;
+  return conversations.value?.find((c) => c.id === conversationId.value) || null;
 });
 
 const {
@@ -43,7 +43,7 @@ watch(conversationsError, (val) => val && showToaster('error', 'Failed to load c
       >
         <Spinner size="1.5rem" />
       </div>
-      <DmMessagesList v-else :messages="messages" />
+      <DmMessagesList v-else :messages="messages || []" />
     </div>
     <DmConversationDmMessageInput />
   </div>

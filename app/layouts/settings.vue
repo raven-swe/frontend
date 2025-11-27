@@ -43,14 +43,14 @@ const middleClasses = computed(() => {
   if (props.hideMiddleOnMobile) {
     return 'hidden h-full w-[320px] flex-shrink-0 border lg:block xl:w-[390px] 2xl:w-[450px]';
   }
-  return 'h-full lg:w-[320px] flex-1 border sm:w-[560px] sm:flex-none xl:w-[390px] 2xl:w-[450px]';
+  return 'h-full lg:w-[320px] flex-1 border sm:w-[560px]  sm:flex-none xl:w-[390px] 2xl:w-[450px]';
 });
 
 const rightClasses = computed(() => {
   if (props.hideRightOnMobile) {
-    return 'hidden h-full flex-1 border sm:w-[560px] sm:flex-none md:w-[600px] lg:block';
+    return 'hidden h-full flex-1 border sm:w-[560px] sm:flex-none  lg:block';
   }
-  return 'h-full flex-1 border sm:w-[560px] sm:flex-none md:w-[600px]';
+  return 'h-full flex-1 border sm:w-[560px] sm:flex-none ';
 });
 </script>
 

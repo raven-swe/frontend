@@ -7,11 +7,10 @@ defineProps<{
 <template>
   <div class="bg-background sticky top-0 flex items-center justify-between p-4 backdrop:blur-md">
     <div class="flex items-center gap-6">
-      <NuxtLink
-        to="/messages"
-        class="hover:bg-foreground/10 flex cursor-pointer items-center rounded-full lg:hidden"
-      >
-        <Icon name="ic:round-arrow-back" size="24" />
+      <NuxtLink to="/messages" class="lg:hidden">
+        <UiButton variant="ghost-default" size="icon-sm">
+          <Icon name="ic:round-arrow-back" size="24" />
+        </UiButton>
       </NuxtLink>
       <NuxtImg
         :src="avatarUrl"
