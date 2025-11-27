@@ -180,5 +180,6 @@ defineExpose({
         </span>
       </div>
     </div>
+    <slot name="reposted-tweet" />
   </div>
 </template>
