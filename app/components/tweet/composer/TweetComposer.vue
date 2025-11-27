@@ -56,7 +56,7 @@ const handlePostWrapper = async () => {
 </script>
 
 <template>
-  <div class="bg-background max-w-[598px] p-4">
+  <div class="bg-background relative max-w-[598px] p-4 pb-15">
     <div class="mb-3 flex gap-3">
       <div class="flex-shrink-0">
         <Avatar
@@ -79,23 +79,24 @@ const handlePostWrapper = async () => {
 
     <slot name="reposted-tweet" />
 
-    <!-- Loading Indicator -->
-    <div v-if="isPosting" class="text-muted-foreground mb-3 flex items-center gap-2 text-sm">
-      <UiSpinner class="h-4 w-4" />
-      <span>{{ loadingMessage }}</span>
-    </div>
+    <div class="bg-background absolute start-0 end-0 bottom-0 p-2">
+      <div v-if="isPosting" class="text-muted-foreground mb-2 flex items-center gap-2 text-sm">
+        <UiSpinner class="h-4 w-4" />
+        <span>{{ loadingMessage }}</span>
+      </div>
 
-    <Toolbar
-      :disabled="!tweetContent.trim() && media.length === 0"
-      :character-count="characterCount"
-      :max-length="MAX_LENGTH"
-      :is-over-limit="isOverLimit"
-      :has-media="media.length > 0"
-      :can-add-media="media.length < MAX_MEDIA"
-      :button-text="$t('tweet.composer.button.' + props.type)"
-      :is-posting="isPosting"
-      @post="handlePostWrapper"
-      @add-media="handleAddMedia"
-    />
+      <Toolbar
+        :disabled="!tweetContent.trim() && media.length === 0"
+        :character-count="characterCount"
+        :max-length="MAX_LENGTH"
+        :is-over-limit="isOverLimit"
+        :has-media="media.length > 0"
+        :can-add-media="media.length < MAX_MEDIA"
+        :button-text="$t('tweet.composer.button.' + props.type)"
+        :is-posting="isPosting"
+        @post="handlePostWrapper"
+        @add-media="handleAddMedia"
+      />
+    </div>
   </div>
 </template>
