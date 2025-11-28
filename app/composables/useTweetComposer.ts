@@ -11,6 +11,7 @@ export const useTweetComposer = (
   tweetContent: Ref<string>,
   media: Ref<MediaItem[]>,
   replyToTweetId?: Ref<string | null>,
+  quoteTweetId?: Ref<string | null>,
 ) => {
   const { t } = useI18n();
 
@@ -70,6 +71,7 @@ export const useTweetComposer = (
         content: tweetContent.value,
         media: mediaIds,
         replyToTweetId: replyToTweetId?.value ?? null,
+        quoteToTweetId: quoteTweetId?.value ?? null,
       });
 
       showToaster('success', t('tweet.composer.post_success') || 'Tweet posted successfully!');

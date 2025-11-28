@@ -177,6 +177,6 @@ const handleShare = async () => {
     </Button>
 
     <!-- Place dialog outside dropdown structure -->
-    <QuoteTweetDialog v-model:open="showQuoteDialog" :reply-to-tweet="props.tweet" />
+    <QuoteTweetDialog v-model:open="showQuoteDialog" :quote-to-tweet="props.tweet" />
   </div>
 </template>

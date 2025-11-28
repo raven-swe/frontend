@@ -11,12 +11,14 @@ import { useTweetComposer } from '~/composables/useTweetComposer';
 
 interface Props {
   replyToTweetId?: string | null;
+  quoteToTweetId?: string | null;
   type?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   type: 'default',
   replyToTweetId: null,
+  quoteToTweetId: null,
 });
 
 const tweetContent = ref('');
@@ -25,6 +27,7 @@ const userStore = useUserStore();
 const media = ref<MediaItem[]>([]);
 
 const replyToRef = toRef(props, 'replyToTweetId');
+const quoteToRef = toRef(props, 'quoteToTweetId');
 const {
   isPosting,
   MAX_LENGTH,
@@ -35,7 +38,7 @@ const {
   handlePost,
   handleAddMedia,
   handleRemoveMedia,
-} = useTweetComposer(tweetContent, media, replyToRef);
+} = useTweetComposer(tweetContent, media, replyToRef, quoteToRef);
 
 const emit = defineEmits<{
   (e: 'posted', tweet: Tweet): void;

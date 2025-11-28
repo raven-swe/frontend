@@ -32,7 +32,7 @@ vi.mock('vue-i18n', async () => {
 describe('useTweetComposer', () => {
   let tweetContent: ReturnType<typeof ref<string>>;
   let media: ReturnType<typeof ref<MediaItem[]>>;
-  let replyToTweetId: ReturnType<typeof ref<string | null>>;
+  let quoteToTweetId: ReturnType<typeof ref<string | null>>;
 
   const mockUploadImage = vi.fn();
   const mockUploadVideo = vi.fn();
@@ -44,7 +44,7 @@ describe('useTweetComposer', () => {
 
     tweetContent = ref('');
     media = ref([]);
-    replyToTweetId = ref(null);
+    quoteToTweetId = ref(null);
 
     (uploadMediaService as ReturnType<typeof vi.fn>).mockReturnValue({
       uploadImage: mockUploadImage,
@@ -94,6 +94,7 @@ describe('useTweetComposer', () => {
       expect(mockCreateTweetService).toHaveBeenCalledWith({
         content: 'Test tweet',
         media: [],
+        quoteToTweetId: null,
         replyToTweetId: null,
       });
       expect(result).toEqual(mockTweet);
@@ -116,6 +117,7 @@ describe('useTweetComposer', () => {
       expect(mockCreateTweetService).toHaveBeenCalledWith({
         content: 'Tweet with image',
         media: ['media-id-1'],
+        quoteToTweetId: null,
         replyToTweetId: null,
       });
       expect(result).toEqual(mockTweet);
@@ -137,12 +139,12 @@ describe('useTweetComposer', () => {
       expect(result).toEqual(mockTweet);
     });
 
-    it('includes replyToTweetId when provided', async () => {
-      replyToTweetId.value = 'parent-tweet-id';
-      const composer = useTweetComposer(tweetContent, media, replyToTweetId);
+    it('includes quoteToTweetId when provided', async () => {
+      quoteToTweetId.value = 'parent-tweet-id';
+      const composer = useTweetComposer(tweetContent, media, null, quoteToTweetId);
       tweetContent.value = 'Reply tweet';
 
-      const mockTweet = { id: '2', content: 'Reply tweet', replyTo: 'parent-tweet-id' };
+      const mockTweet = { id: '2', content: 'Reply tweet', quoteTo: 'parent-tweet-id' };
       mockCreateTweetService.mockResolvedValue(mockTweet);
 
       const result = await composer.handlePost();
@@ -150,7 +152,8 @@ describe('useTweetComposer', () => {
       expect(mockCreateTweetService).toHaveBeenCalledWith({
         content: 'Reply tweet',
         media: [],
-        replyToTweetId: 'parent-tweet-id',
+        quoteToTweetId: 'parent-tweet-id',
+        replyToTweetId: null,
       });
       expect(result).toEqual(mockTweet);
     });

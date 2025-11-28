@@ -23,7 +23,7 @@ describe('QuoteDialog', () => {
     avatarUrl: 'https://example.com/avatar.jpg',
   };
 
-  const mockReplyToTweet = {
+  const mockquoteToTweet = {
     id: 'tweet-123',
     content: 'Original tweet content',
     author: {
@@ -45,7 +45,7 @@ describe('QuoteDialog', () => {
     const wrapper = await mountSuspended(QuoteDialog, {
       props: {
         open: true,
-        replyToTweet: mockReplyToTweet,
+        quoteToTweet: mockquoteToTweet,
       },
       global: {
         plugins: [i18n],
@@ -54,7 +54,7 @@ describe('QuoteDialog', () => {
 
     const composer = wrapper.findComponent(TweetComposer);
     expect(composer.exists()).toBe(true);
-    expect(composer.props('replyToTweetId')).toBe('tweet-123');
+    expect(composer.props('quoteToTweetId')).toBe('tweet-123');
     expect(composer.props('type')).toBe('quote');
   });
 
@@ -62,7 +62,7 @@ describe('QuoteDialog', () => {
     const wrapper = await mountSuspended(QuoteDialog, {
       props: {
         open: true,
-        replyToTweet: mockReplyToTweet,
+        quoteToTweet: mockquoteToTweet,
       },
       global: {
         plugins: [i18n],
@@ -71,7 +71,7 @@ describe('QuoteDialog', () => {
 
     const card = wrapper.findComponent(TweetDefaultCard);
     expect(card.exists()).toBe(true);
-    expect(card.props('tweet')).toEqual(mockReplyToTweet);
+    expect(card.props('tweet')).toEqual(mockquoteToTweet);
     expect(card.props('isPreview')).toBe(true);
   });
 
@@ -79,7 +79,7 @@ describe('QuoteDialog', () => {
     const wrapper = await mountSuspended(QuoteDialog, {
       props: {
         open: true,
-        replyToTweet: mockReplyToTweet,
+        quoteToTweet: mockquoteToTweet,
       },
       global: {
         plugins: [i18n],
@@ -97,7 +97,7 @@ describe('QuoteDialog', () => {
     const wrapper = await mountSuspended(QuoteDialog, {
       props: {
         open: false,
-        replyToTweet: mockReplyToTweet,
+        quoteToTweet: mockquoteToTweet,
       },
       global: {
         plugins: [i18n],
