@@ -19,7 +19,6 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<Emits>();
 
 const currentIndex = ref(0);
-// const fileInputRef = ref<HTMLInputElement | null>(null);
 
 const hasMultipleMedia = computed(() => props.media.length > 1);
 const canNavigateLeft = computed(() => currentIndex.value > 0);

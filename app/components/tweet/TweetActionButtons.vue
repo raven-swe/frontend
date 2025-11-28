@@ -126,12 +126,14 @@ const handleShare = async () => {
               props.tweet.isRetweeted ? 'tweet-icon-turquoise-active' : 'tweet-icon-turquoise'
             "
             size="icon-md"
+            data-testid="retweet-dropdown-trigger"
           >
             <Icon name="tabler:repeat" size="1.2rem" />
           </Button>
         </UiDropdownMenuTrigger>
         <UiDropdownMenuContent align="center">
           <UiDropdownMenuItem
+            data-testid="retweet-action-item"
             @click.prevent.stop="props.tweet.isRetweeted ? handleUndoRetweet() : handleRetweet()"
           >
             <Icon name="tabler:repeat" size="18" />
@@ -139,7 +141,7 @@ const handleShare = async () => {
               props.tweet.isRetweeted ? $t('tweet.actions.unrepost') : $t('tweet.actions.repost')
             }}
           </UiDropdownMenuItem>
-          <UiDropdownMenuItem @click="showQuoteDialog = true">
+          <UiDropdownMenuItem data-testid="quote-action-item" @click="showQuoteDialog = true">
             <Icon name="tabler:pencil" size="18" />
             {{ $t('tweet.actions.quote') }}
           </UiDropdownMenuItem>

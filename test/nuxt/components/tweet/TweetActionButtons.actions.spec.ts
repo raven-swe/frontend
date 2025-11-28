@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mountSuspended } from '@nuxt/test-utils/runtime';
+import { nextTick } from 'vue';
 import TweetActionButtons from '@/components/tweet/TweetActionButtons.vue';
 import Button from '@/components/ui/Button.vue';
 import type { Tweet } from '~~/shared/types/tweets';
@@ -158,17 +159,29 @@ describe('TweetActionButtons actions', () => {
       props: { tweet },
       global: { stubs: { Icon: true } },
     });
-    const buttons = wrapper.findAllComponents(Button);
-    const retweetBtn = buttons[1]!;
 
-    await retweetBtn.trigger('click');
-    await retweetBtn.trigger('click');
+    // First open the dropdown
+    const dropdownTrigger = wrapper.find('[data-testid="retweet-dropdown-trigger"]');
+    await dropdownTrigger.trigger('click');
+    await nextTick();
+
+    // Then find and click the retweet action item
+    const retweetItem = document.querySelector(
+      '[data-testid="retweet-action-item"]',
+    ) as HTMLElement;
+    expect(retweetItem).not.toBeNull();
+
+    await retweetItem.click();
+    await retweetItem.click(); // Test double click prevention
+
     expect(mocks.svc.retweetTweet).toHaveBeenCalledTimes(1);
     expect(mocks.svc.retweetTweet).toHaveBeenCalledWith('tw-1');
 
     def.resolve({ success: true });
     await Promise.resolve();
     expect(wrapper.emitted()['retweet-success']).toBeTruthy();
+
+    wrapper.unmount();
   });
 
   it('clicking undo-retweet calls undoRetweetTweet and emits undo-retweet-success', async () => {
@@ -178,12 +191,22 @@ describe('TweetActionButtons actions', () => {
       props: { tweet },
       global: { stubs: { Icon: true } },
     });
-    const buttons = wrapper.findAllComponents(Button);
-    const undoBtn = buttons[1]!;
 
-    await undoBtn.trigger('click');
+    // First open the dropdown
+    const dropdownTrigger = wrapper.find('[data-testid="retweet-dropdown-trigger"]');
+    await dropdownTrigger.trigger('click');
+    await nextTick();
+
+    // Then find and click the undo retweet action item
+    const undoItem = document.querySelector('[data-testid="retweet-action-item"]') as HTMLElement;
+    expect(undoItem).not.toBeNull();
+
+    await undoItem.click();
+
     expect(mocks.svc.undoRetweetTweet).toHaveBeenCalledWith('tw-1');
     expect(wrapper.emitted()['undo-retweet-success']).toBeTruthy();
+
+    wrapper.unmount();
   });
 
   it('undo-retweet pending prevents double call', async () => {
@@ -194,15 +217,23 @@ describe('TweetActionButtons actions', () => {
       props: { tweet },
       global: { stubs: { Icon: true } },
     });
-    const buttons = wrapper.findAllComponents(Button);
-    const undoBtn = buttons[1]!;
 
-    await undoBtn.trigger('click');
-    await undoBtn.trigger('click');
+    const dropdownTrigger = wrapper.find('[data-testid="retweet-dropdown-trigger"]');
+    await dropdownTrigger.trigger('click');
+    await nextTick();
+
+    const undoItem = document.querySelector('[data-testid="retweet-action-item"]') as HTMLElement;
+    expect(undoItem).not.toBeNull();
+
+    await undoItem.click();
+    await undoItem.click(); // Test double click prevention
+
     expect(mocks.svc.undoRetweetTweet).toHaveBeenCalledTimes(1);
 
     def.resolve({ success: true });
     await Promise.resolve();
+
+    wrapper.unmount();
   });
 
   it('handles unlike error path with optimistic emit then revert', async () => {
@@ -244,13 +275,23 @@ describe('TweetActionButtons actions', () => {
       props: { tweet },
       global: { stubs: { Icon: true } },
     });
-    const buttons = wrapper.findAllComponents(Button);
-    const retweetBtn = buttons[1]!;
 
-    await retweetBtn.trigger('click');
+    const dropdownTrigger = wrapper.find('[data-testid="retweet-dropdown-trigger"]');
+    await dropdownTrigger.trigger('click');
+    await nextTick();
+
+    const retweetItem = document.querySelector(
+      '[data-testid="retweet-action-item"]',
+    ) as HTMLElement;
+    expect(retweetItem).not.toBeNull();
+
+    await retweetItem.click();
     await Promise.resolve();
+
     expect(wrapper.emitted()['retweet-success']).toHaveLength(1);
     expect(wrapper.emitted()['undo-retweet-success']).toHaveLength(1);
+
+    wrapper.unmount();
   });
 
   it('reverts retweet when service returns success=false (optimistic then revert)', async () => {
@@ -260,13 +301,23 @@ describe('TweetActionButtons actions', () => {
       props: { tweet },
       global: { stubs: { Icon: true } },
     });
-    const buttons = wrapper.findAllComponents(Button);
-    const retweetBtn = buttons[1]!;
 
-    await retweetBtn.trigger('click');
+    const dropdownTrigger = wrapper.find('[data-testid="retweet-dropdown-trigger"]');
+    await dropdownTrigger.trigger('click');
+    await nextTick();
+
+    const retweetItem = document.querySelector(
+      '[data-testid="retweet-action-item"]',
+    ) as HTMLElement;
+    expect(retweetItem).not.toBeNull();
+
+    await retweetItem.click();
     await Promise.resolve();
+
     expect(wrapper.emitted()['retweet-success']).toHaveLength(1);
     expect(wrapper.emitted()['undo-retweet-success']).toHaveLength(1);
+
+    wrapper.unmount();
   });
 
   it('handles undo-retweet error path with optimistic emit then revert', async () => {
@@ -276,13 +327,21 @@ describe('TweetActionButtons actions', () => {
       props: { tweet },
       global: { stubs: { Icon: true } },
     });
-    const buttons = wrapper.findAllComponents(Button);
-    const undoBtn = buttons[1]!;
 
-    await undoBtn.trigger('click');
+    const dropdownTrigger = wrapper.find('[data-testid="retweet-dropdown-trigger"]');
+    await dropdownTrigger.trigger('click');
+    await nextTick();
+
+    const undoItem = document.querySelector('[data-testid="retweet-action-item"]') as HTMLElement;
+    expect(undoItem).not.toBeNull();
+
+    await undoItem.click();
     await Promise.resolve();
+
     expect(wrapper.emitted()['undo-retweet-success']).toHaveLength(1);
     expect(wrapper.emitted()['retweet-success']).toHaveLength(1);
+
+    wrapper.unmount();
   });
 
   it('reverts undo-retweet when service returns success=false (optimistic then revert)', async () => {
@@ -292,13 +351,21 @@ describe('TweetActionButtons actions', () => {
       props: { tweet },
       global: { stubs: { Icon: true } },
     });
-    const buttons = wrapper.findAllComponents(Button);
-    const undoBtn = buttons[1]!;
 
-    await undoBtn.trigger('click');
+    const dropdownTrigger = wrapper.find('[data-testid="retweet-dropdown-trigger"]');
+    await dropdownTrigger.trigger('click');
+    await nextTick();
+
+    const undoItem = document.querySelector('[data-testid="retweet-action-item"]') as HTMLElement;
+    expect(undoItem).not.toBeNull();
+
+    await undoItem.click();
     await Promise.resolve();
+
     expect(wrapper.emitted()['undo-retweet-success']).toHaveLength(1);
     expect(wrapper.emitted()['retweet-success']).toHaveLength(1);
+
+    wrapper.unmount();
   });
 
   it('share copies link to clipboard and shows success toaster', async () => {
@@ -347,8 +414,4 @@ describe('TweetActionButtons actions', () => {
     await shareBtn.trigger('click');
     expect(mocks.showToaster).toHaveBeenCalledWith('error', 'Failed to copy link');
   });
-
-  // Note: SSR branch (typeof window === 'undefined') can't be simulated safely with VTU trigger
-  // without breaking Vue Test Utils which relies on window for event creation. The success and
-  // error share paths are covered above, and link content is asserted to be relative.
 });
