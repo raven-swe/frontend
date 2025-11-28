@@ -102,6 +102,39 @@
       "noMoreTweets": "No more tweets"
     }
   },
+  "explore": {
+    "for-you": {
+      "tab": "For You"
+    },
+    "trending": {
+      "tab": "Trending"
+    },
+    "news": {
+      "tab": "News"
+    },
+    "sports": {
+      "tab": "Sports"
+    },
+    "entertainment": {
+      "tab": "Entertainment"
+    },
+    "no-trending-hashtags": "No trending hashtags found"
+  },
+  "search": {
+    "top": {
+      "tab": "Top"
+    },
+    "latest": {
+      "tab": "Latest"
+    },
+    "people": {
+      "tab": "People"
+    },
+    "media": {
+      "tab": "Media"
+    },
+    "no-trending-hashtags": "No trending hashtags found"
+  },
   "playground": {
     "dialog": {
       "title": "Create your account",

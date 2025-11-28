@@ -95,6 +95,24 @@
       "noMoreTweets": "لا توجد تغريدات أخرى"
     }
   },
+  "explore": {
+    "for-you": {
+      "tab": "لك"
+    },
+    "trending": {
+      "tab": "رائج"
+    },
+    "news": {
+      "tab": "أخبار"
+    },
+    "sports": {
+      "tab": "رياضة"
+    },
+    "entertainment": {
+      "tab": "ترفيه"
+    },
+    "no-trending-hashtags": "لا توجد علامات تصنيف رائجة"
+  },
   "playground": {
     "dialog": {
       "title": "إنشاء حسابك",
