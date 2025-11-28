@@ -110,7 +110,7 @@ function handleTweetClick() {
     class="border-b-border flex w-full max-w-[700px] cursor-pointer gap-3 border-b-1 p-2"
     @click.prevent.stop="handleTweetClick"
   >
-    <NuxtLink :to="`/profile/${props.tweet.author.username}`">
+    <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
       <Avatar
         :img="props.tweet.author.avatarUrl || '/default_profile.png'"
         size="sm"
@@ -122,7 +122,7 @@ function handleTweetClick() {
     <div class="min-w-0 flex-1">
       <!-- Header: display name, username, time -->
       <div class="flex flex-wrap items-center gap-x-1 text-sm">
-        <NuxtLink :to="`/profile/${props.tweet.author.username}`">
+        <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
           <span class="cursor-pointer font-semibold hover:underline">{{
             props.tweet.author.displayName
           }}</span>
@@ -143,7 +143,12 @@ function handleTweetClick() {
           <span v-if="seg.type === 'text'" class="inline">
             {{ seg.text }}
           </span>
-          <a v-else :href="seg.href" class="text-primary inline font-medium hover:underline">
+          <a
+            v-else
+            :href="seg.href"
+            class="text-primary inline font-medium hover:underline"
+            @click.stop
+          >
             {{ seg.text }}
           </a>
         </template>
