@@ -75,7 +75,12 @@ const handlePostWrapper = async () => {
       />
     </div>
 
-    <MediaSlideshow :media="media" :max-media="MAX_MEDIA" @remove="handleRemoveMedia" />
+    <MediaSlideshow
+      :media="media"
+      :max-media="MAX_MEDIA"
+      :composer-type="type"
+      @remove="handleRemoveMedia"
+    />
 
     <slot name="reposted-tweet" />
 
@@ -94,6 +99,7 @@ const handlePostWrapper = async () => {
         :can-add-media="media.length < MAX_MEDIA"
         :button-text="$t('tweet.composer.button.' + props.type)"
         :is-posting="isPosting"
+        :composer-type="type"
         @post="handlePostWrapper"
         @add-media="handleAddMedia"
       />

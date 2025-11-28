@@ -135,11 +135,13 @@
     "composer": {
       "placeholder": {
         "default": "ما الذي يحدث؟",
-        "reply": "انشر ردك"
+        "reply": "انشر ردك",
+        "quote": "أضف تعليقًا"
       },
       "button": {
         "default": "نشر",
-        "reply": "رد"
+        "reply": "رد",
+        "quote": "نشر"
       },
       "media": "الوسائط",
       "gif": "GIF صور متحركة",
