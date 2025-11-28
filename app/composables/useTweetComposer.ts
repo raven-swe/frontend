@@ -7,7 +7,7 @@ import { uploadMediaService } from '@/services/tweet/uploadMediaService';
 import { createTweetService } from '@/services/tweet/createTweetService';
 import { showToaster } from '@/utils/showToaster';
 
-export const usePostTweet = (
+export const useTweetComposer = (
   tweetContent: Ref<string>,
   media: Ref<MediaItem[]>,
   replyToTweetId?: Ref<string | null>,

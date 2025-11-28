@@ -7,7 +7,7 @@ import MediaSlideshow from './MediaSlideshow.vue';
 import type { MediaItem } from '~~/shared/types/shared';
 import type { Tweet } from '~~/shared/types/tweets';
 import Avatar from '~/components/ui/Avatar.vue';
-import { usePostTweet } from '@/composables/usePostTweet';
+import { useTweetComposer } from '~/composables/useTweetComposer';
 
 interface Props {
   replyToTweetId?: string | null;
@@ -35,7 +35,7 @@ const {
   handlePost,
   handleAddMedia,
   handleRemoveMedia,
-} = usePostTweet(tweetContent, media, replyToRef);
+} = useTweetComposer(tweetContent, media, replyToRef);
 
 const emit = defineEmits<{
   (e: 'posted', tweet: Tweet): void;
