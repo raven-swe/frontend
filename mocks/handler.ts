@@ -8,6 +8,7 @@ import { handlers as authHandlers } from './handlers/auth';
 import { handlers as onboardingHandlers } from './handlers/onboarding';
 import { handlers as otherUserHandlers } from './handlers/other-user';
 import { handlers as profileInteractionsHandlers } from './handlers/profile-interactions';
+import { handlers as exploreHandlers } from './handlers/explore';
 
 export const handlers = [
   ...registerHandlers,
@@ -20,4 +21,5 @@ export const handlers = [
   ...otherUserHandlers,
   ...onboardingHandlers,
   ...profileInteractionsHandlers,
+  ...exploreHandlers,
 ];
