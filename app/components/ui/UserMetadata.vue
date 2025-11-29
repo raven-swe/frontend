@@ -27,6 +27,17 @@ const unfollowUser = () => {
 const unblockUser = () => {
   emit('unblock');
 };
+const parsedBioTokens = computed(() =>
+  user.value
+    ? parseContentEntities(
+        user.value.bio,
+        user.value.bioEntities || {
+          mentions: [],
+          hashtags: [],
+        },
+      )
+    : [],
+);
 </script>
 
 <template>
@@ -57,7 +68,34 @@ const unblockUser = () => {
       </NuxtLink>
     </div>
     <p v-if="user.bio" class="text-sm">
-      {{ user.bio }}
+      <template v-for="token in parsedBioTokens" :key="token.key">
+        <span v-if="token.type === 'text'" :key="token.key">
+          {{ token.display }}
+        </span>
+        <NuxtLink
+          v-else-if="token.type === 'mention'"
+          :to="`/profile/${token.value}`"
+          class="text-primary hover:underline"
+        >
+          {{ token.display }}
+        </NuxtLink>
+        <NuxtLink
+          v-else-if="token.type === 'hashtag'"
+          :to="`/hashtag/${token.value}`"
+          class="text-primary hover:underline"
+        >
+          {{ token.display }}
+        </NuxtLink>
+        <a
+          v-else-if="token.type === 'link'"
+          :href="token.value"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-primary hover:underline"
+        >
+          {{ token.display }}
+        </a>
+      </template>
     </p>
     <div class="flex gap-5">
       <span class="text-sm font-medium">
