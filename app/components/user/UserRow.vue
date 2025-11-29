@@ -99,7 +99,13 @@ const relationship = computed(() => props.user.relationship);
             @block="$emit('block', user.username)"
             @unblock="$emit('unblock', user.username)"
           >
-            <UiButton variant="ghost-default" class="bg-transparent" size="icon-sm" @click.stop>
+            <UiButton
+              data-test="dropdown-trigger"
+              variant="ghost-default"
+              class="bg-transparent"
+              size="icon-sm"
+              @click.stop
+            >
               <Icon class="text-muted-foreground" name="lucide:more-horizontal" />
             </UiButton>
           </UserActionDropdown>
