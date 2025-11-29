@@ -10,7 +10,7 @@ const NuxtPageStub = { template: '<div data-testid="nuxt-page" />' };
 const SettingsSectionStub = { template: '<div data-testid="settings-section" />' };
 
 /* eslint-disable import/first */
-import AccountLayoutPage from '@/pages/settings/account.vue';
+import AccountLayoutPage from '@/pages/settings.vue';
 /* eslint-enable import/first */
 
 describe('Settings Account Layout Page', () => {
