@@ -34,6 +34,7 @@ const mockUser: User = {
     muted: false,
   },
 };
+const userRef = ref<User>(mockUser);
 
 const i18n = createI18n({
   locale: 'en',
@@ -42,26 +43,31 @@ const i18n = createI18n({
   },
 });
 
+const createWrapper = async () => {
+  const { default: ProfileAvatarSection } = await import(
+    '@/components/profile/ProfileAvatarSection.vue'
+  );
+  return await mountSuspended(ProfileAvatarSection, {
+    global: {
+      provide: {
+        'user-data': userRef,
+      },
+      plugins: [i18n],
+    },
+  });
+};
+
 describe('ProfileAvatarSection Component', () => {
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
     vi.resetAllMocks();
     vi.unstubAllGlobals();
+    userRef.value = structuredClone(mockUser);
   });
 
   it('renders the container with correct layout classes', async () => {
-    const { default: ProfileAvatarSection } = await import(
-      '@/components/profile/ProfileAvatarSection.vue'
-    );
-    const wrapper = await mountSuspended(ProfileAvatarSection, {
-      global: {
-        provide: {
-          'user-data': computed(() => mockUser),
-        },
-        plugins: [i18n],
-      },
-    });
+    const wrapper = await createWrapper();
 
     const container = wrapper.find('.mx-4.flex.flex-wrap');
     expect(container.exists()).toBe(true);
@@ -70,17 +76,7 @@ describe('ProfileAvatarSection Component', () => {
   });
 
   it('has correct profile image source', async () => {
-    const { default: ProfileAvatarSection } = await import(
-      '@/components/profile/ProfileAvatarSection.vue'
-    );
-    const wrapper = await mountSuspended(ProfileAvatarSection, {
-      global: {
-        provide: {
-          'user-data': computed(() => mockUser),
-        },
-        plugins: [i18n],
-      },
-    });
+    const wrapper = await createWrapper();
 
     const profileImage = wrapper.find('img');
     expect(profileImage.exists()).toBe(true);
@@ -98,20 +94,8 @@ describe('ProfileAvatarSection Component', () => {
   });
 
   it('gracefully handle missing avatar URL', async () => {
-    const { default: ProfileAvatarSection } = await import(
-      '@/components/profile/ProfileAvatarSection.vue'
-    );
-    const wrapper = await mountSuspended(ProfileAvatarSection, {
-      global: {
-        provide: {
-          'user-data': computed(() => ({
-            ...mockUser,
-            avatarUrl: null,
-          })),
-        },
-        plugins: [i18n],
-      },
-    });
+    userRef.value.avatarUrl = '';
+    const wrapper = await createWrapper();
 
     const profileImage = wrapper.find('img');
     expect(profileImage.exists()).toBe(true);
@@ -123,17 +107,7 @@ describe('ProfileAvatarSection Component', () => {
       useIsCurrentUser: vi.fn(() => ({ isCurrentUser: computed(() => false) })),
     }));
 
-    const { default: ProfileAvatarSection } = await import(
-      '@/components/profile/ProfileAvatarSection.vue'
-    );
-    const wrapper = await mountSuspended(ProfileAvatarSection, {
-      global: {
-        provide: {
-          'user-data': computed(() => mockUser),
-        },
-        plugins: [i18n],
-      },
-    });
+    const wrapper = await createWrapper();
 
     const setupProfileButton = wrapper.find('button[data-test="setup-profile-button"]');
     expect(setupProfileButton.exists()).toBe(false);
@@ -153,21 +127,7 @@ describe('ProfileAvatarSection Component', () => {
       })),
     }));
 
-    const { default: ProfileAvatarSection } = await import(
-      '@/components/profile/ProfileAvatarSection.vue'
-    );
-
-    const wrapper = await mountSuspended(ProfileAvatarSection, {
-      global: {
-        provide: {
-          'user-data': computed(() => mockUser),
-        },
-        plugins: [i18n],
-      },
-    });
-
-    // console.log(i18n.global.t('profile.setup.setup-profile'))
-    console.log(messages.profile.setup['setup-profile']);
+    const wrapper = await createWrapper();
 
     const setupButton = wrapper.find('button[data-test="setup-profile-button"]');
     expect(setupButton.exists()).toBe(true);
@@ -188,17 +148,7 @@ describe('ProfileAvatarSection Component', () => {
       })),
     }));
 
-    const { default: ProfileAvatarSection } = await import(
-      '@/components/profile/ProfileAvatarSection.vue'
-    );
-    const wrapper = await mountSuspended(ProfileAvatarSection, {
-      global: {
-        provide: {
-          'user-data': computed(() => mockUser),
-        },
-        plugins: [i18n],
-      },
-    });
+    const wrapper = await createWrapper();
 
     const button = wrapper.find('button');
     expect(button.exists()).toBe(true);
@@ -213,17 +163,7 @@ describe('ProfileAvatarSection Component', () => {
       useIsCurrentUser: vi.fn(() => ({ isCurrentUser: computed(() => true) })),
     }));
 
-    const { default: ProfileAvatarSection } = await import(
-      '@/components/profile/ProfileAvatarSection.vue'
-    );
-    const wrapper = await mountSuspended(ProfileAvatarSection, {
-      global: {
-        provide: {
-          'user-data': computed(() => mockUser),
-        },
-        plugins: [i18n],
-      },
-    });
+    const wrapper = await createWrapper();
 
     const blockButton = wrapper.find('[data-test="block-button"]');
     expect(blockButton.exists()).toBe(false);
@@ -237,17 +177,7 @@ describe('ProfileAvatarSection Component', () => {
       useIsCurrentUser: vi.fn(() => ({ isCurrentUser: computed(() => true) })),
     }));
 
-    const { default: ProfileAvatarSection } = await import(
-      '@/components/profile/ProfileAvatarSection.vue'
-    );
-    const wrapper = await mountSuspended(ProfileAvatarSection, {
-      global: {
-        provide: {
-          'user-data': computed(() => mockUser),
-        },
-        plugins: [i18n],
-      },
-    });
+    const wrapper = await createWrapper();
 
     const followButton = wrapper.find('[data-test="follow-button"]');
     expect(followButton.exists()).toBe(false);
@@ -261,17 +191,7 @@ describe('ProfileAvatarSection Component', () => {
       useIsCurrentUser: vi.fn(() => ({ isCurrentUser: computed(() => false) })),
     }));
 
-    const { default: ProfileAvatarSection } = await import(
-      '@/components/profile/ProfileAvatarSection.vue'
-    );
-    const wrapper = await mountSuspended(ProfileAvatarSection, {
-      global: {
-        provide: {
-          'user-data': computed(() => mockUser),
-        },
-        plugins: [i18n],
-      },
-    });
+    const wrapper = await createWrapper();
 
     const followButton = wrapper.find('[data-test="follow-button"]');
     expect(followButton.exists()).toBe(true);
@@ -282,25 +202,9 @@ describe('ProfileAvatarSection Component', () => {
       useIsCurrentUser: vi.fn(() => ({ isCurrentUser: computed(() => false) })),
     }));
 
-    const followedUser: User = {
-      ...mockUser,
-      relationship: {
-        ...mockUser.relationship,
-        following: true,
-      },
-    };
+    userRef.value.relationship.following = true;
 
-    const { default: ProfileAvatarSection } = await import(
-      '@/components/profile/ProfileAvatarSection.vue'
-    );
-    const wrapper = await mountSuspended(ProfileAvatarSection, {
-      global: {
-        provide: {
-          'user-data': computed(() => followedUser),
-        },
-        plugins: [i18n],
-      },
-    });
+    const wrapper = await createWrapper();
 
     const unfollowButton = wrapper.find('[data-test="unfollow-button"]');
     expect(unfollowButton.exists()).toBe(true);
@@ -311,17 +215,7 @@ describe('ProfileAvatarSection Component', () => {
       useIsCurrentUser: vi.fn(() => ({ isCurrentUser: computed(() => false) })),
     }));
 
-    const { default: ProfileAvatarSection } = await import(
-      '@/components/profile/ProfileAvatarSection.vue'
-    );
-    const wrapper = await mountSuspended(ProfileAvatarSection, {
-      global: {
-        provide: {
-          'user-data': computed(() => mockUser),
-        },
-        plugins: [i18n],
-      },
-    });
+    const wrapper = await createWrapper();
 
     const dropdownTrigger = wrapper.find('[data-test="profile-actions-trigger"]');
     expect(dropdownTrigger.exists()).toBe(true);
@@ -336,215 +230,133 @@ describe('ProfileAvatarSection Component', () => {
     expect(muteButton).not.toBeNull();
     wrapper.unmount();
   });
+});
+
+describe('ProfileActions', () => {
+  const muteUserMock = vi.fn(({ action }: { action: 'mute' | 'unmute' }) => {
+    if (action === 'mute') {
+      userRef.value.relationship.muted = true;
+    } else {
+      userRef.value.relationship.muted = false;
+    }
+  });
+
+  const blockUserMock = vi.fn(({ action }: { action: 'block' | 'unblock' }) => {
+    if (action === 'block') {
+      userRef.value.relationship.blocking = true;
+    } else {
+      userRef.value.relationship.blocking = false;
+    }
+    userRef.value.relationship.following = false;
+  });
+
+  const followUserMock = vi.fn(({ action }: { action: 'follow' | 'unfollow' }) => {
+    if (action === 'follow') {
+      userRef.value.relationship.following = true;
+      userRef.value.followersCount += 1;
+    } else {
+      userRef.value.relationship.following = false;
+      userRef.value.followersCount -= 1;
+    }
+  });
+
+  const useMuteMutationMock = vi.fn((_username: string) => {
+    return {
+      mutate: muteUserMock,
+    };
+  });
+
+  const useBlockMutationMock = vi.fn((_username: string) => {
+    return {
+      mutate: blockUserMock,
+    };
+  });
+
+  const useFollowMutationMock = vi.fn((_username: string) => {
+    return {
+      mutate: followUserMock,
+    };
+  });
+
+  beforeEach(() => {
+    vi.resetModules();
+    vi.resetAllMocks();
+    userRef.value = structuredClone(mockUser);
+
+    vi.doMock('~/composables/useProfileMutation', () => ({
+      useMuteMutation: useMuteMutationMock,
+      useBlockMutation: useBlockMutationMock,
+      useFollowMutation: useFollowMutationMock,
+    }));
+
+    vi.doMock('@/composables/useIsCurrentUser', () => ({
+      useIsCurrentUser: vi.fn(() => ({ isCurrentUser: computed(() => false) })),
+    }));
+  });
 
   it('mute a user if unmuted and clicked mute buton', async () => {
-    const user = ref<User>({
-      ...mockUser,
-      relationship: {
-        ...mockUser.relationship,
-        muted: false,
-      },
-    });
+    userRef.value.relationship.muted = false;
 
-    const muteUserMock = vi.fn();
-    const unmuteUserMock = vi.fn();
+    const wrapper = await createWrapper();
 
-    const userProfileMock = vi.fn(
-      ({
-        mutationFn,
-        username: _username,
-        optimisticUpdateFn,
-      }: {
-        mutationFn: (action: 'mute' | 'unmute') => void;
-        optimisticUpdateFn: (data: User, action: 'mute' | 'unmute') => void;
-        username: string;
-      }) => {
-        return {
-          mutate: (action: 'mute' | 'unmute') => {
-            optimisticUpdateFn(user.value, action);
-            return mutationFn(action);
-          },
-        };
-      },
-    );
+    expect(useMuteMutationMock).toHaveBeenCalledWith('testuser');
+    expect(useBlockMutationMock).toHaveBeenCalledWith('testuser');
+    expect(useFollowMutationMock).toHaveBeenCalledWith('testuser');
 
-    vi.doMock('~/composables/useProfileMutation', () => ({
-      useProfileMutation: userProfileMock,
-    }));
+    const dropdownTrigger = wrapper.find('[data-test="profile-actions-trigger"]');
+    expect(dropdownTrigger.exists()).toBe(true);
 
-    vi.doMock('@/composables/useIsCurrentUser', () => ({
-      useIsCurrentUser: vi.fn(() => ({ isCurrentUser: computed(() => false) })),
-    }));
+    await dropdownTrigger.trigger('click');
+    await nextTick();
 
-    vi.doMock('~/services/profile/profileInteractionService', () => ({
-      profileInteractionService: {
-        muteUser: muteUserMock,
-        unmuteUser: unmuteUserMock,
-        blockUser: vi.fn(),
-        unblockUser: vi.fn(),
-      },
-    }));
+    const muteButton = document.querySelector('[data-test="mute-button"]') as HTMLElement;
+    expect(muteButton).not.toBeNull();
 
-    const { default: ProfileAvatarSection } = await import(
-      '@/components/profile/ProfileAvatarSection.vue'
-    );
-    const wrapper = await mountSuspended(ProfileAvatarSection, {
-      global: {
-        provide: {
-          'user-data': user,
-        },
-        plugins: [i18n],
-      },
-    });
-
-    expect(userProfileMock).toHaveBeenNthCalledWith(1, {
-      mutationFn: expect.any(Function),
-      optimisticUpdateFn: expect.any(Function),
+    muteButton.click();
+    await nextTick();
+    expect(muteUserMock).toHaveBeenCalledWith({
+      action: 'mute',
       username: 'testuser',
     });
+    expect(userRef.value.relationship.muted).toBe(true);
+  });
 
-    expect(userProfileMock).toHaveBeenNthCalledWith(2, {
-      mutationFn: expect.any(Function),
-      optimisticUpdateFn: expect.any(Function),
+  it('unmute a user if muted and clicked mute button', async () => {
+    userRef.value.relationship.muted = true;
+
+    const wrapper = await createWrapper();
+
+    expect(useMuteMutationMock).toHaveBeenCalledWith('testuser');
+    expect(useBlockMutationMock).toHaveBeenCalledWith('testuser');
+    expect(useFollowMutationMock).toHaveBeenCalledWith('testuser');
+
+    const dropdownTrigger = wrapper.find('[data-test="profile-actions-trigger"]');
+    expect(dropdownTrigger.exists()).toBe(true);
+
+    await dropdownTrigger.trigger('click');
+    await nextTick();
+
+    const muteButton = document.querySelector('[data-test="mute-button"]') as HTMLElement;
+    expect(muteButton).not.toBeNull();
+
+    await muteButton.click();
+    await nextTick();
+    expect(muteUserMock).toHaveBeenCalledWith({
+      action: 'unmute',
       username: 'testuser',
     });
-
-    const dropdownTrigger = wrapper.find('[data-test="profile-actions-trigger"]');
-    expect(dropdownTrigger.exists()).toBe(true);
-
-    await dropdownTrigger.trigger('click');
-    await nextTick();
-
-    const muteButton = document.querySelector('[data-test="mute-button"]') as HTMLElement;
-    expect(muteButton).not.toBeNull();
-
-    await muteButton.click();
-    await nextTick();
-    expect(muteUserMock).toHaveBeenCalledWith('testuser');
-    expect(unmuteUserMock).not.toHaveBeenCalled();
-    expect(user.value.relationship.muted).toBe(true);
+    expect(userRef.value.relationship.muted).toBe(false);
   });
 
-  it('unmute a user if muted and clicked unmute buton', async () => {
-    const user = ref<User>({
-      ...mockUser,
-      relationship: {
-        ...mockUser.relationship,
-        muted: true,
-      },
-    });
+  it('block a user if unblocked and clicked block button', async () => {
+    userRef.value.relationship.blocking = false;
+    userRef.value.relationship.following = true;
 
-    const muteUserMock = vi.fn();
-    const unmuteUserMock = vi.fn();
+    const wrapper = await createWrapper();
 
-    vi.doMock('~/services/profile/profileInteractionService', () => ({
-      profileInteractionService: {
-        muteUser: muteUserMock,
-        unmuteUser: unmuteUserMock,
-        blockUser: vi.fn(),
-        unblockUser: vi.fn(),
-      },
-    }));
-
-    vi.doMock('~/composables/useProfileMutation', () => ({
-      useProfileMutation: ({
-        mutationFn,
-        optimisticUpdateFn,
-      }: {
-        mutationFn: (action: 'mute' | 'unmute') => void;
-        optimisticUpdateFn: (data: User, action: 'mute' | 'unmute') => void;
-      }) => ({
-        mutate: (action: 'mute' | 'unmute') => {
-          optimisticUpdateFn(user.value, action);
-          return mutationFn(action);
-        },
-      }),
-    }));
-
-    vi.doMock('@/composables/useIsCurrentUser', () => ({
-      useIsCurrentUser: vi.fn(() => ({ isCurrentUser: computed(() => false) })),
-    }));
-
-    const { default: ProfileAvatarSection } = await import(
-      '@/components/profile/ProfileAvatarSection.vue'
-    );
-    const wrapper = await mountSuspended(ProfileAvatarSection, {
-      global: {
-        provide: {
-          'user-data': user,
-        },
-        plugins: [i18n],
-      },
-    });
-
-    const dropdownTrigger = wrapper.find('[data-test="profile-actions-trigger"]');
-    expect(dropdownTrigger.exists()).toBe(true);
-
-    await dropdownTrigger.trigger('click');
-    await nextTick();
-
-    const muteButton = document.querySelector('[data-test="mute-button"]') as HTMLElement;
-    expect(muteButton).not.toBeNull();
-
-    await muteButton.click();
-    await nextTick();
-    expect(unmuteUserMock).toHaveBeenCalledWith('testuser');
-    expect(muteUserMock).not.toHaveBeenCalled();
-    expect(user.value.relationship.muted).toBe(false);
-  });
-
-  it('block a user if unblocked and clicked block buton', async () => {
-    const user = ref<User>({
-      ...mockUser,
-      relationship: {
-        ...mockUser.relationship,
-        blocking: false,
-      },
-    });
-
-    const blockUserMock = vi.fn();
-    const unblockUserMock = vi.fn();
-
-    vi.doMock('~/services/profile/profileInteractionService', () => ({
-      profileInteractionService: {
-        muteUser: vi.fn(),
-        unmuteUser: vi.fn(),
-        blockUser: blockUserMock,
-        unblockUser: unblockUserMock,
-      },
-    }));
-
-    vi.doMock('~/composables/useProfileMutation', () => ({
-      useProfileMutation: ({
-        mutationFn,
-        optimisticUpdateFn,
-      }: {
-        mutationFn: (action: 'block' | 'unblock') => void;
-        optimisticUpdateFn: (data: User, action: 'block' | 'unblock') => void;
-      }) => ({
-        mutate: (action: 'block' | 'unblock') => {
-          optimisticUpdateFn(user.value, action);
-          return mutationFn(action);
-        },
-      }),
-    }));
-
-    vi.doMock('@/composables/useIsCurrentUser', () => ({
-      useIsCurrentUser: vi.fn(() => ({ isCurrentUser: computed(() => false) })),
-    }));
-
-    const { default: ProfileAvatarSection } = await import(
-      '@/components/profile/ProfileAvatarSection.vue'
-    );
-
-    const wrapper = await mountSuspended(ProfileAvatarSection, {
-      global: {
-        provide: {
-          'user-data': user,
-        },
-        plugins: [i18n],
-      },
-    });
+    expect(useMuteMutationMock).toHaveBeenCalledWith('testuser');
+    expect(useBlockMutationMock).toHaveBeenCalledWith('testuser');
+    expect(useFollowMutationMock).toHaveBeenCalledWith('testuser');
 
     const dropdownTrigger = wrapper.find('[data-test="profile-actions-trigger"]');
     expect(dropdownTrigger.exists()).toBe(true);
@@ -557,63 +369,22 @@ describe('ProfileAvatarSection Component', () => {
 
     await blockButton.click();
     await nextTick();
-    expect(blockUserMock).toHaveBeenCalledWith('testuser');
-    expect(unblockUserMock).not.toHaveBeenCalled();
-    expect(user.value.relationship.blocking).toBe(true);
+    expect(blockUserMock).toHaveBeenCalledWith({
+      action: 'block',
+      username: 'testuser',
+    });
+    expect(userRef.value.relationship.blocking).toBe(true);
+    expect(userRef.value.relationship.following).toBe(false);
   });
 
-  it('unblock a user if blocked and clicked unblock buton', async () => {
-    const user = ref<User>({
-      ...mockUser,
-      relationship: {
-        ...mockUser.relationship,
-        blocking: true,
-      },
-    });
+  it('unblock a user if blocked and clicked block button', async () => {
+    userRef.value.relationship.blocking = true;
 
-    const blockUserMock = vi.fn();
-    const unblockUserMock = vi.fn();
+    const wrapper = await createWrapper();
 
-    vi.doMock('~/services/profile/profileInteractionService', () => ({
-      profileInteractionService: {
-        muteUser: vi.fn(),
-        unmuteUser: vi.fn(),
-        blockUser: blockUserMock,
-        unblockUser: unblockUserMock,
-      },
-    }));
-
-    vi.doMock('~/composables/useProfileMutation', () => ({
-      useProfileMutation: ({
-        mutationFn,
-        optimisticUpdateFn,
-      }: {
-        mutationFn: (action: 'block' | 'unblock') => void;
-        optimisticUpdateFn: (data: User, action: 'block' | 'unblock') => void;
-      }) => ({
-        mutate: (action: 'block' | 'unblock') => {
-          optimisticUpdateFn(user.value, action);
-          return mutationFn(action);
-        },
-      }),
-    }));
-
-    vi.doMock('@/composables/useIsCurrentUser', () => ({
-      useIsCurrentUser: vi.fn(() => ({ isCurrentUser: computed(() => false) })),
-    }));
-
-    const { default: ProfileAvatarSection } = await import(
-      '@/components/profile/ProfileAvatarSection.vue'
-    );
-
-    const wrapper = await mountSuspended(ProfileAvatarSection, {
-      global: {
-        provide: {
-          'user-data': user,
-        },
-        plugins: [i18n],
-      },
-    });
+    expect(useMuteMutationMock).toHaveBeenCalledWith('testuser');
+    expect(useBlockMutationMock).toHaveBeenCalledWith('testuser');
+    expect(useFollowMutationMock).toHaveBeenCalledWith('testuser');
 
     const dropdownTrigger = wrapper.find('[data-test="profile-actions-trigger"]');
     expect(dropdownTrigger.exists()).toBe(true);
@@ -626,108 +397,52 @@ describe('ProfileAvatarSection Component', () => {
 
     await blockButton.click();
     await nextTick();
-    expect(unblockUserMock).toHaveBeenCalledWith('testuser');
-    expect(user.value.relationship.blocking).toBe(false);
+    expect(blockUserMock).toHaveBeenCalledWith({
+      action: 'unblock',
+      username: 'testuser',
+    });
+    expect(userRef.value.relationship.blocking).toBe(false);
   });
 
-  it('mutation fn handle not exisiting user gracefully', async () => {
-    const muteUserMock = vi.fn();
-    const unmuteUserMock = vi.fn();
-    const blockUserMock = vi.fn();
-    const unblockUserMock = vi.fn();
+  it('follow a user when clicked follow button', async () => {
+    userRef.value.relationship.following = false;
 
-    const user = ref<User>({
-      ...mockUser,
-      relationship: {
-        ...mockUser.relationship,
-        blocking: true,
-      },
-    });
+    const wrapper = await createWrapper();
 
-    vi.doMock('~/services/profile/profileInteractionService', () => ({
-      profileInteractionService: {
-        muteUser: muteUserMock,
-        unmuteUser: unmuteUserMock,
-        blockUser: blockUserMock,
-        unblockUser: unblockUserMock,
-      },
-    }));
+    expect(useMuteMutationMock).toHaveBeenCalledWith('testuser');
+    expect(useBlockMutationMock).toHaveBeenCalledWith('testuser');
+    expect(useFollowMutationMock).toHaveBeenCalledWith('testuser');
 
-    const userProfileMock = vi.fn(
-      ({
-        mutationFn,
-        username: _username,
-        optimisticUpdateFn,
-      }: {
-        mutationFn: (action: 'mute' | 'unmute') => void;
-        optimisticUpdateFn: (data: User, action: 'mute' | 'unmute') => void;
-        username: string;
-      }) => {
-        return {
-          mutate: (action: 'mute' | 'unmute') => {
-            optimisticUpdateFn(user.value, action);
-            return mutationFn(action);
-          },
-        };
-      },
-    );
+    const followButton = wrapper.find('[data-test="follow-button"]');
+    expect(followButton.exists()).toBe(true);
 
-    vi.doMock('~/composables/useProfileMutation', () => ({
-      useProfileMutation: userProfileMock,
-    }));
-
-    vi.doMock('@/composables/useIsCurrentUser', () => ({
-      useIsCurrentUser: vi.fn(() => ({ isCurrentUser: computed(() => false) })),
-    }));
-
-    const { default: ProfileAvatarSection } = await import(
-      '@/components/profile/ProfileAvatarSection.vue'
-    );
-
-    const wrapper = await mountSuspended(ProfileAvatarSection, {
-      global: {
-        provide: {
-          'user-data': null,
-        },
-        plugins: [i18n],
-      },
-    });
-
-    expect(userProfileMock).toHaveBeenNthCalledWith(1, {
-      mutationFn: expect.any(Function),
-      optimisticUpdateFn: expect.any(Function),
-      username: '',
-    });
-
-    expect(userProfileMock).toHaveBeenNthCalledWith(2, {
-      mutationFn: expect.any(Function),
-      optimisticUpdateFn: expect.any(Function),
-      username: '',
-    });
-
-    const dropdownTrigger = wrapper.find('[data-test="profile-actions-trigger"]');
-    expect(dropdownTrigger.exists()).toBe(true);
-
-    await dropdownTrigger.trigger('click');
+    await followButton.trigger('click');
     await nextTick();
+    expect(followUserMock).toHaveBeenCalledWith({
+      action: 'follow',
+      username: 'testuser',
+    });
+    expect(userRef.value.relationship.following).toBe(true);
+  });
 
-    const muteButton = document.querySelector('[data-test="mute-button"]') as HTMLElement;
-    expect(muteButton).not.toBeNull();
+  it('unfollow a user when clicked unfollow button', async () => {
+    userRef.value.relationship.following = true;
 
-    await muteButton.click();
+    const wrapper = await createWrapper();
+
+    expect(useMuteMutationMock).toHaveBeenCalledWith('testuser');
+    expect(useBlockMutationMock).toHaveBeenCalledWith('testuser');
+    expect(useFollowMutationMock).toHaveBeenCalledWith('testuser');
+
+    const unfollowButton = wrapper.find('[data-test="unfollow-button"]');
+    expect(unfollowButton.exists()).toBe(true);
+
+    await unfollowButton.trigger('click');
     await nextTick();
-    expect(muteUserMock).not.toHaveBeenCalled();
-    expect(unmuteUserMock).not.toHaveBeenCalled();
-
-    await dropdownTrigger.trigger('click');
-    await nextTick();
-
-    const blockButton = document.querySelector('[data-test="block-button"]') as HTMLElement;
-    expect(blockButton).not.toBeNull();
-
-    await blockButton.click();
-    await nextTick();
-    expect(blockUserMock).not.toHaveBeenCalled();
-    expect(unblockUserMock).not.toHaveBeenCalled();
+    expect(followUserMock).toHaveBeenCalledWith({
+      action: 'unfollow',
+      username: 'testuser',
+    });
+    expect(userRef.value.relationship.following).toBe(false);
   });
 });
