@@ -11,8 +11,31 @@ import { registerationService } from '~/services/auth/registerationService';
 
 const { t } = useI18n();
 const registerStore = useRegisterStore();
+const checkEmail = useDebounceFn(
+  async (email: string) => await registerationService.checkEmail(email),
+  300,
+);
+
 const schema = yup.object({
-  email: yup.string().min(1, t('errors.INVALID_EMAIL')).email(t('errors.INVALID_EMAIL')),
+  email: yup
+    .string()
+    .min(1, t('errors.INVALID_EMAIL'))
+    .email(t('errors.INVALID_EMAIL'))
+    .test('unique', $t('errors.EMAIL_ALREADY_EXISTS'), async (value, ctx) => {
+      if (!value) return true;
+      try {
+        const exists = await checkEmail(value);
+        return !exists;
+      } catch (error) {
+        if (isApiValidationError(error)) {
+          const errorCode = error.data?.data?.error.errors.find((e) => e.field === 'email')?.code;
+          return ctx.createError({
+            message: errorCode ? t(`errors.email.${errorCode}`) : t('errors.INVALID_EMAIL'),
+          });
+        }
+        return false;
+      }
+    }),
   name: yup.string().min(1, t('errors.NAME_TOO_SHORT')).max(50, t('errors.NAME_TOO_LONG')),
   birthDate: yup
     .date()
@@ -45,47 +68,27 @@ const onSubmit = handleSubmit(async (values, actions) => {
   if (!values.birthDate || !values.email || !values.name) return;
 
   // Format date as yyyy-mm-dd
-  const formattedBirthDate = values.birthDate?.toISOString()?.split('T')[0] as string;
+  const formattedBirthDate = values.birthDate.toISOString().split('T')[0] as string;
   const vals = {
     name: values.name,
     email: values.email,
     birthDate: formattedBirthDate,
     recaptchaToken: values.recaptchaToken,
   };
-  const errors = await registerStore.submitRegisterationInfo(vals);
-  if (errors) {
-    actions.setErrors(backendValidationToFormErrors(errors, t));
+  const backendErrors = await registerStore.submitRegisterationInfo(vals);
+  if (backendErrors) {
+    const formErrors = backendValidationToFormErrors(backendErrors, t);
+    actions.setErrors(formErrors);
     resetRecaptcha(undefined);
-    setFieldValue('recaptchaToken', '', true);
+    // only revalidate if there is no error from the backend
+    // if there are backend errors, they take precedence
+    setFieldValue('recaptchaToken', '', formErrors.recaptchaToken ? false : true);
   }
 });
 
 const [_email, emailAttrs] = defineField('email');
 const [_name, nameAttrs] = defineField('name');
 
-const emailExists = ref(false);
-
-const checkEmail = useDebounceFn(async (email: string) => {
-  return await registerationService.checkEmail(email);
-}, 300);
-watch(
-  () => values.email,
-  async (email) => {
-    if (!email) return;
-    const exists = await checkEmail(email);
-    emailExists.value = exists;
-    if (exists) setFieldError('email', $t('errors.EMAIL_ALREADY_EXISTS'));
-    else if (!exists && errors.value.email === $t('errors.EMAIL_ALREADY_EXISTS')) {
-      setFieldError('email', undefined);
-    }
-  },
-);
-
-watch(errors, (errs) => {
-  if (!errs.email && emailExists.value) {
-    setFieldError('email', $t('errors.EMAIL_ALREADY_EXISTS'));
-  }
-});
 const dateSelect = useDateSelect(
   new Date().getFullYear() - 100,
   new Date().getFullYear(),
