@@ -21,6 +21,9 @@ jobs:
       - name: Set up pnpm
         run: corepack prepare pnpm@latest --activate
 
+      - name: Print working pnpm path
+        run: which pnpm
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
