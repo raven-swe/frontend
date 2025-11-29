@@ -3,6 +3,7 @@ import Avatar from '@/components/ui/Avatar.vue';
 import { useQuery } from '@tanstack/vue-query';
 import FollowToggleButton from './FollowToggleButton.vue';
 import { profileTabsService } from '~/services/profile/profileTabsService';
+import { parseContentEntities } from '~/utils/contentEntityParser';
 const props = defineProps<{
   username: string;
 }>();
