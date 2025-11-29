@@ -1,12 +1,9 @@
 import { ref, onBeforeUnmount } from 'vue';
-import { getAccessToken } from '~/services/auth/authService';
 import type { DmSseEventMap } from '~~/shared/types/dm';
 import { EventSourcePolyfill } from 'event-source-polyfill';
 
 export function useDmSse() {
-  const config = useRuntimeConfig();
-  const baseUrl = config.public.dmSseUrl;
-  const SSEendpoint = baseUrl ? `${baseUrl}/stream?topics=dm` : '';
+  const SSEendpoint = `/api/dm/stream?topics=dm`;
   const unseenCount = ref<number>(0);
   const lastNewMessage = ref<DmSseEventMap['dm.new_message'] | null>(null);
   const isConnected = ref<boolean>(false);
@@ -15,20 +12,11 @@ export function useDmSse() {
   let es: EventSource | null = null;
 
   const connect = () => {
-    const token = getAccessToken();
-    // console.log('Connecting to DM SSE...');
-    // console.log('token:', token);
     if (es) return;
     if (!SSEendpoint) return;
-    // es = new EventSource(SSEendpoint, {
-    //   withCredentials: true,
-    // });
+
     es = new EventSourcePolyfill(SSEendpoint, {
       withCredentials: true,
-      headers: {
-        Authorization: token ? `Bearer ${token}` : '',
-        Accept: 'text/event-stream',
-      },
     }) as unknown as EventSource;
 
     es.onopen = () => {
