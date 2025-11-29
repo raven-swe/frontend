@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { useQuery, useQueryClient } from '@tanstack/vue-query';
-import { apiFetch } from '~/api';
 import type { FetchError } from 'ofetch';
+import { profileTabsService } from '~/services/profile/profileTabsService';
 
 const route = useRouter();
 
@@ -19,9 +19,7 @@ const {
   suspense,
 } = useQuery<User, FetchError<FetchError<ApiErrorResponse>>>({
   queryKey,
-  queryFn: async () => {
-    return (await apiFetch(`/api/users/${username.value}/profile`)).data;
-  },
+  queryFn: async ({ signal }) => profileTabsService.getProfile(username.value!, signal),
   staleTime: 1000 * 60 * 5, // 5min cache
   retry: false, // Don't retry on 404
   structuralSharing: false, // Disable structural sharing to ensure reactivity

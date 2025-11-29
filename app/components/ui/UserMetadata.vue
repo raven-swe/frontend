@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import Avatar from '@/components/ui/Avatar.vue';
 import { useQuery } from '@tanstack/vue-query';
-import { apiFetch } from '~/api';
 import FollowToggleButton from './FollowToggleButton.vue';
+import { profileTabsService } from '~/services/profile/profileTabsService';
 const props = defineProps<{
   username: string;
 }>();
@@ -13,10 +13,8 @@ const emit = defineEmits<{
 const queryKey = computed(() => ['profile', props.username.toLowerCase()]);
 const { data: user, isLoading } = useQuery({
   queryKey,
-  queryFn: async () => {
-    const response = await apiFetch(`/api/users/${props.username}/profile`);
-    return response.data;
-  },
+  queryFn: async ({ signal }) =>
+    profileTabsService.getProfile(props.username.toLowerCase(), signal),
 });
 
 const followUser = () => {

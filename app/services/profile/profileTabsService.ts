@@ -3,6 +3,10 @@ import { DEFAULT_PAGE_SIZE } from '~/constants/pagination';
 import type { Tab } from '~~/shared/types/profile-tabs';
 
 export const profileTabsService = {
+  getProfile: async (username: string, signal?: AbortSignal) => {
+    return (await apiFetch(`/api/users/${username}/profile`, { method: 'GET', signal })).data;
+  },
+
   getProfileTweetsPaginated: async (
     username: string,
     tab: Tab,
