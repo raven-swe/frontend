@@ -3,6 +3,7 @@ import Avatar from '@/components/ui/Avatar.vue';
 import { useQuery } from '@tanstack/vue-query';
 import FollowToggleButton from '@/components/ui/FollowToggleButton.vue';
 import { profileTabsService } from '~/services/profile/profileTabsService';
+import BlockToggleButton from '@/components/ui/BlockToggleButton.vue';
 const props = defineProps<{
   username: string;
 }>();
@@ -36,11 +37,16 @@ const unblockUser = () => {
         <NuxtLink :to="`/profile/${user.username}`">
           <Avatar size="md" :img="user.avatarUrl" class="cursor-pointer" />
         </NuxtLink>
+        <BlockToggleButton
+          v-if="user.relationship?.blocking"
+          :relationship="user.relationship"
+          @unblock="unblockUser"
+        />
         <FollowToggleButton
+          v-else
           :relationship="user.relationship"
           @follow="followUser"
           @unfollow="unfollowUser"
-          @unblock="unblockUser"
         />
       </header>
       <NuxtLink :to="`/profile/${user.username}`">
