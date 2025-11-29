@@ -92,6 +92,9 @@ function handleTweetClick() {
       <!-- Quoted Tweet -->
       <TweetQuoteCard v-if="tweet.quotedTweet" :tweet="tweet.quotedTweet" />
 
+      <!-- Quoted Tweet -->
+      <TweetQuoteCard v-if="tweet.quotedTweet" :tweet="tweet.quotedTweet" />
+
       <!-- Actions -->
       <TweetActionButtons
         :tweet="tweet"
