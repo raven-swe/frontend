@@ -4,6 +4,7 @@ import Avatar from '~/components/ui/Avatar.vue';
 import type { Tweet } from '~~/shared/types/tweets';
 import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
+import ContentEntitiesRenderer from '../ui/ContentEntitiesRenderer.vue';
 interface Props {
   tweet: Tweet;
 }
@@ -74,7 +75,7 @@ const onUndoRetweetSuccess = () => {
     </div>
     <div class="border-b-border mt-3 border-b-1 pb-3">
       <p class="mt-1 leading-relaxed break-words whitespace-pre-wrap">
-        <UiContentEntitiesRenderer :content="tweet.content" :entities="tweet.entities" />
+        <ContentEntitiesRenderer :content="tweet.content" :entities="tweet.entities" />
       </p>
       <TweetMedia :media="tweet.media" />
 
