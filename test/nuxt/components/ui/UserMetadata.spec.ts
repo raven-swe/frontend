@@ -36,7 +36,7 @@ const mockUser: User = {
 const userRef = ref<User>(mockUser);
 
 const createWrapper = async () => {
-  const { default: UserMetadata } = await import('@/components/ui/UserMetadata.vue');
+  const { default: UserMetadata } = await import('~/components/user/UserMetadata.vue');
   const wrapper = await mountSuspended(UserMetadata, {
     props: { username: 'testuser' },
     global: { plugins: [i18n] },

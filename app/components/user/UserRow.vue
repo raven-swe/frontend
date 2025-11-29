@@ -3,7 +3,6 @@ import type { CompactUser } from '~~/shared/types/user';
 import FollowToggleButton from '@/components/ui/FollowToggleButton.vue';
 import MuteToggleButton from '@/components/ui/MuteToggleButton.vue';
 import BlockToggleButton from '@/components/ui/BlockToggleButton.vue';
-import UserMetadata from '@/components/user/UserMetadata.vue';
 
 const props = withDefaults(
   defineProps<{
@@ -33,49 +32,36 @@ const relationship = computed(() => props.user.relationship);
     :class="{ 'pe-3': !props.showDropdown }"
     @click="router.push(`/profile/${user.username}`)"
   >
-    <UiHoverCard>
-      <UiHoverCardTrigger as-child>
-        <UiAvatar :img="user.avatarUrl" size="sm" />
-      </UiHoverCardTrigger>
-      <UiHoverCardContent>
-        <UserMetadata
-          :username="user.username"
-          @follow="$emit('follow', user.username)"
-          @unfollow="$emit('unfollow', user.username)"
-          @unblock="$emit('unblock', user.username)"
-        />
-      </UiHoverCardContent>
-    </UiHoverCard>
+    <UserHoverCard
+      :username="user.username"
+      @follow="$emit('follow', user.username)"
+      @unfollow="$emit('unfollow', user.username)"
+      @unblock="$emit('unblock', user.username)"
+    >
+      <UiAvatar :img="user.avatarUrl" size="sm" />
+    </UserHoverCard>
+
     <div class="flex flex-1 flex-col gap-1">
       <div class="flex flex-1 items-center justify-between">
         <div>
-          <UiHoverCard>
-            <UiHoverCardTrigger as-child>
-              <p class="text-md font-semibold">{{ user.displayName }}</p>
-            </UiHoverCardTrigger>
-            <UiHoverCardContent>
-              <UserMetadata
-                :username="user.username"
-                @follow="$emit('follow', user.username)"
-                @unfollow="$emit('unfollow', user.username)"
-                @unblock="$emit('unblock', user.username)"
-              />
-            </UiHoverCardContent>
-          </UiHoverCard>
+          <UserHoverCard
+            :username="user.username"
+            @follow="$emit('follow', user.username)"
+            @unfollow="$emit('unfollow', user.username)"
+            @unblock="$emit('unblock', user.username)"
+          >
+            <p class="text-md font-semibold">{{ user.displayName }}</p>
+          </UserHoverCard>
+
           <p class="text-muted-foreground text-sm">
-            <UiHoverCard>
-              <UiHoverCardTrigger>
-                {{ '@' + user.username + ' ' }}
-              </UiHoverCardTrigger>
-              <UiHoverCardContent>
-                <UserMetadata
-                  :username="user.username"
-                  @follow="$emit('follow', user.username)"
-                  @unfollow="$emit('unfollow', user.username)"
-                  @unblock="$emit('unblock', user.username)"
-                />
-              </UiHoverCardContent>
-            </UiHoverCard>
+            <UserHoverCard
+              :username="user.username"
+              @follow="$emit('follow', user.username)"
+              @unfollow="$emit('unfollow', user.username)"
+              @unblock="$emit('unblock', user.username)"
+            >
+              {{ '@' + user.username + ' ' }}
+            </UserHoverCard>
             <span
               v-if="user.relationship.follower"
               class="bg-muted rounded-sm p-0.5 px-0.75 text-xs font-semibold"
@@ -104,29 +90,19 @@ const relationship = computed(() => props.user.relationship);
             @unmute="$emit('unmute', user.username)"
           />
 
-          <UiDropdownMenu v-if="showDropdown">
-            <UiDropdownMenuTrigger as-child>
-              <UiButton variant="ghost-default" class="bg-transparent" size="icon-sm" @click.stop>
-                <Icon class="text-muted-foreground" name="lucide:more-horizontal" />
-              </UiButton>
-            </UiDropdownMenuTrigger>
-            <UiDropdownMenuContent align="end" class="bg-background">
-              <UiDropdownMenuItem
-                data-test="mute-button"
-                @click="$emit(isMuted ? 'unmute' : 'mute', user.username)"
-              >
-                <Icon :name="isMuted ? 'lucide:volume' : 'lucide:volume-off'" size="18" />
-                {{ isMuted ? $t('ui.unmute') : $t('ui.mute') }}
-              </UiDropdownMenuItem>
-              <UiDropdownMenuItem
-                data-test="block-button"
-                @click="$emit(isBlocked ? 'unblock' : 'block', user.username)"
-              >
-                <Icon name="lucide:ban" size="18" class="text-foreground" />
-                {{ isBlocked ? $t('ui.unblock') : $t('ui.block') }}
-              </UiDropdownMenuItem>
-            </UiDropdownMenuContent>
-          </UiDropdownMenu>
+          <UserActionDropdown
+            v-if="props.showDropdown"
+            :is-muted="isMuted"
+            :is-blocked="isBlocked"
+            @mute="$emit('mute', user.username)"
+            @unmute="$emit('unmute', user.username)"
+            @block="$emit('block', user.username)"
+            @unblock="$emit('unblock', user.username)"
+          >
+            <UiButton variant="ghost-default" class="bg-transparent" size="icon-sm" @click.stop>
+              <Icon class="text-muted-foreground" name="lucide:more-horizontal" />
+            </UiButton>
+          </UserActionDropdown>
         </div>
       </div>
       <p class="text-md line-clamp-3 break-all">

@@ -39,29 +39,18 @@ const handleFollow = (action: 'follow' | 'unfollow') => {
       />
     </div>
     <div v-if="!isCurrentUser" class="flex items-center gap-2" data-test="profile-action-buttons">
-      <UiDropdownMenu>
-        <UiDropdownMenuTrigger as-child>
-          <UiButton data-test="profile-actions-trigger" variant="outline" size="icon-md">
-            <Icon name="lucide:more-horizontal" size="20" />
-          </UiButton>
-        </UiDropdownMenuTrigger>
-        <UiDropdownMenuContent align="end">
-          <UiDropdownMenuItem
-            data-test="mute-button"
-            @click="() => handleMute(isMuted ? 'unmute' : 'mute')"
-          >
-            <Icon :name="isMuted ? 'lucide:volume' : 'lucide:volume-off'" size="18" />
-            {{ isMuted ? $t('ui.unmute') : $t('ui.mute') }}
-          </UiDropdownMenuItem>
-          <UiDropdownMenuItem
-            data-test="block-button"
-            @click="() => handleBlock(isBlocked ? 'unblock' : 'block')"
-          >
-            <Icon name="lucide:ban" size="18" class="text-foreground" />
-            {{ isBlocked ? $t('ui.unblock') : $t('ui.block') }}
-          </UiDropdownMenuItem>
-        </UiDropdownMenuContent>
-      </UiDropdownMenu>
+      <UserActionDropdown
+        :is-muted="isMuted"
+        :is-blocked="isBlocked"
+        @mute="() => handleMute('mute')"
+        @unmute="() => handleMute('unmute')"
+        @block="() => handleBlock('block')"
+        @unblock="() => handleBlock('unblock')"
+      >
+        <UiButton data-test="profile-actions-trigger" variant="outline" size="icon-sm">
+          <Icon name="lucide:more-horizontal" size="20" />
+        </UiButton>
+      </UserActionDropdown>
 
       <FollowToggleButton
         :relationship="
