@@ -4,29 +4,13 @@ defineProps<{
 }>();
 
 defineEmits<{
-  (e: 'follow' | 'unfollow' | 'unblock'): void;
+  (e: 'follow' | 'unfollow'): void;
 }>();
 </script>
 
 <template>
   <UiButton
-    v-if="relationship.blocking"
-    variant="destructive"
-    size="xs"
-    data-test="unblock-button"
-    class="group grid-stack"
-    @click.prevent.stop="$emit('unblock')"
-  >
-    <span class="invisible group-hover:visible">
-      {{ $t('ui.unblock') }}
-    </span>
-    <span class="visible group-hover:invisible">
-      {{ $t('ui.blocking') }}
-    </span>
-  </UiButton>
-
-  <UiButton
-    v-else-if="!relationship.following"
+    v-if="!relationship.following"
     size="xs"
     data-test="follow-button"
     @click.prevent.stop="$emit('follow')"
