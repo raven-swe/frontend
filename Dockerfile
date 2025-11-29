@@ -21,6 +21,12 @@ RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
 COPY . .
 RUN pnpm mock:gen
 
+# change back to production for build
+ENV NODE_ENV=production
+
+# Increase memory limit for Node.js during build
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
 # Build Nuxt (SSR)
 RUN pnpm build
 
