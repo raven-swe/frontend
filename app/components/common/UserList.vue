@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { useInfiniteQuery } from '@tanstack/vue-query';
 import { useWindowVirtualizer } from '@tanstack/vue-virtual';
-import UserRow from '~/components/ui/UserRow.vue';
+import UserRow from '~/components/user/UserRow.vue';
 
 const props = defineProps<{
   fetcherFn: (

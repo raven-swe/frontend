@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import type { CompactUser } from '~~/shared/types/user';
-import FollowToggleButton from './FollowToggleButton.vue';
-import MuteToggleButton from './MuteToggleButton.vue';
-import BlockToggleButton from './BlockToggleButton.vue';
+import FollowToggleButton from '@/components/ui/FollowToggleButton.vue';
+import MuteToggleButton from '@/components/ui/MuteToggleButton.vue';
+import BlockToggleButton from '@/components/ui/BlockToggleButton.vue';
+import UserMetadata from '@/components/user/UserMetadata.vue';
 
 const props = withDefaults(
   defineProps<{
@@ -37,7 +38,7 @@ const relationship = computed(() => props.user.relationship);
         <UiAvatar :img="user.avatarUrl" size="sm" />
       </UiHoverCardTrigger>
       <UiHoverCardContent>
-        <UiUserMetadata
+        <UserMetadata
           :username="user.username"
           @follow="$emit('follow', user.username)"
           @unfollow="$emit('unfollow', user.username)"
@@ -53,7 +54,7 @@ const relationship = computed(() => props.user.relationship);
               <p class="text-md font-semibold">{{ user.displayName }}</p>
             </UiHoverCardTrigger>
             <UiHoverCardContent>
-              <UiUserMetadata
+              <UserMetadata
                 :username="user.username"
                 @follow="$emit('follow', user.username)"
                 @unfollow="$emit('unfollow', user.username)"
@@ -67,7 +68,7 @@ const relationship = computed(() => props.user.relationship);
                 {{ '@' + user.username + ' ' }}
               </UiHoverCardTrigger>
               <UiHoverCardContent>
-                <UiUserMetadata
+                <UserMetadata
                   :username="user.username"
                   @follow="$emit('follow', user.username)"
                   @unfollow="$emit('unfollow', user.username)"

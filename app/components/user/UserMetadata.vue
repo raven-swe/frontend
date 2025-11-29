@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import Avatar from '@/components/ui/Avatar.vue';
 import { useQuery } from '@tanstack/vue-query';
-import FollowToggleButton from './FollowToggleButton.vue';
+import FollowToggleButton from '@/components/ui/FollowToggleButton.vue';
 import { profileTabsService } from '~/services/profile/profileTabsService';
 const props = defineProps<{
   username: string;
