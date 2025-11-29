@@ -4,6 +4,7 @@ import Avatar from '~/components/ui/Avatar.vue';
 import type { Tweet } from '~~/shared/types/tweets';
 import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
+import TweetQuoteCard from './TweetQuoteCard.vue';
 interface Props {
   tweet: Tweet;
   isPreview?: boolean;
@@ -159,6 +160,9 @@ function handleTweetClick() {
 
       <!-- Media (single image basic layout) -->
       <TweetMedia :media="tweet.media" :size-class="props.sizeClass" />
+
+      <!-- Quoted Tweet -->
+      <TweetQuoteCard v-if="tweet.quotedTweet" :tweet="tweet.quotedTweet" />
 
       <!-- Actions -->
       <TweetActionButtons
