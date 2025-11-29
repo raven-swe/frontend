@@ -65,6 +65,9 @@ jobs:
       - name: Set up pnpm
         run: corepack prepare pnpm@latest --activate
 
+      - name: Add pnpm to PATH
+        run: echo "/home/btngana/.local/share/pnpm" >> $GITHUB_PATH
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
