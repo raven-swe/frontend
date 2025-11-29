@@ -12,22 +12,23 @@ const media = ref(props.media || []);
 
 <template>
   <div class="w-full pt-2">
-    <!-- 0 media: placeholder 2x2 grid -->
-
     <!-- 1 media -->
     <div v-if="media.length === 1" class="grid overflow-hidden rounded-xl">
       <MediaItem :media="media[0]!" />
     </div>
 
     <!-- 2 media: side by side -->
-    <div v-else-if="media.length === 2" class="grid grid-cols-2 gap-0.5 overflow-hidden rounded-xl">
+    <div
+      v-else-if="media.length === 2"
+      class="border-border grid grid-cols-2 gap-0.5 overflow-hidden rounded-xl border-1"
+    >
       <MediaItem v-for="(m, i) in media" :key="i" :media="m" />
     </div>
 
     <!-- 3 media: first spans full height on left -->
     <div
       v-else-if="media.length === 3"
-      class="grid grid-cols-2 grid-rows-2 gap-0.5 overflow-hidden rounded-xl"
+      class="border-border grid grid-cols-2 grid-rows-2 gap-0.5 overflow-hidden rounded-xl border-1"
     >
       <div class="col-span-1 row-span-2"><MediaItem :media="media[0]!" /></div>
       <MediaItem :media="media[1]!" />
@@ -37,7 +38,7 @@ const media = ref(props.media || []);
     <!-- 4 media: uniform grid -->
     <div
       v-else-if="media.length === 4"
-      class="grid grid-cols-2 grid-rows-2 gap-0.5 overflow-hidden rounded-xl"
+      class="border-border grid grid-cols-2 grid-rows-2 gap-0.5 overflow-hidden rounded-xl border-1"
     >
       <MediaItem v-for="(m, i) in media" :key="i" :media="m!" />
     </div>
