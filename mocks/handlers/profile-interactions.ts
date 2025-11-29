@@ -1,7 +1,13 @@
 import { http, HttpResponse } from 'msw';
 import type { ApiSuccessResponse, ApiErrorResponse, ApiResponseBase } from '~~/shared/types/api';
-import type { User } from '#shared/types/user';
+import type { CompactUser, User } from '#shared/types/user';
 import { mockUserInfos, users } from './mockUserDB';
+
+type ModifiedCompactUser = CompactUser & {
+  isFollowing: boolean;
+  followsYou: boolean;
+  isBlocked: boolean;
+};
 
 const API_URL = process.env.BACKEND_URL;
 
@@ -68,11 +74,20 @@ export const handlers = [
     }
     const followers = users;
     const startIndex = cursor ? Math.max(0, Number(cursor)) : 0;
-    const paginatedFollowers = followers.slice(startIndex, startIndex + limit);
+    const paginatedFollowers: ModifiedCompactUser[] = followers
+      .slice(startIndex, startIndex + limit)
+      .map((u) => {
+        return {
+          ...u,
+          isFollowing: u.relationship.following ?? false,
+          followsYou: u.relationship.follower ?? false,
+          isBlocked: u.relationship.blocking ?? false,
+        };
+      });
     const nextIndex = startIndex + paginatedFollowers.length;
     const nextCursor = nextIndex < followers.length ? String(nextIndex) : null;
 
-    return HttpResponse.json<ApiSuccessResponse<User[]>>({
+    return HttpResponse.json<ApiSuccessResponse<ModifiedCompactUser[]>>({
       success: true,
       data: paginatedFollowers,
       pagination: {
@@ -100,11 +115,20 @@ export const handlers = [
     }
     const following = users;
     const startIndex = cursor ? Math.max(0, Number(cursor)) : 0;
-    const paginatedFollowing = following.slice(startIndex, startIndex + limit);
+    const paginatedFollowing: ModifiedCompactUser[] = following
+      .slice(startIndex, startIndex + limit)
+      .map((u) => {
+        return {
+          ...u,
+          isFollowing: u.relationship.following ?? false,
+          followsYou: u.relationship.follower ?? false,
+          isBlocked: u.relationship.blocking ?? false,
+        };
+      });
     const nextIndex = startIndex + paginatedFollowing.length;
     const nextCursor = nextIndex < following.length ? String(nextIndex) : null;
 
-    return HttpResponse.json<ApiSuccessResponse<User[]>>({
+    return HttpResponse.json<ApiSuccessResponse<ModifiedCompactUser[]>>({
       success: true,
       data: paginatedFollowing,
       pagination: {
