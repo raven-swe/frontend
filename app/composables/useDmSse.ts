@@ -72,7 +72,6 @@ export function useDmSse(options: UseDmSseOptions = {}) {
       es.onerror = (evt) => {
         error.value = evt;
         isConnected.value = false;
-
         if (es) {
           es.close();
           es = null;
