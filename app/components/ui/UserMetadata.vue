@@ -56,7 +56,7 @@ const unblockUser = () => {
         </p>
       </NuxtLink>
     </div>
-    <p v-if="user.bio" class="text-sm">
+    <p v-if="user.bio" class="text-sm break-all">
       <UiContentEntitiesRenderer
         :content="user.bio"
         :entities="

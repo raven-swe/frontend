@@ -84,12 +84,17 @@ const relationship = computed(() => props.user.relationship);
           </p>
         </div>
         <div class="flex items-center gap-1">
+          <BlockToggleButton
+            v-if="primaryAction === 'block' || isBlocked"
+            :relationship="relationship"
+            @block="$emit('block', user.username)"
+            @unblock="$emit('unblock', user.username)"
+          />
           <FollowToggleButton
-            v-if="primaryAction === 'follow'"
+            v-else-if="primaryAction === 'follow'"
             :relationship="relationship"
             @follow="$emit('follow', user.username)"
             @unfollow="$emit('unfollow', user.username)"
-            @unblock="$emit('unblock', user.username)"
           />
           <MuteToggleButton
             v-else-if="primaryAction === 'mute'"
@@ -98,12 +103,6 @@ const relationship = computed(() => props.user.relationship);
             @unmute="$emit('unmute', user.username)"
           />
 
-          <BlockToggleButton
-            v-else-if="primaryAction === 'block'"
-            :relationship="relationship"
-            @block="$emit('block', user.username)"
-            @unblock="$emit('unblock', user.username)"
-          />
           <UiDropdownMenu v-if="showDropdown">
             <UiDropdownMenuTrigger as-child>
               <UiButton variant="ghost-default" class="bg-transparent" size="icon-sm" @click.stop>
@@ -129,7 +128,7 @@ const relationship = computed(() => props.user.relationship);
           </UiDropdownMenu>
         </div>
       </div>
-      <p class="text-md line-clamp-3 break-words">
+      <p class="text-md line-clamp-3 break-all">
         <UiContentEntitiesRenderer
           :content="user.bio ?? ''"
           :entities="user.bioEntities ?? { mentions: [], hashtags: [] }"
