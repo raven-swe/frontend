@@ -44,10 +44,37 @@ onServerPrefetch(async () => {
   syncUser(data.value, error.value, isError.value);
 });
 
-const { connect: connectDmSse, unseenCount: unseenDmCount } = useDmSse();
-onMounted(() => {
-  connectDmSse();
+// DM SSE connection management
+const {
+  connect: connectDmSse,
+  disconnect: disconnectDmSse,
+  unseenCount: unseenDmCount,
+} = useDmSse({
+  autoReconnect: true,
+  maxReconnectAttempts: 5,
+  baseReconnectDelay: 1000,
 });
+
+onMounted(() => {
+  // Only connect if user is authenticated
+  if (userStore.user) {
+    connectDmSse();
+  }
+});
+
+// Watch for auth state changes and manage SSE connection
+watch(
+  () => userStore.user,
+  (newUser, oldUser) => {
+    if (newUser && !oldUser) {
+      // User just logged in - connect SSE
+      connectDmSse();
+    } else if (!newUser && oldUser) {
+      // User just logged out - disconnect SSE
+      disconnectDmSse();
+    }
+  },
+);
 </script>
 
 <template>
