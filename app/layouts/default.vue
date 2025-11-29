@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { useQuery } from '@tanstack/vue-query';
 import { meService } from '~/services/me/meService';
+import { useDmSse } from '~/composables/useDmSse';
 
 const userStore = useUserStore();
 
@@ -42,6 +43,11 @@ onServerPrefetch(async () => {
   await suspense();
   syncUser(data.value, error.value, isError.value);
 });
+
+const { connect: connectDmSse, unseenCount: unseenDmCount } = useDmSse();
+onMounted(() => {
+  connectDmSse();
+});
 </script>
 
 <template>
@@ -52,7 +58,7 @@ onServerPrefetch(async () => {
           <!-- Left sidebar -->
           <div class="w-16 flex-shrink-0 sm:w-16 md:w-24 xl:w-[306px]">
             <div class="sticky top-0">
-              <SideBarLeft />
+              <SideBarLeft :dm-unseen-count="unseenDmCount" />
             </div>
           </div>
 
