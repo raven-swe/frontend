@@ -143,14 +143,14 @@ function handleTweetClick() {
           <span v-if="seg.type === 'text'" class="inline">
             {{ seg.text }}
           </span>
-    <NuxtLink
-      v-else
-      :to="seg.href"
-      class="text-primary inline font-medium hover:underline"
-      @click.stop
-    >
-      {{ seg.text }}
-    </NuxtLink>
+          <NuxtLink
+            v-else
+            :to="seg.href"
+            class="text-primary inline font-medium hover:underline"
+            @click.stop
+          >
+            {{ seg.text }}
+          </NuxtLink>
         </template>
       </p>
 
