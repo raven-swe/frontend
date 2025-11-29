@@ -8,6 +8,8 @@ import Avatar from '~/components/ui/Avatar.vue';
 
 const dmUnseenCount = inject<Ref<number>>('dmUnseenCount', ref(0));
 
+const props = defineProps<{ dmUnseenCount?: number }>();
+
 const { locale, setLocale } = useI18n();
 const { mode, toggleTheme } = useTheme();
 
@@ -51,7 +53,7 @@ const switchLanguage = () => {
           label: 'messages',
           icon: 'chat',
           route: '/messages',
-          badgeCount: dmUnseenCount,
+          badgeCount: props.dmUnseenCount || 0,
         }"
       ></SideBarLeftTab>
       <SideBarLeftTab

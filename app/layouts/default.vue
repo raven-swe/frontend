@@ -12,7 +12,7 @@ useMyProfileQuery();
           <!-- Left sidebar -->
           <div class="w-16 flex-shrink-0 sm:w-16 md:w-24 xl:w-[306px]">
             <div class="sticky top-0">
-              <SideBarLeft />
+              <SideBarLeft :dm-unseen-count="unseenDmCount" />
             </div>
           </div>
 
