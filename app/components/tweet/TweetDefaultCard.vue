@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import Avatar from '~/components/ui/Avatar.vue';
 import type { Tweet } from '~~/shared/types/tweets';
 import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
-import { parseContentEntities } from '~/utils/contentEntityParser';
 interface Props {
   tweet: Tweet;
 }
@@ -42,10 +41,6 @@ const onUndoRetweetSuccess = () => {
     tweet.value.retweetCount = next < 0 ? 0 : next;
   }
 };
-
-const contentSegments = computed(() => {
-  return parseContentEntities(tweet.value.content, tweet.value.entities);
-});
 
 function handleTweetClick() {
   router.push(`/profile/${props.tweet.author.username}/status/${props.tweet.id}`);
@@ -87,34 +82,7 @@ function handleTweetClick() {
 
       <!-- Content -->
       <p class="mt-1 leading-relaxed break-words whitespace-pre-wrap">
-        <template v-for="token in contentSegments" :key="token.key">
-          <span v-if="token.type === 'text'" :key="token.key">
-            {{ token.display }}
-          </span>
-          <NuxtLink
-            v-else-if="token.type === 'mention'"
-            :to="`/profile/${token.value}`"
-            class="text-primary hover:underline"
-          >
-            {{ token.display }}
-          </NuxtLink>
-          <NuxtLink
-            v-else-if="token.type === 'hashtag'"
-            :to="`/hashtag/${token.value}`"
-            class="text-primary hover:underline"
-          >
-            {{ token.display }}
-          </NuxtLink>
-          <a
-            v-else-if="token.type === 'link'"
-            :href="token.value"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-primary hover:underline"
-          >
-            {{ token.display }}
-          </a>
-        </template>
+        <UiContentEntitiesRenderer :content="tweet.content" :entities="tweet.entities" />
       </p>
 
       <!-- Media (single image basic layout) -->

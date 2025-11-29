@@ -16,16 +16,6 @@ const displayUrl = computed(() => {
   }
   return '';
 });
-
-const parsedBioTokens = computed(() =>
-  parseContentEntities(
-    userProfile?.value.bio ?? '',
-    userProfile?.value.bioEntities ?? {
-      mentions: [],
-      hashtags: [],
-    },
-  ),
-);
 </script>
 
 <template>
@@ -43,34 +33,15 @@ const parsedBioTokens = computed(() =>
         class="mt-2 line-clamp-4 break-words whitespace-pre-line"
         data-cy="profile-bio"
       >
-        <template v-for="token in parsedBioTokens" :key="token.key">
-          <span v-if="token.type === 'text'" :key="token.key">
-            {{ token.display }}
-          </span>
-          <NuxtLink
-            v-else-if="token.type === 'mention'"
-            :to="`/profile/${token.value}`"
-            class="text-primary hover:underline"
-          >
-            {{ token.display }}
-          </NuxtLink>
-          <NuxtLink
-            v-else-if="token.type === 'hashtag'"
-            :to="`/hashtag/${token.value}`"
-            class="text-primary hover:underline"
-          >
-            {{ token.display }}
-          </NuxtLink>
-          <a
-            v-else-if="token.type === 'link'"
-            :href="token.value"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-primary hover:underline"
-          >
-            {{ token.display }}
-          </a>
-        </template>
+        <UiContentEntitiesRenderer
+          :content="userProfile?.bio ?? ''"
+          :entities="
+            userProfile?.bioEntities ?? {
+              mentions: [],
+              hashtags: [],
+            }
+          "
+        />
       </p>
 
       <div v-if="!isBlocking" class="mt-2 flex flex-wrap gap-2">

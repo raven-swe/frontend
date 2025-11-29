@@ -20,15 +20,6 @@ defineEmits<{
   (e: 'follow' | 'unfollow' | 'unblock' | 'block' | 'mute' | 'unmute', username: string): void;
 }>();
 const router = useRouter();
-const parsedBioTokens = computed(() =>
-  parseContentEntities(
-    props.user.bio,
-    props.user.bioEntities || {
-      mentions: [],
-      hashtags: [],
-    },
-  ),
-);
 
 const isMuted = computed(() => props.user.relationship.muted || false);
 const isBlocked = computed(() => props.user.relationship.blocking || false);
@@ -139,34 +130,10 @@ const relationship = computed(() => props.user.relationship);
         </div>
       </div>
       <p class="text-md line-clamp-3 break-words">
-        <template v-for="token in parsedBioTokens" :key="token.key">
-          <span v-if="token.type === 'text'" :key="token.key">
-            {{ token.display }}
-          </span>
-          <NuxtLink
-            v-else-if="token.type === 'mention'"
-            :to="`/profile/${token.value}`"
-            class="text-primary hover:underline"
-          >
-            {{ token.display }}
-          </NuxtLink>
-          <NuxtLink
-            v-else-if="token.type === 'hashtag'"
-            :to="`/hashtag/${token.value}`"
-            class="text-primary hover:underline"
-          >
-            {{ token.display }}
-          </NuxtLink>
-          <a
-            v-else-if="token.type === 'link'"
-            :href="token.value"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-primary hover:underline"
-          >
-            {{ token.display }}
-          </a>
-        </template>
+        <UiContentEntitiesRenderer
+          :content="user.bio ?? ''"
+          :entities="user.bioEntities ?? { mentions: [], hashtags: [] }"
+        />
       </p>
     </div>
   </div>

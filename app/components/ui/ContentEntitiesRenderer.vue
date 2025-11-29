@@ -1,0 +1,45 @@
+<script lang="ts" setup>
+const props = defineProps<{
+  content: string;
+  entities: ContentEntities;
+}>();
+
+const parsedBioTokens = computed(() =>
+  parseContentEntities(
+    props.content,
+    props.entities || {
+      mentions: [],
+      hashtags: [],
+    },
+  ),
+);
+</script>
+<template>
+  <template v-for="token in parsedBioTokens" :key="token.key">
+    <span v-if="token.type === 'text'" :key="token.key">
+      {{ token.display }}
+    </span>
+    <NuxtLink
+      v-else-if="token.type === 'mention'"
+      :to="`/profile/${token.value}`"
+      class="text-primary hover:underline"
+    >
+      {{ token.display }}
+    </NuxtLink>
+    <NuxtLink
+      v-else-if="token.type === 'hashtag'"
+      :to="`/hashtag/${token.value}`"
+      class="text-primary hover:underline"
+    >
+      {{ token.display }}
+    </NuxtLink>
+    <NuxtLink
+      v-else-if="token.type === 'link'"
+      :to="token.value"
+      class="text-primary hover:underline"
+      external
+    >
+      {{ token.display }}
+    </NuxtLink>
+  </template>
+</template>
