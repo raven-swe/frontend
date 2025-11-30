@@ -54,10 +54,10 @@ describe('DmConversationView Component', () => {
     expect(messagesArea.classes()).toContain('p-4');
   });
 
-  it('renders empty conversation info placeholder container', async () => {
+  it('renders the messages container area', async () => {
     const wrapper = await mountAndResolve();
-    const infoContainer = wrapper.find('.flex-1 .flex.flex-col');
-    expect(infoContainer.exists()).toBe(true);
+    const messagesContainer = wrapper.find('.flex-1.overflow-y-auto');
+    expect(messagesContainer.exists()).toBe(true);
   });
 
   it('initially shows no messages list items when data not hydrated', async () => {
