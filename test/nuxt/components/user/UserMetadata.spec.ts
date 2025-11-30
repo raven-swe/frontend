@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mountSuspended } from '@nuxt/test-utils/runtime';
+import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime';
 import messages from '@@/i18n/locales/en.json';
 import { createI18n } from 'vue-i18n';
 import type { User } from '#shared/types/user';
@@ -35,6 +35,18 @@ const mockUser: User = {
 
 const userRef = ref<User>(mockUser);
 
+const userStoreMock = vi.hoisted(() => {
+  return {
+    user: {
+      username: 'notcurrentuser',
+    },
+  };
+});
+
+mockNuxtImport('useUserStore', () => {
+  return () => userStoreMock;
+});
+
 const createWrapper = async () => {
   const { default: UserMetadata } = await import('~/components/user/UserMetadata.vue');
   const wrapper = await mountSuspended(UserMetadata, {
@@ -57,6 +69,7 @@ describe('UserMetadata', () => {
         isError: false,
       }),
     }));
+    userStoreMock.user.username = 'notcurrentuser';
   });
 
   it('renders user info: name, username, bio, following/followers counts', async () => {
@@ -186,5 +199,12 @@ describe('UserMetadata', () => {
     const wrapper = await createWrapper();
     const spinner = wrapper.find('svg[aria-label="Loading"]');
     expect(spinner.exists()).toBe(true);
+  });
+
+  it("doesn't render follow/block button when viewing own profile", async () => {
+    userStoreMock.user.username = 'testuser';
+    const wrapper = await createWrapper();
+    const button = wrapper.find('button');
+    expect(button.exists()).toBe(false);
   });
 });

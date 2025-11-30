@@ -48,6 +48,18 @@ const routerMock = vi.hoisted(() => {
   };
 });
 
+const userStoreMock = vi.hoisted(() => {
+  return {
+    user: {
+      username: 'janedoe',
+    },
+  };
+});
+
+mockNuxtImport('useUserStore', () => {
+  return () => userStoreMock;
+});
+
 mockNuxtImport('useRouter', () => {
   return () => routerMock;
 });
@@ -55,6 +67,11 @@ mockNuxtImport('useRouter', () => {
 describe('UserRow.vue', () => {
   beforeEach(() => {
     vi.resetModules();
+    userStoreMock.user = {
+      username: 'janedoe',
+    };
+    routerMock.push.mockClear();
+    routerMock.replace.mockClear();
   });
 
   it('renders user information correctly', async () => {
@@ -236,5 +253,13 @@ describe('UserRow.vue', () => {
     const wrapper = await createWrapper();
     await wrapper.trigger('click');
     expect(routerMock.push).toHaveBeenCalledWith(`/profile/${mockCompactUser.username}`);
+  });
+
+  it('does not render any actions when the user is the current user', async () => {
+    userStoreMock.user.username = 'johndoe';
+
+    const wrapper = await createWrapper();
+    const button = wrapper.find('button');
+    expect(button.exists()).toBe(false);
   });
 });
