@@ -26,7 +26,7 @@ function onSelect(id: string) {
   </div>
   <DmConversationList
     v-else
-    :conversations="conversations"
+    :conversations="conversations || []"
     :selected-id="selectedId"
     @select="onSelect"
   />

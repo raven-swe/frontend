@@ -9,7 +9,7 @@ export interface DmConversation {
     content: string;
     senderUsername: string;
     sentAt: string;
-  };
+  } | null;
   isMuted: boolean;
 }
 

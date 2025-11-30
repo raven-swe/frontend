@@ -4,6 +4,7 @@ const props = defineProps<{
   conversation: DmConversation;
   isSelected?: boolean;
 }>();
+// console.log('Rendering DmConversationItem for', props.conversation);
 </script>
 <template>
   <div
@@ -32,7 +33,10 @@ const props = defineProps<{
         >
           {{ '@' + props.conversation.participant.username }}
         </span>
-        <span class="text-muted-foreground flex-shrink-0">
+        <span
+          v-if="props.conversation.lastMessage?.sentAt"
+          class="text-muted-foreground flex-shrink-0"
+        >
           {{ relativeTime(props.conversation.lastMessage.sentAt) }}
         </span>
       </div>
