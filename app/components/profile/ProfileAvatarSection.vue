@@ -2,6 +2,7 @@
 import { useIsCurrentUser } from '~/composables/useIsCurrentUser';
 import { useUserStore } from '~/stores/user';
 import FollowToggleButton from '../ui/FollowToggleButton.vue';
+import BlockToggleButton from '../ui/BlockToggleButton.vue';
 const userStore = useUserStore();
 
 const { isCurrentUser } = useIsCurrentUser();
@@ -12,9 +13,9 @@ const isMuted = computed(() => user?.value.relationship.muted || false);
 const isBlocked = computed(() => user?.value.relationship.blocking || false);
 const relationship = computed(() => user?.value.relationship);
 
-const { mutate: muteUser } = useMuteMutation(user?.value.username || '');
-const { mutate: blockUser } = useBlockMutation(user?.value.username || '');
-const { mutate: followUser } = useFollowMutation(user?.value.username || '');
+const { mutate: muteUser } = useMuteMutation();
+const { mutate: blockUser } = useBlockMutation();
+const { mutate: followUser } = useFollowMutation();
 
 const handleMute = (action: 'mute' | 'unmute') => {
   muteUser({ action, username: user?.value.username || '' });
@@ -52,7 +53,22 @@ const handleFollow = (action: 'follow' | 'unfollow') => {
         </UiButton>
       </UserActionDropdown>
 
+      <BlockToggleButton
+        v-if="relationship?.blocking"
+        :relationship="
+          relationship || {
+            following: false,
+            follower: false,
+            muted: false,
+            blocking: false,
+            blockedBy: false,
+          }
+        "
+        @block="() => handleBlock('block')"
+        @unblock="() => handleBlock('unblock')"
+      />
       <FollowToggleButton
+        v-else
         :relationship="
           relationship || {
             following: false,
@@ -64,7 +80,6 @@ const handleFollow = (action: 'follow' | 'unfollow') => {
         "
         @follow="() => handleFollow('follow')"
         @unfollow="() => handleFollow('unfollow')"
-        @unblock="() => handleBlock('unblock')"
       />
     </div>
     <UiButton

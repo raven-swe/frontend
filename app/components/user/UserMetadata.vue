@@ -18,6 +18,11 @@ const { data: user, isLoading } = useQuery({
     profileTabsService.getProfile(props.username.toLowerCase(), signal),
 });
 
+const userStore = useUserStore();
+const isCurrentUser = computed(() => {
+  return userStore.user?.username.toLowerCase() === props.username.toLowerCase();
+});
+
 const followUser = () => {
   emit('follow');
 };
@@ -38,12 +43,12 @@ const unblockUser = () => {
           <Avatar size="md" :img="user.avatarUrl" class="cursor-pointer" />
         </NuxtLink>
         <BlockToggleButton
-          v-if="user.relationship?.blocking"
+          v-if="user.relationship?.blocking && !isCurrentUser"
           :relationship="user.relationship"
           @unblock="unblockUser"
         />
         <FollowToggleButton
-          v-else
+          v-else-if="!isCurrentUser"
           :relationship="user.relationship"
           @follow="followUser"
           @unfollow="unfollowUser"

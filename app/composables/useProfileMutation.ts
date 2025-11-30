@@ -26,15 +26,12 @@ function isNoOpError(action: Actions, err: FetchError<FetchError<ApiErrorRespons
 
 export function useProfileMutation<ActionType extends Actions, Q = void>({
   mutationFn,
-  username,
   optimisticUpdateFn,
 }: {
   mutationFn: ({ username, action }: { username: string; action: ActionType }) => Promise<Q>;
-  username: string;
   optimisticUpdateFn: (data: CompactUser | User, action: ActionType) => CompactUser | User;
 }) {
   const { t } = useI18n();
-  const lowercaseUsername = username.toLowerCase();
   return useMutation<
     Q,
     FetchError<FetchError<ApiErrorResponse>>,
@@ -52,6 +49,7 @@ export function useProfileMutation<ActionType extends Actions, Q = void>({
       previousUser?: User;
     }
   >({
+    mutationKey: ['profile-interaction'],
     mutationFn,
     onMutate: async (
       { username: usenameMutate, action }: { username: string; action: ActionType },
@@ -59,7 +57,6 @@ export function useProfileMutation<ActionType extends Actions, Q = void>({
     ) => {
       const usernameToMutate = usenameMutate.toLowerCase();
       const profileQueryKey = ['profile', usernameToMutate];
-      await client.cancelQueries({ predicate: (query) => query.queryKey[0] === 'user-list' });
       // Get previous data
       const previousUser = client.getQueryData<User>(profileQueryKey);
       if (previousUser) {
@@ -73,8 +70,7 @@ export function useProfileMutation<ActionType extends Actions, Q = void>({
       const previousLists = client.getQueriesData<{
         pages: ApiSuccessResponse<CompactUser[]>[];
       }>({
-        predicate: (query) =>
-          query.queryKey[0] === 'user-list' && query.queryKey[1] === lowercaseUsername,
+        predicate: (query) => query.queryKey[0] === 'user-list',
       });
 
       // Optimistically update all user-lists
@@ -82,8 +78,7 @@ export function useProfileMutation<ActionType extends Actions, Q = void>({
         pages: ApiSuccessResponse<CompactUser[]>[];
       }>(
         {
-          predicate: (query) =>
-            query.queryKey[0] === 'user-list' && query.queryKey[1] === lowercaseUsername,
+          predicate: (query) => query.queryKey[0] === 'user-list',
         },
         (oldData) => {
           if (!oldData) return oldData;
@@ -136,6 +131,14 @@ export function useProfileMutation<ActionType extends Actions, Q = void>({
     // To sync up with the backend
     onSettled: (_data, _err, { username }, mutationResult, { client }) => {
       const loweredUsername = username.toLowerCase();
+      const stillRunning = client.isMutating({
+        mutationKey: ['profile-interaction'],
+      });
+
+      if (stillRunning > 0) {
+        // Another follow/unfollow/mute/block is still running; let the last one do the invalidation
+        return;
+      }
       client.invalidateQueries({
         queryKey: ['profile', loweredUsername],
       });
@@ -143,7 +146,7 @@ export function useProfileMutation<ActionType extends Actions, Q = void>({
   });
 }
 
-export function useFollowMutation(username: string) {
+export function useFollowMutation() {
   return useProfileMutation<'follow' | 'unfollow'>({
     mutationFn: async ({ username: usernameToMutate, action }) => {
       if (action === 'follow') {
@@ -152,7 +155,6 @@ export function useFollowMutation(username: string) {
         await profileInteractionService.unfollowUser(usernameToMutate.toLowerCase());
       }
     },
-    username: username.toLowerCase(),
     optimisticUpdateFn: (user, action) => {
       const newUser = structuredClone(user);
       if (action === 'follow') {
@@ -171,7 +173,7 @@ export function useFollowMutation(username: string) {
   });
 }
 
-export function useMuteMutation(username: string) {
+export function useMuteMutation() {
   return useProfileMutation<'mute' | 'unmute'>({
     mutationFn: async ({ action, username: usernameToMutate }) => {
       if (action === 'mute') {
@@ -180,7 +182,6 @@ export function useMuteMutation(username: string) {
         await profileInteractionService.unmuteUser(usernameToMutate.toLowerCase());
       }
     },
-    username: username.toLowerCase(),
     optimisticUpdateFn: (user, action) => {
       const newUser = structuredClone(user);
       if (action === 'mute') {
@@ -193,7 +194,7 @@ export function useMuteMutation(username: string) {
   });
 }
 
-export function useBlockMutation(username: string) {
+export function useBlockMutation() {
   return useProfileMutation<'block' | 'unblock'>({
     mutationFn: async ({ action, username: usernameToMutate }) => {
       if (action === 'block') {
@@ -202,7 +203,6 @@ export function useBlockMutation(username: string) {
         await profileInteractionService.unblockUser(usernameToMutate.toLowerCase());
       }
     },
-    username: username.toLowerCase(),
     optimisticUpdateFn: (user, action) => {
       const newUser = structuredClone(user);
       if (action === 'block') {

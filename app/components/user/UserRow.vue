@@ -20,10 +20,14 @@ defineEmits<{
   (e: 'follow' | 'unfollow' | 'unblock' | 'block' | 'mute' | 'unmute', username: string): void;
 }>();
 const router = useRouter();
+const userStore = useUserStore();
 
 const isMuted = computed(() => props.user.relationship.muted || false);
 const isBlocked = computed(() => props.user.relationship.blocking || false);
 const relationship = computed(() => props.user.relationship);
+const isCurrentUser = computed(() => {
+  return userStore.user?.username.toLowerCase() === props.user.username.toLowerCase();
+});
 </script>
 
 <template>
@@ -70,7 +74,7 @@ const relationship = computed(() => props.user.relationship);
             </span>
           </p>
         </div>
-        <div class="flex items-center gap-1">
+        <div v-if="!isCurrentUser" class="flex items-center gap-1">
           <BlockToggleButton
             v-if="primaryAction === 'block' || isBlocked"
             :relationship="relationship"

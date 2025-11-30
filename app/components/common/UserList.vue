@@ -39,9 +39,9 @@ const {
 });
 
 const users = computed(() => usersPaginated.value?.pages.flatMap((page) => page.data) || []);
-const { mutate: followUser } = useFollowMutation(username.value || '');
-const { mutate: blockUser } = useBlockMutation(username.value || '');
-const { mutate: muteUser } = useMuteMutation(username.value || '');
+const { mutate: followUser } = useFollowMutation();
+const { mutate: blockUser } = useBlockMutation();
+const { mutate: muteUser } = useMuteMutation();
 
 //  Virtualization setup
 const parentRef = ref<HTMLElement | null>(null);

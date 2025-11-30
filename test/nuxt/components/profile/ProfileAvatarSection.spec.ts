@@ -299,9 +299,9 @@ describe('ProfileActions', () => {
 
     const wrapper = await createWrapper();
 
-    expect(useMuteMutationMock).toHaveBeenCalledWith('testuser');
-    expect(useBlockMutationMock).toHaveBeenCalledWith('testuser');
-    expect(useFollowMutationMock).toHaveBeenCalledWith('testuser');
+    expect(useMuteMutationMock).toHaveBeenCalled();
+    expect(useBlockMutationMock).toHaveBeenCalled();
+    expect(useFollowMutationMock).toHaveBeenCalled();
 
     const dropdownTrigger = wrapper.find('[data-test="profile-actions-trigger"]');
     expect(dropdownTrigger.exists()).toBe(true);
@@ -326,9 +326,9 @@ describe('ProfileActions', () => {
 
     const wrapper = await createWrapper();
 
-    expect(useMuteMutationMock).toHaveBeenCalledWith('testuser');
-    expect(useBlockMutationMock).toHaveBeenCalledWith('testuser');
-    expect(useFollowMutationMock).toHaveBeenCalledWith('testuser');
+    expect(useMuteMutationMock).toHaveBeenCalled();
+    expect(useBlockMutationMock).toHaveBeenCalled();
+    expect(useFollowMutationMock).toHaveBeenCalled();
 
     const dropdownTrigger = wrapper.find('[data-test="profile-actions-trigger"]');
     expect(dropdownTrigger.exists()).toBe(true);
@@ -354,9 +354,9 @@ describe('ProfileActions', () => {
 
     const wrapper = await createWrapper();
 
-    expect(useMuteMutationMock).toHaveBeenCalledWith('testuser');
-    expect(useBlockMutationMock).toHaveBeenCalledWith('testuser');
-    expect(useFollowMutationMock).toHaveBeenCalledWith('testuser');
+    expect(useMuteMutationMock).toHaveBeenCalled();
+    expect(useBlockMutationMock).toHaveBeenCalled();
+    expect(useFollowMutationMock).toHaveBeenCalled();
 
     const dropdownTrigger = wrapper.find('[data-test="profile-actions-trigger"]');
     expect(dropdownTrigger.exists()).toBe(true);
@@ -382,9 +382,9 @@ describe('ProfileActions', () => {
 
     const wrapper = await createWrapper();
 
-    expect(useMuteMutationMock).toHaveBeenCalledWith('testuser');
-    expect(useBlockMutationMock).toHaveBeenCalledWith('testuser');
-    expect(useFollowMutationMock).toHaveBeenCalledWith('testuser');
+    expect(useMuteMutationMock).toHaveBeenCalled();
+    expect(useBlockMutationMock).toHaveBeenCalled();
+    expect(useFollowMutationMock).toHaveBeenCalled();
 
     const dropdownTrigger = wrapper.find('[data-test="profile-actions-trigger"]');
     expect(dropdownTrigger.exists()).toBe(true);
@@ -409,9 +409,9 @@ describe('ProfileActions', () => {
 
     const wrapper = await createWrapper();
 
-    expect(useMuteMutationMock).toHaveBeenCalledWith('testuser');
-    expect(useBlockMutationMock).toHaveBeenCalledWith('testuser');
-    expect(useFollowMutationMock).toHaveBeenCalledWith('testuser');
+    expect(useMuteMutationMock).toHaveBeenCalled();
+    expect(useBlockMutationMock).toHaveBeenCalled();
+    expect(useFollowMutationMock).toHaveBeenCalled();
 
     const followButton = wrapper.find('[data-test="follow-button"]');
     expect(followButton.exists()).toBe(true);
@@ -430,9 +430,9 @@ describe('ProfileActions', () => {
 
     const wrapper = await createWrapper();
 
-    expect(useMuteMutationMock).toHaveBeenCalledWith('testuser');
-    expect(useBlockMutationMock).toHaveBeenCalledWith('testuser');
-    expect(useFollowMutationMock).toHaveBeenCalledWith('testuser');
+    expect(useMuteMutationMock).toHaveBeenCalled();
+    expect(useBlockMutationMock).toHaveBeenCalled();
+    expect(useFollowMutationMock).toHaveBeenCalled();
 
     const unfollowButton = wrapper.find('[data-test="unfollow-button"]');
     expect(unfollowButton.exists()).toBe(true);
