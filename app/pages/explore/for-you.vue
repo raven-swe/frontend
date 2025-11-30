@@ -117,7 +117,7 @@ watch(
 </script>
 
 <template>
-  <div class="mt-30border-border mx-auto max-w-[700px]">
+  <div class="border-border mx-auto mt-30 max-w-[700px]">
     <!-- Hashtags Section -->
     <div v-if="trendingHashtags.length > 0" class="border-border border-b">
       <Hashtag v-for="hashtag in trendingHashtags" :key="hashtag.hashtag" :hashtag="hashtag" />
