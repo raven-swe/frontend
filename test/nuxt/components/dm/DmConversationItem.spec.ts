@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { mountSuspended } from '@nuxt/test-utils/runtime';
 import DmConversationItem from '@/components/dm/DmConversationItem.vue';
 import type { DmConversation } from '@/../shared/types/dm';
+import { relativeTime } from '@/utils/time';
 
+const nowIso = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(); // 2h ago
 const mockConversation: DmConversation = {
   id: '1',
   participant: {
@@ -13,7 +15,7 @@ const mockConversation: DmConversation = {
   lastMessage: {
     content: 'Hello, this is a test message',
     senderUsername: '@testuser',
-    sentAt: '2h',
+    sentAt: nowIso,
   },
   isMuted: false,
 };
@@ -86,8 +88,8 @@ describe('DmConversationItem Component', () => {
       },
     });
 
-    const html = wrapper.html();
-    expect(html).toContain(mockConversation.lastMessage.sentAt);
+    const expected = relativeTime(mockConversation.lastMessage.sentAt);
+    expect(wrapper.html()).toContain(expected);
   });
 
   it('applies selected styling when isSelected is true', async () => {

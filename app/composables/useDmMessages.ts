@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/vue-query';
 import type { DmMessage, DmConversationMessagesResponse } from '~~/shared/types/dm';
 import type { ApiSuccessResponse } from '~~/shared/types/api';
 import { apiFetch } from '~/api';
@@ -5,9 +6,9 @@ import { apiFetch } from '~/api';
 export function useDmMessages(conversationId: () => string | null) {
   const idRef = computed(() => conversationId());
 
-  const { data, pending, error, refresh } = useAsyncData(
-    () => `dm-messages-${idRef.value}`,
-    async () => {
+  const { data, isPending, error, refetch } = useQuery({
+    queryKey: ['dm-messages', idRef],
+    queryFn: async () => {
       const id = idRef.value;
 
       if (!id) return [] as DmMessage[];
@@ -16,10 +17,8 @@ export function useDmMessages(conversationId: () => string | null) {
       );
       return resp.data.messages;
     },
-    { watch: [idRef] },
-  );
+    enabled: computed(() => !!idRef.value),
+  });
 
-  const messages = computed(() => data.value || []);
-
-  return { messages, loading: pending, error, refresh };
+  return { messages: data, loading: isPending, error, refresh: refetch };
 }

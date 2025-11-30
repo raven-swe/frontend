@@ -21,7 +21,7 @@ function onSelect(id: string) {
 <template>
   <DmHeader />
   <DmSearchBar />
-  <div v-if="loading" class="p-4">
+  <div v-if="loading" class="flex items-center justify-center p-4">
     <Spinner size="1.5rem" />
   </div>
   <DmConversationList

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { useQuery } from '@tanstack/vue-query';
 import { meService } from '~/services/me/meService';
+import { useDmSse } from '~/composables/useDmSse';
 
 const userStore = useUserStore();
 
@@ -42,6 +43,38 @@ onServerPrefetch(async () => {
   await suspense();
   syncUser(data.value, error.value, isError.value);
 });
+
+// DM SSE connection management
+const {
+  connect: connectDmSse,
+  disconnect: disconnectDmSse,
+  unseenCount: unseenDmCount,
+} = useDmSse({
+  autoReconnect: true,
+  maxReconnectAttempts: 5,
+  baseReconnectDelay: 1000,
+});
+
+onMounted(() => {
+  // Only connect if user is authenticated
+  if (userStore.user) {
+    connectDmSse();
+  }
+});
+
+// Watch for auth state changes and manage SSE connection
+watch(
+  () => userStore.user,
+  (newUser, oldUser) => {
+    if (newUser && !oldUser) {
+      // User just logged in - connect SSE
+      connectDmSse();
+    } else if (!newUser && oldUser) {
+      // User just logged out - disconnect SSE
+      disconnectDmSse();
+    }
+  },
+);
 </script>
 
 <template>
@@ -52,7 +85,7 @@ onServerPrefetch(async () => {
           <!-- Left sidebar -->
           <div class="w-16 flex-shrink-0 sm:w-16 md:w-24 xl:w-[306px]">
             <div class="sticky top-0">
-              <SideBarLeft />
+              <SideBarLeft :dm-unseen-count="unseenDmCount" />
             </div>
           </div>
 

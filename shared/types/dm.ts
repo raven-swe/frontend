@@ -111,3 +111,27 @@ export interface DmConversationMessagesResponse {
   };
   messages: DmMessage[];
 }
+
+export type DmSseEventName = 'dm.unseen_conversations_count' | 'dm.new_message';
+
+export interface DmUnseenConversationsCountEventData {
+  count: number;
+}
+
+export interface DmNewMessageEventData {
+  conversationId: string;
+  messageId: string;
+  sender: {
+    id: string;
+    username: string;
+    displayName: string;
+    avatarUrl: string | null;
+  };
+  bodySnippet: string;
+  createdAt: string;
+}
+
+export interface DmSseEventMap {
+  'dm.unseen_conversations_count': DmUnseenConversationsCountEventData;
+  'dm.new_message': DmNewMessageEventData;
+}

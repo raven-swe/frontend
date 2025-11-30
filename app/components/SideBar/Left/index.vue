@@ -5,6 +5,8 @@ import { ref } from 'vue';
 import { useI18n } from '#imports';
 import { useTheme } from '~/composables/useTheme';
 
+const props = defineProps<{ dmUnseenCount?: number }>();
+
 const { locale, setLocale } = useI18n();
 const { mode, toggleTheme } = useTheme();
 
@@ -44,7 +46,12 @@ const switchLanguage = () => {
         :tab="{ label: 'notifications', icon: 'notifications', route: '/notifications' }"
       ></SideBarLeftTab>
       <SideBarLeftTab
-        :tab="{ label: 'messages', icon: 'chat', route: '/messages' }"
+        :tab="{
+          label: 'messages',
+          icon: 'chat',
+          route: '/messages',
+          badgeCount: props.dmUnseenCount || 0,
+        }"
       ></SideBarLeftTab>
       <SideBarLeftTab
         :tab="{

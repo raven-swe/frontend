@@ -17,6 +17,7 @@ export default defineNuxtConfig({
       siteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY || '',
       baseUrl: process.env.NUXT_PUBLIC_BASE_URL || 'http://localhost:5173',
       dmWebSocketUrl: process.env.NUXT_PUBLIC_DM_WS_URL || 'wss://api.raven.cmp27.space/ws/dm',
+      dmSseUrl: process.env.NUXT_PUBLIC_DM_SSE_URL || '',
     },
   },
   devtools: {
