@@ -34,8 +34,25 @@ const liveMessages = ref<DmMessage[]>([]);
 
 const messages = computed(() => {
   const initial = initialMessages.value || [];
-  return [...initial, ...liveMessages.value];
+  return [...liveMessages.value, ...initial];
 });
+
+const messagesContainer = ref<HTMLElement | null>(null);
+
+function autoScroll() {
+  const el = messagesContainer.value;
+  if (!el) return;
+
+  const threshold = 200;
+
+  const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
+
+  if (isNearBottom) {
+    requestAnimationFrame(() => {
+      el.scrollTop = el.scrollHeight;
+    });
+  }
+}
 
 watch(
   conversationId,
@@ -53,7 +70,9 @@ watch(
       const checkConnection = () => {
         if (ws.isConnected.value) {
           const lastMessage = messages.value[messages.value.length - 1];
-          ws.switchConversation(newId, lastMessage?.id);
+          if (lastMessage?.id) {
+            ws.markSeen(newId, lastMessage.id);
+          }
         } else {
           // retry until connected
           setTimeout(checkConnection, 200);
@@ -61,16 +80,45 @@ watch(
       };
 
       checkConnection();
+      // Force scroll to bottom when switching conversations
+      nextTick(() => {
+        const el = messagesContainer.value;
+        if (el) {
+          requestAnimationFrame(() => {
+            el.scrollTop = el.scrollHeight;
+          });
+        }
+      });
     }
   },
   { immediate: true },
 );
 
-// Handle incoming Socket.IO messages
+// Scroll to bottom when messages load or change
+watch(messages, () => {
+  nextTick(() => autoScroll());
+});
+
+// Force scroll to bottom when messages finish loading initially
+watch(messagesLoading, (isLoading, wasLoading) => {
+  if (wasLoading && !isLoading) {
+    // Messages just finished loading
+    nextTick(() => {
+      const el = messagesContainer.value;
+      if (el) {
+        requestAnimationFrame(() => {
+          el.scrollTop = el.scrollHeight;
+        });
+      }
+    });
+  }
+});
+
+// Handle incoming Socket messages
 onMounted(() => {
   ws.onMessage((message) => {
     if (conversationId.value && message) {
-      liveMessages.value.push(message);
+      liveMessages.value.unshift(message);
     }
   });
 
@@ -88,7 +136,7 @@ watch(conversationsError, (val) => val && showToaster('error', 'Failed to load c
       :username="conversation?.participant.username || conversationId"
       :avatar-url="conversation?.participant.avatarUrl || ''"
     />
-    <div class="flex-1 overflow-y-auto p-4">
+    <div ref="messagesContainer" class="flex-1 overflow-y-auto p-4">
       <DmConversationInfo :conversation="conversation || null" />
       <div v-if="conversationsLoading || messagesLoading" class="p-4">
         <Spinner size="1.5rem" />

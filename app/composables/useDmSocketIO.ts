@@ -32,11 +32,9 @@ export function useDmSocketIO() {
       lastError.value = 'no_token';
       return;
     }
-    // Build desired URL: config.public.dmWebSocketUrl?token=TOKEN (no extra socket.io params)
-    const base = config.public.dmWebSocketUrl.replace(/\/?$/, ''); // remove trailing slash
-    const fullUrl = `${base}?token=${encodeURIComponent(token)}`;
+    const base = config.public.dmWebSocketUrl;
+    const fullUrl = `${base}?token=${token}`;
     attemptedUrl.value = fullUrl;
-    // Connect directly using full URL; rely on websocket transport only
     socket.value = io(fullUrl, {
       transports: ['websocket'],
       autoConnect: true,
@@ -55,7 +53,9 @@ export function useDmSocketIO() {
 
     // Custom server events
     socket.value.on('message_received', (payload: ServerMessageReceivedPayload) => {
+      // console.log('Socket.IO message_received event payload:', payload);
       const data = payload.message;
+      // console.log('Received message via Socket.IO:', data);
       const message: DmMessage = {
         id: data.id,
         content: data.body,
@@ -70,6 +70,10 @@ export function useDmSocketIO() {
       lastError.value = `server_error:${msg}`;
       if (onErrorCallback.value) onErrorCallback.value(msg);
     });
+
+    // socket.value.onAny((eventName, payload) => {
+    //   console.log('Received event:', eventName, payload);
+    // });
   }
 
   function disconnect() {
@@ -81,15 +85,9 @@ export function useDmSocketIO() {
     }
   }
 
-  function switchConversation(conversationId: string, lastSeenMessageId?: string) {
-    currentConversationId.value = conversationId;
-    if (socket.value?.connected) {
-      socket.value.emit('switch_conversation', { conversationId, lastSeenMessageId });
-    }
-  }
-
   function sendMessage(conversationId: string, body: string) {
     const clientMessageId = crypto.randomUUID();
+    // console.log('Sending message via Socket.IO:', { conversationId, body, clientMessageId });
     socket.value?.emit('send_message', { conversationId, body, clientMessageId });
     return clientMessageId;
   }
@@ -120,7 +118,6 @@ export function useDmSocketIO() {
     disconnect,
     sendMessage,
     markSeen,
-    switchConversation,
     onMessage,
     onError,
   };
