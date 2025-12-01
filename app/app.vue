@@ -13,6 +13,34 @@ useHead(() => ({
     // class: 'dark',
   },
 }));
+
+const userStore = useUserStore();
+
+const {
+  connect: connectDmSse,
+  disconnect: disconnectDmSse,
+
+  unseenCount,
+} = useDmSse({
+  autoReconnect: true,
+  maxReconnectAttempts: 5,
+  baseReconnectDelay: 1000,
+});
+
+// Provide unseenCount to all child components
+provide('dmUnseenCount', unseenCount);
+
+watch(
+  () => userStore.user,
+  (newUser, oldUser) => {
+    if (newUser.username && !oldUser?.username) {
+      connectDmSse();
+    } else if (!newUser.username && oldUser?.username) {
+      disconnectDmSse();
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <template>

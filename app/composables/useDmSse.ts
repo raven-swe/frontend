@@ -1,4 +1,3 @@
-import { ref, onBeforeUnmount } from 'vue';
 import type { DmSseEventMap } from '~~/shared/types/dm';
 import { EventSourcePolyfill } from 'event-source-polyfill';
 
@@ -13,7 +12,7 @@ export function useDmSse(options: UseDmSseOptions = {}) {
 
   const SSEendpoint = `/api/dm/stream?topics=dm`;
   const unseenCount = ref<number>(0);
-  const lastNewMessage = ref<DmSseEventMap['dm.new_message'] | null>(null);
+  const lastNewMessageinfo = ref<DmSseEventMap['dm.new_message'] | null>(null);
   const isConnected = ref<boolean>(false);
   const error = ref<Event | null>(null);
   const reconnectAttempts = ref<number>(0);
@@ -32,17 +31,12 @@ export function useDmSse(options: UseDmSseOptions = {}) {
   const scheduleReconnect = () => {
     if (!shouldReconnect || !autoReconnect) return;
     if (reconnectAttempts.value >= maxReconnectAttempts) {
-      console.error('[useDmSse] Max reconnection attempts reached');
       return;
     }
 
     clearReconnectTimeout();
 
-    // Exponential backoff: 1s, 2s, 4s, 8s, 16s...
     const delay = baseReconnectDelay * Math.pow(2, reconnectAttempts.value);
-    console.warn(
-      `[useDmSse] Reconnecting in ${delay}ms (attempt ${reconnectAttempts.value + 1}/${maxReconnectAttempts})`,
-    );
 
     reconnectTimeout = setTimeout(() => {
       reconnectAttempts.value++;
@@ -57,7 +51,6 @@ export function useDmSse(options: UseDmSseOptions = {}) {
     }
 
     if (!SSEendpoint) {
-      console.error('[useDmSse] No SSE endpoint configured');
       return;
     }
 
@@ -67,23 +60,19 @@ export function useDmSse(options: UseDmSseOptions = {}) {
     try {
       es = new EventSourcePolyfill(SSEendpoint, {
         withCredentials: true,
-        heartbeatTimeout: 120_000, // 2 minutes - expect some data within this time
+        heartbeatTimeout: 120_000, // expect some data within this time
       }) as unknown as EventSource;
 
       es.onopen = () => {
         isConnected.value = true;
-        reconnectAttempts.value = 0; // Reset on successful connection
+        reconnectAttempts.value = 0;
         error.value = null;
-        console.warn('[useDmSse] SSE connection opened');
       };
 
       es.onerror = (evt) => {
         error.value = evt;
         isConnected.value = false;
-        console.error('[useDmSse] SSE connection error', evt);
 
-        // EventSource automatically tries to reconnect unless we close it
-        // But we want controlled reconnection with backoff
         if (es) {
           es.close();
           es = null;
@@ -92,29 +81,24 @@ export function useDmSse(options: UseDmSseOptions = {}) {
         scheduleReconnect();
       };
 
-      // Listen for unseen conversations count updates
       es.addEventListener('dm.unseen_conversations_count', (evt: MessageEvent) => {
         try {
           const data = JSON.parse(evt.data) as DmSseEventMap['dm.unseen_conversations_count'];
           unseenCount.value = data.count;
-          console.warn('[useDmSse] Updated unseen DM count:', data.count);
-        } catch (err) {
-          console.error('[useDmSse] Failed to parse unseen_conversations_count', err);
+        } catch {
+          createError('Failed to parse unseen_conversations_count event data');
         }
       });
 
-      // Listen for new message events
       es.addEventListener('dm.new_message', (evt: MessageEvent) => {
         try {
           const data = JSON.parse(evt.data) as DmSseEventMap['dm.new_message'];
-          lastNewMessage.value = data;
-          console.warn('[useDmSse] New DM message:', data.conversationId);
-        } catch (err) {
-          console.error('[useDmSse] Failed to parse new_message', err);
+          lastNewMessageinfo.value = data;
+        } catch {
+          createError('Failed to parse new_message event data');
         }
       });
-    } catch (err) {
-      console.error('[useDmSse] Failed to create EventSource', err);
+    } catch {
       scheduleReconnect();
     }
   };
@@ -143,7 +127,7 @@ export function useDmSse(options: UseDmSseOptions = {}) {
   return {
     // state
     unseenCount,
-    lastNewMessage,
+    lastNewMessageinfo,
     isConnected,
     error,
     reconnectAttempts,

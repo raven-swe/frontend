@@ -5,7 +5,8 @@ import { ref } from 'vue';
 import { useI18n } from '#imports';
 import { useTheme } from '~/composables/useTheme';
 
-const props = defineProps<{ dmUnseenCount?: number }>();
+// Get unseenCount from app.vue via inject
+const dmUnseenCount = inject<Ref<number>>('dmUnseenCount', ref(0));
 
 const { locale, setLocale } = useI18n();
 const { mode, toggleTheme } = useTheme();
@@ -50,7 +51,7 @@ const switchLanguage = () => {
           label: 'messages',
           icon: 'chat',
           route: '/messages',
-          badgeCount: props.dmUnseenCount || 0,
+          badgeCount: dmUnseenCount,
         }"
       ></SideBarLeftTab>
       <SideBarLeftTab
