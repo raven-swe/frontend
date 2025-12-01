@@ -1,7 +1,7 @@
 import { mountSuspended } from '@nuxt/test-utils/runtime';
 import { describe, it, expect, vi } from 'vitest';
 import MutedPage from '~/pages/settings/muted.vue';
-import UserList from '~/components/common/UserList.vue';
+import UserList from '~/components/user/UserList.vue';
 import { createI18n } from 'vue-i18n';
 import en from '~~/i18n/locales/en.json';
 

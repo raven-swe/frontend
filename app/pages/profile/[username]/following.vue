@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import UserList from '~/components/common/UserList.vue';
+import UserList from '~/components/user/UserList.vue';
 import { profileTabsService } from '~/services/profile/profileTabsService';
 
 definePageMeta({
