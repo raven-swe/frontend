@@ -8,7 +8,6 @@ import Avatar from '~/components/ui/Avatar.vue';
 
 const dmUnseenCount = inject<Ref<number>>('dmUnseenCount', ref(0));
 
-// Get unseenCount from app.vue via inject
 const dmUnseenCount = inject<Ref<number>>('dmUnseenCount', ref(0));
 
 const { locale, setLocale } = useI18n();

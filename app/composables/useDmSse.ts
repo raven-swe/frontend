@@ -84,6 +84,7 @@ export function useDmSse(options: UseDmSseOptions = {}) {
         try {
           const data = JSON.parse(evt.data) as DmSseEventMap['dm.unseen_conversations_count'];
           unseenCount.value = data.count;
+          console.log('Received unseen_conversations_count event:', data);
         } catch {
           createError('Failed to parse unseen_conversations_count event data');
         }
@@ -93,6 +94,7 @@ export function useDmSse(options: UseDmSseOptions = {}) {
         try {
           const data = JSON.parse(evt.data) as DmSseEventMap['dm.new_message'];
           lastNewMessageinfo.value = data;
+          console.log('Received new_message event:', data);
         } catch {
           createError('Failed to parse new_message event data');
         }
