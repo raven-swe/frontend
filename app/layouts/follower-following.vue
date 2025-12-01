@@ -53,7 +53,8 @@ onServerPrefetch(async () => {
           variant="ghost-default"
           size="icon-sm"
           class="bg-transparent"
-          @click="route.back()"
+          data-test="back-button"
+          @click="$router.back()"
         >
           <Icon name="ic:round-arrow-back" size="20" />
         </UiButton>
