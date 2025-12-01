@@ -85,7 +85,8 @@ export function useProfileMutation<ActionType extends Actions, Q = void>({
           const updatedPages = oldData.pages.map((page) => {
             const updatedData = page.data.map((user) => {
               if (user.username.toLowerCase() === usernameToMutate) {
-                return optimisticUpdateFn(user, action);
+                const prevUser = toRaw(user);
+                return optimisticUpdateFn(prevUser, action);
               }
               return user;
             });
@@ -120,6 +121,7 @@ export function useProfileMutation<ActionType extends Actions, Q = void>({
       }
 
       const errorCode = err?.data?.data?.error?.code;
+      console.error('Profile mutation error:', err);
 
       showToaster(
         'error',
