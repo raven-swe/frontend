@@ -36,14 +36,16 @@ const isCurrentUser = computed(() => {
     :class="{ 'pe-3': !props.showDropdown }"
     @click="router.push(`/profile/${user.username}`)"
   >
-    <UserHoverCard
-      :username="user.username"
-      @follow="$emit('follow', user.username)"
-      @unfollow="$emit('unfollow', user.username)"
-      @unblock="$emit('unblock', user.username)"
-    >
-      <UiAvatar :img="user.avatarUrl" size="sm" />
-    </UserHoverCard>
+    <div class="flex-shrink-0">
+      <UserHoverCard
+        :username="user.username"
+        @follow="$emit('follow', user.username)"
+        @unfollow="$emit('unfollow', user.username)"
+        @unblock="$emit('unblock', user.username)"
+      >
+        <UiAvatar :img="user.avatarUrl" size="sm" />
+      </UserHoverCard>
+    </div>
 
     <div class="flex flex-1 flex-col gap-1">
       <div class="flex flex-1 items-center justify-between">
