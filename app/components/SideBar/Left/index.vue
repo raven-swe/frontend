@@ -5,7 +5,6 @@ import { ref } from 'vue';
 import { useI18n } from '#imports';
 import { useTheme } from '~/composables/useTheme';
 
-// Get unseenCount from app.vue via inject
 const dmUnseenCount = inject<Ref<number>>('dmUnseenCount', ref(0));
 
 const { locale, setLocale } = useI18n();

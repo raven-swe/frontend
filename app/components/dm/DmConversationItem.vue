@@ -1,15 +1,22 @@
 <script lang="ts" setup>
 import type { DmConversation } from '~/../shared/types/dm';
+import { useDmHighlight } from '@/composables/useDmHighlight';
+
 const props = defineProps<{
   conversation: DmConversation;
   isSelected?: boolean;
 }>();
-// console.log('Rendering DmConversationItem for', props.conversation);
+
+const { isHighlighted } = useDmHighlight();
+const highlighted = computed(() => isHighlighted(props.conversation.id));
 </script>
 <template>
   <div
     class="flex min-w-0 items-center gap-2 border-e-2 p-4 transition-colors"
-    :class="props.isSelected ? 'border-e-primary' : 'border-e-transparent'"
+    :class="[
+      props.isSelected ? 'border-e-primary' : 'border-e-transparent',
+      highlighted ? 'bg-foreground/5' : '',
+    ]"
   >
     <div>
       <NuxtImg
@@ -22,26 +29,29 @@ const props = defineProps<{
     <div class="flex min-w-0 flex-col gap-0.5">
       <div class="flex min-w-0 flex-nowrap items-center gap-2 overflow-hidden text-sm">
         <span
-          class="max-w-[110px] truncate font-bold"
+          class="max-w-[110px] truncate"
+          :class="highlighted ? 'text-primary font-bold' : 'font-bold'"
           :title="props.conversation.participant.displayName"
         >
           {{ props.conversation.participant.displayName }}
         </span>
         <span
-          class="text-muted-foreground max-w-[100px] truncate"
+          class="max-w-[100px] truncate"
+          :class="highlighted ? 'text-primary' : 'text-muted-foreground'"
           :title="props.conversation.participant.username"
         >
           {{ '@' + props.conversation.participant.username }}
         </span>
         <span
           v-if="props.conversation.lastMessage?.sentAt"
-          class="text-muted-foreground flex-shrink-0"
+          class="flex-shrink-0"
+          :class="highlighted ? 'text-primary' : 'text-muted-foreground'"
         >
           {{ relativeTime(props.conversation.lastMessage.sentAt) }}
         </span>
       </div>
       <div class="text-sm">
-        <span class="text-muted-foreground">
+        <span :class="highlighted ? 'text-primary font-bold' : 'text-muted-foreground'">
           {{ props.conversation.lastMessage?.content || 'No messages yet' }}
         </span>
       </div>

@@ -1,11 +1,13 @@
 <script lang="ts" setup>
 import { useDmConversations } from '@/composables/useDmConversations';
+import { useDmHighlight } from '@/composables/useDmHighlight';
 import { showToaster } from '@/utils/showToaster';
 import Spinner from '../ui/Spinner.vue';
 
 const route = useRoute();
 const router = useRouter();
 const { conversations, loading, error } = useDmConversations();
+const { removeHighlight } = useDmHighlight();
 const selectedId = computed(() => (route.params.conversationId as string) || null);
 
 watch(error, (val) => {
@@ -15,6 +17,7 @@ watch(error, (val) => {
 });
 
 function onSelect(id: string) {
+  removeHighlight(id);
   router.push({ path: `/messages/${id}` });
 }
 </script>
@@ -26,7 +29,7 @@ function onSelect(id: string) {
   </div>
   <DmConversationList
     v-else
-    :conversations="conversations || []"
+    :conversations="conversations"
     :selected-id="selectedId"
     @select="onSelect"
   />
