@@ -1,4 +1,5 @@
 import { apiFetch } from '~/api';
+import { DEFAULT_PAGE_SIZE } from '~/constants/pagination';
 
 export const accountSettingsService = {
   updateUsername: async (username: string) => {
@@ -24,9 +25,22 @@ export const accountSettingsService = {
     });
   },
 
-  getFollowSuggestions: async () => {
+  getFollowSuggestions: async ({
+    cursor,
+    limit,
+    signal,
+  }: {
+    cursor: string | null;
+    limit?: number;
+    signal?: AbortSignal;
+  }) => {
     return await apiFetch('/api/onboarding/follow-suggestions', {
       method: 'GET',
+      query: {
+        cursor,
+        limit: (limit ?? DEFAULT_PAGE_SIZE).toString(),
+      },
+      signal,
     });
   },
 };

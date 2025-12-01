@@ -2,10 +2,9 @@ import { defineWrappedResponseHandler } from '~~/server/utils/handler';
 
 export default defineWrappedResponseHandler(async (event) => {
   const fetcher = serverApiFetch(event);
-  return await fetcher<ApiSuccessResponse<{ suggestions: User[] }>>(
-    '/onboarding/follow-suggestions',
-    {
-      method: 'GET',
-    },
-  );
+  const query = getQuery(event);
+  return await fetcher<ApiSuccessResponse<CompactUser[]>>('/onboarding/follow-suggestions', {
+    method: 'GET',
+    query,
+  });
 });
