@@ -56,6 +56,11 @@ const handlePostWrapper = async () => {
   media.value = [];
   tweetEditorRef.value?.resetHeight();
 };
+
+const handleInsertEmoji = (emoji: string) => {
+  tweetContent.value += emoji;
+  tweetEditorRef.value?.resetHeight();
+};
 </script>
 
 <template>
@@ -93,19 +98,19 @@ const handlePostWrapper = async () => {
         <span>{{ loadingMessage }}</span>
       </div>
 
-      <Toolbar
-        :disabled="!tweetContent.trim() && media.length === 0"
-        :character-count="characterCount"
-        :max-length="MAX_LENGTH"
-        :is-over-limit="isOverLimit"
-        :has-media="media.length > 0"
-        :can-add-media="media.length < MAX_MEDIA"
-        :button-text="$t('tweet.composer.button.' + props.type)"
-        :is-posting="isPosting"
-        :composer-type="type"
-        @post="handlePostWrapper"
-        @add-media="handleAddMedia"
-      />
-    </div>
+    <Toolbar
+      :disabled="!tweetContent.trim() && media.length === 0"
+      :character-count="characterCount"
+      :max-length="MAX_LENGTH"
+      :is-over-limit="isOverLimit"
+      :has-media="media.length > 0"
+      :can-add-media="media.length < MAX_MEDIA"
+      :button-text="$t('tweet.composer.button.' + props.type)"
+      :is-posting="isPosting"
+      :composer-type="type"
+      @post="handlePostWrapper"
+      @add-media="handleAddMedia"
+      @insert-emoji="handleInsertEmoji"
+    />
   </div>
 </template>

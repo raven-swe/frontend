@@ -24,6 +24,7 @@ interface Props {
 interface Emits {
   (e: 'post'): void;
   (e: 'add-media', files: File[]): void;
+  (e: 'insert-emoji', emoji: string): void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -106,8 +107,9 @@ interface EmojiSelectEvent {
 
 const handleEmojiSelect = (emoji: EmojiSelectEvent) => {
   isOpen.value = false;
-  console.log(emoji);
+  emit('insert-emoji', emoji.emoji);
 };
+
 const isOpen = ref(false);
 </script>
 
