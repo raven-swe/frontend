@@ -23,7 +23,7 @@ defineProps<{
 }>();
 </script>
 <template>
-  <div class="relative">
+  <div class="relative size-full">
     <Icon
       v-if="multiple"
       name="lucide:images"
@@ -31,14 +31,15 @@ defineProps<{
       size="1.5rem"
     />
     <NuxtImg
-      v-if="media?.type === 'IMAGE'"
+      v-if="media?.type === 'IMAGE' || media?.type === 'GIF'"
       :src="media?.url"
       :alt="media?.altText || 'Media image'"
-      class="border-background flex aspect-square object-cover"
+      class="border-background flex aspect-square size-full object-cover"
     />
     <video
+      v-else-if="media?.type === 'VIDEO'"
       :src="media?.url"
-      class="border-background flex aspect-square object-cover"
+      class="border-background flex aspect-square size-full object-cover"
       @loadedmetadata="(event) => setDuration(event)"
     ></video>
     <span

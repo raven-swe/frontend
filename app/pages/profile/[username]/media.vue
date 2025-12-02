@@ -58,13 +58,16 @@ onServerPrefetch(async () => {
           :fetch-next-page="fetchNextPage"
         >
           <template #item="{ item }">
-            <div class="grid aspect-3/1 grid-cols-3 gap-1 overflow-hidden py-1">
-              <div v-for="tweet in item" :key="tweet.id" class="relative">
-                <!-- Always delegate media rendering to Thumbnail -->
-                <NuxtLink :to="`/profile/${tweet.author.username}/status/${tweet.id}`">
-                  <Thumbnail :media="tweet.media?.[0]" :multiple="tweet.media?.length > 1" />
-                </NuxtLink>
-              </div>
+            <div class="grid grid-cols-3 gap-1 overflow-hidden pt-1">
+              <!-- Always delegate media rendering to Thumbnail -->
+              <NuxtLink
+                v-for="tweet in item"
+                :key="tweet.id"
+                :to="`/profile/${tweet.author.username}/status/${tweet.id}`"
+                class="block size-full"
+              >
+                <Thumbnail :media="tweet.media?.[0]" :multiple="tweet.media?.length > 1" />
+              </NuxtLink>
             </div>
           </template>
         </VirtualInfiniteScroller>
