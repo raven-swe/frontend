@@ -122,7 +122,8 @@
   },
   "search": {
     "top": {
-      "tab": "Top"
+      "tab": "Top",
+      "view-all": "View all"
     },
     "latest": {
       "tab": "Latest"
@@ -133,7 +134,8 @@
     "media": {
       "tab": "Media"
     },
-    "no-trending-hashtags": "No trending hashtags found"
+    "no-trending-hashtags": "No trending hashtags found",
+    "no-results": "No results for \"{query}\""
   },
   "playground": {
     "dialog": {
