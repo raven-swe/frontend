@@ -138,14 +138,14 @@ onServerPrefetch(async () => {
           </div>
         </div>
       </div>
-    </ClientOnly>
 
-    <div
-      v-if="(hasNextPage && isFetchingNextPage) || isLoading"
-      class="text-primary flex shrink-0 items-center justify-center py-4"
-    >
-      <UiSpinner />
-    </div>
+      <div
+        v-if="(hasNextPage && isFetchingNextPage) || isLoading"
+        class="text-primary flex shrink-0 items-center justify-center py-4"
+      >
+        <UiSpinner />
+      </div>
+    </ClientOnly>
     <div
       v-if="tweets.length === 0 && !isFetchingNextPage && !isLoading"
       data-testid="empty-state"

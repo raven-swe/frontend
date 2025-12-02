@@ -135,13 +135,13 @@ watchEffect(() => {
           </div>
         </div>
       </div>
+      <div
+        v-if="(hasNextPage && isFetchingNextPage) || isLoading"
+        class="text-primary flex shrink-0 items-center justify-center py-4"
+      >
+        <UiSpinner />
+      </div>
     </ClientOnly>
-    <div
-      v-if="(hasNextPage && isFetchingNextPage) || isLoading"
-      class="text-primary flex shrink-0 items-center justify-center py-4"
-    >
-      <UiSpinner />
-    </div>
     <div v-if="!isLoading && users.length === 0" class="mx-auto my-10 max-w-90 px-8 text-start">
       <h2 class="text-[2rem] leading-tight font-black">
         {{ emptyTitle }}
