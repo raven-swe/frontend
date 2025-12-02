@@ -7,7 +7,7 @@ on:
 
 jobs:
   e2e-tests:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     environment: e2e
     env:
       APP_POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
@@ -62,6 +62,9 @@ jobs:
         run: |
           printenv | grep '^APP_' | sed 's/^APP_//' > .env
 
+      - name: Set up Corepack
+        run: corepack enable
+        
       - name: Set up pnpm
         run: corepack prepare pnpm@latest --activate
 
