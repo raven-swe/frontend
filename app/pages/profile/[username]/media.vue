@@ -10,6 +10,11 @@ definePageMeta({
 
 const user = inject<ComputedRef<User>>('user-data');
 const isBlockedBy = computed(() => user?.value.relationship.blockedBy || false);
+const userStore = useUserStore();
+
+const isCurrentUser = computed(() => {
+  return userStore.user?.username === user?.value.username;
+});
 
 const {
   data: response,
@@ -71,21 +76,30 @@ onServerPrefetch(async () => {
             </div>
           </template>
         </VirtualInfiniteScroller>
+
+        <div
+          v-if="(hasNextPage && isFetchingNextPage) || isLoading"
+          class="text-primary flex shrink-0 items-center justify-center py-4"
+        >
+          <UiSpinner />
+        </div>
       </ClientOnly>
     </div>
-
-    <div
-      v-if="(hasNextPage && isFetchingNextPage) || isLoading"
-      class="text-primary flex shrink-0 items-center justify-center py-4"
-    >
-      <UiSpinner />
-    </div>
-    <div
-      v-if="tweets.length === 0 && !isFetchingNextPage && !isLoading"
-      data-testid="empty-state"
-      class="text-muted-foreground mt-10 text-center"
-    >
-      <h1 class="text-xl font-semibold">{{ $t('testing.tweets.tweet-not-found') }}</h1>
+    <div v-if="!isLoading && tweets.length === 0" class="mx-auto my-10 max-w-90 px-8 text-start">
+      <h2 class="text-[2rem] leading-tight font-black">
+        {{
+          isCurrentUser
+            ? $t('profile.media.current-user-no-media.title')
+            : $t('profile.media.no-media.title', { username: user?.username || '' })
+        }}
+      </h2>
+      <p class="text-muted-foreground leading-tight">
+        {{
+          isCurrentUser
+            ? $t('profile.media.current-user-no-media.description')
+            : $t('profile.media.no-media.description')
+        }}
+      </p>
     </div>
   </div>
 </template>
