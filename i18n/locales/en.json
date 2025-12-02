@@ -254,6 +254,9 @@
       "media": "Media",
       "gif": "GIF",
       "emoji": "Emoji",
+      "no-emojis": "No emojis found",
+      "select-emoji": "Select an emoji",
+      "change-skin-tone": "Change skin tone",
       "profile-alt": "Avatar of {name}",
       "loading": {
         "uploading": "Uploading media... {progress}%",

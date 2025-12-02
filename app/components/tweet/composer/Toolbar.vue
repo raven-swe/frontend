@@ -98,6 +98,17 @@ const handleFileSelect = (event: Event) => {
     target.value = '';
   }
 };
+
+interface EmojiSelectEvent {
+  emoji: string;
+  label: string;
+}
+
+const handleEmojiSelect = (emoji: EmojiSelectEvent) => {
+  isOpen.value = false;
+  console.log(emoji);
+};
+const isOpen = ref(false);
 </script>
 
 <template>
@@ -124,14 +135,31 @@ const handleFileSelect = (event: Event) => {
       >
         <Icon name="heroicons:gif-solid" size="20" />
       </UiButton>
-      <UiButton
-        variant="tweet-icon-blue"
-        :title="$t('tweet.composer.emoji')"
-        class="text-brand-blue"
-        size="icon-md"
-      >
-        <Icon name="heroicons:face-smile" size="20" />
-      </UiButton>
+      <!--  -->
+      <UiPopover v-model:open="isOpen">
+        <UiPopoverTrigger as-child>
+          <UiButton
+            variant="tweet-icon-blue"
+            :title="$t('tweet.composer.emoji')"
+            class="text-brand-blue"
+            size="icon-md"
+          >
+            <Icon name="heroicons:face-smile" size="20" />
+          </UiButton>
+        </UiPopoverTrigger>
+        <UiPopoverContent class="w-fit rounded-xl p-0">
+          <UiEmojiPicker
+            class="bg-background h-[342px] !border-none !shadow-none"
+            @emoji-select="handleEmojiSelect"
+          >
+            <UiEmojiPickerSearch />
+            <UiEmojiPickerContent />
+            <UiEmojiPickerFooter />
+          </UiEmojiPicker>
+        </UiPopoverContent>
+      </UiPopover>
+
+      <!--  -->
     </div>
 
     <div class="flex items-center gap-3">
