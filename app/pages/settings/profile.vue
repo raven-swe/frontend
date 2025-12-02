@@ -83,7 +83,7 @@ defineExpose({ __testGetProfileState });
               variant="ghost-default"
               size="icon-xs"
               class="hover:bg-muted-foreground/10"
-              data-class="edit-profile-close-btn"
+              data-cy="edit-profile-close-btn"
               @click="handleDialogClose"
             >
               <Icon name="lucide:x" class="size-5" />
