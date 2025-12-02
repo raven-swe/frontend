@@ -2,7 +2,7 @@ import { apiFetch } from '~/api';
 import type { PaginationParams } from '~~/shared/types/pagination';
 import type { validSearchTweetsTabs } from '~~/shared/types/timeline';
 
-export const exploreService = {
+export const searchService = {
   async getTopThreeHashtags(query: string) {
     return await apiFetch(`/api/search/hashtags/top`, {
       method: 'GET',
@@ -40,7 +40,7 @@ export const exploreService = {
   },
 
   async getPeople(pagination: PaginationParams, query: string) {
-    return apiFetch(`/api/search/users/all`, {
+    return apiFetch(`/api/search/users`, {
       method: 'GET',
       query: {
         query: query,
