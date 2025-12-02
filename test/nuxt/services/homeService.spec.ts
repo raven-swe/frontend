@@ -8,7 +8,7 @@ describe('homeService', () => {
     vi.clearAllMocks();
   });
 
-  it('forYou calls API with correct params and returns response', async () => {
+  it('getHomeTab calls API with correct params for "for-you" tab', async () => {
     registerEndpoint('/api/timeline/for-you', () => {
       return {
         data: {
@@ -19,7 +19,7 @@ describe('homeService', () => {
     });
 
     const payload = { limit: 10, cursor: null };
-    const res = await homeService.forYou(payload);
+    const res = await homeService.getHomeTab(payload, 'for-you');
 
     expect(res).toEqual({
       data: {
@@ -29,7 +29,7 @@ describe('homeService', () => {
     });
   });
 
-  it('following calls API with correct params', async () => {
+  it('getHomeTab calls API with correct params for "following" tab', async () => {
     registerEndpoint('/api/timeline/following', () => {
       return {
         data: {
@@ -40,7 +40,7 @@ describe('homeService', () => {
     });
 
     const payload = { limit: 10, cursor: null };
-    const res = await homeService.following(payload);
+    const res = await homeService.getHomeTab(payload, 'following');
 
     expect(res).toEqual({
       data: {

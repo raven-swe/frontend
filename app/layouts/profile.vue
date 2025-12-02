@@ -7,10 +7,10 @@ import { apiFetch } from '~/api';
 import { useQuery, useQueryClient } from '@tanstack/vue-query';
 import type { FetchError } from 'ofetch';
 
-const route = useRouter().currentRoute.value;
+const route = useRouter();
 
 const username = computed(() => {
-  const val = route.params.username;
+  const val = route.currentRoute.value.params.username;
   return typeof val === 'string' ? val.toLowerCase() : null;
 });
 const profilePath = computed(() => `/profile/${username.value}`);
@@ -44,7 +44,7 @@ const isUserNotFound = computed(() => {
 });
 const queryClient = useQueryClient();
 watch(
-  () => route.fullPath,
+  () => route.currentRoute.value.fullPath,
   () => {
     if (!user.value) return;
 
@@ -82,7 +82,7 @@ onServerPrefetch(async () => {
           <Tab
             :label="$t('profile.tabs.posts')"
             :route="profilePath"
-            :is-active="$route.path === profilePath"
+            :is-active="$route.path.toLowerCase() === profilePath"
           />
           <Tab
             :label="$t('profile.tabs.replies')"

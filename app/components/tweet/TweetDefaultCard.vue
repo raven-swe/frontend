@@ -1,19 +1,19 @@
 <script setup lang="ts">
+import { ref, computed } from 'vue';
 import Avatar from '~/components/ui/Avatar.vue';
 import type { Tweet } from '~~/shared/types/tweets';
-import { relativeTime, formatDate } from '~/utils/time';
 import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
 interface Props {
   tweet: Tweet;
 }
 const props = defineProps<Props>();
+const router = useRouter();
+
 // Format createdAt to a short relative time like "6h", "3d", "2m"
-
+const tweet = ref<Tweet>(JSON.parse(JSON.stringify(props.tweet)));
 type Segment = { type: 'text' | 'mention' | 'hashtag'; text: string; href?: string };
-const tweet = ref(props.tweet);
 
-// Update local tweet state when like/unlike succeeds
 const onLikeSuccess = () => {
   if (!tweet.value.isLiked) {
     tweet.value.isLiked = true;
@@ -43,7 +43,6 @@ const onUndoRetweetSuccess = () => {
   }
 };
 
-// Build content segments using entities positions so we can style mentions and hashtags
 const contentSegments = computed<Segment[]>(() => {
   const segments: Segment[] = [];
   const content = tweet.value.content || '';
@@ -99,10 +98,18 @@ const contentSegments = computed<Segment[]>(() => {
   }
   return segments;
 });
+
+function handleTweetClick() {
+  router.push(`/profile/${props.tweet.author.username}/status/${props.tweet.id}`);
+}
 </script>
 
 <template>
-  <article class="border-b-border flex w-full max-w-[700px] gap-3 border-b-1 p-2">
+  <article
+    :id="'tweet-' + props.tweet.id"
+    class="border-b-border flex w-full max-w-[700px] cursor-pointer gap-3 border-b-1 p-2"
+    @click.prevent.stop="handleTweetClick"
+  >
     <NuxtLink :to="`/profile/${props.tweet.author.username}`">
       <Avatar
         :img="props.tweet.author.avatarUrl || '/default_profile.png'"
@@ -119,7 +126,7 @@ const contentSegments = computed<Segment[]>(() => {
           <span class="cursor-pointer font-semibold hover:underline">{{
             props.tweet.author.displayName
           }}</span>
-          <span class="text-muted-foreground" v-text="'@' + props.tweet.author.username" />
+          <span class="text-muted-foreground ms-1" v-text="'@' + props.tweet.author.username" />
           <span class="text-muted-foreground">·</span>
         </NuxtLink>
         <time
@@ -136,11 +143,9 @@ const contentSegments = computed<Segment[]>(() => {
           <span v-if="seg.type === 'text'" class="inline">
             {{ seg.text }}
           </span>
-          <NuxtLink v-else :to="seg.href">
-            <a class="text-primary inline font-medium hover:underline">
-              {{ seg.text }}
-            </a>
-          </NuxtLink>
+          <a v-else :href="seg.href" class="text-primary inline font-medium hover:underline">
+            {{ seg.text }}
+          </a>
         </template>
       </p>
 
@@ -150,6 +155,7 @@ const contentSegments = computed<Segment[]>(() => {
       <!-- Actions -->
       <TweetActionButtons
         :tweet="tweet"
+        @click.stop
         @like-success="onLikeSuccess"
         @unlike-success="onUnlikeSuccess"
         @retweet-success="onRetweetSuccess"

@@ -16,9 +16,9 @@ type TweetAuthor = {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-function makeAuthorFromUser(user: User | undefined, index: number) {
+function makeAuthorFromUser(user: Partial<User> | undefined) {
   const rawName = user?.username ?? faker.internet.username();
-  const username = (String(rawName).toLowerCase() + index).replace(/\s+/g, '');
+  const username = String(rawName).toLowerCase();
   return {
     username,
     displayName: user?.displayName ?? faker.person.fullName(),
@@ -71,12 +71,21 @@ function randomMedia() {
     }
 
     case 'VIDEO': {
-      const videos = [
-        'https://sample-videos.com/video321/mp4/480/big_buck_bunny_480p_1mb.mp4',
-        'https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_1mb.mp4',
-        'https://sample-videos.com/video321/mp4/240/big_buck_bunny_240p_1mb.mp4',
+      const videoSources = [
+        'https://media.w3.org/2010/05/sintel/trailer.mp4',
+        'https://media.w3.org/2010/05/sintel/trailer_hd.mp4',
+        'https://vjs.zencdn.net/v/oceans.mp4',
+        'https://www.w3schools.com/html/mov_bbb.mp4',
+        'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+        'https://test-streams.mux.dev/x36xhzz/url_6/193039199_mp4_h264_aac_hq_7.m3u8',
+        'https://test-streams.mux.dev/test_001/stream.m3u8',
+        'https://test-streams.mux.dev/dai-discontinuity-deltatre/manifest.m3u8',
+        'https://test-streams.mux.dev/issue666/playlists/cisq0gim60007xzvi505emlxx.m3u8',
+        'https://test-streams.mux.dev/bbbAES/playlists/sample_aes/index.m3u8',
+        'https://test-streams.mux.dev/pts_shift/master.m3u8',
+        'https://test-streams.mux.dev/tos_ismc/main.m3u8',
       ];
-      url = faker.helpers.arrayElement(videos);
+      url = faker.helpers.arrayElement(videoSources);
       break;
     }
   }
@@ -97,7 +106,11 @@ function makeBaseTweet(id: string, content?: string, author?: TweetAuthor): Twee
     id,
     content: content ?? faker.lorem.sentences({ min: 1, max: 3 }),
     createdAt: new Date().toISOString(),
-    author: author ?? makeAuthorFromUser(undefined, faker.number.int({ min: 1, max: 999 })),
+    author:
+      author ??
+      makeAuthorFromUser({
+        username: faker.internet.username().toLowerCase() + faker.number.int({ min: 1, max: 9999 }),
+      }),
     replyCount: 0,
     retweetCount: faker.number.int({ min: 0, max: 100 }),
     likeCount: faker.number.int({ min: 0, max: 500 }),
@@ -105,6 +118,7 @@ function makeBaseTweet(id: string, content?: string, author?: TweetAuthor): Twee
     isRetweeted: faker.datatype.boolean(),
     entities: randomEntities(),
     media: randomMedia(),
+    replyToTweetId: undefined,
   };
 }
 
@@ -120,16 +134,24 @@ function makeData() {
   }
 
   const tweets: Tweet[] = [];
-  for (let i = 0; i < NUM_TWEETS; i++) {
+  for (let i = 0; i < 100; i++) {
+    const id = 'tw-' + faker.string.nanoid(8);
+    const chosenUser = users[0];
+    const author = makeAuthorFromUser(chosenUser as Partial<User>);
+    const t: Tweet = makeBaseTweet(id, 'This is a pinned tweet example.', author);
+    tweets.push(t);
+  }
+
+  for (let i = 0; i < NUM_TWEETS - 100; i++) {
     const id = 'tw-' + faker.string.nanoid(8);
     const chosenUser = users.length ? faker.helpers.arrayElement(users) : undefined;
-    const author = makeAuthorFromUser(chosenUser as User | undefined, i + 1);
+    const author = makeAuthorFromUser(chosenUser as Partial<User>);
     const t: Tweet = makeBaseTweet(id, undefined, author);
     tweets.push(t);
   }
 
   for (let i = 1; i < tweets.length; i++) {
-    if (faker.number.int({ min: 0, max: 100 }) < 12) {
+    if (faker.number.int({ min: 0, max: 100 }) < 50) {
       const targetIndex = faker.number.int({ min: 0, max: i - 1 });
       tweets[i]!.replyToTweetId = tweets[targetIndex]!.id;
       tweets[targetIndex]!.replyCount = (tweets[targetIndex]!.replyCount ?? 0) + 1;
@@ -139,8 +161,8 @@ function makeData() {
       const targetIndex = faker.number.int({ min: 0, max: i - 1 });
       const quotedLight: Partial<Tweet> = { ...tweets[targetIndex]! };
       (quotedLight as unknown as Record<string, unknown>).quotedTweet = undefined;
-      (quotedLight as unknown as Record<string, unknown>).quoteToTweetId = undefined;
-      (quotedLight as unknown as Record<string, unknown>).replyToTweetId = undefined;
+      (quotedLight as unknown as Record<string, unknown>).quotedTweetId = undefined;
+      // (quotedLight as unknown as Record<string, unknown>).isReplyToTweetId = undefined;
       tweets[i]!.quoteToTweetId = tweets[targetIndex]!.id;
       tweets[i]!.quotedTweet = quotedLight as unknown as Tweet;
     }
