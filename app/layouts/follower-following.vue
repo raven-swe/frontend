@@ -77,14 +77,20 @@ onServerPrefetch(async () => {
       </header>
       <UiTabs>
         <UiTab
+          v-if="user?.mutualsCount !== 0"
+          :route="`${profilePath}/followers-you-follow`"
+          :is-active="$route.path.toLowerCase() === `${profilePath}/followers-you-follow`"
+          :label="$t('profile.followers-you-follow.title')"
+        />
+        <UiTab
           :route="`${profilePath}/followers`"
           :is-active="$route.path.toLowerCase() === `${profilePath}/followers`"
-          label="Followers"
+          :label="$t('profile.followers.title')"
         />
         <UiTab
           :route="`${profilePath}/following`"
           :is-active="$route.path.toLowerCase() === `${profilePath}/following`"
-          label="Following"
+          :label="$t('profile.following.title')"
         />
       </UiTabs>
     </div>

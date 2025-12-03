@@ -65,4 +65,25 @@ export const profileTabsService = {
       signal,
     });
   },
+
+  getMutualFollowersPaginated: async ({
+    username,
+    cursor,
+    limit,
+    signal,
+  }: {
+    username: string;
+    cursor: string | null;
+    limit?: number;
+    signal?: AbortSignal;
+  }) => {
+    return await apiFetch(`/api/users/${username}/mutual`, {
+      method: 'GET',
+      query: {
+        cursor,
+        limit: (limit ?? DEFAULT_PAGE_SIZE).toString(),
+      },
+      signal,
+    });
+  },
 };
