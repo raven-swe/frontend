@@ -8,12 +8,15 @@ export type UserRelationship = {
   follower?: boolean;
 };
 
-export type CompactUser = {
-  username: string;
+export type MutualUser = {
   displayName: string;
+  avatarUrl: string;
+};
+
+export type CompactUser = MutualUser & {
+  username: string;
   bio: string | null;
   bioEntities: ContentEntities | null;
-  avatarUrl: string;
   relationship: UserRelationship;
 };
 
@@ -26,7 +29,7 @@ export type User = CompactUser & {
   followingCount: number;
   followersCount: number;
   mutualsCount?: number;
-  mutualNames?: string[];
+  mutualUsers?: MutualUser[];
   email?: string;
   phone?: string;
   languageCode?: string;
