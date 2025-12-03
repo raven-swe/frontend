@@ -317,7 +317,7 @@ describe('pages/media/[id].vue', () => {
     expect(tweetsService.tweet).toHaveBeenCalledWith('tw-456');
   });
   it('scrolls to top when a reply is posted', async () => {
-    // Mock window.scrollTo
+    // Mock   .scrollTo
     const scrollToMock = vi.fn();
     vi.spyOn(window, 'scrollTo').mockImplementation(scrollToMock);
 

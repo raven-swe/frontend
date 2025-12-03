@@ -188,10 +188,12 @@ function handleReplied(tweet: Tweet) {
           // Scroll to the top of the replies section
           const headerHeight = 48;
           const offset = parentRef.value.offsetTop - headerHeight;
-          window.scrollTo({
-            top: offset,
-            behavior: 'smooth',
-          });
+          if (typeof window !== 'undefined') {
+            window.scrollTo({
+              top: offset,
+              behavior: 'smooth',
+            });
+          }
         }
       }, 100);
     });
