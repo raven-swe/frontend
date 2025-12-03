@@ -184,6 +184,8 @@
       "previous": {
         "icon": "lucide:arrow-right",
         "label": "الشريحة السابقة"
+      }
+    },
     "follow": "متابعة",
     "unfollow": "إلغاء المتابعة",
     "following": "متابع",

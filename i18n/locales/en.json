@@ -200,6 +200,8 @@
       "previous": {
         "icon": "lucide:arrow-left",
         "label": "Previous slide"
+      }
+    },
     "search": {
       "searchbar": {
         "placeholder": "Search"

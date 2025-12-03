@@ -159,9 +159,8 @@ function handleTweetClick() {
 
       <NuxtLink :to="`/media/${props.tweet.id}`" @click.stop>
         <!-- Media (single image basic layout) -->
-        <TweetMedia :media="tweet.media" :size-class="props.sizeClass"/>
+        <TweetMedia :media="tweet.media" :size-class="props.sizeClass" />
       </NuxtLink>
-
 
       <!-- Actions -->
       <TweetActionButtons
