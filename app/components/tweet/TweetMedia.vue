@@ -21,7 +21,10 @@ const sizeClass = computed(() => props.sizeClass ?? 'rounded-xl');
     <!-- 2 media: side by side -->
     <div
       v-else-if="media.length === 2"
-      :class="['border-border grid grid-cols-2 gap-0.5 overflow-hidden rounded-xl border-1', sizeClass]"
+      :class="[
+        'border-border grid grid-cols-2 gap-0.5 overflow-hidden rounded-xl border-1',
+        sizeClass,
+      ]"
     >
       <MediaItem v-for="(m, i) in media" :key="i" :media="m" />
     </div>
@@ -29,7 +32,10 @@ const sizeClass = computed(() => props.sizeClass ?? 'rounded-xl');
     <!-- 3 media -->
     <div
       v-else-if="media.length === 3"
-      :class="['border-border grid grid-cols-2 grid-rows-2 gap-0.5 overflow-hidden rounded-xl border-1', sizeClass]"
+      :class="[
+        'border-border grid grid-cols-2 grid-rows-2 gap-0.5 overflow-hidden rounded-xl border-1',
+        sizeClass,
+      ]"
     >
       <div class="col-span-1 row-span-2"><MediaItem :media="media[0]!" /></div>
       <MediaItem :media="media[1]!" />
@@ -39,7 +45,10 @@ const sizeClass = computed(() => props.sizeClass ?? 'rounded-xl');
     <!-- 4 media -->
     <div
       v-else-if="media.length === 4"
-      :class="['border-border grid grid-cols-2 grid-rows-2 gap-0.5 overflow-hidden rounded-xl border-1', sizeClass]"
+      :class="[
+        'border-border grid grid-cols-2 grid-rows-2 gap-0.5 overflow-hidden rounded-xl border-1',
+        sizeClass,
+      ]"
     >
       <MediaItem v-for="(m, i) in media" :key="i" :media="m!" />
     </div>
