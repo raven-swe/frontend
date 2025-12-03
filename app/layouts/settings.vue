@@ -1,7 +1,26 @@
 <script lang="ts" setup>
 import useMyProfileQuery from '~/composables/useMyProfileQuery';
-
 useMyProfileQuery();
+
+const props = defineProps<{
+  hideMiddleOnMobile?: boolean;
+  hideRightOnMobile?: boolean;
+}>();
+
+// Compute responsive classes based on props
+const middleClasses = computed(() => {
+  if (props.hideMiddleOnMobile) {
+    return 'hidden h-full w-[320px] flex-shrink-0 border lg:block xl:w-[390px] 2xl:w-[450px]';
+  }
+  return 'h-full lg:w-[320px] flex-1 border sm:w-[560px]  sm:flex-none xl:w-[390px] 2xl:w-[450px]';
+});
+
+const rightClasses = computed(() => {
+  if (props.hideRightOnMobile) {
+    return 'hidden h-full flex-1 border sm:w-[560px] sm:flex-none  lg:block';
+  }
+  return 'h-full flex-1 border sm:w-[560px] sm:flex-none ';
+});
 </script>
 
 <template>
@@ -17,14 +36,12 @@ useMyProfileQuery();
           </div>
 
           <!-- settings Section -->
-          <div
-            class="hidden h-full w-[320px] flex-shrink-0 border lg:block xl:w-[390px] 2xl:w-[450px]"
-          >
+          <div :class="middleClasses">
             <slot name="middle" />
           </div>
 
           <!-- Right sidebar -->
-          <div class="h-full flex-1 border sm:w-[560px] sm:flex-none md:w-[600px]">
+          <div :class="rightClasses">
             <slot name="right" />
           </div>
         </div>

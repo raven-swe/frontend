@@ -23,6 +23,7 @@ const parsedBioTokens = computed(() =>
       v-else-if="token.type === 'mention'"
       :to="`/profile/${token.value}`"
       class="text-primary hover:underline"
+      @click.stop
     >
       {{ token.display }}
     </NuxtLink>
@@ -30,6 +31,7 @@ const parsedBioTokens = computed(() =>
       v-else-if="token.type === 'hashtag'"
       :to="`/hashtag/${token.value}`"
       class="text-primary hover:underline"
+      @click.stop
     >
       {{ token.display }}
     </NuxtLink>
@@ -38,6 +40,7 @@ const parsedBioTokens = computed(() =>
       :to="token.value"
       class="text-primary hover:underline"
       external
+      @click.stop
     >
       {{ token.display }}
     </NuxtLink>

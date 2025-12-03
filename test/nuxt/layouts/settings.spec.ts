@@ -31,10 +31,31 @@ describe('Settings Layout', () => {
     expect(wrapper.html()).toContain('top-0');
   });
 
-  it('shows the settings section only on large screens', async () => {
+  it('shows the settings section by default without props', async () => {
     const wrapper = await mountSuspended(SettingsLayout);
-    const settingsSection = wrapper.find('[class*="hidden"][class*="lg:block"][class*="border"]');
-    expect(settingsSection.exists()).toBe(true);
+    // When no props are passed, middle section should be visible (not hidden by default)
+    const middleSection = wrapper.find('[class*="flex-1"][class*="border"][class*="lg:w-[320px]"]');
+    expect(middleSection.exists()).toBe(true);
+  });
+
+  it('hides middle section on mobile when hideMiddleOnMobile prop is true', async () => {
+    const wrapper = await mountSuspended(SettingsLayout, {
+      props: {
+        hideMiddleOnMobile: true,
+      },
+    });
+    const middleSection = wrapper.find('[class*="hidden"][class*="lg:block"][class*="w-[320px]"]');
+    expect(middleSection.exists()).toBe(true);
+  });
+
+  it('hides right section on mobile when hideRightOnMobile prop is true', async () => {
+    const wrapper = await mountSuspended(SettingsLayout, {
+      props: {
+        hideRightOnMobile: true,
+      },
+    });
+    const rightSection = wrapper.find('[class*="hidden"][class*="lg:block"][class*="flex-1"]');
+    expect(rightSection.exists()).toBe(true);
   });
 
   it('has proper responsive container structure', async () => {
