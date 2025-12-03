@@ -58,6 +58,8 @@ const buttonVariants = cva(
   },
 );
 
+export type ButtonVariants = NonNullable<Parameters<typeof buttonVariants>[0]>;
+
 interface Props {
   variant?: NonNullable<Parameters<typeof buttonVariants>[0]>['variant'];
   size?: NonNullable<Parameters<typeof buttonVariants>[0]>['size'];

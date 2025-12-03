@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { buttonVariants } from '~~/shared/types/ui';
+import type { ButtonVariants } from '@/components/ui/Button.vue';
 import {
   MAX_IMAGE_SIZE_MB,
   MAX_IMAGE_SIZE_BYTES,
@@ -24,7 +24,7 @@ const actionButton = computed(() => {
   const hasImage = !!selectedImage.value;
   return {
     text: hasImage ? $t('ui.next') : $t('ui.skip-for-now'),
-    variant: (hasImage ? 'primary' : 'outline') as buttonVariants,
+    variant: (hasImage ? 'primary' : 'outline') as ButtonVariants['variant'],
   };
 });
 
