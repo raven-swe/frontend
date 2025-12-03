@@ -200,4 +200,62 @@ describe('profileTabsService', () => {
       signal: undefined,
     });
   });
+
+  it('calls apiFetch correctly for getFollowerMutualFollowers', async () => {
+    registerEndpoint('/api/users/john/mutual', () => ({
+      data: [{ id: 'm1' }],
+      pagination: { cursor: '0', nextCursor: '2', hasNextPage: true },
+    }));
+
+    const apiFetchSpy = vi.spyOn(apiModule, 'apiFetch');
+    const controller = new AbortController();
+
+    const result = await profileTabsService.getMutualFollowersPaginated({
+      username: 'john',
+      cursor: '0',
+      limit: 6,
+      signal: controller.signal,
+    });
+
+    expect(result).toEqual({
+      data: [{ id: 'm1' }],
+      pagination: { cursor: '0', nextCursor: '2', hasNextPage: true },
+    });
+
+    expect(apiFetchSpy).toHaveBeenCalledWith('/api/users/john/mutual', {
+      method: 'GET',
+      query: {
+        cursor: '0',
+        limit: '6',
+      },
+      signal: controller.signal,
+    });
+  });
+
+  it('uses default limit in getMutualFollowersPaginated when limit is not provided', async () => {
+    registerEndpoint('/api/users/john/mutual', () => ({
+      data: [{ id: 'm2' }],
+      pagination: { cursor: '0', nextCursor: '2', hasNextPage: true },
+    }));
+    const apiFetchSpy = vi.spyOn(apiModule, 'apiFetch');
+
+    const result = await profileTabsService.getMutualFollowersPaginated({
+      username: 'john',
+      cursor: null,
+    });
+
+    expect(result).toEqual({
+      data: [{ id: 'm2' }],
+      pagination: { cursor: '0', nextCursor: '2', hasNextPage: true },
+    });
+
+    expect(apiFetchSpy).toHaveBeenCalledWith('/api/users/john/mutual', {
+      method: 'GET',
+      query: {
+        cursor: null,
+        limit: DEFAULT_PAGE_SIZE.toString(),
+      },
+      signal: undefined,
+    });
+  });
 });
