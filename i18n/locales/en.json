@@ -143,11 +143,13 @@
     "composer": {
       "placeholder": {
         "default": "What's happening?",
-        "reply": "Post your reply"
+        "reply": "Post your reply",
+        "quote": "Add a comment"
       },
       "button": {
         "default": "Post",
-        "reply": "Reply"
+        "reply": "Reply",
+        "quote": "Post"
       },
       "media": "Media",
       "gif": "GIF",
@@ -160,7 +162,15 @@
     },
     "no-replies": "No replies yet",
     "upload-limit-image": "Image {file} size exceeds the maximum limit of {size} MB.",
-    "upload-limit-video": "Video {file} size exceeds the maximum limit of {size} MB."
+    "upload-limit-video": "Video {file} size exceeds the maximum limit of {size} MB.",
+    "actions": {
+      "repost": "Repost",
+      "unrepost": "Undo repost",
+      "quote": "Quote",
+      "reply": "Reply",
+      "like": "Like",
+      "unlike": "Unlike"
+    }
   },
   "ui": {
     "close": "Close",

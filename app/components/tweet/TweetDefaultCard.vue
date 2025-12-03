@@ -6,6 +6,8 @@ import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
 interface Props {
   tweet: Tweet;
+  isPreview?: boolean;
+  sizeClass?: string;
 }
 const props = defineProps<Props>();
 const router = useRouter();
@@ -100,6 +102,7 @@ const contentSegments = computed<Segment[]>(() => {
 });
 
 function handleTweetClick() {
+  if (props.isPreview) return;
   router.push(`/profile/${props.tweet.author.username}/status/${props.tweet.id}`);
 }
 </script>
@@ -150,10 +153,11 @@ function handleTweetClick() {
       </p>
 
       <!-- Media (single image basic layout) -->
-      <TweetMedia :media="tweet.media" />
+      <TweetMedia :media="tweet.media" :size-class="props.sizeClass" />
 
       <!-- Actions -->
       <TweetActionButtons
+        v-if="!props.isPreview"
         :tweet="tweet"
         @click.stop
         @like-success="onLikeSuccess"
