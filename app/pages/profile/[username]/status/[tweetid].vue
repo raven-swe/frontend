@@ -220,7 +220,7 @@ function handleReplied(tweet: Tweet) {
       </button>
 
       <div v-if="tweetData" class="mt-10">
-        <TweetView :tweet="tweetData" />
+        <TweetView :tweet="tweetData" :media="true" />
       </div>
 
       <TweetComposer :reply-to-tweet-id="tweetData?.id" type="reply" @posted="handleReplied" />

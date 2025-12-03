@@ -6,8 +6,10 @@ import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
 interface Props {
   tweet: Tweet;
+  isMedia?: boolean;
 }
 const props = defineProps<Props>();
+const showMedia = computed(() => props.isMedia ?? true);
 
 type Segment = { type: 'text' | 'mention' | 'hashtag'; text: string; href?: string };
 const tweet = ref(props.tweet);
@@ -140,7 +142,7 @@ const contentSegments = computed<Segment[]>(() => {
           </NuxtLink>
         </template>
       </p>
-      <TweetMedia :media="tweet.media" />
+      <TweetMedia v-if="showMedia" :media="tweet.media" />
 
       <div class="mt-2">
         <time
@@ -158,42 +160,5 @@ const contentSegments = computed<Segment[]>(() => {
       @retweet-success="onRetweetSuccess"
       @undo-retweet-success="onUndoRetweetSuccess"
     />
-
-    <div v-if="false" class="min-w-0 flex-1">
-      <div class="flex flex-wrap items-center gap-x-1 text-sm">
-        <span class="text-muted-foreground" v-text="'@' + tweet.author.username" />
-        <span class="text-muted-foreground">·</span>
-        <time
-          :title="formatDate(tweet.createdAt)"
-          :datetime="tweet.createdAt"
-          class="text-muted-foreground hover:cursor-pointer hover:underline"
-          >{{ relativeTime(tweet.createdAt) }}</time
-        >
-      </div>
-
-      <!-- Content -->
-      <p class="mt-1 leading-relaxed break-words whitespace-pre-wrap">
-        <template v-for="(seg, i) in contentSegments" :key="i">
-          <span v-if="seg.type === 'text'" class="inline">
-            {{ seg.text }}
-          </span>
-          <NuxtLink v-else :to="seg.href" class="text-primary inline font-medium hover:underline">
-            {{ seg.text }}
-          </NuxtLink>
-        </template>
-      </p>
-
-      <!-- Media (single image basic layout) -->
-      <TweetMedia :media="tweet.media" />
-
-      <!-- Actions -->
-      <TweetActionButtons
-        :tweet="tweet"
-        @like-success="onLikeSuccess"
-        @unlike-success="onUnlikeSuccess"
-        @retweet-success="onRetweetSuccess"
-        @undo-retweet-success="onUndoRetweetSuccess"
-      />
-    </div>
   </article>
 </template>
