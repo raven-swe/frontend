@@ -1,123 +1,49 @@
 <script lang="ts" setup>
-import type { DmMessage } from '#shared/types/dm';
 import DmMessagesList from './DmMessagesList.vue';
+import { useRoute } from 'vue-router';
+import { useDmMessages } from '@/composables/useDmMessages';
 
-const me = {
-  username: 'hussein',
-  displayName: 'Hussein',
-  avatarUrl: 'https://i.pravatar.cc/150?img=2',
-};
+import { showToaster } from '@/utils/showToaster';
+import Spinner from '~/components/ui/Spinner.vue';
 
-const other = {
-  username: '@btngana',
-  displayName: 'Ahmed Amr',
-  avatarUrl: 'https://i.pravatar.cc/150?img=3',
-};
+const route = useRoute();
+const conversationId = computed(() => route.params.conversationId as string | null);
 
-const now = () => new Date().toISOString();
+const {
+  conversations,
+  loading: conversationsLoading,
+  error: conversationsError,
+} = useDmConversations();
 
-const messages: DmMessage[] = [
-  {
-    id: 'msg_1',
-    sender: { ...me },
-    content: 'Hey! How are you?',
-    entities: { mentions: [], hashtags: [] },
-    mediaUrl: null,
-    createdAt: now(),
-    isMine: true,
-  },
-  {
-    id: 'msg_2',
-    sender: { ...other },
-    content: 'I’m good! Working on the project.',
-    entities: { mentions: [], hashtags: [] },
-    mediaUrl: null,
-    createdAt: now(),
-    isMine: false,
-  },
-  {
-    id: 'msg_3',
-    sender: { ...me },
-    content: `Great! Let’s push the latest changes. ${other.username}`,
-    entities: {
-      mentions: [{ username: other.username.replace(/^@/, ''), startPosition: 39 }],
-      hashtags: [],
-    },
-    mediaUrl: null,
-    createdAt: now(),
-    isMine: true,
-  },
-  {
-    id: 'msg_4',
-    sender: { ...me },
-    content: 'Check this out #update',
-    entities: { mentions: [], hashtags: [{ hashtag: 'update', startPosition: 15 }] },
-    mediaUrl: 'https://picsum.photos/seed/dm/300/200',
-    createdAt: now(),
-    isMine: true,
-  },
-  {
-    id: 'msg_1',
-    sender: { ...me },
-    content: 'Hey! How are you?',
-    entities: { mentions: [], hashtags: [] },
-    mediaUrl: null,
-    createdAt: now(),
-    isMine: true,
-  },
-  {
-    id: 'msg_2',
-    sender: { ...other },
-    content: 'I’m good! Working on the project.',
-    entities: { mentions: [], hashtags: [] },
-    mediaUrl: null,
-    createdAt: now(),
-    isMine: false,
-  },
-  {
-    id: 'msg_1',
-    sender: { ...me },
-    content: 'Hey! How are you?',
-    entities: { mentions: [], hashtags: [] },
-    mediaUrl: null,
-    createdAt: now(),
-    isMine: true,
-  },
-  {
-    id: 'msg_2',
-    sender: { ...other },
-    content: 'I’m good! Working on the project.',
-    entities: { mentions: [], hashtags: [] },
-    mediaUrl: null,
-    createdAt: now(),
-    isMine: false,
-  },
-  {
-    id: 'msg_1',
-    sender: { ...me },
-    content: 'Hey! How are you?',
-    entities: { mentions: [], hashtags: [] },
-    mediaUrl: null,
-    createdAt: now(),
-    isMine: true,
-  },
-  {
-    id: 'msg_2',
-    sender: { ...other },
-    content: 'I’m good! Working on the project.',
-    entities: { mentions: [], hashtags: [] },
-    mediaUrl: null,
-    createdAt: now(),
-    isMine: false,
-  },
-];
+const conversation = computed<DmConversation | null>(() => {
+  if (!conversationId.value) return null;
+  return conversations.value?.find((c) => c.id === conversationId.value) || null;
+});
+
+const {
+  messages,
+  loading: messagesLoading,
+  error: messagesError,
+} = useDmMessages(() => conversationId.value);
+
+watch(messagesError, (val) => val && showToaster('error', 'Failed to load messages'));
+watch(conversationsError, (val) => val && showToaster('error', 'Failed to load conversation'));
 </script>
 <template>
   <div class="flex h-full flex-col overflow-hidden">
-    <DmConversationHeader :username="me.username" :avatar-url="me.avatarUrl" />
+    <DmConversationHeader
+      :username="conversation?.participant.username || conversationId"
+      :avatar-url="conversation?.participant.avatarUrl || ''"
+    />
     <div class="flex-1 overflow-y-auto p-4">
-      <DmConversationInfo />
-      <DmMessagesList :messages="messages" />
+      <DmConversationInfo :conversation="conversation || null" />
+      <div
+        v-if="conversationsLoading || messagesLoading"
+        class="flex items-center justify-center p-4"
+      >
+        <Spinner size="1.5rem" />
+      </div>
+      <DmMessagesList v-else :messages="messages || []" />
     </div>
     <DmConversationDmMessageInput />
   </div>

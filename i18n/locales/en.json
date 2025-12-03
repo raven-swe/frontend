@@ -143,11 +143,13 @@
     "composer": {
       "placeholder": {
         "default": "What's happening?",
-        "reply": "Post your reply"
+        "reply": "Post your reply",
+        "quote": "Add a comment"
       },
       "button": {
         "default": "Post",
-        "reply": "Reply"
+        "reply": "Reply",
+        "quote": "Post"
       },
       "media": "Media",
       "gif": "GIF",
@@ -160,7 +162,15 @@
     },
     "no-replies": "No replies yet",
     "upload-limit-image": "Image {file} size exceeds the maximum limit of {size} MB.",
-    "upload-limit-video": "Video {file} size exceeds the maximum limit of {size} MB."
+    "upload-limit-video": "Video {file} size exceeds the maximum limit of {size} MB.",
+    "actions": {
+      "repost": "Repost",
+      "unrepost": "Undo repost",
+      "quote": "Quote",
+      "reply": "Reply",
+      "like": "Like",
+      "unlike": "Unlike"
+    }
   },
   "ui": {
     "close": "Close",
@@ -179,7 +189,15 @@
     "mute": "Mute",
     "block": "Block",
     "unmute": "Unmute",
-    "unblock": "Unblock"
+    "unblock": "Unblock",
+    "search": {
+      "searchbar": {
+        "placeholder": "Search"
+      },
+      "search-list": {
+        "placeholder": "Try searching for people, lists, or keywords"
+      }
+    }
   },
   "errors": {
     "INVALID_EMAIL": "Please enter a valid email.",
@@ -407,7 +425,12 @@
     "placeholder-search": "Search Direct Messages",
     "header-title": "Messages",
     "placeholder-start-message": "Start a new message",
-    "attachedImage": "Attached image"
+    "attachedImage": "Attached image",
+    "empty": {
+      "select": "Select a message",
+      "description": "Choose from your existing conversations, start a new one, or just keep swimming.",
+      "new": "New message"
+    }
   },
   "toaster": {
     "login": {
