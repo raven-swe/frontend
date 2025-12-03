@@ -18,6 +18,12 @@ import { isApiError, isApiValidationError } from '~/utils/errorUtils';
 import { showToaster } from '~/utils/showToaster';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/vue-query';
 import { useWindowVirtualizer } from '@tanstack/vue-virtual';
+import MediaItemCompact from '~/components/tweet/MediaItemCompact.vue';
+import Carousel from '~/components/ui/carousel/Carousel.vue';
+import CarouselContent from '~/components/ui/carousel/CarouselContent.vue';
+import CarouselItem from '~/components/ui/carousel/CarouselItem.vue';
+import CarouselNext from '~/components/ui/carousel/CarouselNext.vue';
+import CarouselPrevious from '~/components/ui/carousel/CarouselPrevious.vue';
 
 definePageMeta({
   layout: 'media',
@@ -199,15 +205,15 @@ function handleReplied(tweet: Tweet) {
 <template>
   <div>
     <button
-      class="hover:bg-muted bg-background/60 fixed top-0 z-50 inline-flex h-12 w-full cursor-pointer items-center gap-2 rounded-b-md py-1 text-sm font-medium backdrop-blur-sm"
+      class="bg-background/60 hover:bg-muted absolute start-2 top-2 z-50 inline-flex size-10 items-center justify-center rounded-full shadow"
+      :aria-label="$t('ui.close')"
       @click="goBackToHome"
     >
-      <Icon class="ms-6" :name="$t('icons.back-button-icon')" size="1.3rem" />
-      <span class="ms-5 text-xl font-bold">{{ $t('ui.post') }}</span>
+      <Icon :name="$t('icons.back-button-icon')" class="text-foreground" size="1.3rem" />
     </button>
 
-    <div class="mt-14 p-4">
-      <div class="w-full">
+    <div>
+      <div class="h-full w-full">
         <div v-if="isLoading" class="text-primary flex items-center justify-center py-6">
           <UiSpinner />
         </div>
@@ -226,21 +232,25 @@ function handleReplied(tweet: Tweet) {
           </div>
 
           <div v-else>
-            <div v-if="tweetData" class="flex w-full">
-              <div class="w-[80%] pe-6">
-                <TweetMedia :media="tweetData.media" />
+            <div v-if="tweetData" class="divide-border flex min-h-screen w-full divide-x">
+              <div class="flex min-h-screen w-[80%] items-center justify-center pt-9 align-middle">
+                <Carousel class="h-full w-full">
+                  <CarouselContent>
+                    <CarouselItem
+                      v-for="(m, i) in tweetData.media"
+                      :key="i"
+                      class="flex h-full w-full items-center justify-center"
+                    >
+                      <MediaItemCompact :media="m" />
+                    </CarouselItem>
+                  </CarouselContent>
+                  <CarouselPrevious />
+                  <CarouselNext />
+                </Carousel>
               </div>
 
-              <div class="ms-auto w-[20%]">
-                <button
-                  class="hover:bg-muted bg-background/60 fixed top-0 z-50 inline-flex h-12 w-full max-w-[598px] cursor-pointer items-center gap-2 rounded-b-md py-1 text-sm font-medium backdrop-blur-sm"
-                  @click="goBackToHome"
-                >
-                  <Icon class="ms-6" :name="$t('icons.back-button-icon')" size="1.3rem" />
-                  <span class="ms-5 text-xl font-bold">{{ $t('ui.post') }}</span>
-                </button>
-
-                <div v-if="tweetData" class="mt-10">
+              <div class="ms-auto min-h-screen w-[20%] overflow-y-auto">
+                <div v-if="tweetData">
                   <TweetView :tweet="tweetData" :media="false" />
                 </div>
 

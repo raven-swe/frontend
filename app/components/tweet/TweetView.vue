@@ -6,10 +6,10 @@ import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
 interface Props {
   tweet: Tweet;
-  isMedia?: boolean;
+  media?: boolean;
 }
 const props = defineProps<Props>();
-const showMedia = computed(() => props.isMedia ?? true);
+const showMedia = computed(() => props.media ?? true);
 
 type Segment = { type: 'text' | 'mention' | 'hashtag'; text: string; href?: string };
 const tweet = ref(props.tweet);
@@ -142,7 +142,12 @@ const contentSegments = computed<Segment[]>(() => {
           </NuxtLink>
         </template>
       </p>
-      <TweetMedia v-if="showMedia" :media="tweet.media" />
+      <div v-if="showMedia">
+        <NuxtLink :to="`/media/${props.tweet.id}`" @click.stop>
+          <!-- Media (single image basic layout) -->
+          <TweetMedia :media="tweet.media" />
+        </NuxtLink>
+      </div>
 
       <div class="mt-2">
         <time
