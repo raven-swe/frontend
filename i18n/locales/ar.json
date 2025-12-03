@@ -163,7 +163,19 @@
     "cancel": "إلغاء",
     "discard": "تجاهل",
     "post": "نشر",
-    "reply": "رد"
+    "reply": "رد",
+    "carousel": {
+      "carousel": "معرض شرائح",
+      "item": "شريحة",
+      "next": {
+        "icon": "lucide:arrow-left",
+        "label": "الشريحة التالية"
+      },
+      "previous": {
+        "icon": "lucide:arrow-right",
+        "label": "الشريحة السابقة"
+      }
+    }
   },
   "errors": {
     "INVALID_EMAIL": "يرجى إدخال بريد إلكتروني صالح.",

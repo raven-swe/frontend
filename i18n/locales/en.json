@@ -179,7 +179,19 @@
     "mute": "Mute",
     "block": "Block",
     "unmute": "Unmute",
-    "unblock": "Unblock"
+    "unblock": "Unblock",
+    "carousel": {
+      "carousel": "carousel",
+      "item": "slide",
+      "next": {
+        "icon": "lucide:arrow-right",
+        "label": "Next slide"
+      },
+      "previous": {
+        "icon": "lucide:arrow-left",
+        "label": "Previous slide"
+      }
+    }
   },
   "errors": {
     "INVALID_EMAIL": "Please enter a valid email.",
