@@ -135,11 +135,13 @@
     "composer": {
       "placeholder": {
         "default": "ما الذي يحدث؟",
-        "reply": "انشر ردك"
+        "reply": "انشر ردك",
+        "quote": "أضف تعليقًا"
       },
       "button": {
         "default": "نشر",
-        "reply": "رد"
+        "reply": "رد",
+        "quote": "نشر"
       },
       "media": "الوسائط",
       "gif": "GIF صور متحركة",
@@ -152,7 +154,15 @@
     },
     "no-replies": "لا توجد ردود بعد",
     "upload-limit-image": "الصورة {file} حجمها يتجاوز الحد الأقصى المسموح به وهو {size} ميجابايت.",
-    "upload-limit-video": "الفيديو {file} حجمه يتجاوز الحد الأقصى المسموح به وهو {size} ميجابايت."
+    "upload-limit-video": "الفيديو {file} حجمه يتجاوز الحد الأقصى المسموح به وهو {size} ميجابايت.",
+    "actions": {
+      "repost": "إعادة تغريد",
+      "unrepost": "إلغاء إعادة التغريد",
+      "quote": "اقتباس",
+      "reply": "رد",
+      "like": "إعجاب",
+      "unlike": "إلغاء الإعجاب"
+    }
   },
   "ui": {
     "close": "إغلاق",
@@ -174,6 +184,20 @@
       "previous": {
         "icon": "lucide:arrow-right",
         "label": "الشريحة السابقة"
+    "follow": "متابعة",
+    "unfollow": "إلغاء المتابعة",
+    "following": "متابع",
+    "follow-back": "متابعة متبادلة",
+    "mute": "كتم",
+    "block": "حظر",
+    "unmute": "إلغاء الكتم",
+    "unblock": "إلغاء الحظر",
+    "search": {
+      "searchbar": {
+        "placeholder": "ابحث"
+      },
+      "search-list": {
+        "placeholder": "حاول البحث عن أشخاص أو قوائم أو كلمات رئيسية"
       }
     }
   },
@@ -394,7 +418,12 @@
     "placeholder-search": "ابحث في الرسائل المباشرة",
     "header-title": "الرسائل",
     "placeholder-start-message": "ابدأ رسالة جديدة",
-    "attachedImage": "صورة مرفقة"
+    "attachedImage": "صورة مرفقة",
+    "empty": {
+      "select": "اختر رسالة",
+      "description": "اختر من محادثاتك الحالية، ابدأ محادثة جديدة، أو استمر في التصفح.",
+      "new": "رسالة جديدة"
+    }
   },
   "toaster": {
     "login": {

@@ -6,6 +6,8 @@ import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
 interface Props {
   tweet: Tweet;
+  isPreview?: boolean;
+  sizeClass?: string;
 }
 const props = defineProps<Props>();
 const router = useRouter();
@@ -100,6 +102,7 @@ const contentSegments = computed<Segment[]>(() => {
 });
 
 function handleTweetClick() {
+  if (props.isPreview) return;
   router.push(`/profile/${props.tweet.author.username}/status/${props.tweet.id}`);
 }
 </script>
@@ -110,7 +113,7 @@ function handleTweetClick() {
     class="border-b-border flex w-full max-w-[700px] cursor-pointer gap-3 border-b-1 p-2"
     @click.prevent.stop="handleTweetClick"
   >
-    <NuxtLink :to="`/profile/${props.tweet.author.username}`">
+    <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
       <Avatar
         :img="props.tweet.author.avatarUrl || '/default_profile.png'"
         size="sm"
@@ -122,7 +125,7 @@ function handleTweetClick() {
     <div class="min-w-0 flex-1">
       <!-- Header: display name, username, time -->
       <div class="flex flex-wrap items-center gap-x-1 text-sm">
-        <NuxtLink :to="`/profile/${props.tweet.author.username}`">
+        <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
           <span class="cursor-pointer font-semibold hover:underline">{{
             props.tweet.author.displayName
           }}</span>
@@ -143,19 +146,26 @@ function handleTweetClick() {
           <span v-if="seg.type === 'text'" class="inline">
             {{ seg.text }}
           </span>
-          <a v-else :href="seg.href" class="text-primary inline font-medium hover:underline">
+          <NuxtLink
+            v-else
+            :to="seg.href"
+            class="text-primary inline font-medium hover:underline"
+            @click.stop
+          >
             {{ seg.text }}
-          </a>
+          </NuxtLink>
         </template>
       </p>
 
       <NuxtLink :to="`/media/${props.tweet.id}`" @click.stop>
         <!-- Media (single image basic layout) -->
-        <TweetMedia :media="tweet.media" />
+        <TweetMedia :media="tweet.media" :size-class="props.sizeClass"/>
       </NuxtLink>
+
 
       <!-- Actions -->
       <TweetActionButtons
+        v-if="!props.isPreview"
         :tweet="tweet"
         @click.stop
         @like-success="onLikeSuccess"

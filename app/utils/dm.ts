@@ -4,8 +4,10 @@ export type DmSegment = { type: 'text' | 'mention' | 'hashtag'; value: string };
 
 export function renderSegments(message: DmMessage): DmSegment[] {
   if (!message.content) return [];
-  const mentions = message.entities.mentions.map((x) => '@' + x.username);
-  const hashtags = message.entities.hashtags.map((x) => '#' + x.hashtag);
+  // Defensive: backend messages may temporarily omit entities; treat as empty.
+  const entities = message.entities || { mentions: [], hashtags: [] };
+  const mentions = entities.mentions.map((x) => '@' + x.username);
+  const hashtags = entities.hashtags.map((x) => '#' + x.hashtag);
   if (!mentions.length && !hashtags.length) return [{ type: 'text', value: message.content }];
   const tokens = message.content.split(/(\s+)/);
   return tokens.map((token) => {

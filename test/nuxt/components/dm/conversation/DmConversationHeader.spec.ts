@@ -78,7 +78,7 @@ describe('DmConversationHeader Component', () => {
       props: mockProps,
     });
 
-    const innerContainer = wrapper.find('.flex.items-center.gap-3');
+    const innerContainer = wrapper.find('.flex.items-center.gap-6');
     expect(innerContainer.exists()).toBe(true);
   });
 });
