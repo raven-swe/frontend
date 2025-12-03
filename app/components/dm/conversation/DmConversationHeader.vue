@@ -1,13 +1,17 @@
 <script lang="ts" setup>
-// define props that take username and avatarurl
 defineProps<{
-  username: string;
+  username: string | null;
   avatarUrl: string;
 }>();
 </script>
 <template>
   <div class="bg-background sticky top-0 flex items-center justify-between p-4 backdrop:blur-md">
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-6">
+      <NuxtLink to="/messages" class="lg:hidden">
+        <UiButton variant="ghost-default" size="icon-sm">
+          <Icon name="ic:round-arrow-back" size="24" />
+        </UiButton>
+      </NuxtLink>
       <NuxtImg
         :src="avatarUrl"
         alt="Profile picture"

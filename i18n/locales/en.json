@@ -415,7 +415,12 @@
     "placeholder-search": "Search Direct Messages",
     "header-title": "Messages",
     "placeholder-start-message": "Start a new message",
-    "attachedImage": "Attached image"
+    "attachedImage": "Attached image",
+    "empty": {
+      "select": "Select a message",
+      "description": "Choose from your existing conversations, start a new one, or just keep swimming.",
+      "new": "New message"
+    }
   },
   "toaster": {
     "login": {

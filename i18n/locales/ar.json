@@ -398,7 +398,12 @@
     "placeholder-search": "ابحث في الرسائل المباشرة",
     "header-title": "الرسائل",
     "placeholder-start-message": "ابدأ رسالة جديدة",
-    "attachedImage": "صورة مرفقة"
+    "attachedImage": "صورة مرفقة",
+    "empty": {
+      "select": "اختر رسالة",
+      "description": "اختر من محادثاتك الحالية، ابدأ محادثة جديدة، أو استمر في التصفح.",
+      "new": "رسالة جديدة"
+    }
   },
   "toaster": {
     "login": {
