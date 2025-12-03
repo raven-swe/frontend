@@ -128,15 +128,12 @@ watchEffect(() => {
   }
 });
 
-watch(
-  () => [route.params.username, route.params.tweetid],
-  ([newUsername, newTweetid], [oldUsername, oldTweetid]) => {
-    if (newUsername !== oldUsername || newTweetid !== oldTweetid) {
-      tweetData.value = null;
-      loadMainTweet();
-    }
-  },
-);
+watch(tweetid, (newTweetid, oldTweetid) => {
+  if (newTweetid !== oldTweetid) {
+    tweetData.value = null;
+    loadMainTweet();
+  }
+});
 
 watch(tweetData, () => {
   {
