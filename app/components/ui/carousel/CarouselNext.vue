@@ -22,14 +22,14 @@ const { orientation, canScrollNext, scrollNext } = useCarousel();
 
 <template>
   <UiButton
+    v-show="canScrollNext"
     data-slot="carousel-next"
-    :disabled="!canScrollNext"
     :class="
       cn(
-        'absolute size-8 rounded-full',
+        'bg-background/60 absolute z-10 size-8 rounded-full shadow',
         orientation === 'horizontal'
-          ? 'top-1/2 -right-12 -translate-y-1/2'
-          : '-bottom-12 left-1/2 -translate-x-1/2 rotate-90',
+          ? 'end-2 top-1/2 -translate-y-1/2'
+          : 'start-1/2 -bottom-12 -translate-x-1/2 rotate-90',
         props.class,
       )
     "

@@ -22,14 +22,14 @@ const { orientation, canScrollPrev, scrollPrev } = useCarousel();
 
 <template>
   <UiButton
+    v-show="canScrollPrev"
     data-slot="carousel-previous"
-    :disabled="!canScrollPrev"
     :class="
       cn(
-        'absolute size-8 rounded-full',
+        'bg-background/60 absolute z-10 size-8 rounded-full shadow',
         orientation === 'horizontal'
-          ? 'top-1/2 -left-12 -translate-y-1/2'
-          : '-top-12 left-1/2 -translate-x-1/2 rotate-90',
+          ? 'start-2 top-1/2 -translate-y-1/2'
+          : 'start-1/2 -top-12 -translate-x-1/2 rotate-90',
         props.class,
       )
     "
