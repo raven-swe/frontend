@@ -33,3 +33,11 @@ export type User = {
   mutualNames?: string[];
   languageCode: string;
 };
+
+export type SearchedUser = {
+  username: string;
+  displayName: string;
+  avatarUrl: string;
+  isFollowing: boolean;
+  isFollower: boolean;
+};

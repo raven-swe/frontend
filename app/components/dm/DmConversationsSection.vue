@@ -23,7 +23,7 @@ function onSelect(id: string) {
 </script>
 <template>
   <DmHeader />
-  <DmSearchBar />
+
   <div v-if="loading" class="flex items-center justify-center p-4">
     <Spinner size="1.5rem" />
   </div>

@@ -394,6 +394,13 @@
       "select": "Select a message",
       "description": "Choose from your existing conversations, start a new one, or just keep swimming.",
       "new": "New message"
+    },
+    "dialog": {
+      "new-message": "New message",
+      "search-people": "Search people",
+      "next": "Next",
+      "you-follow": "Following",
+      "follow-each-other": "You follow each other"
     }
   },
   "toaster": {

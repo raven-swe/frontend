@@ -18,7 +18,7 @@ const highlighted = computed(() => isHighlighted(props.conversation.id));
       highlighted ? 'bg-foreground/5' : '',
     ]"
   >
-    <div>
+    <div class="flex-shrink-0">
       <NuxtImg
         :src="props.conversation.participant.avatarUrl"
         alt="Profile picture"
@@ -50,8 +50,11 @@ const highlighted = computed(() => isHighlighted(props.conversation.id));
           {{ relativeTime(props.conversation.lastMessage.sentAt) }}
         </span>
       </div>
-      <div class="text-sm">
-        <span :class="highlighted ? 'text-primary font-bold' : 'text-muted-foreground'">
+      <div class="min-w-0 text-sm">
+        <span
+          class="block truncate"
+          :class="highlighted ? 'text-primary font-bold' : 'text-muted-foreground'"
+        >
           {{ props.conversation.lastMessage?.content || 'No messages yet' }}
         </span>
       </div>
