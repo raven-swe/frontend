@@ -23,7 +23,7 @@ const deleteFromHistory = (event: Event) => {
   <NuxtLink
     v-if="props.type === 'user'"
     :to="`/profile/${(props.content as User).username}`"
-    class="hover:bg-accent flex items-center px-5 py-3 transition-colors"
+    class="hover:bg-accent flex items-center p-3 transition-colors"
   >
     <div class="flex w-full items-center justify-between ps-3">
       <div class="flex min-w-0 flex-1 items-center gap-3">
@@ -49,7 +49,7 @@ const deleteFromHistory = (event: Event) => {
   <NuxtLink
     v-else
     :to="`/search/top?q=${encodeURIComponent(props.content as string)}`"
-    class="hover:bg-accent flex items-center px-5 py-3 transition-colors"
+    class="hover:bg-accent flex items-center p-3 transition-colors"
   >
     <div class="flex w-full items-center justify-between gap-2 ps-3">
       <div class="flex min-w-0 flex-1 items-center gap-3">

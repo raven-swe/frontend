@@ -9,6 +9,7 @@ const trendingHashtags = ref<TrendingHashtag[]>([]);
 const isLoading = ref(false);
 const router = useRouter();
 const showWhatIsHappening = ref(true);
+const showSearchField = ref(true);
 
 const loadHashtags = async () => {
   isLoading.value = true;
@@ -30,6 +31,7 @@ watch(
   () => router.currentRoute.value.path,
   (newPath) => {
     showWhatIsHappening.value = !newPath.includes('explore');
+    showSearchField.value = !newPath.includes('explore') && !newPath.includes('search');
   },
   { immediate: true },
 );
@@ -69,26 +71,27 @@ const whoToFollowItems = [
 
 <template>
   <div class="ms-4">
-    <div v-if="showWhatIsHappening">
-      <div class="bg-background/60 sticky top-0 z-50 backdrop-blur-sm">
-        <UiSearchField />
-      </div>
-      <!-- What is happening -->
-      <SideBarRightPreviewCard :title="$t('rightsidebar.whats-happening.title')">
-        <div v-if="isLoading" class="text-primary mt-10 flex shrink-0 items-center justify-center">
-          <UiSpinner />
-        </div>
-        <Hashtag
-          v-for="hashtag in trendingHashtags"
-          v-else
-          :key="hashtag.hashtag"
-          :hashtag="hashtag"
-        />
-        <UiButton variant="ghost-primary" size="sm" @click="goToExplore">
-          {{ $t('rightsidebar.show-more') }}
-        </UiButton>
-      </SideBarRightPreviewCard>
+    <div v-if="showSearchField" class="bg-background/60 sticky top-0 z-50 backdrop-blur-sm">
+      <UiSearchField />
     </div>
+    <!-- What is happening -->
+    <SideBarRightPreviewCard
+      v-if="showWhatIsHappening"
+      :title="$t('rightsidebar.whats-happening.title')"
+    >
+      <div v-if="isLoading" class="text-primary mt-10 flex shrink-0 items-center justify-center">
+        <UiSpinner />
+      </div>
+      <Hashtag
+        v-for="hashtag in trendingHashtags"
+        v-else
+        :key="hashtag.hashtag"
+        :hashtag="hashtag"
+      />
+      <UiButton variant="ghost-primary" size="sm" @click="goToExplore">
+        {{ $t('rightsidebar.show-more') }}
+      </UiButton>
+    </SideBarRightPreviewCard>
     <!-- Who to follow -->
     <SideBarRightPreviewCard :title="$t('rightsidebar.who-to-follow.title')">
       <SideBarRightPreviewCardItem
