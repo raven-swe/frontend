@@ -15,19 +15,31 @@ const props = defineProps<{
 const { t } = useI18n();
 const usernameSchemaBase = getUsernameSchema(t);
 
-const debouncedCheckUsername = useDebounceFn(
-  async (username: string) => await accountService.checkAccountExists(username),
-  300,
-);
+const debouncedCheckUsername = useDebounceFn(async (username: string, ctx: yup.TestContext) => {
+  if (!username) return false;
+
+  try {
+    const exists = await accountService.checkAccountExists(username);
+    return exists;
+  } catch (error) {
+    if (isApiError(error)) {
+      const code = error.data?.data?.error.code;
+      throw ctx.createError({
+        message: t(`errors.username.${code}`),
+      });
+    }
+    return false;
+  }
+}, 300);
 
 const userStore = useUserStore();
 
 const usernameSchema = usernameSchemaBase.test(
   'uniqueUsername',
   $t('errors.USERNAME_ALREADY_EXISTS'),
-  async (username) => {
-    const exists = await debouncedCheckUsername(username);
-    return !exists || username.toLowerCase() === userStore.user.username?.toLowerCase();
+  async (username, ctx) => {
+    const check = await debouncedCheckUsername(username, ctx);
+    return !check || username.toLowerCase() === userStore.user.username?.toLowerCase();
   },
 );
 
@@ -59,7 +71,8 @@ const { handleUsernameSubmit, goToNextStep } = useAccountSetup();
 const onSubmit = handleSubmit(async (formValues, actions) => {
   const errors = await handleUsernameSubmit(formValues.username);
   if (errors) {
-    actions.setErrors(backendValidationToFormErrors(errors, t));
+    const convertedErrors = backendValidationToFormErrors(errors, t);
+    actions.setErrors(convertedErrors);
   }
 });
 
