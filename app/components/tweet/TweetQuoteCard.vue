@@ -5,6 +5,7 @@ import type { Tweet } from '~~/shared/types/tweets';
 import TweetMedia from './TweetMedia.vue';
 interface Props {
   tweet: Tweet;
+  isPreview?: boolean;
 }
 const props = defineProps<Props>();
 const router = useRouter();
@@ -70,6 +71,7 @@ const contentSegments = computed<Segment[]>(() => {
 });
 
 function handleTweetClick() {
+  if (props.isPreview) return;
   router.push(`/profile/${props.tweet.author.username}/status/${props.tweet.id}`);
 }
 </script>
