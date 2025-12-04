@@ -199,6 +199,20 @@
       "unlike": "Unlike"
     }
   },
+  "notifications": {
+    "title": "Notifications",
+    "tabs": {
+      "all": "All",
+      "mentions": "Mentions"
+    },
+    "no-notifications": "No notifications yet",
+    "message": {
+      "follow": " started following you",
+      "like": " liked your post",
+      "reply": "Replying to ",
+      "repost": " reposted your post"
+    }
+  },
   "ui": {
     "close": "Close",
     "next": "Next",
