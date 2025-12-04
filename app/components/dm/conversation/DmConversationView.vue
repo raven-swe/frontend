@@ -16,8 +16,6 @@ const {
   error: conversationsError,
 } = useDmConversations();
 
-console.log('Conversations:', conversations.value);
-
 const conversation = computed<DmConversation | null>(() => {
   if (!conversationId.value) return null;
   return conversations.value?.find((c) => c.id === conversationId.value) || null;
@@ -31,7 +29,6 @@ const {
   hasNextPage,
   isFetchingNextPage,
 } = useDmMessages(() => conversationId.value);
-console.log('messages', initialMessages.value);
 
 const ws = useDmSocketIO();
 provide('dmSocket', ws);
