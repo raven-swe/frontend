@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { ButtonVariants } from '@/components/ui/Button.vue';
+import type { ButtonVariants } from '@/components/ui/button/variants';
 
 const props = defineProps<{
   open: boolean;

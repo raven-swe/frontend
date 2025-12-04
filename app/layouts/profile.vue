@@ -3,9 +3,9 @@ import ProfileDetails from '~/components/profile/ProfileDetails.vue';
 import ProfileDetailsSkeleton from '~/components/profile/skeletons/ProfileDetailsSkeleton.vue';
 import Tabs from '@/components/ui/Tabs.vue';
 import Tab from '@/components/ui/Tab.vue';
-import { apiFetch } from '~/api';
 import { useQuery, useQueryClient } from '@tanstack/vue-query';
 import type { FetchError } from 'ofetch';
+import { profileTabsService } from '~/services/profile/profileTabsService';
 
 const route = useRouter();
 
@@ -25,9 +25,7 @@ const {
   suspense,
 } = useQuery<User, FetchError<FetchError<ApiErrorResponse>>>({
   queryKey,
-  queryFn: async () => {
-    return (await apiFetch(`/api/users/${username.value}/profile`)).data;
-  },
+  queryFn: async ({ signal }) => profileTabsService.getProfile(username.value!, signal),
   staleTime: 1000 * 60 * 5, // 5min cache
   retry: false, // Don't retry on 404
   structuralSharing: false, // Disable structural sharing to ensure reactivity

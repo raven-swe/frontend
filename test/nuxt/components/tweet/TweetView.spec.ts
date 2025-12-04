@@ -71,7 +71,7 @@ describe('TweetView.vue', () => {
       global: { stubs: { NuxtImg: true, Icon: true } },
     });
 
-    const mention = wrapper.find('a[href="/@alice"]');
+    const mention = wrapper.find('a[href="/profile/alice"]');
     expect(mention.exists()).toBe(true);
     expect(mention.text()).toContain('@alice');
 

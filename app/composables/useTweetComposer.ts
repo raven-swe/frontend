@@ -68,7 +68,7 @@ export const useTweetComposer = (
 
       uploadStatus.value = 'posting';
       const newTweet = await createTweetService({
-        content: tweetContent.value,
+        content: tweetContent.value.trim(),
         media: mediaIds,
         replyToTweetId: replyToTweetId?.value ?? null,
         quoteToTweetId: quoteTweetId?.value ?? null,
