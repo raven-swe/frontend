@@ -207,10 +207,10 @@
     },
     "no-notifications": "No notifications yet",
     "message": {
-      "follow": " started following you",
+      "follow": "started following you",
       "like": " liked your post",
       "reply": "Replying to ",
-      "repost": " reposted your post"
+      "repost": "reposted your post"
     }
   },
   "ui": {

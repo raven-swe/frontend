@@ -57,7 +57,7 @@ defineEmits<{
               >
                 <span class="text-foreground font-semibold">{{ actor.username }}</span>
               </UserHoverCard>
-              <span class="text-foreground ms-2">{{ message }}</span>
+              <span class="text-foreground ms-1">{{ message }}</span>
             </p>
             <slot></slot>
           </div>

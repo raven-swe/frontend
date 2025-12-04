@@ -10,7 +10,7 @@ const icon = {
   color: 'text-brand-blue',
 };
 
-const linkTo = `/profile/@${props.actor.username}`;
+const linkTo = `/profile/${props.actor.username}`;
 
 const message = $t('notifications.message.follow');
 </script>
