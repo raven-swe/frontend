@@ -1,21 +1,42 @@
-// eslint-disable @typescript-eslint/no-unused-vars
-
 import mockNotifications from '../../pages/notifications/mock-notifications.json';
 
 export const notificationsService = {
   /**
-   * Returns mock notifications data (reads from mock-notifications.json).
+   * Returns mock notifications data with pagination support.
    */
   getNotificationsMock: async ({
-    _cursor,
-    _limit,
-    _signal,
+    cursor = null,
+    limit = 20,
   }: {
-    _cursor?: string | null;
-    _limit?: number;
-    _signal?: AbortSignal;
+    cursor?: string | null;
+    limit?: number;
   } = {}) => {
-    // Later this function can be swapped for an SSE implementation.
-    return Promise.resolve(mockNotifications.data);
+    // test the spinner
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
+    const allNotifications = mockNotifications.data;
+
+    // Find start index based on cursor
+    let startIndex = 0;
+    if (cursor) {
+      const cursorIndex = allNotifications.findIndex((notif) => notif.id === cursor);
+      startIndex = cursorIndex >= 0 ? cursorIndex + 1 : 0;
+    }
+
+    // Slice the data for pagination
+    const endIndex = startIndex + limit;
+    const paginatedData = allNotifications.slice(startIndex, endIndex);
+
+    // Determine if there's a next page
+    const hasNextPage = endIndex < allNotifications.length;
+    const nextCursor = hasNextPage ? paginatedData[paginatedData.length - 1]?.id : null;
+
+    return {
+      data: paginatedData,
+      pagination: {
+        hasNextPage,
+        nextCursor,
+      },
+    };
   },
 };

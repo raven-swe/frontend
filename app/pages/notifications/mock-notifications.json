@@ -578,7 +578,633 @@
       "isSeen": false
     },
     {
-      "id": "notif_mention_002",
+      "id": "notif_mention_666002",
+      "type": "MENTION",
+      "actorSummary": {
+        "previewActors": [
+          {
+            "username": "nourhan",
+            "displayName": "nourhan",
+            "avatarUrl": "https://cdn.raven.cmp27.space/default_avatar.png"
+          }
+        ],
+        "totalCount": 1
+      },
+      "tweetSummary": {
+        "primaryTweet": {
+          "id": "304",
+          "author": {
+            "username": "nourhan",
+            "displayName": "nourhan",
+            "avatarUrl": "https://cdn.raven.cmp27.space/default_avatar.png",
+            "isBlocked": false,
+            "isFollowing": true,
+            "isMuted": false
+          },
+          "content": "@habiba birds are amazing don't you think? 🐦",
+          "createdAt": "2025-12-03T15:44:22.567Z",
+          "replyCount": 0,
+          "retweetCount": 0,
+          "likeCount": 0,
+          "isLiked": false,
+          "isRetweeted": false,
+          "entities": {
+            "mentions": [
+              {
+                "username": "habiba",
+                "startPosition": 0
+              }
+            ],
+            "hashtags": []
+          },
+          "media": [],
+          "replyToTweetId": null,
+          "quoteToTweetId": null,
+          "quotedTweet": null
+        },
+        "totalCount": 1,
+        "subjectIds": ["304"]
+      },
+      "latestEventAt": "2025-12-03T15:44:22.567Z",
+      "isSeen": true
+    },
+    {
+      "id": "notif_follow_456002",
+      "type": "FOLLOW",
+      "actorSummary": {
+        "previewActors": [
+          {
+            "username": "nourhan",
+            "displayName": "nourhan",
+            "avatarUrl": "https://cdn.raven.cmp27.space/default_avatar.png"
+          }
+        ],
+        "totalCount": 1
+      },
+      "tweetSummary": null,
+      "latestEventAt": "2025-12-02T14:30:11.456Z",
+      "isSeen": true
+    },
+    {
+      "id": "notif_like_23401",
+      "type": "LIKE",
+      "actorSummary": {
+        "previewActors": [
+          {
+            "username": "notnowomar",
+            "displayName": "omar",
+            "avatarUrl": "https://cdn.raven.cmp27.space/avatars/bd58c5b1-9cf8-4b82-9f71-fd373307467d.jpeg"
+          }
+        ],
+        "totalCount": 1
+      },
+      "tweetSummary": {
+        "primaryTweet": {
+          "id": "237",
+          "author": {
+            "username": "habiba",
+            "displayName": "habiba",
+            "avatarUrl": "https://cdn.raven.cmp27.space/avatars/691fc500-b246-4d09-a4b7-c5b33873244f.jpg",
+            "isBlocked": false,
+            "isFollowing": false,
+            "isMuted": false
+          },
+          "content": "charming ",
+          "createdAt": "2025-12-02T21:06:44.283Z",
+          "replyCount": 0,
+          "retweetCount": 0,
+          "likeCount": 1,
+          "isLiked": false,
+          "isRetweeted": false,
+          "entities": {
+            "mentions": [],
+            "hashtags": []
+          },
+          "media": [
+            {
+              "type": "IMAGE",
+              "url": "https://cdn.raven.cmp27.space/tweets/cf9f42e9-3c85-4633-8dbf-68d94a9ba769.png",
+              "altText": null,
+              "width": 581,
+              "height": 500
+            }
+          ],
+          "replyToTweetId": null,
+          "quoteToTweetId": null,
+          "quotedTweet": null
+        },
+        "totalCount": 1,
+        "subjectIds": ["237"]
+      },
+      "latestEventAt": "2025-12-02T21:15:33.789Z",
+      "isSeen": false
+    },
+    {
+      "id": "notif_like_1102",
+      "type": "LIKE",
+      "actorSummary": {
+        "previewActors": [
+          {
+            "username": "nourhan",
+            "displayName": "nourhan",
+            "avatarUrl": "https://cdn.raven.cmp27.space/default_avatar.png"
+          }
+        ],
+        "totalCount": 1
+      },
+      "tweetSummary": {
+        "primaryTweet": {
+          "id": "236",
+          "author": {
+            "username": "habiba",
+            "displayName": "habiba",
+            "avatarUrl": "https://cdn.raven.cmp27.space/avatars/691fc500-b246-4d09-a4b7-c5b33873244f.jpg",
+            "isBlocked": false,
+            "isFollowing": false,
+            "isMuted": false
+          },
+          "content": "hello from the new emoji picker 😍🥰",
+          "createdAt": "2025-12-02T21:06:09.335Z",
+          "replyCount": 0,
+          "retweetCount": 0,
+          "likeCount": 1,
+          "isLiked": false,
+          "isRetweeted": false,
+          "entities": {
+            "mentions": [],
+            "hashtags": []
+          },
+          "media": [],
+          "replyToTweetId": null,
+          "quoteToTweetId": null,
+          "quotedTweet": null
+        },
+        "totalCount": 1,
+        "subjectIds": ["236"]
+      },
+      "latestEventAt": "2025-12-02T21:08:45.234Z",
+      "isSeen": true
+    },
+    {
+      "id": "notif_follow_001",
+      "type": "FOLLOW",
+      "actorSummary": {
+        "previewActors": [
+          {
+            "username": "notnowomar",
+            "displayName": "omar",
+            "avatarUrl": "https://cdn.raven.cmp27.space/avatars/bd58c5b1-9cf8-4b82-9f71-fd373307467d.jpeg"
+          },
+          {
+            "username": "ahmed_sobhy",
+            "displayName": "Ahmed Sobhy",
+            "avatarUrl": "https://cdn.raven.cmp27.space/default_avatar.png"
+          }
+        ],
+        "totalCount": 2
+      },
+      "tweetSummary": null,
+      "latestEventAt": "2025-12-03T18:45:22.123Z",
+      "isSeen": false
+    },
+    {
+      "id": "notif_retweet_4401",
+      "type": "RETWEET",
+      "actorSummary": {
+        "previewActors": [
+          {
+            "username": "ahmed_sobhy",
+            "displayName": "Ahmed Sobhy",
+            "avatarUrl": "https://cdn.raven.cmp27.space/default_avatar.png"
+          }
+        ],
+        "totalCount": 1
+      },
+      "tweetSummary": {
+        "primaryTweet": {
+          "id": "299",
+          "author": {
+            "username": "habiba",
+            "displayName": "habiba",
+            "avatarUrl": "https://cdn.raven.cmp27.space/avatars/691fc500-b246-4d09-a4b7-c5b33873244f.jpg",
+            "isBlocked": false,
+            "isFollowing": false,
+            "isMuted": false
+          },
+          "content": "I can use some sleep, but this is fun idk",
+          "createdAt": "2025-12-04T00:43:14.268Z",
+          "replyCount": 0,
+          "retweetCount": 1,
+          "likeCount": 0,
+          "isLiked": false,
+          "isRetweeted": false,
+          "entities": {
+            "mentions": [],
+            "hashtags": []
+          },
+          "media": [],
+          "replyToTweetId": null,
+          "quoteToTweetId": null,
+          "quotedTweet": null
+        },
+        "totalCount": 1,
+        "subjectIds": ["299"]
+      },
+      "latestEventAt": "2025-12-04T01:22:18.567Z",
+      "isSeen": false
+    },
+    {
+      "id": "notif_retweet_7502",
+      "type": "RETWEET",
+      "actorSummary": {
+        "previewActors": [
+          {
+            "username": "notnowomar",
+            "displayName": "omar",
+            "avatarUrl": "https://cdn.raven.cmp27.space/avatars/bd58c5b1-9cf8-4b82-9f71-fd373307467d.jpeg"
+          },
+          {
+            "username": "nourhan",
+            "displayName": "nourhan",
+            "avatarUrl": "https://cdn.raven.cmp27.space/default_avatar.png"
+          }
+        ],
+        "totalCount": 2
+      },
+      "tweetSummary": {
+        "primaryTweet": {
+          "id": "223",
+          "author": {
+            "username": "habiba",
+            "displayName": "habiba",
+            "avatarUrl": "https://cdn.raven.cmp27.space/avatars/691fc500-b246-4d09-a4b7-c5b33873244f.jpg",
+            "isBlocked": false,
+            "isFollowing": false,
+            "isMuted": false
+          },
+          "content": "hiiiiiiii",
+          "createdAt": "2025-11-30T17:51:23.370Z",
+          "replyCount": 0,
+          "retweetCount": 2,
+          "likeCount": 1,
+          "isLiked": true,
+          "isRetweeted": false,
+          "entities": {
+            "mentions": [],
+            "hashtags": []
+          },
+          "media": [
+            {
+              "type": "IMAGE",
+              "url": "https://cdn.raven.cmp27.space/tweets/ec1e3f37-afce-4af3-8498-c268c3f3e906.png",
+              "altText": null,
+              "width": 612,
+              "height": 459
+            },
+            {
+              "type": "IMAGE",
+              "url": "https://cdn.raven.cmp27.space/tweets/b1da3c6d-f461-498d-8acf-acaa0b5c5864.jpeg",
+              "altText": null,
+              "width": 736,
+              "height": 464
+            }
+          ],
+          "replyToTweetId": null,
+          "quoteToTweetId": "219",
+          "quotedTweet": {
+            "id": "219",
+            "author": {
+              "username": "habiba",
+              "displayName": "habiba",
+              "avatarUrl": "https://cdn.raven.cmp27.space/avatars/691fc500-b246-4d09-a4b7-c5b33873244f.jpg",
+              "isBlocked": false,
+              "isFollowing": false,
+              "isMuted": false
+            },
+            "content": "",
+            "createdAt": "2025-11-29T19:02:56.921Z",
+            "replyCount": 1,
+            "retweetCount": 1,
+            "likeCount": 0,
+            "isLiked": false,
+            "isRetweeted": false,
+            "entities": {
+              "mentions": [],
+              "hashtags": []
+            },
+            "media": [
+              {
+                "type": "IMAGE",
+                "url": "https://cdn.raven.cmp27.space/tweets/c0bd9e34-86a7-4d99-bde2-66e51d0940f1.jpeg",
+                "altText": null,
+                "width": 736,
+                "height": 874
+              }
+            ]
+          }
+        },
+        "totalCount": 1,
+        "subjectIds": ["223"]
+      },
+      "latestEventAt": "2025-11-30T19:35:42.891Z",
+      "isSeen": true
+    },
+    {
+      "id": "notif_reply_2201",
+      "type": "REPLY",
+      "actorSummary": {
+        "previewActors": [
+          {
+            "username": "notnowomar",
+            "displayName": "omar",
+            "avatarUrl": "https://cdn.raven.cmp27.space/avatars/bd58c5b1-9cf8-4b82-9f71-fd373307467d.jpeg"
+          }
+        ],
+        "totalCount": 1
+      },
+      "tweetSummary": {
+        "primaryTweet": {
+          "id": "302",
+          "author": {
+            "username": "notnowomar",
+            "displayName": "omar",
+            "avatarUrl": "https://cdn.raven.cmp27.space/avatars/bd58c5b1-9cf8-4b82-9f71-fd373307467d.jpeg",
+            "isBlocked": false,
+            "isFollowing": false,
+            "isMuted": false
+          },
+          "content": "This looks great in compact view!",
+          "createdAt": "2025-12-04T05:12:33.445Z",
+          "replyCount": 0,
+          "retweetCount": 0,
+          "likeCount": 0,
+          "isLiked": false,
+          "isRetweeted": false,
+          "entities": {
+            "mentions": [],
+            "hashtags": []
+          },
+          "media": [],
+          "replyToTweetId": "301",
+          "quoteToTweetId": null,
+          "quotedTweet": null
+        },
+        "totalCount": 1,
+        "subjectIds": ["301"]
+      },
+      "latestEventAt": "2025-12-04T05:12:33.445Z",
+      "isSeen": false
+    },
+    {
+      "id": "notif_reply_3302",
+      "type": "REPLY",
+      "actorSummary": {
+        "previewActors": [
+          {
+            "username": "ahmed_sobhy",
+            "displayName": "Ahmed Sobhy",
+            "avatarUrl": "https://cdn.raven.cmp27.space/default_avatar.png"
+          }
+        ],
+        "totalCount": 1
+      },
+      "tweetSummary": {
+        "primaryTweet": {
+          "id": "220",
+          "author": {
+            "username": "ahmed_sobhy",
+            "displayName": "Ahmed Sobhy",
+            "avatarUrl": "https://cdn.raven.cmp27.space/default_avatar.png",
+            "isBlocked": false,
+            "isFollowing": false,
+            "isMuted": false
+          },
+          "content": "Nice picture!",
+          "createdAt": "2025-11-29T20:15:44.678Z",
+          "replyCount": 0,
+          "retweetCount": 0,
+          "likeCount": 0,
+          "isLiked": false,
+          "isRetweeted": false,
+          "entities": {
+            "mentions": [],
+            "hashtags": []
+          },
+          "media": [],
+          "replyToTweetId": "219",
+          "quoteToTweetId": null,
+          "quotedTweet": null
+        },
+        "totalCount": 1,
+        "subjectIds": ["219"]
+      },
+      "latestEventAt": "2025-11-29T20:15:44.678Z",
+      "isSeen": true
+    },
+    {
+      "id": "notif_quote_501",
+      "type": "QUOTE",
+      "actorSummary": {
+        "previewActors": [
+          {
+            "username": "nourhan",
+            "displayName": "nourhan",
+            "avatarUrl": "https://cdn.raven.cmp27.space/default_avatar.png"
+          }
+        ],
+        "totalCount": 1
+      },
+      "tweetSummary": {
+        "primaryTweet": {
+          "id": "301",
+          "author": {
+            "username": "habiba",
+            "displayName": "habiba",
+            "avatarUrl": "https://cdn.raven.cmp27.space/avatars/691fc500-b246-4d09-a4b7-c5b33873244f.jpg",
+            "isBlocked": false,
+            "isFollowing": false,
+            "isMuted": false
+          },
+          "content": "how will this look in compact view?",
+          "createdAt": "2025-12-04T04:01:52.809Z",
+          "replyCount": 0,
+          "retweetCount": 0,
+          "likeCount": 0,
+          "isLiked": false,
+          "isRetweeted": false,
+          "entities": {
+            "mentions": [],
+            "hashtags": []
+          },
+          "media": [],
+          "replyToTweetId": null,
+          "quoteToTweetId": "299",
+          "quotedTweet": {
+            "id": "299",
+            "author": {
+              "username": "habiba",
+              "displayName": "habiba",
+              "avatarUrl": "https://cdn.raven.cmp27.space/avatars/691fc500-b246-4d09-a4b7-c5b33873244f.jpg",
+              "isBlocked": false,
+              "isFollowing": false,
+              "isMuted": false
+            },
+            "content": "a test to see whether farag implemented \"see more\" in the tweet view.\nI\ndon't \nthink\nso\noh\nI \nwish\nI\nam\nwrong\nwhat\nis \nthe \nlimit\nanyways\n?",
+            "createdAt": "2025-12-04T00:43:14.268Z",
+            "replyCount": 0,
+            "retweetCount": 1,
+            "likeCount": 0,
+            "isLiked": false,
+            "isRetweeted": false,
+            "entities": {
+              "mentions": [],
+              "hashtags": []
+            },
+            "media": []
+          }
+        },
+        "totalCount": 1,
+        "subjectIds": ["299"]
+      },
+      "latestEventAt": "2025-12-04T04:01:52.809Z",
+      "isSeen": false
+    },
+    {
+      "id": "notif_quote_102",
+      "type": "QUOTE",
+      "actorSummary": {
+        "previewActors": [
+          {
+            "username": "notnowomar",
+            "displayName": "omar",
+            "avatarUrl": "https://cdn.raven.cmp27.space/avatars/bd58c5b1-9cf8-4b82-9f71-fd373307467d.jpeg"
+          }
+        ],
+        "totalCount": 1
+      },
+      "tweetSummary": {
+        "primaryTweet": {
+          "id": "300",
+          "author": {
+            "username": "habiba",
+            "displayName": "habiba",
+            "avatarUrl": "https://cdn.raven.cmp27.space/avatars/691fc500-b246-4d09-a4b7-c5b33873244f.jpg",
+            "isBlocked": false,
+            "isFollowing": false,
+            "isMuted": false
+          },
+          "content": "I can use some sleep, but this is fun idk",
+          "createdAt": "2025-12-04T03:58:09.286Z",
+          "replyCount": 0,
+          "retweetCount": 0,
+          "likeCount": 0,
+          "isLiked": false,
+          "isRetweeted": false,
+          "entities": {
+            "mentions": [],
+            "hashtags": []
+          },
+          "media": [],
+          "replyToTweetId": null,
+          "quoteToTweetId": "167",
+          "quotedTweet": {
+            "id": "167",
+            "author": {
+              "username": "habiba",
+              "displayName": "habiba",
+              "avatarUrl": "https://cdn.raven.cmp27.space/avatars/691fc500-b246-4d09-a4b7-c5b33873244f.jpg",
+              "isBlocked": false,
+              "isFollowing": false,
+              "isMuted": false
+            },
+            "content": "will this be finally fixed?",
+            "createdAt": "2025-11-27T17:27:20.523Z",
+            "replyCount": 0,
+            "retweetCount": 2,
+            "likeCount": 0,
+            "isLiked": false,
+            "isRetweeted": false,
+            "entities": {
+              "mentions": [],
+              "hashtags": []
+            },
+            "media": [
+              {
+                "url": "https://cdn.raven.cmp27.space/tweets/cfaff34e-768d-4688-9699-db1ce863ad6d.webp",
+                "type": "IMAGE",
+                "altText": null,
+                "width": 640,
+                "height": 480
+              },
+              {
+                "url": "https://cdn.raven.cmp27.space/tweets/286f3e7c-799e-4793-b080-430b37e5aa8c.webp",
+                "type": "IMAGE",
+                "altText": null,
+                "width": 640,
+                "height": 480
+              }
+            ]
+          }
+        },
+        "totalCount": 1,
+        "subjectIds": ["167"]
+      },
+      "latestEventAt": "2025-12-04T03:58:09.286Z",
+      "isSeen": true
+    },
+    {
+      "id": "notif_mention_101",
+      "type": "MENTION",
+      "actorSummary": {
+        "previewActors": [
+          {
+            "username": "ahmed_sobhy",
+            "displayName": "Ahmed Sobhy",
+            "avatarUrl": "https://cdn.raven.cmp27.space/default_avatar.png"
+          }
+        ],
+        "totalCount": 1
+      },
+      "tweetSummary": {
+        "primaryTweet": {
+          "id": "303",
+          "author": {
+            "username": "ahmed_sobhy",
+            "displayName": "Ahmed Sobhy",
+            "avatarUrl": "https://cdn.raven.cmp27.space/default_avatar.png",
+            "isBlocked": false,
+            "isFollowing": false,
+            "isMuted": false
+          },
+          "content": "Hey @habiba check out this cool feature!",
+          "createdAt": "2025-12-04T06:23:11.234Z",
+          "replyCount": 0,
+          "retweetCount": 0,
+          "likeCount": 0,
+          "isLiked": false,
+          "isRetweeted": false,
+          "entities": {
+            "mentions": [
+              {
+                "username": "habiba",
+                "startPosition": 4
+              }
+            ],
+            "hashtags": []
+          },
+          "media": [],
+          "replyToTweetId": null,
+          "quoteToTweetId": null,
+          "quotedTweet": null
+        },
+        "totalCount": 1,
+        "subjectIds": ["303"]
+      },
+      "latestEventAt": "2025-12-04T06:23:11.234Z",
+      "isSeen": false
+    },
+    {
+      "id": "notif_follow_002",
       "type": "MENTION",
       "actorSummary": {
         "previewActors": [
