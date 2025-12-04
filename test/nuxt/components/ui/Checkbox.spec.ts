@@ -160,4 +160,19 @@ describe('Checkbox Component', () => {
     const classes = wrapper.classes();
     expect(classes.some((c) => c.includes('aria-invalid'))).toBe(true);
   });
+
+  it('renders with slot binding correctly', async () => {
+    const wrapper = await mountSuspended(Checkbox);
+    // Verify the component renders with proper slot structure
+    expect(wrapper.exists()).toBe(true);
+    expect(wrapper.attributes('data-slot')).toBe('checkbox');
+    // Check that the component has proper aria attributes
+    expect(wrapper.attributes('aria-checked')).toBeDefined();
+  });
+
+  it('has proper button role', async () => {
+    const wrapper = await mountSuspended(Checkbox);
+    expect(wrapper.attributes('role')).toBe('checkbox');
+    expect(wrapper.attributes('type')).toBe('button');
+  });
 });
