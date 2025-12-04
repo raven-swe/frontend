@@ -35,12 +35,12 @@ importers:
       '@tanstack/vue-query':
         specifier: ^5.90.5
         version: 5.90.5(vue@3.5.22(typescript@5.9.3))
-      '@videojs-player/vue':
-        specifier: ^1.0.0
-        version: 1.0.0(@types/video.js@7.3.58)(video.js@8.23.4)(vue@3.5.22(typescript@5.9.3))
       '@tanstack/vue-virtual':
         specifier: 3.13.12
         version: 3.13.12(vue@3.5.22(typescript@5.9.3))
+      '@videojs-player/vue':
+        specifier: ^1.0.0
+        version: 1.0.0(@types/video.js@7.3.58)(video.js@8.23.4)(vue@3.5.22(typescript@5.9.3))
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -68,9 +68,6 @@ importers:
       tailwindcss:
         specifier: ^4.1.14
         version: 4.1.14
-      tw-animate-css:
-        specifier: ^1.4.0
-        version: 1.4.0
       vee-validate:
         specifier: ^4.15.1
         version: 4.15.1(vue@3.5.22(typescript@5.9.3))
@@ -183,6 +180,9 @@ importers:
       tsx:
         specifier: ^4.20.6
         version: 4.20.6
+      tw-animate-css:
+        specifier: ^1.4.0
+        version: 1.4.0
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -4540,6 +4540,7 @@ packages:
 
   min-document@2.19.2:
     resolution: {integrity: sha512-8S5I8db/uZN8r9HSLFVWPdJCvYOejMcEC82VIzNUc6Zkklf/d1gg2psfE79/vyhWOj4+J8MtwmoOz3TmvaGu5A==}
+
   minimatch@10.1.1:
     resolution: {integrity: sha512-enIvLvRAFZYXJzkCYG5RKmPfrFArdLv+R+lbQ53BmIMLIry74bjKzX6iHAm8WYamJkhSSEabrWN5D97XnKObjQ==}
     engines: {node: 20 || >=22}
@@ -11386,6 +11387,7 @@ snapshots:
   min-document@2.19.2:
     dependencies:
       dom-walk: 0.1.2
+
   minimatch@10.1.1:
     dependencies:
       '@isaacs/brace-expansion': 5.0.0
