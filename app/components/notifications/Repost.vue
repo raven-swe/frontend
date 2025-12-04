@@ -10,13 +10,13 @@ const props = defineProps<{
 }>();
 
 const icon = {
-  name: 'lucide:heart',
-  color: 'text-brand-red',
+  name: 'tabler:repeat',
+  color: 'text-brand-turquoise',
 };
 
 const linkTo = `/profile/${props.tweet.author.username}}/status/${props.tweet.id}`;
 
-const message = $t('notifications.message.like');
+const message = $t('notifications.message.repost');
 </script>
 
 <template>
