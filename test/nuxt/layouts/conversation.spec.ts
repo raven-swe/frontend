@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime';
-import SettingsLayout from '@/layouts/settings.vue';
+import SettingsLayout from '@/layouts/conversation.vue';
 
 mockNuxtImport('useI18n', () => {
   return () => ({
@@ -9,7 +9,7 @@ mockNuxtImport('useI18n', () => {
   });
 });
 
-describe('Settings Layout', () => {
+describe('Conversation Layout', () => {
   it('renders middle and right slot content', async () => {
     const wrapper = await mountSuspended(SettingsLayout, {
       slots: {
