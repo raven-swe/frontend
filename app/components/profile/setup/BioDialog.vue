@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import type { buttonVariants } from '~~/shared/types/ui';
-
+import type { ButtonVariants } from '@/components/ui/button/variants';
 const props = defineProps<{
   open: boolean;
 }>();
@@ -17,7 +16,7 @@ const actionButton = computed(() => {
   const isBioSet = bio.value.trim().length > 0;
   return {
     text: isBioSet ? $t('ui.next') : $t('ui.skip-for-now'),
-    variant: (isBioSet ? 'primary' : 'outline') as buttonVariants,
+    variant: (isBioSet ? 'primary' : 'outline') as ButtonVariants['variant'],
   };
 });
 
