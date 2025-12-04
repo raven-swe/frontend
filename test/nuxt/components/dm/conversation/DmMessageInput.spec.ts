@@ -10,13 +10,13 @@ describe('DmMessageInput Component', () => {
     expect(container.exists()).toBe(true);
   });
 
-  it('renders the text input field', async () => {
+  it('renders the text area field', async () => {
     const wrapper = await mountSuspended(DmMessageInput);
 
-    const input = wrapper.find('input[type="text"]');
-    expect(input.exists()).toBe(true);
-    expect(input.classes()).toContain('flex-1');
-    expect(input.classes()).toContain('bg-transparent');
+    const textarea = wrapper.find('textarea');
+    expect(textarea.exists()).toBe(true);
+    expect(textarea.classes()).toContain('flex-1');
+    expect(textarea.classes()).toContain('bg-transparent');
   });
 
   it('renders the send button', async () => {
@@ -54,8 +54,8 @@ describe('DmMessageInput Component', () => {
   it('enables send button when message has content', async () => {
     const wrapper = await mountSuspended(DmMessageInput);
 
-    const input = wrapper.find('input[type="text"]');
-    await input.setValue('Test message');
+    const textarea = wrapper.find('textarea');
+    await textarea.setValue('Test message');
 
     // Wait for reactivity
     await wrapper.vm.$nextTick();
@@ -68,8 +68,8 @@ describe('DmMessageInput Component', () => {
   it('emits send event with text when send button is clicked', async () => {
     const wrapper = await mountSuspended(DmMessageInput);
 
-    const input = wrapper.find('input[type="text"]');
-    await input.setValue('Test message');
+    const textarea = wrapper.find('textarea');
+    await textarea.setValue('Test message');
 
     const buttons = wrapper.findAll('button[type="button"]');
     const sendButton = buttons[buttons.length - 1];
@@ -81,9 +81,8 @@ describe('DmMessageInput Component', () => {
 
   it('clears message after sending', async () => {
     const wrapper = await mountSuspended(DmMessageInput);
-
-    const input = wrapper.find('input[type="text"]');
-    await input.setValue('Test message');
+    const textarea = wrapper.find('textarea');
+    await textarea.setValue('Test message');
     await wrapper.vm.$nextTick();
 
     const buttons = wrapper.findAll('button[type="button"]');
@@ -91,16 +90,16 @@ describe('DmMessageInput Component', () => {
     await sendButton?.trigger('click');
     await wrapper.vm.$nextTick();
 
-    expect((input.element as HTMLInputElement).value).toBe('');
+    expect((textarea.element as HTMLTextAreaElement).value).toBe('');
   });
 
   it('handles Enter key to send message', async () => {
     const wrapper = await mountSuspended(DmMessageInput);
 
-    const input = wrapper.find('input[type="text"]');
-    await input.setValue('Test message');
+    const textarea = wrapper.find('textarea');
+    await textarea.setValue('Test message');
 
-    await input.trigger('keydown', { key: 'Enter' });
+    await textarea.trigger('keydown', { key: 'Enter' });
 
     expect(wrapper.emitted('send')).toBeTruthy();
   });
@@ -108,10 +107,10 @@ describe('DmMessageInput Component', () => {
   it('does not send on Enter + Shift', async () => {
     const wrapper = await mountSuspended(DmMessageInput);
 
-    const input = wrapper.find('input[type="text"]');
-    await input.setValue('Test message');
+    const textarea = wrapper.find('textarea');
+    await textarea.setValue('Test message');
 
-    await input.trigger('keydown', { key: 'Enter', shiftKey: true });
+    await textarea.trigger('keydown', { key: 'Enter', shiftKey: true });
 
     expect(wrapper.emitted('send')).toBeFalsy();
   });
@@ -234,8 +233,8 @@ describe('DmMessageInput Component', () => {
     const wrapper = await mountSuspended(DmMessageInput);
 
     // Add text
-    const input = wrapper.find('input[type="text"]');
-    await input.setValue('Test message');
+    const textarea = wrapper.find('textarea');
+    await textarea.setValue('Test message');
 
     // Add image
     const fileInput = wrapper.find('input[type="file"]');
@@ -507,8 +506,8 @@ describe('DmMessageInput Component', () => {
   it('computes canSend correctly with trimmed empty message', async () => {
     const wrapper = await mountSuspended(DmMessageInput);
 
-    const input = wrapper.find('input[type="text"]');
-    await input.setValue('   '); // Only spaces
+    const textarea = wrapper.find('textarea');
+    await textarea.setValue('   '); // Only spaces
 
     await wrapper.vm.$nextTick();
 

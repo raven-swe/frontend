@@ -4,13 +4,13 @@ definePageMeta({
 });
 </script>
 <template>
-  <NuxtLayout name="settings">
+  <NuxtLayout name="conversation" :hide-right-on-mobile="true">
     <template #middle>
       <DmConversationsSection />
     </template>
 
     <template #right>
-      <DmConversationView />
+      <DmConversationEmptyState />
     </template>
   </NuxtLayout>
 </template>

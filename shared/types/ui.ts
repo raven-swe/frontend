@@ -2,7 +2,7 @@ export type buttonVariants =
   | 'default'
   | 'primary'
   | 'outline'
-  | 'outline-destructive'
+  | 'outline-destructive-hover'
   | 'destructive'
   | 'ghost-default'
   | 'ghost-primary'

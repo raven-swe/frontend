@@ -19,7 +19,7 @@ export const handlers = [
     const jwtData = jwt.decode(token || '') as { username: string } | null;
     const username = params.username as string;
     const user = mockUserInfos[username.toLowerCase()];
-    const isCurrentUser = jwtData?.username.toLowerCase() === username.toLowerCase();
+    const isCurrentUser = jwtData?.username?.toLowerCase() === username.toLowerCase();
     if (user) {
       if (isCurrentUser) {
         user.relationship = {
