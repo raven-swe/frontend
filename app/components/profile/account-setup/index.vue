@@ -10,6 +10,7 @@ const { setupStep, handleProfilePictureSubmit } = useAccountSetup();
   <div>
     <ProfileSetupProfilePictureDialog
       :open="setupStep === 'profile-picture'"
+      disable-close
       @submit="handleProfilePictureSubmit"
     />
     <EditUsernameDialog :open="setupStep === 'username'" />
