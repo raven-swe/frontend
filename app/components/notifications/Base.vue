@@ -9,6 +9,11 @@ const props = defineProps<{
   linkTo: string;
   isSeen?: boolean;
 }>();
+
+// Don't forget to listen to these events somewhere
+defineEmits<{
+  (e: 'follow' | 'unfollow' | 'unblock'): void;
+}>();
 </script>
 
 <template>
@@ -25,11 +30,18 @@ const props = defineProps<{
         <div class="flex w-full flex-col gap-2">
           <div class="flex items-start justify-between">
             <div class="flex-shrink-0">
-              <img
-                :src="actor.avatarUrl"
-                :alt="actor.username"
-                class="h-10 w-10 rounded-full object-cover"
-              />
+              <UserHoverCard
+                :username="actor.username"
+                @follow="$emit('follow')"
+                @unfollow="$emit('unfollow')"
+                @unblock="$emit('unblock')"
+              >
+                <img
+                  :src="actor.avatarUrl"
+                  :alt="actor.username"
+                  class="h-10 w-10 rounded-full object-cover"
+                />
+              </UserHoverCard>
             </div>
             <span class="text-muted-foreground flex-shrink-0 text-sm">{{ timestamp }}</span>
           </div>
@@ -37,7 +49,14 @@ const props = defineProps<{
           <!-- username + message + tweet content -->
           <div>
             <p class="text-foreground leading-tight">
-              <span class="text-foreground font-semibold">{{ actor.username }}</span>
+              <UserHoverCard
+                :username="actor.username"
+                @follow="$emit('follow')"
+                @unfollow="$emit('unfollow')"
+                @unblock="$emit('unblock')"
+              >
+                <span class="text-foreground font-semibold">{{ actor.username }}</span>
+              </UserHoverCard>
               <span class="text-foreground ms-2">{{ message }}</span>
             </p>
             <slot></slot>
