@@ -4,6 +4,7 @@ import { useWindowVirtualizer } from '@tanstack/vue-virtual';
 import Follow from '~/components/notifications/Follow.vue';
 import Like from '~/components/notifications/Like.vue';
 import Repost from '~/components/notifications/Repost.vue';
+import Reply from '~/components/notifications/Reply.vue';
 import QuoteMention from '~/components/notifications/QuoteMention.vue';
 import { notificationsService } from '~/services/notifications/notificationsService';
 import type { ActorSummary, ActorSummaryContainer } from '~~/shared/types/notifications';
@@ -107,6 +108,7 @@ function componentForType(type: string) {
     case 'RETWEET':
       return Repost;
     case 'REPLY':
+      return Reply;
     case 'QUOTE':
       return QuoteMention;
     case 'MENTION':

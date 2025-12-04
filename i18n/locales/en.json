@@ -209,7 +209,7 @@
     "message": {
       "follow": "started following you",
       "like": " liked your post",
-      "reply": "Replying to ",
+      "reply": "replied to your post",
       "repost": "reposted your post"
     }
   },

@@ -5,7 +5,7 @@
 :root {
   --background: #ffffff;
   --foreground: #0f1419;
-  --border: #eff3f4;
+  --border: #dddddd;
   --input: #d1d9de;
   --muted: #eff3f4;
   --muted-foreground: #536471;
@@ -35,9 +35,8 @@
 .dark {
   --background: #000000;
   --foreground: #e7e9ea;
-  --border: #303336;
+  --border: #202224;
   --input: #536471;
-
   --muted: #202327;
   --muted-foreground: #71767b;
   --primary: #3b82f6;
