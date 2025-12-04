@@ -12,6 +12,8 @@ export default function useAccountSetup() {
     setupStep.value = 'profile-picture';
   };
 
+  const isOpen = computed(() => setupStep.value !== null);
+
   const goToNextStep = () => {
     switch (setupStep.value) {
       case 'profile-picture':
@@ -85,5 +87,6 @@ export default function useAccountSetup() {
     handleUsernameSubmit,
     handleInterestsSubmit,
     start,
+    isOpen,
   };
 }
