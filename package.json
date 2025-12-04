@@ -36,7 +36,6 @@
     "clsx": "^2.1.1",
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
-    "lucide-vue-next": "^0.555.0",
     "nuxt": "^4.1.2",
     "pinia": "^3.0.3",
     "reka-ui": "^2.5.1",
