@@ -37,6 +37,7 @@ watch(
   (newQuery) => {
     if (typeof newQuery === 'string' && newQuery !== searchQuery.value) {
       searchQuery.value = newQuery;
+      loadUsers();
     }
   },
 );
@@ -61,7 +62,7 @@ const {
   isFetching: isLoading,
   suspense,
 } = useInfiniteQuery({
-  queryKey: ['explore', 'for-you', searchQuery.value],
+  queryKey: computed(() => ['search', 'tweets', 'top', searchQuery.value]),
   initialPageParam: null as string | null,
   queryFn: async ({ pageParam = null }) =>
     await searchService.getTweets({ limit: 10, cursor: pageParam }, searchQuery.value, 'top'),
@@ -140,6 +141,14 @@ watch(
 
 <template>
   <div class="border-border mx-auto mt-30 max-w-[700px]">
+    <div v-if="users.length === 0 && tweets.length === 0 && !isLoading" class="p-20 break-words">
+      <p class="text-foreground text-3xl font-bold">
+        {{ $t('search.no-results', { query: searchQuery }) }}
+      </p>
+      <p class="text-md text-muted-foreground mt-5">
+        {{ $t('search.try-searching') }}
+      </p>
+    </div>
     <!-- Users Section -->
     <div v-if="users.length > 0" class="border-border border-b">
       <h2 class="px-4 py-4 text-xl font-bold">{{ $t('search.people.tab') }}</h2>
@@ -209,14 +218,6 @@ watch(
       >
         <UiSpinner />
       </div>
-    </div>
-
-    <div
-      v-if="tweets.length === 0 && !isFetchingNextPage && !isLoading"
-      data-testid="empty-state"
-      class="text-muted-foreground mt-20 text-center"
-    >
-      <h1 class="text-xl font-semibold">{{ $t('errors.TWEET_NOT_FOUND') }}</h1>
     </div>
   </div>
 </template>
