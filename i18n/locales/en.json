@@ -135,7 +135,8 @@
       "tab": "Media"
     },
     "no-trending-hashtags": "No trending hashtags found",
-    "no-results": "No results for \"{query}\""
+    "no-results": "No results for \"{query}\"",
+    "try-searching": "Try searching for something else."
   },
   "playground": {
     "dialog": {
@@ -204,6 +205,7 @@
     "skip-for-now": "Skip for now",
     "save": "Save",
     "cancel": "Cancel",
+    "clear": "Clear",
     "discard": "Discard",
     "post": "Post",
     "reply": "Reply",
@@ -220,7 +222,15 @@
         "placeholder": "Search"
       },
       "search-list": {
-        "placeholder": "Try searching for people, lists, or keywords"
+        "placeholder": "Try searching for people, lists, or keywords",
+        "recent": "Recent",
+        "clear-all": "Clear all",
+        "search-for": "Search For \"{query}\"",
+        "go-to": "Go to {'@'}{query}"
+      },
+      "clear-dialog": {
+        "title": "Clear all recent searches?",
+        "description": "This can’t be undone and you’ll remove all your recent searches."
       }
     }
   },
