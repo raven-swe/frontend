@@ -30,10 +30,18 @@ const displayUrl = computed(() => {
       <p class="text-muted-foreground text-md" data-cy="profile-user-name">{{ displayUsername }}</p>
       <p
         v-if="!isBlocking"
-        class="text-muted-foreground mt-2 line-clamp-4 break-words whitespace-pre-line"
+        class="mt-2 line-clamp-4 break-words whitespace-pre-line"
         data-cy="profile-bio"
       >
-        {{ userProfile?.bio }}
+        <UiContentEntitiesRenderer
+          :content="userProfile?.bio ?? ''"
+          :entities="
+            userProfile?.bioEntities ?? {
+              mentions: [],
+              hashtags: [],
+            }
+          "
+        />
       </p>
 
       <div v-if="!isBlocking" class="mt-2 flex flex-wrap gap-2">
@@ -67,22 +75,28 @@ const displayUrl = computed(() => {
       </div>
 
       <div class="mt-4 flex space-x-4">
-        <span data-test="following-count"
+        <NuxtLink
+          :to="`/profile/${userProfile?.username}/following`"
+          class="hover:underline"
+          data-test="following-count"
           ><strong data-cy="profile-following-count">{{
             $n(userProfile?.followingCount ?? 0, {
               notation: 'compact',
             })
           }}</strong>
-          <span class="text-muted-foreground ms-1"> {{ $t('profile-info.following') }} </span>
-        </span>
-        <span data-test="followers-count"
+          <span class="text-muted-foreground"> {{ ' ' + $t('profile-info.following') }} </span>
+        </NuxtLink>
+        <NuxtLink
+          :to="`/profile/${userProfile?.username}/followers`"
+          class="hover:underline"
+          data-test="followers-count"
           ><strong data-cy="profile-followers-count">{{
             $n(userProfile?.followersCount ?? 0, {
               notation: 'compact',
             })
           }}</strong>
           <span class="text-muted-foreground ms-1"> {{ $t('profile-info.followers') }} </span>
-        </span>
+        </NuxtLink>
       </div>
       <div v-if="isMuted" class="mt-4">
         <p class="text-muted-foreground text-sm">

@@ -69,7 +69,6 @@ describe('ProfileInfo', () => {
     const bio = wrapper.find('p.whitespace-pre-line');
     expect(bio.exists()).toBe(true);
     expect(bio.text()).toBe('This is a test bio');
-    expect(bio.classes()).toContain('text-muted-foreground');
     expect(bio.classes()).toContain('mt-2');
 
     expect(wrapper.html()).toContain('Test Location');

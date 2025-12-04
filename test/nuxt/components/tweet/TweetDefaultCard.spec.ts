@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
 import TweetDefaultCard from '@/components/tweet/TweetDefaultCard.vue';
@@ -6,12 +6,23 @@ import Avatar from '@/components/ui/Avatar.vue';
 import TweetMedia from '@/components/tweet/TweetMedia.vue';
 import TweetActionButtons from '@/components/tweet/TweetActionButtons.vue';
 import type { Tweet } from '~~/shared/types/tweets';
+import { mockNuxtImport } from '@nuxt/test-utils/runtime';
 
 // Mock i18n
 const i18nMock = {
   locale: 'en',
   t: (key: string) => key,
 };
+
+const routerMock = vi.hoisted(() => {
+  return {
+    push: vi.fn(),
+  };
+});
+
+mockNuxtImport('useRouter', () => {
+  return () => routerMock;
+});
 
 // Stub components for faster tests
 const stubs = {
@@ -215,64 +226,6 @@ describe('TweetDefaultCard.vue', () => {
     expect(contentP.findAll('a').length).toBe(0);
   });
 
-  it('renders plain text when entities is undefined (covers !entities branch)', async () => {
-    const tweet = makeTweet({
-      content: 'No entities field on this tweet.',
-    } as Partial<Tweet>);
-    // Force entities to be undefined to hit the first OR branch without using `any`
-    const tObj = tweet as unknown as { entities?: unknown };
-    delete tObj.entities;
-    const wrapper = mount(TweetDefaultCard, {
-      props: { tweet: tObj as unknown as Tweet },
-      global: globalConfig,
-    });
-
-    const contentP = wrapper.find('p');
-    expect(contentP.exists()).toBe(true);
-    expect(contentP.text()).toContain('No entities field on this tweet.');
-    expect(contentP.findAll('a').length).toBe(0);
-  });
-
-  it('handles only mentions when hashtags are undefined', async () => {
-    const content = 'Hello @john_doe there';
-    const tweet = makeTweet();
-    tweet.content = content;
-    const entities = {
-      mentions: [{ username: 'john_doe', startPosition: content.indexOf('@john_doe') }],
-      // hashtags intentionally omitted to exercise `|| []`
-    } as unknown as Tweet['entities'];
-    tweet.entities = entities;
-    const wrapper = mount(TweetDefaultCard, {
-      props: { tweet },
-      global: globalConfig,
-    });
-
-    const mention = wrapper.find('a[href="/profile/john_doe"]');
-    expect(mention.exists()).toBe(true);
-    expect(wrapper.text()).toContain('Hello');
-    expect(wrapper.text()).toContain('there');
-  });
-
-  it('handles only hashtags when mentions are undefined', async () => {
-    const content = 'Hello #Nuxt3 there';
-    const tweet = makeTweet();
-    tweet.content = content;
-    const entities = {
-      hashtags: [{ hashtag: 'Nuxt3', startPosition: content.indexOf('#Nuxt3') }],
-      // mentions intentionally omitted to exercise `|| []`
-    } as unknown as Tweet['entities'];
-    tweet.entities = entities;
-    const wrapper = mount(TweetDefaultCard, {
-      props: { tweet },
-      global: globalConfig,
-    });
-
-    const hashtag = wrapper.find('a[href="/hashtag/Nuxt3"]');
-    expect(hashtag.exists()).toBe(true);
-    expect(wrapper.text()).toContain('Hello');
-    expect(wrapper.text()).toContain('there');
-  });
-
   it('updates like state on like-success when not previously liked', async () => {
     const tweet = makeTweet({ isLiked: false, likeCount: 10 });
     const wrapper = mount(TweetDefaultCard, {
@@ -458,13 +411,9 @@ describe('TweetDefaultCard.vue', () => {
   });
 
   it('uses empty-string fallback for content when tweet.content is empty (content || "")', async () => {
-    const tweet = makeTweet();
-    tweet.content = '';
-    // Remove entities to trigger early return with text segment
-    const tObj = tweet as unknown as { entities?: unknown };
-    delete tObj.entities;
+    const tweet = makeTweet({ content: '', entities: { mentions: [], hashtags: [] } });
     const wrapper = mount(TweetDefaultCard, {
-      props: { tweet: tObj as unknown as Tweet },
+      props: { tweet },
       global: globalConfig,
     });
     const contentP = wrapper.find('p');
@@ -484,5 +433,19 @@ describe('TweetDefaultCard.vue', () => {
     const updated = actions.props('tweet') as Tweet;
     expect(updated.isRetweeted).toBe(false);
     expect(updated.retweetCount).toBe(7);
+  });
+
+  it('handle clicking on tweet navigates to tweet detail page', async () => {
+    const tweet = makeTweet();
+    const wrapper = mount(TweetDefaultCard, {
+      props: { tweet },
+      global: globalConfig,
+    });
+
+    await wrapper.trigger('click');
+
+    expect(routerMock.push).toHaveBeenCalledWith(
+      `/profile/${tweet.author.username}/status/${tweet.id}`,
+    );
   });
 });
