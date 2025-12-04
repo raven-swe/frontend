@@ -4,7 +4,7 @@ import { useUserStore } from '~/stores/user';
 import { useI18n } from 'vue-i18n';
 import SettingsItem from '~/components/Settings/SettingsItem.vue';
 const { locale } = useI18n();
-definePageMeta({ layout: false });
+definePageMeta({ layout: 'settings' });
 const userStore = useUserStore();
 const user = computed(() => userStore.user);
 const birthDate = computed(() =>
@@ -13,10 +13,19 @@ const birthDate = computed(() =>
 </script>
 
 <template>
-  <!-- This page now only provides RIGHT slot content via parent account.vue -->
   <div>
     <div class="p-4">
-      <h1 class="h-8.5 text-2xl font-bold">{{ $t('setting.account-information') }}</h1>
+      <header class="flex flex-row gap-4">
+        <UiButton
+          variant="ghost-default"
+          class="flex bg-transparent lg:hidden"
+          size="icon-sm"
+          @click="$router.back()"
+        >
+          <Icon name="lucide:arrow-left" size="1.2rem" />
+        </UiButton>
+        <h1 class="text-2xl font-bold">{{ $t('setting.account-information') }}</h1>
+      </header>
       <p class="text-muted-foreground mt-2 text-sm">
         {{ $t('setting.account-information-details') }}
       </p>

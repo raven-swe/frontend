@@ -2,9 +2,7 @@
 import { useChangeEmailStore } from '~/stores/settings/change-email';
 import ChangeEmailForm from '~/components/emailSettings/ChangeEmailForm.vue';
 import OtpForm from '~/components/emailSettings/OtpForm.vue';
-definePageMeta({
-  layout: false,
-});
+definePageMeta({ layout: 'settings' });
 
 const userStore = useUserStore();
 const changeEmailStore = useChangeEmailStore();

@@ -2,6 +2,7 @@
 import UserList from '~/components/user/UserList.vue';
 import { settingsService } from '~/services/settingsService';
 
+definePageMeta({ layout: 'settings' });
 const userStore = useUserStore();
 const username = computed(() => userStore.user?.username.toLowerCase() || null);
 </script>

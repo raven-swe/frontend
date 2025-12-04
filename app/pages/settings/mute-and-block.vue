@@ -1,4 +1,6 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+definePageMeta({ layout: 'settings' });
+</script>
 
 <template>
   <div>

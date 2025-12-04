@@ -1,11 +1,23 @@
 <script lang="ts" setup>
 import SettingsItem from '~/components/Settings/SettingsItem.vue';
+
+definePageMeta({ layout: 'settings' });
 </script>
 
 <template>
   <div>
     <div class="p-4">
-      <h1 class="h-8.5 text-2xl font-bold">{{ $t('setting.privacy-settings.title') }}</h1>
+      <header class="flex flex-row gap-4">
+        <UiButton
+          variant="ghost-default"
+          class="flex bg-transparent lg:hidden"
+          size="icon-sm"
+          @click="$router.back()"
+        >
+          <Icon name="lucide:arrow-left" size="1.2rem" />
+        </UiButton>
+        <h1 class="text-2xl font-bold">{{ $t('setting.privacy-settings.title') }}</h1>
+      </header>
       <p class="text-muted-foreground mt-2 text-sm">
         {{ $t('setting.privacy-settings.description') }}
       </p>

@@ -1,25 +1,15 @@
 <script lang="ts" setup>
 import useMyProfileQuery from '~/composables/useMyProfileQuery';
+import SettingsSection from '~/components/Settings/SettingsSection/index.vue';
+import { useBreakpoints } from '@vueuse/core';
 useMyProfileQuery();
 
-const props = defineProps<{
-  hideMiddleOnMobile?: boolean;
-  hideRightOnMobile?: boolean;
-}>();
-
-// Compute responsive classes based on props
-const middleClasses = computed(() => {
-  if (props.hideMiddleOnMobile) {
-    return 'hidden h-full w-[320px] flex-shrink-0 border lg:block xl:w-[390px] 2xl:w-[450px]';
-  }
-  return 'h-full lg:w-[320px] flex-1 border sm:w-[560px]  sm:flex-none xl:w-[390px] 2xl:w-[450px]';
-});
-
-const rightClasses = computed(() => {
-  if (props.hideRightOnMobile) {
-    return 'hidden h-full flex-1 border sm:w-[560px] sm:flex-none  lg:block';
-  }
-  return 'h-full flex-1 border sm:w-[560px] sm:flex-none ';
+const breakpoints = useBreakpoints({ large: 1024 });
+const viewportIsLarge = breakpoints.greaterOrEqual('large');
+const router = useRouter();
+const isSettingsRoot = computed(() => {
+  const path = router.currentRoute.value.fullPath;
+  return path.endsWith('settings/') || path.endsWith('settings');
 });
 </script>
 
@@ -36,13 +26,16 @@ const rightClasses = computed(() => {
           </div>
 
           <!-- settings Section -->
-          <div :class="middleClasses">
-            <slot name="middle" />
+          <div
+            class="h-full w-150 border-x lg:block lg:w-80 xl:w-96 2xl:w-112"
+            :class="{ hidden: !isSettingsRoot }"
+          >
+            <SettingsSection />
           </div>
 
-          <!-- Right sidebar -->
-          <div :class="rightClasses">
-            <slot name="right" />
+          <!-- Setting content -->
+          <div class="h-full w-150 border-x lg:block" :class="{ hidden: isSettingsRoot }">
+            <NuxtPage v-if="viewportIsLarge || !isSettingsRoot" />
           </div>
         </div>
       </div>
