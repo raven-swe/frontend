@@ -139,7 +139,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="relative flex w-full items-center gap-2 px-4 pt-2">
+  <div class="relative flex w-full items-center gap-2 px-2 pt-2">
     <UiButton
       v-if="props.showBackOnFocus && isFocused"
       variant="icon"
