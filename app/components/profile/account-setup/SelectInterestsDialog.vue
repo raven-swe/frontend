@@ -11,14 +11,13 @@ const props = defineProps<{
 
 const interestsSchema = yup.array().of(yup.string()).min(1, $t('errors.interests.REQUIRED'));
 
-const { handleSubmit, isFieldValid, errors } = useForm({
+const { handleSubmit, isFieldValid } = useForm({
   validationSchema: yup.object({
     interests: interestsSchema,
   }),
   initialValues: {
     interests: [],
   },
-  validateOnMount: true,
 });
 const { fields, push, remove, replace } = useFieldArray<string>('interests');
 
@@ -62,6 +61,14 @@ const handleToggleInterest = (interestId: string) => {
 const isInterestActive = (interestId: string) => {
   return fields.value.some((field) => field.value === interestId);
 };
+
+const translatedInterest = (interest: Interest) => {
+  return $t(
+    $te(`profile.account-setup.interests.${interest.code}`)
+      ? `profile.account-setup.interests.${interest.code}`
+      : interest.name,
+  );
+};
 </script>
 
 <template>
@@ -83,7 +90,7 @@ const isInterestActive = (interestId: string) => {
           <InterestItem
             v-for="interest in interestsData?.data || []"
             :key="interest.code"
-            :interest="$t(`profile.account-setup.interests.${interest.code}`)"
+            :interest="translatedInterest(interest)"
             :is-active="isInterestActive(interest.code)"
             @toggle-interest="handleToggleInterest(interest.code)"
           />
@@ -105,11 +112,11 @@ const isInterestActive = (interestId: string) => {
               })
             }}
           </p>
-          <p v-if="errors.interests" class="text-destructive text-sm">{{ errors.interests }}</p>
+          <!-- <p v-if="errors.interests" class="text-destructive text-sm">{{ errors.interests }}</p> -->
           <UiButton
             class="px-8"
             size="xl"
-            :disabled="!isFieldValid('interests')"
+            :disabled="fields.length === 0 || !isFieldValid('interests')"
             @click="handleSubmit"
           >
             {{ $t('ui.next') }}
