@@ -5,9 +5,12 @@ export default defineWrappedResponseHandler(async (event) => {
   }>(event);
   const fetcher = serverApiFetch(event);
   const response = await fetcher<ApiSuccessResponse<{ suggestions: string[] }>>(
-    `/onboarding/username-suggestions?typed=${body.baseUsername}`,
+    `/onboarding/username-suggestions`,
     {
       method: 'GET',
+      query: {
+        typed: body.baseUsername,
+      },
     },
   );
   return response;

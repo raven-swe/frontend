@@ -5,46 +5,57 @@ import * as yup from 'yup';
 import FieldInput from '~/components/ui/form/FieldInput.vue';
 import { accountService } from '~/services/auth/accountService';
 import { accountSettingsService } from '~/services/settings/accountSettingsService';
+import getUsernameSchema from '~/schemas/username';
+import { useQuery } from '@tanstack/vue-query';
 
 const props = defineProps<{
   open: boolean;
 }>();
 
-const _checkUsername = async (username: string) => {
-  if (!username) return false;
-  return await accountService.checkAccountExists(username);
-};
+const { t } = useI18n();
+const usernameSchemaBase = getUsernameSchema(t);
 
-const checkUsername = useDebounceFn(_checkUsername, 300);
-const usernameRegex = /^[a-zA-Z0-9_]{3,15}$/;
-
-const { data } = useAsyncData(
-  'username-suggestions',
-  async () => await accountSettingsService.getUsernameSuggestions(),
+const debouncedCheckUsername = useDebounceFn(
+  async (username: string) => await accountService.checkAccountExists(username),
+  300,
 );
-const currentUsername = useUserStore().user?.username || '';
 
-const usernameSchema = yup
-  .string()
-  .trim()
-  .matches(usernameRegex, $t('errors.INVALID_USERNAME'))
-  .test('uniqueUsername', $t('errors.USERNAME_ALREADY_EXISTS'), async (username) => {
-    if (!username || !usernameRegex.test(username)) return true;
-    const exists = await checkUsername(username);
-    return !exists || username.toLowerCase() === currentUsername.toLowerCase();
-  });
+const userStore = useUserStore();
+
+const usernameSchema = usernameSchemaBase.test(
+  'uniqueUsername',
+  $t('errors.USERNAME_ALREADY_EXISTS'),
+  async (username) => {
+    const exists = await debouncedCheckUsername(username);
+    return !exists || username.toLowerCase() === userStore.user.username?.toLowerCase();
+  },
+);
 
 const { values, defineField, handleSubmit, isSubmitting, isFieldValid, setFieldValue } = useForm({
   validationSchema: yup.object({
     username: usernameSchema.required(),
   }),
   initialValues: {
-    username: currentUsername,
+    username: userStore.user.username?.toString() || '',
   },
 });
 
-const { t } = useI18n();
+const usernameQueryKey = useDebounce(
+  computed(() => ['username-suggestions', values.username]),
+  300,
+);
+
+const { data: suggestions, isLoading } = useQuery({
+  queryKey: usernameQueryKey,
+  queryFn: async () => {
+    const response = await accountSettingsService.getUsernameSuggestions(values.username);
+    return response.data.suggestions ?? [];
+  },
+  enabled: computed(() => !!values.username && isFieldValid('username')),
+});
+
 const { handleUsernameSubmit, goToNextStep } = useAccountSetup();
+
 const onSubmit = handleSubmit(async (formValues, actions) => {
   const errors = await handleUsernameSubmit(formValues.username);
   if (errors) {
@@ -95,9 +106,12 @@ const actionButton = computed(() => {
         <div class="py-8">
           <div class="mx-auto w-full max-w-100">
             <h2 class="mb-4 text-2xl font-bold">{{ $t('setting.username.suggestions') }}</h2>
-            <div class="flex flex-col gap-2">
+            <div v-if="isLoading">
+              <UiSpinner class="text-primary" />
+            </div>
+            <div v-if="suggestions" class="flex flex-col gap-2">
               <button
-                v-for="suggestion in data?.data?.suggestions"
+                v-for="suggestion in suggestions"
                 :key="suggestion"
                 type="button"
                 class="text-primary cursor-pointer text-start hover:underline"

@@ -8,9 +8,12 @@ export const accountSettingsService = {
       query: { newUsername: username },
     });
   },
-  getUsernameSuggestions: async () => {
+  getUsernameSuggestions: async (username: string) => {
     return await apiFetch('/api/settings/username/suggestions', {
       method: 'GET',
+      query: {
+        baseUsername: username,
+      },
     });
   },
   updateInterests: async (interests: string[]) => {
