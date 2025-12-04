@@ -331,7 +331,6 @@
     "EMPTY_NAME": "Name can't be blank",
     "USERNAME_ALREADY_EXISTS": "That username has been taken. Please choose another.",
     "INVALID_USERNAME": "Usernames can only contain letters, numbers, and underscores, and must be between 3 and 15 characters long.",
-    "SELECT_AT_LEAST_ONE_INTEREST": "Select atleast one interest.",
     "RECAPTCHA_REQUIRED": "Please complete the reCAPTCHA challenge",
     "ACCOUNT_NOT_FOUND": "This account doesn't \nexist",
     "TRY_SEARCHING": "Try searching for another one",
@@ -390,6 +389,9 @@
     },
     "username": {
       "RATE_LIMIT_EXCEEDED": "Too many requests. Please try again later."
+    },
+    "interests": {
+      "REQUIRED": "Select atleast one interest."
     },
     "RATE_LIMIT_EXCEEDED": "Too many requests. Please try again later.",
     "CANNOT_BLOCK_USER": "You cannot block this user.",

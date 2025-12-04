@@ -3,17 +3,15 @@ import { useFieldArray, useForm } from 'vee-validate';
 import * as yup from 'yup';
 import { settingsService } from '~/services/settingsService';
 import InterestItem from './InterestItem.vue';
+import { useQuery } from '@tanstack/vue-query';
 
 const props = defineProps<{
   open: boolean;
 }>();
 
-const interestsSchema = yup
-  .array()
-  .of(yup.string())
-  .min(1, $t('errors.SELECT_AT_LEAST_ONE_INTEREST'));
+const interestsSchema = yup.array().of(yup.string()).min(1, $t('errors.interests.REQUIRED'));
 
-const { handleSubmit, isFieldValid } = useForm({
+const { handleSubmit, isFieldValid, errors } = useForm({
   validationSchema: yup.object({
     interests: interestsSchema,
   }),
@@ -22,16 +20,35 @@ const { handleSubmit, isFieldValid } = useForm({
   },
   validateOnMount: true,
 });
-const { fields, push, remove } = useFieldArray<string>('interests');
+const { fields, push, remove, replace } = useFieldArray<string>('interests');
 
-const { data: suggestionData } = useAsyncData(
-  'available-interests',
-  async () => await settingsService.getInterests(),
+const { data: interestsData } = useQuery({
+  queryKey: ['interests'],
+  queryFn: async () => await settingsService.getInterests(),
+  staleTime: Infinity,
+});
+
+watch(
+  () => interestsData?.value,
+  (newData) => {
+    if (newData?.data) {
+      const selected = newData.data
+        .filter((interest) => interest.isSelected)
+        .map((interest) => interest.code);
+      replace(selected);
+    }
+  },
+  { immediate: true },
 );
 
 const { handleInterestsSubmit } = useAccountSetup();
-const onSubmit = handleSubmit(async (formValues) => {
-  await handleInterestsSubmit(formValues.interests);
+const { t } = useI18n();
+const onSubmit = handleSubmit(async (formValues, action) => {
+  const errors = await handleInterestsSubmit(formValues.interests);
+  if (errors) {
+    const convertedErrors = backendValidationToFormErrors(errors, t);
+    action.setErrors(convertedErrors);
+  }
 });
 const handleToggleInterest = (interestId: string) => {
   const index = fields.value.findIndex((field) => field.value === interestId);
@@ -64,7 +81,7 @@ const isInterestActive = (interestId: string) => {
       <form class="flex h-full flex-1 flex-col overflow-y-hidden px-0" @submit.prevent="onSubmit">
         <div class="grid grid-cols-2 justify-center gap-4 overflow-y-auto px-4 py-2 sm:grid-cols-3">
           <InterestItem
-            v-for="interest in suggestionData?.data"
+            v-for="interest in interestsData?.data || []"
             :key="interest.code"
             :interest="$t(`profile.account-setup.interests.${interest.code}`)"
             :is-active="isInterestActive(interest.code)"
@@ -88,10 +105,11 @@ const isInterestActive = (interestId: string) => {
               })
             }}
           </p>
+          <p v-if="errors.interests" class="text-destructive text-sm">{{ errors.interests }}</p>
           <UiButton
             class="px-8"
             size="xl"
-            :disabled="fields.length === 0 || !isFieldValid('interests')"
+            :disabled="!isFieldValid('interests')"
             @click="handleSubmit"
           >
             {{ $t('ui.next') }}

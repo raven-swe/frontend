@@ -2,7 +2,7 @@ import { http, HttpResponse } from 'msw';
 
 import rawUsers from '../data/mock-users.json' assert { type: 'json' };
 import type { CompactUser, User } from '../../shared/types/user';
-import type { ApiSuccessResponse } from '../../shared/types/api';
+import type { ApiSuccessResponse, ApiValidationErrorResponse } from '../../shared/types/api';
 import type { Interest } from '../../shared/types/interests';
 const mockUsers = rawUsers as User[];
 
@@ -36,13 +36,22 @@ export const handlers = [
   http.put(`${API_URL}/me/settings/interests`, async ({ request }) => {
     const body = (await request.json()) as { interests: string[] };
     const selectedInterests: string[] = body?.interests;
-    if (!Array.isArray(selectedInterests)) {
-      return HttpResponse.json(
+    if (!Array.isArray(selectedInterests) || selectedInterests.length === 0) {
+      return HttpResponse.json<ApiValidationErrorResponse>(
         {
           success: false,
-          message: 'Invalid interests format.',
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'Validation error',
+            errors: [
+              {
+                field: 'interests',
+                code: 'REQUIRED',
+              },
+            ],
+          },
         },
-        { status: 400 },
+        { status: 422 },
       );
     }
     return HttpResponse.json(
