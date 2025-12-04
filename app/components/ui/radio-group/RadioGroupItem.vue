@@ -2,7 +2,6 @@
 import type { RadioGroupItemProps } from 'reka-ui';
 import type { HTMLAttributes } from 'vue';
 import { reactiveOmit } from '@vueuse/core';
-import { CircleIcon } from 'lucide-vue-next';
 import { RadioGroupIndicator, RadioGroupItem, useForwardProps } from 'reka-ui';
 import { cn } from '@/utils';
 
@@ -29,8 +28,10 @@ const forwardedProps = useForwardProps(delegatedProps);
       class="relative flex items-center justify-center"
     >
       <slot>
-        <CircleIcon
-          class="fill-primary absolute start-1/2 top-1/2 size-2 -translate-x-1/2 -translate-y-1/2"
+        <Icon
+          name="tabler:circle-filled"
+          size="0.8rem"
+          class="fill-primary bg-primary absolute start-1/2 top-1/2 size-2 -translate-x-1/2 -translate-y-1/2"
         />
       </slot>
     </RadioGroupIndicator>
