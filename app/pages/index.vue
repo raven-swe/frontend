@@ -23,10 +23,10 @@ const lang = ref(locale.value);
 const switchLanguage = () => {
   setLocale(lang.value);
 
-  if (lang.value === 'en') {
-    lang.value = 'ar';
+  if (lang.value === 'en-US') {
+    lang.value = 'ar-EG';
   } else {
-    lang.value = 'en';
+    lang.value = 'en-US';
   }
 };
 </script>

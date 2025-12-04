@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createMockH3Event } from '~~/test/mocks/h3-event';
 import { useH3TestUtils } from '~~/test/mocks/h3-test-utils';
 import { createError } from '#app';
-import userProfileHandler from '~~/server/api/users/[username]/profile/index.get';
+import userProfileHandler from '~~/server/api/users/[username]/profile.get';
 
 useH3TestUtils();
 
@@ -34,7 +34,53 @@ describe('GET /api/users/[username]/profile', () => {
     expect(mockServerApiFetch).toHaveBeenCalledWith('/users/johndoe/profile', {
       method: 'GET',
     });
-    expect(response).toEqual(mockResponse);
+    expect(response).toEqual({
+      ...mockResponse,
+      data: {
+        ...mockResponse.data,
+        mutualUsers: [],
+      },
+    });
+  });
+
+  it('return correct data when mutualNames parameter is provided', async () => {
+    const mockResponse = {
+      success: true,
+      data: {
+        username: 'johndoe',
+        fullName: 'John Doe',
+        bio: 'Just a test user',
+        mutualNames: ['janedoe', 'alice'],
+      },
+    };
+    mockServerApiFetch.mockResolvedValueOnce(mockResponse);
+
+    const event = createMockH3Event({
+      method: 'GET',
+      params: { username: 'johndoe' },
+    });
+
+    const response = await userProfileHandler(event);
+
+    expect(mockServerApiFetch).toHaveBeenCalledWith('/users/johndoe/profile', {
+      method: 'GET',
+    });
+    expect(response).toEqual({
+      ...mockResponse,
+      data: {
+        ...mockResponse.data,
+        mutualUsers: [
+          {
+            displayName: 'janedoe',
+            avatarUrl: expect.any(String),
+          },
+          {
+            displayName: 'alice',
+            avatarUrl: expect.any(String),
+          },
+        ],
+      },
+    });
   });
 
   it('throws error for invalid username parameter', async () => {

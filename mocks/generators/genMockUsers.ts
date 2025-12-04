@@ -7,15 +7,66 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export function generateMockUser(): User {
+type BioEntity = User['bioEntities'];
+
+function generateUsername(): string {
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_';
+  const length = faker.number.int({ min: 3, max: 15 });
+
+  let username = '';
+  for (let i = 0; i < length; i++) {
+    username += chars.charAt(faker.number.int({ min: 0, max: chars.length - 1 }));
+  }
+  return username;
+}
+
+function generateBioWithEntities(): { bio: string; bioEntities: BioEntity } {
+  const bioTokens: string[] = [];
+  const mentions: BioEntity['mentions'] = [];
+  const hashtags: BioEntity['hashtags'] = [];
+
+  const wordCount = faker.number.int({ min: 10, max: 25 });
+  let currentPosition = 0;
+
+  for (let i = 0; i < wordCount; i++) {
+    const rnd = Math.random();
+
+    let token = '';
+    if (rnd < 0.7) {
+      token = faker.word.words(); // 70% regular word
+    } else if (rnd < 0.8) {
+      const username = generateUsername();
+      token = `@${username}`;
+      mentions.push({ username, startPosition: currentPosition });
+    } else if (rnd < 0.9) {
+      const tag = faker.word.noun(); // 10% hashtag
+      token = `#${tag}`;
+      hashtags.push({ hashtag: tag, startPosition: currentPosition });
+    } else {
+      // 10% random link
+      const url = faker.internet.url();
+      token = url;
+    }
+
+    bioTokens.push(token);
+    currentPosition += token.length + 1;
+  }
+
+  const bio = bioTokens.join(' ');
+
   return {
-    username: faker.internet.username(),
+    bio,
+    bioEntities: { mentions, hashtags },
+  };
+}
+
+export function generateMockUser(): User {
+  const { bio, bioEntities } = generateBioWithEntities();
+  return {
+    username: generateUsername(),
     displayName: faker.internet.displayName(),
-    bio: faker.lorem.sentence(),
-    bioEntities: {
-      mentions: [],
-      hashtags: [],
-    },
+    bio,
+    bioEntities,
     avatarUrl: faker.image.avatar(),
     bannerUrl: faker.image.urlPicsumPhotos({ width: 128 }),
     location: faker.location.city(),

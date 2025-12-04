@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { buttonVariants } from '~~/shared/types/ui';
+import type { ButtonVariants } from '@/components/ui/button/variants';
 
 const props = defineProps<{
   open: boolean;
@@ -17,7 +17,7 @@ const actionButton = computed(() => {
   const isLocationSet = location.value.trim().length > 0;
   return {
     text: isLocationSet ? $t('ui.next') : $t('ui.skip-for-now'),
-    variant: (isLocationSet ? 'primary' : 'outline') as buttonVariants,
+    variant: (isLocationSet ? 'primary' : 'outline') as ButtonVariants['variant'],
   };
 });
 
