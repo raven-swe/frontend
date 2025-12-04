@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { useForm } from 'vee-validate';
-import type { buttonVariants } from '~~/shared/types/ui';
 import * as yup from 'yup';
 import FieldInput from '~/components/ui/form/FieldInput.vue';
 import { accountService } from '~/services/auth/accountService';
 import { accountSettingsService } from '~/services/settings/accountSettingsService';
 import getUsernameSchema from '~/schemas/username';
 import { useQuery } from '@tanstack/vue-query';
+import type { ButtonVariants } from '~/components/ui/button/variants';
 
 const props = defineProps<{
   open: boolean;
@@ -15,31 +15,37 @@ const props = defineProps<{
 const { t } = useI18n();
 const usernameSchemaBase = getUsernameSchema(t);
 
-const debouncedCheckUsername = useDebounceFn(async (username: string, ctx: yup.TestContext) => {
+const debouncedCheckUsername = useDebounceFn(async (username: string) => {
   if (!username) return false;
-
-  try {
-    const exists = await accountService.checkAccountExists(username);
-    return exists;
-  } catch (error) {
-    if (isApiError(error)) {
-      const code = error.data?.data?.error.code;
-      throw ctx.createError({
-        message: t(`errors.username.${code}`),
-      });
-    }
-    return false;
-  }
+  return await accountService.checkAccountExists(username);
 }, 300);
 
 const userStore = useUserStore();
 
 const usernameSchema = usernameSchemaBase.test(
   'uniqueUsername',
-  $t('errors.USERNAME_ALREADY_EXISTS'),
+  t('errors.USERNAME_ALREADY_EXISTS'),
   async (username, ctx) => {
-    const check = await debouncedCheckUsername(username, ctx);
-    return !check || username.toLowerCase() === userStore.user.username?.toLowerCase();
+    if (!username) return false;
+
+    const current = userStore.user.username?.toLowerCase();
+    const normalized = username.toLowerCase();
+    if (normalized === current) return true;
+
+    try {
+      const exists = await debouncedCheckUsername(username);
+      return !exists;
+    } catch (error) {
+      if (isApiError(error)) {
+        const code = error.data?.data?.error?.code;
+        return ctx.createError({
+          message: t(`errors.username.${code}`),
+        });
+      }
+      return ctx.createError({
+        message: t('errors.UNKNOWN_ERROR'),
+      });
+    }
   },
 );
 
@@ -86,7 +92,7 @@ const actionButton = computed(() => {
   const isUsernameSet = values.username.trim().length > 0;
   return {
     text: isUsernameSet ? $t('ui.next') : $t('ui.skip-for-now'),
-    variant: (isUsernameSet ? 'primary' : 'outline') as buttonVariants,
+    variant: (isUsernameSet ? 'primary' : 'outline') as ButtonVariants['variant'],
   };
 });
 </script>
