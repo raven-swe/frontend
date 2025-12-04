@@ -4,7 +4,7 @@ import { createI18n } from 'vue-i18n';
 import messages from '~~/i18n/locales/en.json';
 import QuoteDialog from '~/components/tweet/composer/QuoteTweetDialog.vue';
 import TweetComposer from '~/components/tweet/composer/TweetComposer.vue';
-import TweetDefaultCard from '~/components/tweet/TweetDefaultCard.vue';
+import TweetQuoteCard from '~/components/tweet/TweetQuoteCard.vue';
 import { useUserStore } from '@/stores/user';
 
 const i18n = createI18n({
@@ -58,7 +58,7 @@ describe('QuoteDialog', () => {
     expect(composer.props('type')).toBe('quote');
   });
 
-  it('renders TweetDefaultCard in reposted-tweet slot', async () => {
+  it('renders TweetQuoteCard in reposted-tweet slot', async () => {
     const wrapper = await mountSuspended(QuoteDialog, {
       props: {
         open: true,
@@ -69,7 +69,7 @@ describe('QuoteDialog', () => {
       },
     });
 
-    const card = wrapper.findComponent(TweetDefaultCard);
+    const card = wrapper.findComponent(TweetQuoteCard);
     expect(card.exists()).toBe(true);
     expect(card.props('tweet')).toEqual(mockquoteToTweet);
     expect(card.props('isPreview')).toBe(true);

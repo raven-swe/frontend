@@ -4,10 +4,9 @@ import Avatar from '~/components/ui/Avatar.vue';
 import type { Tweet } from '~~/shared/types/tweets';
 import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
+import TweetQuoteCard from './TweetQuoteCard.vue';
 interface Props {
   tweet: Tweet;
-  isPreview?: boolean;
-  sizeClass?: string;
 }
 const props = defineProps<Props>();
 const router = useRouter();
@@ -102,7 +101,6 @@ const contentSegments = computed<Segment[]>(() => {
 });
 
 function handleTweetClick() {
-  if (props.isPreview) return;
   router.push(`/profile/${props.tweet.author.username}/status/${props.tweet.id}`);
 }
 </script>
@@ -158,11 +156,13 @@ function handleTweetClick() {
       </p>
 
       <!-- Media (single image basic layout) -->
-      <TweetMedia :media="tweet.media" :size-class="props.sizeClass" />
+      <TweetMedia :media="tweet.media" />
+
+      <!-- Quoted Tweet -->
+      <TweetQuoteCard v-if="tweet.quotedTweet" :tweet="tweet.quotedTweet" />
 
       <!-- Actions -->
       <TweetActionButtons
-        v-if="!props.isPreview"
         :tweet="tweet"
         @click.stop
         @like-success="onLikeSuccess"
