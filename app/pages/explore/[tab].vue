@@ -45,7 +45,7 @@ watch(
 </script>
 
 <template>
-  <div class="border-border mx-auto mt-30 max-w-[700px]">
+  <div class="border-border mx-auto max-w-[700px]">
     <div v-if="isLoading" class="text-primary mt-50 flex shrink-0 items-center justify-center">
       <UiSpinner />
     </div>

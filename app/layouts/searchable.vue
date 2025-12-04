@@ -15,7 +15,7 @@ const goBack = () => {
 <template>
   <NuxtLayout name="default">
     <div
-      class="bg-background/60 fixed top-0 z-50 flex inline-flex h-30 w-full max-w-[598px] cursor-pointer flex-col items-center gap-2 rounded-b-md py-1 text-sm font-medium backdrop-blur-sm"
+      class="bg-background/60 sticky top-0 z-50 flex inline-flex h-30 w-full max-w-[598px] cursor-pointer flex-col items-center gap-2 rounded-b-md py-1 text-sm font-medium backdrop-blur-sm"
     >
       <div class="flex w-full">
         <UiButton v-if="!isExplore" variant="icon" size="icon" @click="goBack">

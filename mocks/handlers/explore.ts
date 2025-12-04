@@ -68,10 +68,10 @@ export const handlers = [
   // GET /explore/for-you
   http.get(`${API_URL}/explore/for-you`, () => {
     const mixedHashtags = [
-      ...categorizedHashtags.trending.slice(0, 3),
-      ...categorizedHashtags.news.slice(0, 3),
-      ...categorizedHashtags.sports.slice(0, 2),
-      ...categorizedHashtags.entertainment.slice(0, 2),
+      ...categorizedHashtags.trending.slice(0, 2),
+      ...categorizedHashtags.news.slice(0, 1),
+      ...categorizedHashtags.sports.slice(0, 1),
+      ...categorizedHashtags.entertainment.slice(0, 1),
     ];
     return HttpResponse.json(
       {

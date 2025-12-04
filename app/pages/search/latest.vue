@@ -110,7 +110,7 @@ onServerPrefetch(async () => {
 </script>
 
 <template>
-  <div class="border-border mx-auto mt-30 max-w-[700px]">
+  <div class="border-border mx-auto max-w-[700px]">
     <div v-if="tweets.length === 0 && !isLoading" class="p-20 break-words">
       <p class="text-foreground text-3xl font-bold">
         {{ $t('search.no-results', { query: searchQuery }) }}
