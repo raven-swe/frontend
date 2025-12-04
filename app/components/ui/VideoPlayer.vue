@@ -17,7 +17,7 @@ const props = defineProps<Props>();
       autoplay: false,
       preload: 'metadata',
       responsive: true,
-      fluid: false,
+      fluid: true,
       poster: props.poster,
       controlBar: { autoHide: false },
       sources: [

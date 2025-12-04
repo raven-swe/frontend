@@ -9,12 +9,17 @@ interface Props {
 const props = defineProps<Props>();
 const media = ref(props.media || []);
 const compact = computed(() => props.compact === true);
+
+// Size class for single media (taller)
+const singleSizeClass = computed(() => (compact.value ? 'max-h-[250px]' : 'max-h-[500px]'));
+// Size class for multi-image grids
+const sizeClass = computed(() => (compact.value ? 'max-h-[200px]' : 'max-h-[400px]'));
 </script>
 
 <template>
   <div :class="[compact ? 'w-full max-w-[300px]' : 'w-full', 'pt-2']">
     <!-- 1 media -->
-    <div v-if="media.length === 1" class="grid overflow-hidden rounded-xl">
+    <div v-if="media.length === 1" :class="['grid overflow-hidden rounded-xl', singleSizeClass]">
       <MediaItem :media="media[0]!" :compact="compact" />
     </div>
 
@@ -37,7 +42,9 @@ const compact = computed(() => props.compact === true);
         sizeClass,
       ]"
     >
-      <div class="col-span-1 row-span-2"><MediaItem :media="media[0]!" :compact="compact" /></div>
+      <div class="col-span-1 row-span-2 flex items-center justify-center">
+        <MediaItem :media="media[0]!" :compact="compact" />
+      </div>
       <MediaItem :media="media[1]!" :compact="compact" />
       <MediaItem :media="media[2]!" :compact="compact" />
     </div>
