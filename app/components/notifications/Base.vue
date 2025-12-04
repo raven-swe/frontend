@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ActorSummary } from '~~/shared/types/notifications';
+import { relativeTime } from '@/utils/time';
 
 const props = defineProps<{
   message: string;
@@ -9,6 +10,8 @@ const props = defineProps<{
   linkTo: string;
   isSeen?: boolean;
 }>();
+
+const relativeTimestamp = computed(() => relativeTime(props.timestamp));
 
 // Don't forget to listen to these events somewhere
 defineEmits<{
@@ -22,7 +25,7 @@ defineEmits<{
       class="border-muted-foreground/20 hover:bg-muted-foreground/10 border-[0.5px] p-4 transition-colors hover:cursor-pointer"
       :class="{ 'bg-primary/10': !props.isSeen }"
     >
-      <div class="flex items-start gap-3">
+      <div class="flex items-start gap-4">
         <div v-if="icon" class="mt-1 flex-shrink-0">
           <Icon :name="icon.name" size="1.7rem" :class="icon.color" />
         </div>
@@ -43,7 +46,7 @@ defineEmits<{
                 />
               </UserHoverCard>
             </div>
-            <span class="text-muted-foreground flex-shrink-0 text-sm">{{ timestamp }}</span>
+            <span class="text-muted-foreground flex-shrink-0 text-sm">{{ relativeTimestamp }}</span>
           </div>
 
           <!-- username + message + tweet content -->

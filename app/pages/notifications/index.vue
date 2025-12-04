@@ -8,7 +8,7 @@ import type {
   Notification,
   ActorSummary,
   ActorSummaryContainer,
-} from '~/shared/types/notifications';
+} from '~~/shared/types/notifications';
 
 definePageMeta({
   layout: 'notifications',
@@ -21,7 +21,7 @@ onMounted(async () => {
   notifications.value = (data as Notification[]) || [];
 });
 
-function getPrimaryActor(actorSummary?: ActorSummaryContainer): ActorSummary {
+function getPrimaryActor(actorSummary?: ActorSummaryContainer | null): ActorSummary {
   return (
     actorSummary?.previewActors?.[0] ?? {
       username: 'unknown',
@@ -55,7 +55,7 @@ function componentForType(type: string) {
     <div v-for="notif in notifications" :key="notif.id">
       <component
         :is="componentForType(notif.type)"
-        :timestamp="notif.latestEventAt"
+        :timestamp="notif.latestEventAt ?? ''"
         :actor="getPrimaryActor(notif.actorSummary)"
         :is-seen="notif.isSeen"
         :tweet="notif.tweetSummary?.primaryTweet"

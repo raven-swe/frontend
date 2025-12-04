@@ -3,28 +3,6 @@
   "message": "Notifications retrieved successfully",
   "data": [
     {
-      "id": "notif_follow_001",
-      "type": "FOLLOW",
-      "actorSummary": {
-        "previewActors": [
-          {
-            "username": "notnowomar",
-            "displayName": "omar",
-            "avatarUrl": "https://cdn.raven.cmp27.space/avatars/bd58c5b1-9cf8-4b82-9f71-fd373307467d.jpeg"
-          },
-          {
-            "username": "ahmed_sobhy",
-            "displayName": "Ahmed Sobhy",
-            "avatarUrl": "https://cdn.raven.cmp27.space/default_avatar.png"
-          }
-        ],
-        "totalCount": 2
-      },
-      "tweetSummary": null,
-      "latestEventAt": "2025-12-03T18:45:22.123Z",
-      "isSeen": false
-    },
-    {
       "id": "notif_follow_002",
       "type": "FOLLOW",
       "actorSummary": {
@@ -142,6 +120,28 @@
       "isSeen": true
     },
     {
+      "id": "notif_follow_001",
+      "type": "FOLLOW",
+      "actorSummary": {
+        "previewActors": [
+          {
+            "username": "notnowomar",
+            "displayName": "omar",
+            "avatarUrl": "https://cdn.raven.cmp27.space/avatars/bd58c5b1-9cf8-4b82-9f71-fd373307467d.jpeg"
+          },
+          {
+            "username": "ahmed_sobhy",
+            "displayName": "Ahmed Sobhy",
+            "avatarUrl": "https://cdn.raven.cmp27.space/default_avatar.png"
+          }
+        ],
+        "totalCount": 2
+      },
+      "tweetSummary": null,
+      "latestEventAt": "2025-12-03T18:45:22.123Z",
+      "isSeen": false
+    },
+    {
       "id": "notif_retweet_001",
       "type": "RETWEET",
       "actorSummary": {
@@ -165,7 +165,7 @@
             "isFollowing": false,
             "isMuted": false
           },
-          "content": "a test to see whether farag implemented \"see more\" in the tweet view.\nI\ndon't \nthink\nso\noh\nI \nwish\nI\nam\nwrong\nwhat\nis \nthe \nlimit\nanyways\n?",
+          "content": "I can use some sleep, but this is fun idk",
           "createdAt": "2025-12-04T00:43:14.268Z",
           "replyCount": 0,
           "retweetCount": 1,
