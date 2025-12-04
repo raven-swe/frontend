@@ -37,16 +37,12 @@ const { mutate: muteUser } = useMuteMutation();
 
 //  Virtualization setup
 const parentRef = ref<HTMLElement | null>(null);
-const parentOffsetRef = ref(0);
-onMounted(() => {
-  parentOffsetRef.value = parentRef.value?.offsetTop ?? 0;
-});
 
 const rowVirtualizerOptions = computed(() => {
   return {
     count: hasNextPage ? users.value.length + 1 : users.value.length,
     estimateSize: () => 95.95, // Approximate height of UserRow component with one line of bio
-    overscan: 2,
+    overscan: 3,
     getItemKey: (index: number) => users.value[index]?.username || index,
     getScrollElement: () => parentRef.value,
   };
@@ -58,8 +54,10 @@ const totalSize = computed(() => rowVirtualizer.value.getTotalSize());
 
 const measureElement = (el: Element | ComponentPublicInstance | null) => {
   if (!el) return;
-  const element = 'nodeType' in el ? (el as HTMLElement) : (el as ComponentPublicInstance).$el;
-  rowVirtualizer.value.measureElement(element);
+  nextTick(() => {
+    const element = 'nodeType' in el ? (el as HTMLElement) : (el as ComponentPublicInstance).$el;
+    rowVirtualizer.value.measureElement(element);
+  });
 };
 
 watchEffect(() => {
@@ -94,7 +92,11 @@ const hasFollowedAtLeastOne = computed(() => {
       </UiDialogHeader>
       <UiSpinner v-if="isLoading" class="mx-20" />
       <ClientOnly>
-        <div v-if="users && users.length !== 0" ref="parentRef" class="mb-4 w-full overflow-y-auto">
+        <div
+          v-if="users && users.length !== 0"
+          ref="parentRef"
+          class="mb-4 w-full flex-1 overflow-y-auto contain-strict"
+        >
           <div
             :style="{
               height: `${totalSize}px`,
@@ -108,9 +110,7 @@ const hasFollowedAtLeastOne = computed(() => {
                 top: 0,
                 left: 0,
                 width: '100%',
-                transform: `translateY(${
-                  virtualRows[0] ? virtualRows[0].start - rowVirtualizer.options.scrollMargin : 0
-                }px)`,
+                transform: `translateY(${virtualRows[0]?.start ?? 0}px)`,
               }"
             >
               <div

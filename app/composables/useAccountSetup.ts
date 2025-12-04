@@ -9,7 +9,7 @@ export default function useAccountSetup() {
   const { updateProfilePicture } = updateProfileService();
 
   const start = () => {
-    setupStep.value = 'interests';
+    setupStep.value = 'profile-picture';
   };
 
   const isOpen = computed(() => setupStep.value !== null);
