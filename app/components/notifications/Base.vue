@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import type { NotificationType, ActorSummary } from '~~/shared/types/notifications';
+import type { ActorSummary } from '~~/shared/types/notifications';
 
 const props = defineProps<{
-  type: NotificationType;
   message: string;
   timestamp: string;
   icon?: { name: string; color?: string };

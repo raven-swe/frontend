@@ -21,7 +21,6 @@ const message = $t('notifications.message.like');
 
 <template>
   <NotificationsBase
-    :type="'LIKE'"
     :message="message"
     :timestamp="props.timestamp"
     :icon="icon"

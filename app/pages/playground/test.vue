@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import type { NotificationType, ActorSummary } from '~~/shared/types/notifications';
+import type { ActorSummary } from '~~/shared/types/notifications';
 import Base from '~/components/notifications/Base.vue';
 import { ref } from 'vue';
 
 const notifications = ref<
   Array<{
-    type: NotificationType;
     message: string;
     timestamp: string;
     icon: { name: string; color?: string };
@@ -14,7 +13,6 @@ const notifications = ref<
   }>
 >([
   {
-    type: 'LIKE',
     message: 'liked your tweet',
     timestamp: '2h ago',
     icon: { name: 'lucide:heart', color: 'text-brand-red' },
@@ -26,7 +24,6 @@ const notifications = ref<
     isSeen: true,
   },
   {
-    type: 'FOLLOW',
     message: 'started following you',
     timestamp: '5h ago',
     icon: { name: 'lucide:user-plus', color: 'text-brand-blue' },
@@ -46,7 +43,6 @@ const notifications = ref<
       <Base
         v-for="(notification, index) in notifications"
         :key="index"
-        :type="notification.type"
         :message="notification.message"
         :timestamp="notification.timestamp"
         :icon="notification.icon"
