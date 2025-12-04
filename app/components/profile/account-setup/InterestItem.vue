@@ -12,9 +12,14 @@ const handleClick = () => {
 </script>
 
 <template>
-  <div
+  <button
+    type="button"
     :data-active="props.isActive ? 'true' : 'false'"
-    class="border-border hover:bg-accent data-[active=true]:border-primary data-[active=true]:bg-primary relative flex aspect-[4/3] cursor-pointer items-end justify-between rounded-2xl border-2 p-3 text-center text-lg font-bold select-none"
+    class="border-border focus-visible:bg-foreground/10 focus-visible:ring-ring hover:bg-accent relative flex aspect-[4/3] cursor-pointer items-end justify-between rounded-2xl border-2 p-3 text-center text-lg font-bold transition-[box-shadow] outline-none select-none focus-visible:ring-[2px]"
+    :class="{
+      'border-primary bg-primary hover:bg-primary focus-visible:ring-primary focus-visible:bg-primary':
+        props.isActive,
+    }"
     @click="handleClick"
   >
     <p class="items-end justify-start">
@@ -26,5 +31,5 @@ const handleClick = () => {
       name="lets-icons:check-fill"
       class="text-foreground absolute end-3 top-3"
     />
-  </div>
+  </button>
 </template>
