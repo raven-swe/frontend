@@ -1,18 +1,42 @@
 <script lang="ts" setup>
-const whatHappeningItems = [
-  {
-    title: 'Football',
-    count: '18.8k',
+import { exploreService } from '~/services/explore/exploreService';
+import type { TrendingHashtag } from '~~/shared/types/hashtag';
+import Hashtag from '~/components/explore/Hashtag.vue';
+import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
+
+const trendingHashtags = ref<TrendingHashtag[]>([]);
+const isLoading = ref(false);
+const router = useRouter();
+const showWhatIsHappening = ref(true);
+
+const loadHashtags = async () => {
+  isLoading.value = true;
+  try {
+    const response = await exploreService.getExploreTab('for-you');
+    trendingHashtags.value = response.data.trendingHashtags;
+  } catch (error) {
+    console.error('Failed to load trending hashtags:', error);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const goToExplore = () => {
+  router.push({ name: 'explore', params: { tab: 'for-you' } });
+};
+
+watch(
+  () => router.currentRoute.value.path,
+  (newPath) => {
+    showWhatIsHappening.value = !newPath.includes('explore');
   },
-  {
-    title: '#CodingIsFun',
-    count: '8.8k',
-  },
-  {
-    title: '#VueJS',
-    count: '1.8k',
-  },
-];
+  { immediate: true },
+);
+
+onMounted(() => {
+  loadHashtags();
+});
 
 const whoToFollowItems = [
   {
@@ -45,22 +69,26 @@ const whoToFollowItems = [
 
 <template>
   <div class="ms-4">
-    <!-- preview Card -->
-    <SideBarRightPreviewCard :title="$t('rightsidebar.whats-happening.title')">
-      <div>
-        <SideBarRightPreviewCardItem
-          v-for="(happingItem, index) in whatHappeningItems"
-          :key="index"
-        >
-          <h2 class="text-md text-foreground font-bold">
-            {{ happingItem.title }}
-          </h2>
-          <p class="text-muted-foreground text-sm">
-            {{ happingItem.count }} {{ $t('rightsidebar.whats-happening.tweets') }}
-          </p>
-        </SideBarRightPreviewCardItem>
+    <div v-if="showWhatIsHappening">
+      <div class="bg-background/60 sticky top-0 z-50 backdrop-blur-sm">
+        <UiSearchField />
       </div>
-    </SideBarRightPreviewCard>
+      <!-- What is happening -->
+      <SideBarRightPreviewCard :title="$t('rightsidebar.whats-happening.title')">
+        <div v-if="isLoading" class="text-primary mt-10 flex shrink-0 items-center justify-center">
+          <UiSpinner />
+        </div>
+        <Hashtag
+          v-for="hashtag in trendingHashtags"
+          v-else
+          :key="hashtag.hashtag"
+          :hashtag="hashtag"
+        />
+        <UiButton variant="ghost-primary" size="sm" @click="goToExplore">
+          {{ $t('rightsidebar.show-more') }}
+        </UiButton>
+      </SideBarRightPreviewCard>
+    </div>
     <!-- Who to follow -->
     <SideBarRightPreviewCard :title="$t('rightsidebar.who-to-follow.title')">
       <SideBarRightPreviewCardItem
