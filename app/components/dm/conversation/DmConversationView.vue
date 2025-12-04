@@ -17,6 +17,8 @@ const {
   error: conversationsError,
 } = useDmConversations();
 
+console.log('Conversations:', conversations.value);
+
 const conversation = computed<DmConversation | null>(() => {
   if (!conversationId.value) return null;
   return conversations.value?.find((c) => c.id === conversationId.value) || null;
@@ -26,7 +28,11 @@ const {
   messages: initialMessages,
   loading: messagesLoading,
   error: messagesError,
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage,
 } = useDmMessages(() => conversationId.value);
+console.log('messages', initialMessages.value);
 
 const ws = useDmSocketIO();
 provide('dmSocket', ws);
@@ -34,25 +40,9 @@ const liveMessages = ref<DmMessage[]>([]);
 
 const messages = computed(() => {
   const initial = initialMessages.value || [];
-  return [...liveMessages.value, ...initial];
+  // Add live messages at the END (bottom) so they appear as newest
+  return [...initial, ...liveMessages.value];
 });
-
-const messagesContainer = ref<HTMLElement | null>(null);
-
-function autoScroll() {
-  const el = messagesContainer.value;
-  if (!el) return;
-
-  const threshold = 200;
-
-  const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
-
-  if (isNearBottom) {
-    requestAnimationFrame(() => {
-      el.scrollTop = el.scrollHeight;
-    });
-  }
-}
 
 watch(
   conversationId,
@@ -80,45 +70,17 @@ watch(
       };
 
       checkConnection();
-      // Force scroll to bottom when switching conversations
-      nextTick(() => {
-        const el = messagesContainer.value;
-        if (el) {
-          requestAnimationFrame(() => {
-            el.scrollTop = el.scrollHeight;
-          });
-        }
-      });
     }
   },
   { immediate: true },
 );
 
-// Scroll to bottom when messages load or change
-watch(messages, () => {
-  nextTick(() => autoScroll());
-});
-
-// Force scroll to bottom when messages finish loading initially
-watch(messagesLoading, (isLoading, wasLoading) => {
-  if (wasLoading && !isLoading) {
-    // Messages just finished loading
-    nextTick(() => {
-      const el = messagesContainer.value;
-      if (el) {
-        requestAnimationFrame(() => {
-          el.scrollTop = el.scrollHeight;
-        });
-      }
-    });
-  }
-});
-
 // Handle incoming Socket messages
 onMounted(() => {
   ws.onMessage((message) => {
     if (conversationId.value && message) {
-      liveMessages.value.unshift(message);
+      // Push new messages to the end (bottom of chat)
+      liveMessages.value.push(message);
     }
   });
 
@@ -136,15 +98,22 @@ watch(conversationsError, (val) => val && showToaster('error', 'Failed to load c
       :username="conversation?.participant.username || conversationId"
       :avatar-url="conversation?.participant.avatarUrl || ''"
     />
-    <div ref="messagesContainer" class="flex-1 overflow-y-auto p-4">
-      <DmConversationInfo :conversation="conversation || null" />
+    <div class="flex flex-1 flex-col overflow-hidden">
+      <DmConversationInfo :conversation="conversation || null" class="px-4 pt-4" />
       <div
         v-if="conversationsLoading || messagesLoading"
-        class="flex items-center justify-center p-4"
+        class="flex flex-1 items-center justify-center p-4"
       >
         <Spinner size="1.5rem" />
       </div>
-      <DmMessagesList v-else :messages="messages || []" />
+      <DmMessagesList
+        v-else
+        class="flex-1 px-4 pb-4"
+        :messages="messages || []"
+        :has-next-page="hasNextPage || false"
+        :is-fetching-next-page="isFetchingNextPage || false"
+        :on-load-more="fetchNextPage"
+      />
     </div>
     <DmConversationDmMessageInput />
   </div>
