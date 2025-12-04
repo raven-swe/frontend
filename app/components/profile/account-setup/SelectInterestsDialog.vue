@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { useFieldArray, useForm } from 'vee-validate';
 import * as yup from 'yup';
-import { accountSettingsService } from '~/services/settings/accountSettingsService';
+import { settingsService } from '~/services/settingsService';
 import InterestItem from './InterestItem.vue';
 
 const props = defineProps<{
@@ -26,7 +26,7 @@ const { fields, push, remove } = useFieldArray<string>('interests');
 
 const { data: suggestionData } = useAsyncData(
   'available-interests',
-  async () => await accountSettingsService.getInterests(),
+  async () => await settingsService.getInterests(),
 );
 
 const { handleInterestsSubmit } = useAccountSetup();
@@ -65,10 +65,10 @@ const isInterestActive = (interestId: string) => {
         <div class="grid grid-cols-2 justify-center gap-4 overflow-y-auto px-4 py-2 sm:grid-cols-3">
           <InterestItem
             v-for="interest in suggestionData?.data"
-            :key="interest.id"
+            :key="interest.code"
             :interest="$t(`profile.account-setup.interests.${interest.code}`)"
-            :is-active="isInterestActive(interest.id)"
-            @toggle-interest="handleToggleInterest(interest.id)"
+            :is-active="isInterestActive(interest.code)"
+            @toggle-interest="handleToggleInterest(interest.code)"
           />
         </div>
         <UiDialogFooter

@@ -2,7 +2,7 @@
 import { useInfiniteQuery } from '@tanstack/vue-query';
 import { useVirtualizer } from '@tanstack/vue-virtual';
 import useAccountSetup from '~/composables/useAccountSetup';
-import { accountSettingsService } from '~/services/settings/accountSettingsService';
+import { settingsService } from '~/services/settingsService';
 
 const props = defineProps<{
   open: boolean;
@@ -21,7 +21,7 @@ const {
   queryKey,
   initialPageParam: null as string | null,
   queryFn: async ({ signal, pageParam }) =>
-    await accountSettingsService.getFollowSuggestions({
+    await settingsService.getFollowSuggestions({
       cursor: pageParam,
       signal,
     }),

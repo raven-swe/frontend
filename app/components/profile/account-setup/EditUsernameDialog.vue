@@ -3,7 +3,7 @@ import { useForm } from 'vee-validate';
 import * as yup from 'yup';
 import FieldInput from '~/components/ui/form/FieldInput.vue';
 import { accountService } from '~/services/auth/accountService';
-import { accountSettingsService } from '~/services/settings/accountSettingsService';
+import { settingsService } from '~/services/settingsService';
 import getUsernameSchema from '~/schemas/username';
 import { useQuery } from '@tanstack/vue-query';
 import type { ButtonVariants } from '~/components/ui/button/variants';
@@ -66,7 +66,7 @@ const usernameQueryKey = useDebounce(
 const { data: suggestions, isLoading } = useQuery({
   queryKey: usernameQueryKey,
   queryFn: async () => {
-    const response = await accountSettingsService.getUsernameSuggestions(values.username);
+    const response = await settingsService.getUsernameSuggestions(values.username);
     return response.data.suggestions ?? [];
   },
   enabled: computed(() => !!values.username && isFieldValid('username')),

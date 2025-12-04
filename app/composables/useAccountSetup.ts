@@ -1,5 +1,5 @@
 import { updateProfileService } from '~/services/profile/updateProfileService';
-import { accountSettingsService } from '~/services/settings/accountSettingsService';
+import { settingsService } from '~/services/settingsService';
 
 export default function useAccountSetup() {
   const setupStep = useState<'profile-picture' | 'username' | 'interests' | 'follow-user' | null>(
@@ -9,7 +9,7 @@ export default function useAccountSetup() {
   const { updateProfilePicture } = updateProfileService();
 
   const start = () => {
-    setupStep.value = 'profile-picture';
+    setupStep.value = 'interests';
   };
 
   const isOpen = computed(() => setupStep.value !== null);
@@ -46,7 +46,7 @@ export default function useAccountSetup() {
 
   async function handleUsernameSubmit(username: string) {
     try {
-      await accountSettingsService.updateUsername(username);
+      await settingsService.updateUsername(username);
       goToNextStep();
     } catch (error) {
       if (isApiValidationError(error)) {
@@ -64,7 +64,7 @@ export default function useAccountSetup() {
 
   async function handleInterestsSubmit(interests: string[]) {
     try {
-      await accountSettingsService.updateInterests(interests);
+      await settingsService.updateInterests(interests);
       goToNextStep();
     } catch (error) {
       if (isApiValidationError(error)) {
