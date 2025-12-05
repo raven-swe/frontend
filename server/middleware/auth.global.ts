@@ -21,6 +21,7 @@ export default defineEventHandler(async (event) => {
       },
     );
     setAuthCookies(event, response);
+    if (event.node.req.url === '/') sendRedirect(event, '/home', 302);
   } catch {
     deleteCookie(event, 'refreshToken');
     deleteCookie(event, 'access_token');

@@ -1,100 +1,111 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, defineEmits, toRef } from 'vue';
 import { useUserStore } from '@/stores/user';
 import TweetEditor from './TweetEditor.vue';
 import Toolbar from './Toolbar.vue';
 import MediaSlideshow from './MediaSlideshow.vue';
 import type { MediaItem } from '~~/shared/types/shared';
+import type { Tweet } from '~~/shared/types/tweets';
+import Avatar from '~/components/ui/Avatar.vue';
+import { useTweetComposer } from '~/composables/useTweetComposer';
+
+interface Props {
+  replyToTweetId?: string | null;
+  quoteToTweetId?: string | null;
+  type?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  type: 'default',
+  replyToTweetId: null,
+  quoteToTweetId: null,
+});
 
 const tweetContent = ref('');
 const tweetEditorRef = ref<InstanceType<typeof TweetEditor> | null>(null);
 const userStore = useUserStore();
 const media = ref<MediaItem[]>([]);
 
-const MAX_LENGTH = 280;
-const MAX_MEDIA = 4;
+const replyToRef = toRef(props, 'replyToTweetId');
+const quoteToRef = toRef(props, 'quoteToTweetId');
+const {
+  isPosting,
+  MAX_LENGTH,
+  MAX_MEDIA,
+  characterCount,
+  isOverLimit,
+  loadingMessage,
+  handlePost,
+  handleAddMedia,
+  handleRemoveMedia,
+} = useTweetComposer(tweetContent, media, replyToRef, quoteToRef);
 
-const characterCount = computed(() => tweetContent.value.length);
-const isOverLimit = computed(() => characterCount.value > MAX_LENGTH);
+const emit = defineEmits<{
+  (e: 'posted', tweet: Tweet): void;
+}>();
 
-const handlePost = () => {
-  if (tweetContent.value.trim() && !isOverLimit.value) {
-    // Extract files from media items
-    const files = media.value.map((item) => item.file);
+const handlePostWrapper = async () => {
+  const newTweet = await handlePost();
+  if (!newTweet) return;
 
-    // eslint-disable-next-line no-console
-    console.log({
-      content: tweetContent.value,
-      media: files,
-    });
+  emit('posted', newTweet);
 
-    // Clean up blob URLs
-    media.value.forEach((item) => URL.revokeObjectURL(item.url));
-    tweetContent.value = '';
-    media.value = [];
-    tweetEditorRef.value?.resetHeight();
-  }
-};
-
-const handleAddMedia = (files: File[]) => {
-  files.forEach((file) => {
-    if (media.value.length === MAX_MEDIA) return;
-
-    const url = URL.createObjectURL(file);
-    const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
-    media.value.push({
-      id,
-      file,
-      url, // for display
-      type: 'image',
-    });
-  });
-};
-
-const handleRemoveMedia = (id: string) => {
-  const index = media.value.findIndex((m) => m.id === id);
-
-  if (index !== -1 && index < media.value.length && media.value[index]) {
-    // Revoke the blob URL to free memory
-    URL.revokeObjectURL(media.value[index].url);
-    media.value.splice(index, 1);
-  }
+  // Cleanup
+  media.value.forEach((item) => URL.revokeObjectURL(item.url));
+  tweetContent.value = '';
+  media.value = [];
+  tweetEditorRef.value?.resetHeight();
 };
 </script>
 
 <template>
-  <div class="bg-background border-border max-w-[598px] rounded-lg border p-4">
+  <div class="bg-background relative max-w-[598px] p-4 pb-15">
     <div class="mb-3 flex gap-3">
       <div class="flex-shrink-0">
-        <img
-          :src="userStore.user?.avatarUrl"
+        <Avatar
+          :img="userStore.user?.avatarUrl"
           :alt="$t('tweet.composer.profile-alt', { name: userStore.user?.username || '' })"
-          class="h-12 w-12 rounded-full object-cover"
+          :size="'sm'"
+          variant="primary"
         />
       </div>
       <TweetEditor
         ref="tweetEditorRef"
         v-model="tweetContent"
-        :placeholder="$t('tweet.composer.placeholder')"
+        :placeholder="$t('tweet.composer.placeholder.' + props.type)"
         :max-length="MAX_LENGTH"
         @paste-media="handleAddMedia"
       />
     </div>
 
-    <MediaSlideshow :media="media" :max-media="MAX_MEDIA" @remove="handleRemoveMedia" />
+    <MediaSlideshow
+      :media="media"
+      :max-media="MAX_MEDIA"
+      :composer-type="type"
+      @remove="handleRemoveMedia"
+    />
 
     <slot name="reposted-tweet" />
 
-    <Toolbar
-      :disabled="!tweetContent.trim() && media.length === 0"
-      :character-count="characterCount"
-      :max-length="MAX_LENGTH"
-      :is-over-limit="isOverLimit"
-      :has-media="media.length > 0"
-      :can-add-media="media.length < MAX_MEDIA"
-      @post="handlePost"
-      @add-media="handleAddMedia"
-    />
+    <div class="bg-background absolute start-0 end-0 bottom-0 p-2">
+      <div v-if="isPosting" class="text-muted-foreground mb-2 flex items-center gap-2 text-sm">
+        <UiSpinner class="h-4 w-4" />
+        <span>{{ loadingMessage }}</span>
+      </div>
+
+      <Toolbar
+        :disabled="!tweetContent.trim() && media.length === 0"
+        :character-count="characterCount"
+        :max-length="MAX_LENGTH"
+        :is-over-limit="isOverLimit"
+        :has-media="media.length > 0"
+        :can-add-media="media.length < MAX_MEDIA"
+        :button-text="$t('tweet.composer.button.' + props.type)"
+        :is-posting="isPosting"
+        :composer-type="type"
+        @post="handlePostWrapper"
+        @add-media="handleAddMedia"
+      />
+    </div>
   </div>
 </template>

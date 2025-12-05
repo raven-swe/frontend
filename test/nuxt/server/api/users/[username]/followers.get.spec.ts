@@ -16,21 +16,49 @@ describe('GET /api/users/[username]/followers', () => {
   it('returns user followers data for valid username', async () => {
     const mockResponse = {
       success: true,
-      data: [{ username: 'janedoe', fullName: 'Jane Doe' }],
+      data: [
+        {
+          username: 'janedoe',
+          fullName: 'Jane Doe',
+          isFollowing: false,
+          followsYou: false,
+          isBlocked: false,
+        },
+      ],
     };
     mockServerApiFetch.mockResolvedValueOnce(mockResponse);
 
     const event = createMockH3Event({
       method: 'GET',
       params: { username: 'johndoe' },
+      query: {
+        cursor: 'abc123',
+        limit: '10',
+      },
     });
 
     const response = await followersGetEventHandler(event);
 
     expect(mockServerApiFetch).toHaveBeenCalledWith('/users/johndoe/followers', {
       method: 'GET',
+      query: { cursor: 'abc123', limit: '10' },
     });
-    expect(response).toEqual(mockResponse);
+    expect(response).toMatchObject({
+      ...mockResponse,
+      data: [
+        {
+          username: 'janedoe',
+          fullName: 'Jane Doe',
+          relationship: {
+            blocking: false,
+            blockedBy: false,
+            muted: false,
+            following: false,
+            follower: false,
+          },
+        },
+      ],
+    });
   });
 
   it('throws error for invalid username parameter', async () => {

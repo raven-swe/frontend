@@ -90,6 +90,33 @@
         "title": "{'@'}{username} has blocked you",
         "description": "You can view public posts from {'@'}{username}, but you are blocked from engaging with them. You also cannot follow or message {'@'}{username}."
       }
+    },
+    "following": {
+      "title": "Following",
+      "messages": {
+        "empty": {
+          "title": "Be in the know",
+          "description": "Following accounts is an easy way to curate your timeline and know what's happening with the topics and people you're interested in."
+        }
+      }
+    },
+    "followers": {
+      "title": "Followers",
+      "messages": {
+        "empty": {
+          "title": "Looking for followers?",
+          "description": "When someone follows this account, they'll show up here. Posting and interacting with others helps boost followers."
+        }
+      }
+    },
+    "followers-you-follow": {
+      "title": "Followers you follow",
+      "messages": {
+        "empty": {
+          "title": "{'@'}{username} doesn't have any followers you know yet",
+          "description": "When someone you know follows them, they'll be listed here."
+        }
+      }
     }
   },
   "home": {
@@ -141,11 +168,35 @@
   },
   "tweet": {
     "composer": {
-      "placeholder": "What's happening?",
+      "placeholder": {
+        "default": "What's happening?",
+        "reply": "Post your reply",
+        "quote": "Add a comment"
+      },
+      "button": {
+        "default": "Post",
+        "reply": "Reply",
+        "quote": "Post"
+      },
       "media": "Media",
       "gif": "GIF",
       "emoji": "Emoji",
-      "profile-alt": "Avatar of {name}"
+      "profile-alt": "Avatar of {name}",
+      "loading": {
+        "uploading": "Uploading media... {progress}%",
+        "posting": "Posting tweet..."
+      }
+    },
+    "no-replies": "No replies yet",
+    "upload-limit-image": "Image {file} size exceeds the maximum limit of {size} MB.",
+    "upload-limit-video": "Video {file} size exceeds the maximum limit of {size} MB.",
+    "actions": {
+      "repost": "Repost",
+      "unrepost": "Undo repost",
+      "quote": "Quote",
+      "reply": "Reply",
+      "like": "Like",
+      "unlike": "Unlike"
     }
   },
   "ui": {
@@ -157,14 +208,25 @@
     "cancel": "Cancel",
     "discard": "Discard",
     "post": "Post",
+    "reply": "Reply",
     "follow": "Follow",
     "unfollow": "Unfollow",
     "following": "Following",
     "follow-back": "Follow back",
+    "follows-you": "Follows you",
     "mute": "Mute",
     "block": "Block",
     "unmute": "Unmute",
-    "unblock": "Unblock"
+    "unblock": "Unblock",
+    "blocking": "Blocked",
+    "search": {
+      "searchbar": {
+        "placeholder": "Search"
+      },
+      "search-list": {
+        "placeholder": "Try searching for people, lists, or keywords"
+      }
+    }
   },
   "errors": {
     "INVALID_EMAIL": "Please enter a valid email.",
@@ -186,6 +248,8 @@
     "RECAPTCHA_REQUIRED": "Please complete the reCAPTCHA challenge",
     "ACCOUNT_NOT_FOUND": "This account doesn't \nexist",
     "TRY_SEARCHING": "Try searching for another one",
+    "TWEET_NOT_FOUND": "Sorry, this tweet \ndoesn't exist",
+    "GO_BACK_HOME": "Go back home",
     "OTP_RESEND_LIMIT_EXCEEDED": "OTP resend limit reached. Please try again in {seconds}.",
     "otp": {
       "INVALID_TOKEN": "The OTP you entered is invalid",
@@ -217,7 +281,8 @@
       "IS_EMPTY": "Please enter your password",
       "TOO_SHORT": "Password must be at least 10 characters long",
       "INVALID_FORMAT": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
-      "UNAUTHORIZED": "The password you entered is incorrect"
+      "UNAUTHORIZED": "The password you entered is incorrect",
+      "INVALID_PASSWORD": "You entered a wrong password"
     },
     "UNSUPPORTED-IMAGE-TYPE": "Only images of type {types} are supported.",
     "INVALID_WEBSITE_URL": "Please enter a real website URL",
@@ -239,6 +304,7 @@
     "username": {
       "RATE_LIMIT_EXCEEDED": "Too many requests. Please try again later."
     },
+    "RATE_LIMIT_EXCEEDED": "Too many requests. Please try again later.",
     "CANNOT_BLOCK_USER": "You cannot block this user.",
     "ALREADY_NOT_FOLLOWING": "You are already not following this user.",
     "ALREADY_FOLLOWING": "You are already following this user.",
@@ -298,6 +364,26 @@
     "failed-to-load-user": "Failed to load user data.",
     "back-button-icon": "material-symbols:arrow-back",
     "account-information": "Your account",
+    "privacy-settings": {
+      "title": "Privacy and safety",
+      "description": "Manage what information you see and share on Raven."
+    },
+    "mute-and-block": {
+      "title": "Mute and block",
+      "description": "Manage your muted and blocked accounts."
+    },
+    "muted": {
+      "title": "Muted accounts",
+      "description": "Here's everyone you muted. You can add or remove them from this list.",
+      "empty-title": "Muted accounts",
+      "empty-description": "Posts from muted accounts won't show up in your Home timeline. Mute accounts directly from their profile or post."
+    },
+    "blocked": {
+      "title": "Blocked accounts",
+      "description": "When you block someone, that person won't be able to follow or message you, and you won't see notifications from them.",
+      "empty-title": "Block unwanted accounts",
+      "empty-description": "When you block someone, they won't be able to follow or message you, and you won't see notifications from them."
+    },
     "account-information-details": "See information about your account, download an archive of your data, or learn about your account deactivation options.",
     "username": {
       "username-taken": "That username has been taken. Please choose another.",
@@ -412,6 +498,10 @@
       "error": "Failed to check user existence",
       "rateLimit": "You are making requests too frequently. Please try again later."
     },
+    "tweet-page": {
+      "tweet-load-error": "Failed to load the tweet. Please try again.",
+      "user-error": "Failed to load user data. Please try again."
+    },
     "verfyUser": {
       "error": "Failed to verify user"
     },
@@ -424,6 +514,9 @@
       "success": "Password reset successful",
       "error": "Failed to reset password"
     }
+  },
+  "icons": {
+    "back-button-icon": "material-symbols:arrow-back"
   },
   "hashtag": {
     "placeholder": {

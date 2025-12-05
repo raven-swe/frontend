@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import type { buttonVariants } from '~~/shared/types/ui';
-
+import type { ButtonVariants } from '@/components/ui/button/variants';
 const props = defineProps<{
   open: boolean;
 }>();
@@ -17,7 +16,7 @@ const actionButton = computed(() => {
   const isBioSet = bio.value.trim().length > 0;
   return {
     text: isBioSet ? $t('ui.next') : $t('ui.skip-for-now'),
-    variant: (isBioSet ? 'primary' : 'outline') as buttonVariants,
+    variant: (isBioSet ? 'primary' : 'outline') as ButtonVariants['variant'],
   };
 });
 
@@ -70,7 +69,7 @@ watch(
           {{ $t('profile.setup.bio-desc') }}
         </UiDialogDescription>
       </UiDialogHeader>
-      <div class="mx-2 mt-2 mb-auto p-4">
+      <div class="mx-2 mt-2 mb-auto p-4" data-cy="profile-setup-bio-dialog">
         <uiInput
           v-model="bio"
           type="textarea"
@@ -78,10 +77,17 @@ watch(
           placeholder="Your bio"
           class="w-full max-w-md"
           maxlength="160"
+          data-cy="profile-setup-bio-input"
         />
       </div>
       <UiDialogFooter>
-        <UiButton :variant="actionButton.variant" class="w-100" size="xl" @click="handleSubmit">
+        <UiButton
+          :variant="actionButton.variant"
+          class="w-100"
+          size="xl"
+          data-cy="profile-setup-next-button"
+          @click="handleSubmit"
+        >
           {{ actionButton.text }}
         </UiButton>
       </UiDialogFooter>

@@ -7,6 +7,7 @@ import {
   unLikeTweet,
   undoRetweetTweet,
 } from '~/services/tweet/actionButtonsService';
+import QuoteTweetDialog from './composer/QuoteTweetDialog.vue';
 import { showToaster } from '~/utils/showToaster';
 import { buildTweetLink } from '~/utils/tweetLink';
 
@@ -21,6 +22,7 @@ const emit = defineEmits<{
 }>();
 
 const pendingLike = ref(false);
+const showQuoteDialog = ref(false);
 
 const handleLike = async () => {
   if (pendingLike.value) return;
@@ -110,21 +112,41 @@ const handleShare = async () => {
     </label>
 
     <label
-      v-if="props.tweet.isRetweeted"
-      class="hover:text-brand-turquoise text-brand-turquoise relative flex items-center justify-center gap-[1px]"
+      :class="[
+        'relative flex items-center justify-center gap-[1px]',
+        props.tweet.isRetweeted
+          ? 'hover:text-brand-turquoise text-brand-turquoise'
+          : 'hover:text-brand-turquoise',
+      ]"
     >
-      <Button variant="tweet-icon-turquoise-active" size="icon-md" @click="handleUndoRetweet">
-        <Icon name="tabler:repeat" size="1.2rem" />
-      </Button>
-      <span class="absolute start-8">{{ props.tweet.retweetCount }}</span>
-    </label>
-    <label
-      v-else
-      class="hover:text-brand-turquoise relative flex items-center justify-center gap-[1px]"
-    >
-      <Button variant="tweet-icon-turquoise" size="icon-md" @click="handleRetweet">
-        <Icon name="tabler:repeat" size="1.2rem" />
-      </Button>
+      <UiDropdownMenu>
+        <UiDropdownMenuTrigger as-child>
+          <Button
+            :variant="
+              props.tweet.isRetweeted ? 'tweet-icon-turquoise-active' : 'tweet-icon-turquoise'
+            "
+            size="icon-md"
+            data-testid="retweet-dropdown-trigger"
+          >
+            <Icon name="tabler:repeat" size="1.2rem" />
+          </Button>
+        </UiDropdownMenuTrigger>
+        <UiDropdownMenuContent align="center">
+          <UiDropdownMenuItem
+            data-testid="retweet-action-item"
+            @click.prevent.stop="props.tweet.isRetweeted ? handleUndoRetweet() : handleRetweet()"
+          >
+            <Icon name="tabler:repeat" size="18" />
+            {{
+              props.tweet.isRetweeted ? $t('tweet.actions.unrepost') : $t('tweet.actions.repost')
+            }}
+          </UiDropdownMenuItem>
+          <UiDropdownMenuItem data-testid="quote-action-item" @click="showQuoteDialog = true">
+            <Icon name="tabler:pencil" size="18" />
+            {{ $t('tweet.actions.quote') }}
+          </UiDropdownMenuItem>
+        </UiDropdownMenuContent>
+      </UiDropdownMenu>
       <span class="absolute start-8">{{ props.tweet.retweetCount }}</span>
     </label>
 
@@ -132,14 +154,14 @@ const handleShare = async () => {
       v-if="props.tweet.isLiked"
       class="hover:text-brand-red text-brand-red relative flex items-center justify-center"
     >
-      <Button variant="tweet-icon-red-active" size="icon-md" @click="handleUnlike">
+      <Button variant="tweet-icon-red-active" size="icon-md" @click.prevent.stop="handleUnlike">
         <Icon name="line-md:heart-filled" size="1.2rem" />
       </Button>
       <span class="absolute start-8">{{ props.tweet.likeCount }}</span>
     </label>
 
     <label v-else class="hover:text-brand-red relative flex items-center justify-center gap-[1px]">
-      <Button variant="tweet-icon-red" size="icon-md" @click="handleLike">
+      <Button variant="tweet-icon-red" size="icon-md" @click.prevent.stop="handleLike">
         <Icon name="tabler:heart" size="1.2rem" />
       </Button>
       <span class="absolute start-8">{{ props.tweet.likeCount }}</span>
@@ -149,9 +171,16 @@ const handleShare = async () => {
       variant="tweet-icon-blue"
       size="icon-md"
       class="hover:text-brand-blue"
-      @click="handleShare"
+      @click.prevent.stop="handleShare"
     >
       <Icon name="lucide:share" size="1.2rem" />
     </Button>
+
+    <!-- Place dialog outside dropdown structure -->
+    <QuoteTweetDialog
+      v-model:open="showQuoteDialog"
+      :quote-to-tweet="props.tweet"
+      @quote-success="emit('retweet-success')"
+    />
   </div>
 </template>

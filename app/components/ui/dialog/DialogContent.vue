@@ -12,6 +12,7 @@ const props = defineProps<
     class?: HTMLAttributes['class'];
     headerClass?: HTMLAttributes['class'];
     hideCloseButton?: boolean;
+    contentHeight?: string;
   }
 >();
 const emits = defineEmits<DialogContentEmits>();
@@ -19,6 +20,7 @@ const emits = defineEmits<DialogContentEmits>();
 const delegatedProps = reactiveOmit(props, 'class', 'headerClass');
 
 const forwarded = useForwardPropsEmits(delegatedProps, emits);
+const contentHeight = computed(() => props.contentHeight ?? 'sm:h-160');
 </script>
 
 <template>
@@ -29,8 +31,9 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
       v-bind="forwarded"
       :class="
         cn(
-          'bg-background focus-visible:ring-ring data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 flex h-full max-h-[calc(100vh-3rem)] w-full translate-x-[-50%] translate-y-[-50%] flex-col border shadow-lg outline-0 duration-200 sm:h-160 sm:max-w-xl sm:rounded-2xl',
+          'bg-background focus-visible:ring-ring data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 flex h-full max-h-[calc(100vh-3rem)] w-full translate-x-[-50%] translate-y-[-50%] flex-col border shadow-lg outline-0 duration-200 sm:max-w-xl sm:rounded-2xl',
           props.class,
+          contentHeight,
         )
       "
       @escape-key-down="(e) => e.preventDefault()"

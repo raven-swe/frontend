@@ -61,7 +61,7 @@ const switchLanguage = () => {
         }"
       ></SideBarLeftTab>
       <SideBarLeftTab
-        :tab="{ label: 'settings', icon: 'settings', route: '/settings/account' }"
+        :tab="{ label: 'settings', icon: 'settings', route: '/settings' }"
         data-cy="sidebar-settings-btn"
       ></SideBarLeftTab>
       <UiButton variant="ghost-default" size="icon-xl" @click="switchLanguage">

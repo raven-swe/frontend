@@ -1,20 +1,16 @@
+import type { ContentEntities } from './entity';
+
 type TweetAuthor = {
   username: string;
   displayName: string;
   avatarUrl: string;
   isFollowing: boolean;
-  isFollower: boolean;
+  isFollower?: boolean;
+  isBlocked?: boolean;
 };
 
-type TweetMention = {
-  username: string;
-  startPosition: number;
-};
-type TweetHashtag = {
-  hashtag: string;
-  startPosition: number;
-};
 export type TweetMedia = {
+  id?: string;
   type: 'IMAGE' | 'VIDEO' | 'GIF';
   url: string;
   altText: string;
@@ -22,10 +18,6 @@ export type TweetMedia = {
   height: number;
 };
 
-type TweetEntity = {
-  mentions: TweetMention[];
-  hashtags: TweetHashtag[];
-};
 export type Tweet = {
   id: string;
   content: string;
@@ -36,9 +28,16 @@ export type Tweet = {
   likeCount: number;
   isLiked: boolean;
   isRetweeted: boolean;
-  entities: TweetEntity;
+  entities: ContentEntities;
   media: TweetMedia[];
-  isReplyToTweetId?: string;
-  quotedTweetId?: string;
+  replyToTweetId?: string | null;
+  quoteToTweetId?: string;
   quotedTweet?: Tweet;
+};
+
+export type CreateTweetRequest = {
+  content: string;
+  media?: string[];
+  replyToTweetId?: string | null;
+  quoteToTweetId?: string | null;
 };

@@ -112,7 +112,9 @@ export const useProfileSetupFlow = () => {
       resetFlow();
       // refresh data
       queryClient.invalidateQueries({ queryKey: ['layout-data'] });
-      queryClient.invalidateQueries({ queryKey: ['profile', userStore.user.username] });
+      queryClient.invalidateQueries({
+        queryKey: ['profile', userStore.user.username.toLowerCase()],
+      });
     }
   };
 
