@@ -35,7 +35,7 @@ const mockUser: User = {
   },
 };
 
-describe('user tweets page', () => {
+describe('replies page', () => {
   let queryClient: QueryClient;
 
   beforeEach(() => {
@@ -47,13 +47,13 @@ describe('user tweets page', () => {
   });
 
   it('renders empty state when no tweets are available', async () => {
-    registerEndpoint(`/api/users/${mockUser.username}/tweets`, () => ({
+    registerEndpoint(`/api/users/${mockUser.username}/replies`, () => ({
       data: [],
     }));
-    const { default: ProfilePage } = await import('~/pages/profile/[username]/index.vue');
+    const { default: ProfilePage } = await import('~/pages/profile/[username]/replies.vue');
     const wrapper = await mountSuspended(ProfilePage, {
       route: {
-        params: { username: mockUser.username, tab: '' },
+        params: { username: mockUser.username },
       },
       global: {
         provide: {
@@ -115,15 +115,15 @@ describe('user tweets page', () => {
       },
     ];
 
-    registerEndpoint(`/api/users/${mockUser.username}/tweets`, () => ({
+    registerEndpoint(`/api/users/${mockUser.username}/replies`, () => ({
       data: mockTweets,
     }));
 
-    const { default: ProfilePage } = await import('~/pages/profile/[username]/index.vue');
+    const { default: ProfilePage } = await import('~/pages/profile/[username]/replies.vue');
 
     const wrapper = await mountSuspended(ProfilePage, {
       route: {
-        params: { username: mockUser.username, tab: '' },
+        params: { username: mockUser.username },
       },
       global: {
         provide: {
