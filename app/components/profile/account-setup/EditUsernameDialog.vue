@@ -7,6 +7,8 @@ import { settingsService } from '~/services/settingsService';
 import getUsernameSchema from '~/schemas/username';
 import { useQuery } from '@tanstack/vue-query';
 import type { ButtonVariants } from '~/components/ui/button/variants';
+import { useUserStore } from '~/stores/user';
+import useAccountSetup from '~/composables/useAccountSetup';
 
 const props = defineProps<{
   open: boolean;
@@ -128,12 +130,13 @@ const actionButton = computed(() => {
             <div v-if="isLoading">
               <UiSpinner class="text-primary" />
             </div>
-            <div v-if="suggestions" class="flex flex-col gap-2">
+            <div v-if="suggestions" data-test="suggestions-container" class="flex flex-col gap-2">
               <button
-                v-for="suggestion in suggestions"
+                v-for="(suggestion, index) in suggestions"
                 :key="suggestion"
                 type="button"
                 class="text-primary cursor-pointer text-start hover:underline"
+                :data-test="`suggestion-button-${index}`"
                 @click="setFieldValue('username', suggestion)"
               >
                 {{ suggestion }}
@@ -146,6 +149,7 @@ const actionButton = computed(() => {
             :variant="actionButton.variant"
             class="w-full max-w-100"
             size="xl"
+            data-test="submit-button"
             :disabled="
               (isSubmitting || !isFieldValid('username')) && values.username.trim().length > 0
             "
