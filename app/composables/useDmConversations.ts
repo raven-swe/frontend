@@ -1,19 +1,31 @@
-import { useQuery } from '@tanstack/vue-query';
+import { useInfiniteQuery } from '@tanstack/vue-query';
 import type { DmConversation, DmSseEventMap } from '~~/shared/types/dm';
 import type { ApiSuccessResponse } from '~~/shared/types/api';
 import { apiFetch } from '~/api';
 import { useDmHighlight } from './useDmHighlight';
 
 export function useDmConversations() {
-  const { data, isPending, error, refetch } = useQuery({
-    queryKey: ['dm-conversations'],
-    queryFn: async () => {
-      const resp = await apiFetch<ApiSuccessResponse<DmConversation[]>>('/api/conversations', {
-        method: 'GET',
-      });
-      return resp.data;
-    },
-  });
+  const { data, isPending, error, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ['dm-conversations'],
+      queryFn: async ({ pageParam }) => {
+        const resp = await apiFetch<ApiSuccessResponse<DmConversation[]>>('/api/conversations', {
+          method: 'GET',
+          query: {
+            cursor: pageParam,
+            limit: 20,
+          },
+        });
+        return resp;
+      },
+      initialPageParam: undefined as string | undefined,
+      getNextPageParam: (lastPage) => {
+        if (lastPage.pagination?.hasNextPage && lastPage.pagination?.nextCursor) {
+          return lastPage.pagination.nextCursor;
+        }
+        return undefined;
+      },
+    });
 
   const { highlightedIds } = useDmHighlight();
 
@@ -27,15 +39,21 @@ export function useDmConversations() {
 
   const lastProcessedMessageId = ref<string | null>(null);
 
+  // Flatten all pages into a single array
+  const allConversations = computed(() => {
+    if (!data.value) return [];
+    return data.value.pages.flatMap((page) => page.data);
+  });
+
   watch(
     () => lastNewMessageinfo.value,
     (newMessage) => {
-      if (!newMessage || !data.value) return;
+      if (!newMessage || !allConversations.value.length) return;
 
       if (newMessage.messageId === lastProcessedMessageId.value) return;
       lastProcessedMessageId.value = newMessage.messageId;
 
-      const conversation = data.value.find((c) => c.id === newMessage.conversationId);
+      const conversation = allConversations.value.find((c) => c.id === newMessage.conversationId);
       if (conversation) {
         conversation.lastMessage = {
           content: newMessage.bodySnippet,
@@ -58,9 +76,9 @@ export function useDmConversations() {
   );
 
   const sortedConversations = computed(() => {
-    if (!data.value) return [];
+    if (!allConversations.value.length) return [];
 
-    const list = [...data.value];
+    const list = [...allConversations.value];
 
     list.sort((a, b) => {
       const aIsTop = movedToTopIds.value.has(a.id);
@@ -74,5 +92,13 @@ export function useDmConversations() {
     return list;
   });
 
-  return { conversations: sortedConversations, loading: isPending, error, refresh: refetch };
+  return {
+    conversations: sortedConversations,
+    loading: isPending,
+    error,
+    refresh: refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  };
 }
