@@ -16,11 +16,12 @@ const displayUrl = computed(() => {
   }
   return '';
 });
-const count = computed(() => (userProfile?.value.mutualsCount ?? 1) - 1);
+
+const mutualPluralIndex = computed(() => (userProfile?.value.mutualsCount ?? 1) - 1);
 
 const modifiedMutualUsers = computed(() => {
   if (!userProfile?.value.mutualUsers) return [];
-  return userProfile.value.mutualUsers.slice(0, 3);
+  return userProfile.value.mutualUsers.slice(0, Math.min(userProfile.value.mutualsCount ?? 0, 3));
 });
 </script>
 
@@ -81,6 +82,7 @@ const modifiedMutualUsers = computed(() => {
         </p>
       </div>
 
+      <!-- Following and Followers -->
       <div class="mt-3 flex space-x-4">
         <NuxtLink
           :to="`/profile/${userProfile?.username}/following`"
@@ -105,9 +107,10 @@ const modifiedMutualUsers = computed(() => {
           <span class="text-muted-foreground ms-1"> {{ $t('profile-info.followers') }} </span>
         </NuxtLink>
       </div>
-      <div class="mt-3">
+
+      <!-- Mutual Followers -->
+      <div v-if="userProfile?.mutualsCount !== 0" class="mt-3">
         <NuxtLink
-          v-if="userProfile?.mutualsCount !== 0"
           :to="`/profile/${userProfile?.username}/followers-you-follow`"
           class="decoration-muted-foreground flex w-fit items-center gap-2 hover:underline"
         >
@@ -126,9 +129,9 @@ const modifiedMutualUsers = computed(() => {
           </div>
           <p class="text-muted-foreground text-sm">
             {{
-              $t('profile-info.mutual', count, {
+              $t('profile-info.mutual', mutualPluralIndex, {
                 named: {
-                  others: Math.max(count - 1, 0),
+                  others: Math.max(mutualPluralIndex - 1, 0),
                   user1: userProfile?.mutualUsers?.[0]?.displayName,
                   user2: userProfile?.mutualUsers?.[1]?.displayName,
                   user3: userProfile?.mutualUsers?.[2]?.displayName,
