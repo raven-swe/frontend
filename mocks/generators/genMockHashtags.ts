@@ -91,20 +91,41 @@ const entertainmentHashtags = [
   'Action',
 ];
 
-function generateHashtagsForCategory(hashtags: string[], count: number): TrendingHashtag[] {
+function generateHashtagsForCategory(
+  hashtags: string[],
+  count: number,
+  interest: string,
+): TrendingHashtag[] {
   const shuffled = faker.helpers.shuffle([...hashtags]);
-  return shuffled.slice(0, Math.min(count, hashtags.length)).map((hashtag) => ({
-    hashtag,
-    tweetsCount: faker.number.int({ min: 1000, max: 1000000 }),
-  }));
+  const countries = [
+    'United States',
+    'United Kingdom',
+    'Canada',
+    'Australia',
+    'Germany',
+    'France',
+    'Japan',
+    'Brazil',
+  ];
+
+  return shuffled.slice(0, Math.min(count, hashtags.length)).map((hashtag, index) => {
+    const includeCountry = faker.datatype.boolean();
+    return {
+      rank: index + 1,
+      hashtag,
+      tweetsCount: faker.number.int({ min: 1000, max: 1000000 }),
+      ...(includeCountry ? { country: faker.helpers.arrayElement(countries) } : {}),
+      interest,
+    };
+  });
 }
 
 function generateAllHashtags() {
   const categorizedHashtags: Record<ExploreTab, TrendingHashtag[]> = {
-    trending: generateHashtagsForCategory(trendingHashtags, 15),
-    news: generateHashtagsForCategory(newsHashtags, 15),
-    sports: generateHashtagsForCategory(sportsHashtags, 20),
-    entertainment: generateHashtagsForCategory(entertainmentHashtags, 20),
+    trending: generateHashtagsForCategory(trendingHashtags, 15, 'Trending'),
+    news: generateHashtagsForCategory(newsHashtags, 15, 'News'),
+    sports: generateHashtagsForCategory(sportsHashtags, 20, 'Sports'),
+    entertainment: generateHashtagsForCategory(entertainmentHashtags, 20, 'Entertainment'),
   };
 
   return categorizedHashtags;

@@ -15,9 +15,7 @@ export const handlers = [
       {
         success: true,
         message: 'Trending hashtags fetched successfully.',
-        data: {
-          trendingHashtags: categorizedHashtags.trending || [],
-        },
+        data: categorizedHashtags.trending || [],
       },
       { status: 200 },
     );
@@ -29,9 +27,7 @@ export const handlers = [
       {
         success: true,
         message: 'News hashtags fetched successfully.',
-        data: {
-          trendingHashtags: categorizedHashtags.news || [],
-        },
+        data: categorizedHashtags.news || [],
       },
       { status: 200 },
     );
@@ -43,9 +39,7 @@ export const handlers = [
       {
         success: true,
         message: 'Sports hashtags fetched successfully.',
-        data: {
-          trendingHashtags: categorizedHashtags.sports || [],
-        },
+        data: categorizedHashtags.sports || [],
       },
       { status: 200 },
     );
@@ -57,9 +51,7 @@ export const handlers = [
       {
         success: true,
         message: 'Entertainment hashtags fetched successfully.',
-        data: {
-          trendingHashtags: categorizedHashtags.entertainment || [],
-        },
+        data: categorizedHashtags.entertainment || [],
       },
       { status: 200 },
     );
@@ -77,9 +69,7 @@ export const handlers = [
       {
         success: true,
         message: 'For you content fetched successfully.',
-        data: {
-          trendingHashtags: mixedHashtags,
-        },
+        data: mixedHashtags,
       },
       { status: 200 },
     );
