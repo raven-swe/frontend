@@ -24,7 +24,7 @@ const {
   isLoading,
   suspense,
 } = useInfiniteQuery({
-  queryKey: ['profile', user?.value.username, 'tweets-replies'],
+  queryKey: ['profile', user?.value.username, 'tweets-media'],
   initialPageParam: null as string | null,
   queryFn: async ({ pageParam = null }) =>
     await profileTabsService.getProfileTweetsPaginated(
