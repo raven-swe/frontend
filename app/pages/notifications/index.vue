@@ -31,6 +31,7 @@ const {
 });
 
 const notifications = computed(() => response.value?.pages.flatMap((page) => page.data) || []);
+const { mutate: followUser } = useFollowMutation();
 
 // Virtualization
 const parentRef = ref<HTMLElement | null>(null);
@@ -154,6 +155,20 @@ function componentForType(type: string) {
                 :actor="getPrimaryActor(notifications[virtualRow.index]!.actorSummary)"
                 :is-seen="notifications[virtualRow.index]!.isSeen"
                 :tweet="notifications[virtualRow.index]!.tweetSummary?.primaryTweet"
+                @follow="
+                  followUser({
+                    username: getPrimaryActor(notifications[virtualRow.index]!.actorSummary)
+                      .username,
+                    action: 'follow',
+                  })
+                "
+                @unfollow="
+                  followUser({
+                    username: getPrimaryActor(notifications[virtualRow.index]!.actorSummary)
+                      .username,
+                    action: 'unfollow',
+                  })
+                "
               />
             </div>
           </div>

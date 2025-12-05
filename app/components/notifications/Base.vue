@@ -56,7 +56,6 @@ defineEmits<{
                 :username="actor.username"
                 @follow="$emit('follow')"
                 @unfollow="$emit('unfollow')"
-                @unblock="$emit('unblock')"
               >
                 <span class="text-foreground font-semibold">{{ actor.username }}</span>
               </UserHoverCard>
