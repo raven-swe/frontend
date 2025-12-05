@@ -20,6 +20,9 @@ export const serverApiFetch = (event: H3Event) =>
 
         const xForwardedIp = getHeader(event, 'X-Forwarded-For');
         if (xForwardedIp) options.headers.append('X-Forwarded-For', xForwardedIp);
+
+        const userAgent = getHeader(event, 'user-agent');
+        if (userAgent) options.headers.append('user-agent', userAgent);
       }
       // Ensure the X-Client-Type header is set to web
       options.headers.append('X-Client-Type', 'web');
