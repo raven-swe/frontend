@@ -14,6 +14,10 @@ export const serverApiFetch = (event: H3Event) =>
 
         const authHeader = getHeader(event, 'Authorization');
         if (authHeader) options.headers.append('Authorization', authHeader);
+        else {
+          const token = getCookie(event, 'access_token');
+          if (token) options.headers.append('Authorization', `Bearer ${token}`);
+        }
       }
       // Ensure the X-Client-Type header is set to web
       options.headers.append('X-Client-Type', 'web');
