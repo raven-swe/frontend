@@ -4,6 +4,7 @@ import * as yup from 'yup';
 import { settingsService } from '~/services/settingsService';
 import InterestItem from './InterestItem.vue';
 import { useQuery } from '@tanstack/vue-query';
+import useAccountSetup from '~/composables/useAccountSetup';
 
 const props = defineProps<{
   open: boolean;
@@ -117,7 +118,7 @@ const translatedInterest = (interest: Interest) => {
             class="px-8"
             size="xl"
             :disabled="fields.length === 0 || !isFieldValid('interests')"
-            @click="handleSubmit"
+            type="submit"
           >
             {{ $t('ui.next') }}
           </UiButton>
