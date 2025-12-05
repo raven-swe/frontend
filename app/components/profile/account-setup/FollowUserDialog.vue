@@ -160,6 +160,7 @@ const hasFollowedAtLeastOne = computed(() => {
         <UiButton
           class="w-full max-w-100"
           size="xl"
+          data-test="submit-follow-users"
           :disabled="!hasFollowedAtLeastOne"
           @click="accountSetup.goToNextStep()"
         >

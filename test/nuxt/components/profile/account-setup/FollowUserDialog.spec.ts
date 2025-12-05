@@ -4,8 +4,9 @@ import FollowUserDialog from '~/components/profile/account-setup/FollowUserDialo
 import en from '~~/i18n/locales/en.json';
 import { createI18n } from 'vue-i18n';
 import { flushPromises } from '@vue/test-utils';
-import { nextTick, ref } from 'vue';
+import { nextTick } from 'vue';
 import type { CompactUser } from '~~/shared/types/user';
+import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query';
 
 const i18n = createI18n({
   locale: 'en',
@@ -57,29 +58,23 @@ const data: CompactUser[] = [
   },
 ];
 
-const settingServiceMock = vi.hoisted(() => {
-  return {
-    getFollowSuggestions: vi.fn(() => {
-      return {
-        data,
-      };
-    }),
-  };
-});
+const settingServiceMock = vi.hoisted(() => ({
+  getFollowSuggestions: vi.fn(() => ({ data })),
+}));
 
 const useVirtualizerMock = vi.hoisted(() =>
-  vi.fn(() =>
-    ref({
-      getVirtualItems: () => [
+  vi.fn(() => ({
+    value: {
+      getVirtualItems: vi.fn(() => [
         { index: 0, key: 0, start: 0, end: 96 },
         { index: 1, key: 1, start: 96, end: 192 },
         { index: 2, key: 2, start: 192, end: 288 },
-      ],
+      ]),
       getTotalSize: () => 288,
       measureElement: vi.fn(),
       scrollToIndex: vi.fn(),
-    }),
-  ),
+    },
+  })),
 );
 
 const followMutateMock = vi.hoisted(() => vi.fn());
@@ -92,11 +87,9 @@ vi.mock('~/composables/useProfileMutation', () => ({
   useMuteMutation: () => ({ mutate: muteMutateMock }),
 }));
 
-vi.mock('~/services/settingsService', async () => {
-  return {
-    settingsService: settingServiceMock,
-  };
-});
+vi.mock('~/services/settingsService', () => ({
+  settingsService: settingServiceMock,
+}));
 
 vi.mock('@tanstack/vue-virtual', async () => {
   return {
@@ -106,7 +99,8 @@ vi.mock('@tanstack/vue-virtual', async () => {
 
 describe('FollowUserDialog', () => {
   beforeEach(() => {
-    vi.resetModules();
+    vi.resetAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders correctly', async () => {
@@ -191,5 +185,47 @@ describe('FollowUserDialog', () => {
       username: 'user1',
       action: 'unmute',
     });
+  });
+
+  it('enable submit button after following at least one user', async () => {
+    settingServiceMock.getFollowSuggestions.mockImplementation(() => {
+      return {
+        data: [
+          ...data,
+          {
+            username: 'user4',
+            displayName: 'User Four',
+            bio: '',
+            bioEntities: null,
+            avatarUrl: '',
+            relationship: {
+              follower: false,
+              following: true,
+              muted: false,
+              blockedBy: false,
+              blocking: false,
+            },
+          },
+        ],
+      };
+    });
+
+    const wrapper = await mountSuspended(FollowUserDialog, {
+      props: { open: true },
+      global: {
+        plugins: [i18n, [VueQueryPlugin, { queryClient: new QueryClient() }]],
+        stubs: {
+          UiDialogContent: {
+            template: "<div><slot /> <slot name='header' /></div>",
+          },
+          LogoRaven: {
+            template: '<div data-test="logo-raven">LogoRaven</div>',
+          },
+        },
+      },
+    });
+
+    const submitButton = wrapper.find('button[data-test="submit-follow-users"]');
+    expect(submitButton.attributes('disabled')).toBeUndefined();
   });
 });
