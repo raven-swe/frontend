@@ -98,13 +98,14 @@ export const handlers = [
     const paginatedUsers = matchedUsers.slice(startIndex, endIndex);
     const hasNextPage = endIndex < matchedUsers.length;
 
-    // Map to the expected User type
+    // Map to the expected CompactUser type
     const users = paginatedUsers.map((user) => ({
-      id: user.username,
       username: user.username,
-      name: user.displayName,
-      profileImage: user.avatarUrl,
+      displayName: user.displayName,
+      avatarUrl: user.avatarUrl,
       bio: user.bio,
+      bioEntities: user.bioEntities,
+      relationship: user.relationship,
     }));
 
     return HttpResponse.json(

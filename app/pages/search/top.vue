@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch, watchEffect, type ComponentPublicInstance } from 'vue';
 import TweetDefaultCard from '~/components/tweet/TweetDefaultCard.vue';
+import UserList from '~/components/user/UserList.vue';
 import { searchService } from '~/services/search/searchService';
 import { useInfiniteQuery } from '@tanstack/vue-query';
 import { useWindowVirtualizer } from '@tanstack/vue-virtual';
 import { useSearchQuery } from '~/composables/useSearchQuery';
-import type { User } from '~~/shared/types/user';
 import { useSearchStore } from '~/stores/search';
 import { PeopleFilter } from '~~/shared/types/search';
 
@@ -17,9 +17,6 @@ const { searchQuery, initializeFromRoute } = useSearchQuery();
 const route = useRoute();
 const searchStore = useSearchStore();
 
-const users = ref<User[]>([]);
-const isUsersLoading = ref(false);
-
 // Compute people filter from URL
 const peopleFilter = computed(() =>
   route.query.pf === 'on' ? PeopleFilter.following : PeopleFilter.anyone,
@@ -28,7 +25,6 @@ const peopleFilter = computed(() =>
 // Initialize search query from URL
 onMounted(() => {
   initializeFromRoute();
-  loadUsers();
 });
 
 // Watch for route query changes
@@ -37,42 +33,30 @@ watch(
   (newQuery) => {
     if (typeof newQuery === 'string' && newQuery !== searchQuery.value) {
       searchQuery.value = newQuery;
-      loadUsers();
     }
   },
 );
 
-// Watch for people filter changes
-watch(
-  () => route.query.pf,
-  () => {
-    loadUsers();
-  },
-);
-
-// Watch for removeBlocked changes
-watch(
-  () => searchStore.removeBlocked,
-  () => {
-    loadUsers();
-  },
-);
-
-const loadUsers = async () => {
-  isUsersLoading.value = true;
-  try {
-    const response = await searchService.getPeople({
-      pagination: { cursor: null, limit: 3 },
+// Fetch function for users (limited to 3)
+const usersFetcherFn = async (cursor: string | null, signal: AbortSignal) => {
+  const response = await searchService.getPeople(
+    {
+      pagination: { limit: 3, cursor },
       query: searchQuery.value,
       peopleFilter: peopleFilter.value,
       removeBlocked: searchStore.removeBlocked,
-    });
-    users.value = response.data;
-  } catch (error) {
-    console.error('Failed to load users:', error);
-  } finally {
-    isUsersLoading.value = false;
-  }
+    },
+    signal,
+  );
+
+  // Only return first page, no pagination for top results
+  return {
+    ...response,
+    pagination: {
+      hasNextPage: false,
+      nextCursor: null,
+    },
+  };
 };
 
 const {
@@ -107,7 +91,7 @@ const {
 const tweets = computed(() => response.value?.pages.flatMap((page) => page.data) || []);
 
 // Combined loading state
-const isLoading = computed(() => isUsersLoading.value || isTweetsLoading.value);
+const isLoading = computed(() => isTweetsLoading.value);
 
 //  Virtualization setup
 const parentRef = ref<HTMLElement | null>(null);
@@ -115,7 +99,7 @@ const parentOffsetRef = ref(0);
 
 // Recalculate offset whenever content changes
 watch(
-  [users, () => tweets.value.length],
+  () => tweets.value.length,
   () => {
     setTimeout(() => {
       if (parentRef.value) {
@@ -173,7 +157,7 @@ watch(
 
 <template>
   <div class="border-border mx-auto max-w-[700px]">
-    <div v-if="users.length === 0 && tweets.length === 0 && !isLoading" class="p-20 break-words">
+    <div v-if="tweets.length === 0 && !isLoading" class="p-20 break-words">
       <p class="text-foreground text-3xl font-bold">
         {{ $t('search.no-results', { query: searchQuery }) }}
       </p>
@@ -182,28 +166,26 @@ watch(
       </p>
     </div>
     <!-- Users Section -->
-    <div v-if="users.length > 0" class="border-border border-b">
+    <div class="border-border border-b">
       <h2 class="px-4 py-4 text-xl font-bold">{{ $t('search.people.tab') }}</h2>
-      <!-- -------------- Have to put the user preview component ----------------------- -->
-      <NuxtLink
-        v-for="user in users"
-        :key="user.id"
-        :to="`/profile/${user.username}`"
-        class="hover:bg-accent flex items-center gap-3 px-4 py-3 transition-colors"
+      <UserList
+        :fetcher-fn="usersFetcherFn"
+        :current-username="'search-top'"
+        :query-key-suffix="`search-top-users-${searchQuery}-${peopleFilter}-${searchStore.removeBlocked}`"
+        :empty-title="''"
+        :empty-description="''"
+        :show-dropdown="false"
+      />
+      <UiButton
+        variant="ghost-primary"
+        @click="
+          $router.push(
+            `/search/people?q=${encodeURIComponent(searchQuery)}${route.query.pf ? '&pf=on' : ''}`,
+          )
+        "
       >
-        <img
-          :src="user.profileImage"
-          :alt="user.name"
-          class="h-10 w-10 rounded-full object-cover"
-        />
-        <div class="flex-1 overflow-hidden">
-          <div class="text-foreground truncate font-semibold">{{ user.name }}</div>
-          <div class="text-muted-foreground truncate text-sm">{{ $t('@') }}{{ user.username }}</div>
-        </div>
-      </NuxtLink>
-      <UiButton variant="link" :to="`/search/people?q=${encodeURIComponent(searchQuery)}`">{{
-        $t('search.top.view-all')
-      }}</UiButton>
+        {{ $t('search.top.view-all') }}
+      </UiButton>
     </div>
 
     <!-- Tweets Section -->

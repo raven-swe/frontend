@@ -41,7 +41,7 @@ export const searchService = {
     });
   },
 
-  async getPeople(peopleSearchQuery: SearchQuery) {
+  async getPeople(peopleSearchQuery: SearchQuery, signal?: AbortSignal) {
     return apiFetch(`/api/search/users`, {
       method: 'GET',
       query: {
@@ -51,6 +51,7 @@ export const searchService = {
         peopleFilter: peopleSearchQuery.peopleFilter,
         excludeMutedAndBlocked: peopleSearchQuery.removeBlocked,
       },
+      signal,
     });
   },
 };
