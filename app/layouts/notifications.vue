@@ -13,7 +13,7 @@ const tabs = [
 
 <template>
   <NuxtLayout name="default">
-    <div class="bg-background/65 sticky top-0 z-10 p-2 backdrop-blur-md">
+    <div class="bg-background/65 sticky top-0 z-10 p-2 pb-0 backdrop-blur-md">
       <h2 class="text-foreground m-2 ms-3 text-xl font-bold">{{ $t('notifications.title') }}</h2>
       <UiTabs>
         <UiTab

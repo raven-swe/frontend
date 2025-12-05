@@ -14,7 +14,7 @@ const icon = {
   color: 'text-brand-red',
 };
 
-const linkTo = `/profile/${props.tweet.author.username}}/status/${props.tweet.id}`;
+const linkTo = `/profile/${props.tweet.author.username}/status/${props.tweet.id}`;
 
 const message = $t('notifications.message.like');
 </script>
