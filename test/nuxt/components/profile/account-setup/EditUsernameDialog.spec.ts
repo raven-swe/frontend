@@ -7,6 +7,7 @@ import { createI18n } from 'vue-i18n';
 import { nextTick } from 'vue';
 import { FetchError } from 'ofetch';
 import type { ApiErrorResponse } from '#shared/types/api';
+import { flushPromises } from '@vue/test-utils';
 
 const i18n = createI18n({
   locale: 'en',
@@ -67,9 +68,18 @@ vi.mock('~/stores/user', () => ({
   useUserStore: () => userStoreMock,
 }));
 
+// Debounce mock -> run immediately
+vi.mock('@vueuse/core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@vueuse/core')>();
+  return {
+    ...actual,
+    useDebounceFn: (fn: (...args: unknown[]) => unknown) => fn,
+    useDebounce: (value: unknown) => value,
+  };
+});
+
 describe('EditUsernameDialog', () => {
   beforeEach(() => {
-    vi.resetModules();
     vi.resetAllMocks();
     vi.clearAllMocks();
   });
@@ -93,10 +103,11 @@ describe('EditUsernameDialog', () => {
     expect(wrapper.text()).toContain('the_currentuser');
     // LogoRaven stub
     expect(wrapper.find('[data-test="logo-raven"]').exists()).toBe(true);
+    wrapper.unmount();
   });
 
   it('show username taken error', async () => {
-    accountServiceMock.checkAccountExists.mockResolvedValueOnce(true);
+    accountServiceMock.checkAccountExists.mockResolvedValue(true);
 
     const wrapper = await mountSuspended(EditUsernameDialog, {
       props: { open: true },
@@ -110,12 +121,12 @@ describe('EditUsernameDialog', () => {
 
     const input = wrapper.find('input[name="username"]');
     await input.setValue('takenusername');
-
-    await new Promise((resolve) => setTimeout(resolve, 310)); // wait for debounce
     await nextTick();
-
+    await flushPromises(); // ensure any promises inside the debounced validator resolve
+    await new Promise((r) => setTimeout(r, 5)); // wait for DOM update
     expect(accountServiceMock.checkAccountExists).toHaveBeenCalledWith('takenusername');
     expect(wrapper.text()).toContain('That username has been taken. Please choose another.');
+    wrapper.unmount();
   });
 
   it('handle backend throw ratelimit error on debounce check', async () => {
@@ -131,7 +142,7 @@ describe('EditUsernameDialog', () => {
       message: 'Rate limit exceeded',
       name: 'Rate limit exceeded',
     };
-    accountServiceMock.checkAccountExists.mockRejectedValueOnce(rateLimitError);
+    accountServiceMock.checkAccountExists.mockRejectedValue(rateLimitError);
 
     const wrapper = await mountSuspended(EditUsernameDialog, {
       props: { open: true },
@@ -146,15 +157,16 @@ describe('EditUsernameDialog', () => {
     const input = wrapper.find('input[name="username"]');
     await input.setValue('errorusername');
 
-    await new Promise((resolve) => setTimeout(resolve, 310)); // wait for debounce
+    await new Promise((resolve) => setTimeout(resolve, 5)); // wait for DOM update
     await nextTick();
 
     expect(accountServiceMock.checkAccountExists).toHaveBeenCalledWith('errorusername');
     expect(wrapper.text()).toContain('errors.username.TOO_MANY_REQUESTS');
+    wrapper.unmount();
   });
 
   it('handle backend throw error in general on debounce check', async () => {
-    accountServiceMock.checkAccountExists.mockRejectedValueOnce(new Error('Generic error'));
+    accountServiceMock.checkAccountExists.mockRejectedValue(new Error('Generic error'));
 
     const wrapper = await mountSuspended(EditUsernameDialog, {
       props: { open: true },
@@ -168,16 +180,17 @@ describe('EditUsernameDialog', () => {
 
     const input = wrapper.find('input[name="username"]');
     await input.setValue('errorusername');
-
-    await new Promise((resolve) => setTimeout(resolve, 310)); // wait for debounce
     await nextTick();
+    await new Promise((resolve) => setTimeout(resolve, 5)); // wait for DOM update
+    await flushPromises(); // ensure any promises inside the debounced validator resolve
 
     expect(accountServiceMock.checkAccountExists).toHaveBeenCalledWith('errorusername');
     expect(wrapper.text()).toContain('errors.UNKNOWN_ERROR');
+    wrapper.unmount();
   });
 
   it('submits valid username', async () => {
-    userAccountSetupMock.handleUsernameSubmit.mockResolvedValueOnce(undefined);
+    userAccountSetupMock.handleUsernameSubmit.mockResolvedValue(undefined);
     const wrapper = await mountSuspended(EditUsernameDialog, {
       props: { open: true },
       global: {
@@ -194,14 +207,15 @@ describe('EditUsernameDialog', () => {
     const form = wrapper.find('form');
     await form.trigger('submit');
     await nextTick();
-
-    await new Promise((resolve) => setTimeout(resolve, 310));
+    await new Promise((resolve) => setTimeout(resolve, 5)); // wait for DOM update
+    await flushPromises();
 
     expect(userAccountSetupMock.handleUsernameSubmit).toHaveBeenCalledWith('validusername');
+    wrapper.unmount();
   });
 
   it('handles backend validation errors on submit', async () => {
-    userAccountSetupMock.handleUsernameSubmit.mockResolvedValueOnce([
+    userAccountSetupMock.handleUsernameSubmit.mockResolvedValue([
       {
         field: 'username',
         code: 'USERNAME_TAKEN',
@@ -223,16 +237,17 @@ describe('EditUsernameDialog', () => {
 
     const form = wrapper.find('form');
     await form.trigger('submit');
-
-    await new Promise((resolve) => setTimeout(resolve, 310));
     await nextTick();
+    await new Promise((resolve) => setTimeout(resolve, 5)); // wait for DOM update
+    await flushPromises();
 
     expect(userAccountSetupMock.handleUsernameSubmit).toHaveBeenCalledWith('takenusername');
     expect(wrapper.text()).toContain('errors.username.USERNAME_TAKEN');
+    wrapper.unmount();
   });
 
   it('skips step if username is empty', async () => {
-    userAccountSetupMock.handleUsernameSubmit.mockResolvedValueOnce(undefined);
+    userAccountSetupMock.handleUsernameSubmit.mockResolvedValue(undefined);
     const wrapper = await mountSuspended(EditUsernameDialog, {
       props: { open: true },
       global: {
@@ -249,11 +264,11 @@ describe('EditUsernameDialog', () => {
     const submitBtn = wrapper.find('button[data-test="submit-button"]');
     await submitBtn.trigger('click');
     await nextTick();
-
-    await new Promise((resolve) => setTimeout(resolve, 310));
-
+    await new Promise((resolve) => setTimeout(resolve, 5)); // wait for DOM update
+    await flushPromises();
     expect(userAccountSetupMock.handleUsernameSubmit).not.toHaveBeenCalled();
     expect(userAccountSetupMock.goToNextStep).toHaveBeenCalled();
+    wrapper.unmount();
   });
 
   it('clicking on suggestion sets input value', async () => {
@@ -272,8 +287,11 @@ describe('EditUsernameDialog', () => {
 
     await firstSuggestion.trigger('click');
     await nextTick();
+    await new Promise((resolve) => setTimeout(resolve, 5)); // wait for DOM update
+    await flushPromises();
 
     const input = wrapper.find('input[name="username"]');
     expect((input.element as HTMLInputElement).value).toBe(firstSuggestion.text());
+    wrapper.unmount();
   });
 });

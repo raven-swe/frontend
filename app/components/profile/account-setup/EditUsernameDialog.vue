@@ -9,6 +9,7 @@ import { useQuery } from '@tanstack/vue-query';
 import type { ButtonVariants } from '~/components/ui/button/variants';
 import { useUserStore } from '~/stores/user';
 import useAccountSetup from '~/composables/useAccountSetup';
+import { useDebounceFn, useDebounce } from '@vueuse/core';
 
 const props = defineProps<{
   open: boolean;
