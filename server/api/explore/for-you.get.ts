@@ -3,10 +3,7 @@ import { defineWrappedResponseHandler } from '~~/server/utils/handler';
 
 export default defineWrappedResponseHandler(async (event) => {
   const fetcher = serverApiFetch(event);
-  return await fetcher<ApiSuccessResponse<{ trendingHashtags: TrendingHashtag[] }>>(
-    '/explore/for-you',
-    {
-      method: 'GET',
-    },
-  );
+  return await fetcher<ApiSuccessResponse<TrendingHashtag[]>>('/explore/for-you', {
+    method: 'GET',
+  });
 });

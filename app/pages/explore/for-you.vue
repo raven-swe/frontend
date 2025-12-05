@@ -19,11 +19,11 @@ const loadHashtags = async () => {
   isHashtagsLoading.value = true;
   try {
     const response = await exploreService.getForYou();
-    trendingHashtags.value = response.data.trendingHashtags;
+    trendingHashtags.value = response.data;
   } catch (error) {
     console.error('Failed to load trending hashtags:', error);
   } finally {
-    isLoading.value = false;
+    isHashtagsLoading.value = false;
   }
 };
 

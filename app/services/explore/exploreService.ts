@@ -11,7 +11,7 @@ export const exploreService = {
   },
 
   async getForYou() {
-    return await apiFetch('/api/explore/for-you', {
+    return await apiFetch<ApiSuccessResponse<TrendingHashtag[]>>('/api/explore/for-you', {
       method: 'GET',
     });
   },
