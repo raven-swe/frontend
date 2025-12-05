@@ -109,7 +109,7 @@ const modifiedMutualUsers = computed(() => {
         <NuxtLink
           v-if="userProfile?.mutualsCount !== 0"
           :to="`/profile/${userProfile?.username}/followers-you-follow`"
-          class="decoration-muted-foreground flex w-fit items-center gap-4 hover:underline"
+          class="decoration-muted-foreground flex w-fit items-center gap-2 hover:underline"
         >
           <div
             class="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-1"
@@ -128,7 +128,7 @@ const modifiedMutualUsers = computed(() => {
             {{
               $t('profile-info.mutual', count, {
                 named: {
-                  others: Math.max(count - 2, 0),
+                  others: Math.max(count - 1, 0),
                   user1: userProfile?.mutualUsers?.[0]?.displayName,
                   user2: userProfile?.mutualUsers?.[1]?.displayName,
                   user3: userProfile?.mutualUsers?.[2]?.displayName,
