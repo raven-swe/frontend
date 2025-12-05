@@ -1,19 +1,13 @@
 <script setup lang="ts">
-import {
-  ref,
-  onMounted,
-  computed,
-  watch,
-  watchEffect,
-  onServerPrefetch,
-  type ComponentPublicInstance,
-} from 'vue';
+import { ref, onMounted, computed, watch, watchEffect, type ComponentPublicInstance } from 'vue';
 import TweetDefaultCard from '~/components/tweet/TweetDefaultCard.vue';
 import { searchService } from '~/services/search/searchService';
 import { useInfiniteQuery } from '@tanstack/vue-query';
 import { useWindowVirtualizer } from '@tanstack/vue-virtual';
 import { useSearchQuery } from '~/composables/useSearchQuery';
 import type { User } from '~~/shared/types/user';
+import { useSearchStore } from '~/stores/search';
+import { PeopleFilter } from '~~/shared/types/search';
 
 definePageMeta({
   layout: 'search',
@@ -21,9 +15,15 @@ definePageMeta({
 
 const { searchQuery, initializeFromRoute } = useSearchQuery();
 const route = useRoute();
+const searchStore = useSearchStore();
 
 const users = ref<User[]>([]);
 const isUsersLoading = ref(false);
+
+// Compute people filter from URL
+const peopleFilter = computed(() =>
+  route.query.pf === 'on' ? PeopleFilter.following : PeopleFilter.anyone,
+);
 
 // Initialize search query from URL
 onMounted(() => {
@@ -42,10 +42,31 @@ watch(
   },
 );
 
+// Watch for people filter changes
+watch(
+  () => route.query.pf,
+  () => {
+    loadUsers();
+  },
+);
+
+// Watch for removeBlocked changes
+watch(
+  () => searchStore.removeBlocked,
+  () => {
+    loadUsers();
+  },
+);
+
 const loadUsers = async () => {
   isUsersLoading.value = true;
   try {
-    const response = await searchService.getPeople({ cursor: null, limit: 3 }, searchQuery.value);
+    const response = await searchService.getPeople({
+      pagination: { cursor: null, limit: 3 },
+      query: searchQuery.value,
+      peopleFilter: peopleFilter.value,
+      removeBlocked: searchStore.removeBlocked,
+    });
     users.value = response.data;
   } catch (error) {
     console.error('Failed to load users:', error);
@@ -59,19 +80,34 @@ const {
   fetchNextPage,
   hasNextPage,
   isFetchingNextPage,
-  isFetching: isLoading,
-  suspense,
+  isFetching: isTweetsLoading,
 } = useInfiniteQuery({
-  queryKey: computed(() => ['search', 'tweets', 'top', searchQuery.value]),
+  queryKey: computed(() => [
+    'search',
+    'tweets',
+    'top',
+    searchQuery.value,
+    peopleFilter.value,
+    searchStore.removeBlocked,
+  ]),
   initialPageParam: null as string | null,
   queryFn: async ({ pageParam = null }) =>
-    await searchService.getTweets({ limit: 10, cursor: pageParam }, searchQuery.value, 'top'),
+    await searchService.getTweets({
+      pagination: { limit: 10, cursor: pageParam },
+      query: searchQuery.value,
+      tab: 'top',
+      peopleFilter: peopleFilter.value,
+      removeBlocked: searchStore.removeBlocked,
+    }),
   getNextPageParam: (lastPage) =>
     lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined,
   structuralSharing: false,
 });
 
 const tweets = computed(() => response.value?.pages.flatMap((page) => page.data) || []);
+
+// Combined loading state
+const isLoading = computed(() => isUsersLoading.value || isTweetsLoading.value);
 
 //  Virtualization setup
 const parentRef = ref<HTMLElement | null>(null);
@@ -120,10 +156,6 @@ watchEffect(() => {
   if (lastItem.index >= tweets.value.length - 3 && hasNextPage.value && !isFetchingNextPage.value) {
     fetchNextPage();
   }
-});
-
-onServerPrefetch(async () => {
-  await suspense();
 });
 
 watch(

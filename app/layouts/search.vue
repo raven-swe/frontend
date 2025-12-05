@@ -22,28 +22,44 @@ watch(
   },
 );
 
-const tabs = computed(() => [
-  {
-    label: $t('search.top.tab'),
-    route: `/search/top${route.query.q ? `?q=${route.query.q}` : ''}`,
-    path: '/search/top',
-  },
-  {
-    label: $t('search.latest.tab'),
-    route: `/search/latest${route.query.q ? `?q=${route.query.q}` : ''}`,
-    path: '/search/latest',
-  },
-  {
-    label: $t('search.people.tab'),
-    route: `/search/people${route.query.q ? `?q=${route.query.q}` : ''}`,
-    path: '/search/people',
-  },
-  {
-    label: $t('search.media.tab'),
-    route: `/search/media${route.query.q ? `?q=${route.query.q}` : ''}`,
-    path: '/search/media',
-  },
-]);
+const tabs = computed(() => {
+  const buildQueryString = () => {
+    const params = new URLSearchParams();
+    if (route.query.q) {
+      params.append('q', route.query.q as string);
+    }
+    if (route.query.pf) {
+      params.append('pf', route.query.pf as string);
+    }
+    const queryString = params.toString();
+    return queryString ? `?${queryString}` : '';
+  };
+
+  const queryString = buildQueryString();
+
+  return [
+    {
+      label: $t('search.top.tab'),
+      route: `/search/top${queryString}`,
+      path: '/search/top',
+    },
+    {
+      label: $t('search.latest.tab'),
+      route: `/search/latest${queryString}`,
+      path: '/search/latest',
+    },
+    {
+      label: $t('search.people.tab'),
+      route: `/search/people${queryString}`,
+      path: '/search/people',
+    },
+    {
+      label: $t('search.media.tab'),
+      route: `/search/media${queryString}`,
+      path: '/search/media',
+    },
+  ];
+});
 </script>
 
 <template>

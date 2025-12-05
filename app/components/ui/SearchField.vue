@@ -146,7 +146,7 @@ onMounted(() => {
       size="icon"
       @click="isFocused = false"
     >
-      <Icon class="ms-2" :name="$t('icons.back-button-icon')" size="1.3rem" />
+      <Icon class="mx-3" :name="$t('icons.back-button-icon')" size="1.3rem" />
     </UiButton>
     <div class="relative flex-1">
       <UiSearchBar
@@ -197,7 +197,7 @@ onMounted(() => {
             </div>
             <div v-if="searchResults.hashtags.length === 0" class="border-border border-b">
               <NuxtLink
-                :to="`/search?type=hashtags&q=${searchQuery}`"
+                :to="`/search/top?q=${encodeURIComponent(searchQuery)}`"
                 class="hover:bg-accent flex items-center transition-colors"
                 @click="saveInHistory({ type: 'hashtag', content: searchQuery })"
               >

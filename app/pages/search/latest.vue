@@ -13,6 +13,8 @@ import { searchService } from '~/services/search/searchService';
 import { useInfiniteQuery } from '@tanstack/vue-query';
 import { useWindowVirtualizer } from '@tanstack/vue-virtual';
 import { useSearchQuery } from '~/composables/useSearchQuery';
+import { useSearchStore } from '~/stores/search';
+import { PeopleFilter } from '~~/shared/types/search';
 
 definePageMeta({
   layout: 'search',
@@ -20,6 +22,12 @@ definePageMeta({
 
 const { searchQuery, initializeFromRoute } = useSearchQuery();
 const route = useRoute();
+const searchStore = useSearchStore();
+
+// Compute people filter from URL
+const peopleFilter = computed(() =>
+  route.query.pf === 'on' ? PeopleFilter.following : PeopleFilter.anyone,
+);
 
 // Initialize search query from URL
 onMounted(() => {
@@ -44,10 +52,23 @@ const {
   isFetching: isLoading,
   suspense,
 } = useInfiniteQuery({
-  queryKey: computed(() => ['search', 'tweets', 'latest', searchQuery.value]),
+  queryKey: computed(() => [
+    'search',
+    'tweets',
+    'latest',
+    searchQuery.value,
+    peopleFilter.value,
+    searchStore.removeBlocked,
+  ]),
   initialPageParam: null as string | null,
   queryFn: async ({ pageParam = null }) =>
-    await searchService.getTweets({ limit: 10, cursor: pageParam }, searchQuery.value, 'latest'),
+    await searchService.getTweets({
+      pagination: { limit: 10, cursor: pageParam },
+      query: searchQuery.value,
+      tab: 'latest',
+      peopleFilter: peopleFilter.value,
+      removeBlocked: searchStore.removeBlocked,
+    }),
   getNextPageParam: (lastPage) =>
     lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined,
   structuralSharing: false,
