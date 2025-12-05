@@ -44,6 +44,14 @@
       "title": "Who to follow",
       "follow": "Follow"
     },
+    "search-filters": {
+      "title": "Search Filters",
+      "people": {
+        "title": "People",
+        "any-one": "From any one",
+        "you-follow": "people you follow"
+      }
+    },
     "show-more": "Show more"
   },
   "homepage": {
@@ -145,7 +153,8 @@
     "entertainment": {
       "tab": "Entertainment"
     },
-    "no-trending-hashtags": "No trending hashtags found"
+    "no-trending-hashtags": "No trending hashtags found",
+    "hashtag": "{rank} . Trending in {location}"
   },
   "search": {
     "top": {
@@ -163,7 +172,12 @@
     },
     "no-trending-hashtags": "No trending hashtags found",
     "no-results": "No results for \"{query}\"",
-    "try-searching": "Try searching for something else."
+    "try-searching": "Try searching for something else.",
+    "settings": {
+      "title": "Search Settings",
+      "remove-block": "Remove blocked and muted accounts",
+      "remove-block-desc": "Use this to eliminate search results from accounts you’ve blocked or muted."
+    }
   },
   "playground": {
     "dialog": {

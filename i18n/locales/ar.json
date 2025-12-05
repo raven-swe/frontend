@@ -44,6 +44,14 @@
       "title": "من تتابع",
       "follow": "متابعة"
     },
+    "search-filters": {
+      "title": "تصفية البحث",
+      "people": {
+        "title": "الأشخاص",
+        "any-one": "من أي شخص",
+        "you-follow": "الأشخاص الذين تتابعهم"
+      }
+    },
     "show-more": "عرض المزيد"
   },
   "homepage": {
@@ -118,7 +126,8 @@
     "entertainment": {
       "tab": "ترفيه"
     },
-    "no-trending-hashtags": "لا توجد علامات تصنيف رائجة"
+    "no-trending-hashtags": "لا توجد علامات تصنيف رائجة",
+    "hashtag": "{rank} . رائج في {location}"
   },
   "search": {
     "top": {
@@ -136,7 +145,12 @@
     },
     "no-trending-hashtags": "لا توجد علامات تصنيف رائجة",
     "no-results": "لا توجد نتائج لـ \"{query}\"",
-    "try-searching": "حاول البحث عن شيء آخر."
+    "try-searching": "حاول البحث عن شيء آخر.",
+    "settings": {
+      "title": "إعدادات البحث",
+      "remove-block": "إزالة الحسابات المحظورة والمكتومة",
+      "remove-block-desc": "استخدم هذا لإزالة نتائج البحث من الحسابات التي قمت بحظرها أو كتمها."
+    }
   },
   "playground": {
     "dialog": {
