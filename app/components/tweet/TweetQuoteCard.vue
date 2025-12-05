@@ -80,7 +80,7 @@ function handleTweetClick() {
   <!-- Compact embedded quoted tweet card -->
   <div
     :id="'quoted-tweet-' + props.tweet.id"
-    class="border-border bg-muted/30 hover:bg-muted/40 mt-2 rounded-xl border p-3 text-sm"
+    class="border-border bg-muted/40 hover:bg-muted/40 mt-2 rounded-xl border p-3 text-sm"
     @click.prevent.stop="handleTweetClick"
   >
     <!-- Header: avatar + names inline -->

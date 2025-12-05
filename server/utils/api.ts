@@ -18,6 +18,15 @@ export const serverApiFetch = (event: H3Event) =>
           const token = getCookie(event, 'access_token');
           if (token) options.headers.append('Authorization', `Bearer ${token}`);
         }
+
+        const xRealIp = getHeader(event, 'X-Real-IP');
+        if (xRealIp) options.headers.append('X-Real-IP', xRealIp);
+
+        const xForwardedIp = getHeader(event, 'X-Forwarded-For');
+        if (xForwardedIp) options.headers.append('X-Forwarded-For', xForwardedIp);
+
+        const userAgent = getHeader(event, 'User-Agent');
+        if (userAgent) options.headers.append('User-Agent', userAgent);
       }
       // Ensure the X-Client-Type header is set to web
       options.headers.append('X-Client-Type', 'web');
