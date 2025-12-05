@@ -12,6 +12,8 @@ export default defineWrappedResponseHandler(async (event) => {
       tab: query.tab,
       limit: query.limit,
       cursor: query.cursor ?? undefined,
+      peopleFilter: query.peopleFilter,
+      excludeMutedAndBlocked: query.removeBlocked,
     },
   });
 });

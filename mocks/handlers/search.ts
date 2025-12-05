@@ -54,6 +54,8 @@ export const handlers = [
     const query = url.searchParams.get('query') || '';
     const limit = parseInt(url.searchParams.get('limit') || '10');
     const cursor = url.searchParams.get('cursor');
+    const peopleFilter = url.searchParams.get('peopleFilter') || 'anyone'; // 'anyone' or 'following'
+    const excludeMutedAndBlocked = url.searchParams.get('excludeMutedAndBlocked') === 'true';
 
     if (!query.trim()) {
       return HttpResponse.json(
@@ -71,11 +73,24 @@ export const handlers = [
     }
 
     // Filter users that match the query (username or display name)
-    const matchedUsers = usersData.filter(
+    let matchedUsers = usersData.filter(
       (user) =>
         user.username.toLowerCase().includes(query.toLowerCase()) ||
         user.displayName.toLowerCase().includes(query.toLowerCase()),
     );
+
+    // Apply people filter (following only)
+    if (peopleFilter === 'following') {
+      matchedUsers = matchedUsers.filter((user) => user.relationship.following);
+    }
+
+    // Apply blocked/muted filter
+    if (excludeMutedAndBlocked) {
+      matchedUsers = matchedUsers.filter(
+        (user) =>
+          !user.relationship.blocking && !user.relationship.blockedBy && !user.relationship.muted,
+      );
+    }
 
     // Simple pagination
     const startIndex = cursor ? parseInt(cursor) : 0;
@@ -113,6 +128,8 @@ export const handlers = [
     const tab = url.searchParams.get('tab') || 'top';
     const limit = parseInt(url.searchParams.get('limit') || '10');
     const cursor = url.searchParams.get('cursor');
+    const peopleFilter = url.searchParams.get('peopleFilter') || 'anyone'; // 'anyone' or 'following'
+    const excludeMutedAndBlocked = url.searchParams.get('excludeMutedAndBlocked') === 'true';
 
     if (!query.trim()) {
       return HttpResponse.json(
@@ -130,7 +147,7 @@ export const handlers = [
     }
 
     // Filter tweets that match the query (content, hashtags, or mentions)
-    const matchedTweets = tweetsData.filter((tweet) => {
+    let matchedTweets = tweetsData.filter((tweet) => {
       const contentMatch = tweet.content.toLowerCase().includes(query.toLowerCase());
       const hashtagMatch = tweet.entities?.hashtags?.some((h) =>
         h.hashtag.toLowerCase().includes(query.toLowerCase().replace('#', '')),
@@ -140,6 +157,29 @@ export const handlers = [
       );
       return contentMatch || hashtagMatch || mentionMatch;
     });
+
+    // Apply people filter (following only) - filter by tweet author
+    if (peopleFilter === 'following') {
+      const followingUsernames = usersData
+        .filter((user) => user.relationship.following)
+        .map((user) => user.username);
+      matchedTweets = matchedTweets.filter((tweet) =>
+        followingUsernames.includes(tweet.author.username),
+      );
+    }
+
+    // Apply blocked/muted filter - filter by tweet author
+    if (excludeMutedAndBlocked) {
+      const blockedOrMutedUsernames = usersData
+        .filter(
+          (user) =>
+            user.relationship.blocking || user.relationship.blockedBy || user.relationship.muted,
+        )
+        .map((user) => user.username);
+      matchedTweets = matchedTweets.filter(
+        (tweet) => !blockedOrMutedUsernames.includes(tweet.author.username),
+      );
+    }
 
     // Simple pagination
     const startIndex = cursor ? parseInt(cursor) : 0;

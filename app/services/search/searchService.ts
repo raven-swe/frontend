@@ -1,6 +1,5 @@
 import { apiFetch } from '~/api';
-import type { PaginationParams } from '~~/shared/types/pagination';
-import type { validSearchTweetsTabs } from '~~/shared/types/timeline';
+import { PeopleFilter, type SearchQuery, type TweetsSearchQuery } from '~~/shared/types/search';
 
 export const searchService = {
   async getTopThreeHashtags(query: string) {
@@ -13,7 +12,12 @@ export const searchService = {
   },
 
   async search(query: string) {
-    const usersResponse = await this.getPeople({ cursor: null, limit: 10 }, query);
+    const usersResponse = await this.getPeople({
+      pagination: { cursor: null, limit: 10 },
+      query: query,
+      peopleFilter: PeopleFilter.anyone,
+      removeBlocked: false,
+    });
     const users = usersResponse.data;
     const hashtagsResponse = await this.getTopThreeHashtags(query);
     const hashtags: [string] = hashtagsResponse.data;
@@ -23,29 +27,29 @@ export const searchService = {
     };
   },
 
-  async getTweets(
-    pagination: PaginationParams,
-    query: string,
-    tab: (typeof validSearchTweetsTabs)[number],
-  ) {
+  async getTweets(tweetsSearchQuery: TweetsSearchQuery) {
     return apiFetch(`/api/search/tweets`, {
       method: 'GET',
       query: {
-        query: query,
-        tab: tab,
-        limit: pagination.limit,
-        cursor: pagination.cursor ?? undefined,
+        query: tweetsSearchQuery.query,
+        tab: tweetsSearchQuery.tab,
+        limit: tweetsSearchQuery.pagination.limit,
+        cursor: tweetsSearchQuery.pagination.cursor ?? undefined,
+        peopleFilter: tweetsSearchQuery.peopleFilter,
+        excludeMutedAndBlocked: tweetsSearchQuery.removeBlocked,
       },
     });
   },
 
-  async getPeople(pagination: PaginationParams, query: string) {
+  async getPeople(peopleSearchQuery: SearchQuery) {
     return apiFetch(`/api/search/users`, {
       method: 'GET',
       query: {
-        query: query,
-        limit: pagination.limit,
-        cursor: pagination.cursor ?? undefined,
+        query: peopleSearchQuery.query,
+        limit: peopleSearchQuery.pagination.limit,
+        cursor: peopleSearchQuery.pagination.cursor ?? undefined,
+        peopleFilter: peopleSearchQuery.peopleFilter,
+        excludeMutedAndBlocked: peopleSearchQuery.removeBlocked,
       },
     });
   },
