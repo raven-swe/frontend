@@ -3,6 +3,11 @@ import { useInfiniteQuery } from '@tanstack/vue-query';
 import { useVirtualizer } from '@tanstack/vue-virtual';
 import useAccountSetup from '~/composables/useAccountSetup';
 import { settingsService } from '~/services/settingsService';
+import {
+  useFollowMutation,
+  useBlockMutation,
+  useMuteMutation,
+} from '~/composables/useProfileMutation';
 
 const props = defineProps<{
   open: boolean;
