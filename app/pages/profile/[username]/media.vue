@@ -93,7 +93,7 @@ onServerPrefetch(async () => {
             : $t('profile.media.no-media.title', { username: user?.username || '' })
         }}
       </h2>
-      <p class="text-muted-foreground leading-tight">
+      <p class="text-muted-foreground leading-tight" data-test="empty-description">
         {{
           isCurrentUser
             ? $t('profile.media.current-user-no-media.description')
