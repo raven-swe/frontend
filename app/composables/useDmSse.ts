@@ -14,6 +14,7 @@ export function useDmSse(options: UseDmSseOptions = {}) {
   const SSEendpoint = `/api/stream?topics=dm,notifications`;
   const unseenCount = ref<number>(0);
   const lastNewMessageinfo = ref<DmSseEventMap['dm.new_message'] | null>(null);
+  const lastNotification = ref<Notification | null>(null);
   const isConnected = ref<boolean>(false);
   const error = ref<Event | null>(null);
   const reconnectAttempts = ref<number>(0);
@@ -116,6 +117,7 @@ export function useDmSse(options: UseDmSseOptions = {}) {
         try {
           const data = JSON.parse(evt.data) as Notification;
           // update the last notification somewhere
+          lastNotification.value = data;
           console.log('Received notifications.new event:', data);
         } catch {
           createError('Failed to parse notifications.new event data');
@@ -151,6 +153,7 @@ export function useDmSse(options: UseDmSseOptions = {}) {
     // state
     unseenCount,
     lastNewMessageinfo,
+    lastNotification,
     isConnected,
     error,
     reconnectAttempts,

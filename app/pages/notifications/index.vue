@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useInfiniteQuery } from '@tanstack/vue-query';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/vue-query';
 import { useWindowVirtualizer } from '@tanstack/vue-virtual';
 import { Like, Follow, Repost, Reply, QuoteMention } from '~/components/notifications';
 import { notificationsService } from '~/services/notifications/notificationsService';
@@ -13,6 +13,9 @@ definePageMeta({
   layout: 'notifications',
 });
 
+const lastNotification = inject<Ref<Notification | null>>('lastNotification')!;
+const queryClient = useQueryClient();
+
 // infinite query to fetch notifications
 const {
   data: response,
@@ -21,13 +24,14 @@ const {
   isFetchingNextPage,
   isLoading,
 } = useInfiniteQuery({
-  queryKey: ['notifications'],
+  queryKey: ['notifications-main'],
   initialPageParam: null as string | null,
   queryFn: async ({ pageParam = null }) =>
     await notificationsService.getNotifications({ cursor: pageParam, limit: 20 }),
   getNextPageParam: (lastPage) =>
     lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined,
   structuralSharing: false,
+  retry: false,
 });
 
 const notifications = computed<Notification[]>(() => {
@@ -125,6 +129,47 @@ function componentForType(type: string) {
       return Follow;
   }
 }
+
+watch(
+  () => lastNotification.value,
+  (notif) => {
+    if (!notif) return;
+
+    // Prepend new notification to page 0
+    queryClient.setQueryData(['notifications-main'], (oldData: unknown) => {
+      if (!oldData || typeof oldData !== 'object') return oldData;
+
+      const od = oldData as {
+        pages?: Array<{ data?: unknown[] }>;
+        [k: string]: unknown;
+      };
+
+      const firstPage = od.pages?.[0];
+      if (!firstPage) return oldData;
+
+      const firstPageTyped = firstPage as { data?: Notification[] };
+
+      return {
+        ...od,
+        pages: [
+          {
+            ...firstPageTyped,
+            data: [notif, ...(firstPageTyped.data ?? [])],
+          },
+          ...(od.pages?.slice(1) ?? []),
+        ],
+      };
+    });
+  },
+);
+
+watch(
+  () => lastNotification.value,
+  async () => {
+    await nextTick();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  },
+);
 </script>
 
 <template>
