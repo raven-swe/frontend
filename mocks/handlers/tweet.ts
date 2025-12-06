@@ -279,7 +279,7 @@ export const handlers = [
     if (!tweet) {
       return HttpResponse.json({ message: `Tweet "${id}" not found` }, { status: 404 });
     }
-    const allTweets = Array.from(tweets.values()).filter((t) => t.isReplyToTweetId === id);
+    const allTweets = Array.from(tweets.values()).filter((t) => t.replyToTweetId === id);
     const startIndex = cursor ? Math.max(0, Number(cursor)) : 0;
     const paginatedTweets = allTweets.slice(startIndex, startIndex + limit);
     const nextIndex = startIndex + paginatedTweets.length;

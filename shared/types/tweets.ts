@@ -1,6 +1,6 @@
 import type { ContentEntities } from './entity';
 
-type TweetAuthor = {
+export type TweetAuthor = {
   username: string;
   displayName: string;
   avatarUrl: string;
@@ -31,8 +31,11 @@ export type Tweet = {
   entities: ContentEntities;
   media: TweetMedia[];
   replyToTweetId?: string | null;
-  quoteToTweetId?: string;
-  quotedTweet?: Tweet;
+  quoteToTweetId?: string | null;
+  quotedTweet?: Tweet | null;
+  rootTweet?: Tweet | null;
+  parentTweets?: Tweet[] | null;
+  hasMoreParents?: boolean;
 };
 
 export type CreateTweetRequest = {
