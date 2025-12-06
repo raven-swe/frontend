@@ -103,6 +103,7 @@ export const useInterestsForm = () => {
   return {
     isLoading,
     interests: computed(() => interestsResponse.value?.data),
+    selectedOne: computed(() => fields.value.length > 0),
     onSubmit,
     handleToggleInterest,
     isInterestActive,

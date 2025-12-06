@@ -2,7 +2,7 @@
 import InterestEntry from '~/components/Settings/InterestEntry.vue';
 
 definePageMeta({ layout: 'settings' });
-const { isLoading, onSubmit, interests, handleToggleInterest, isInterestActive } =
+const { isLoading, onSubmit, interests, handleToggleInterest, isInterestActive, selectedOne } =
   useInterestsForm();
 </script>
 
@@ -37,7 +37,13 @@ const { isLoading, onSubmit, interests, handleToggleInterest, isInterestActive }
       <div v-if="isLoading" class="flex flex-1 items-center justify-center overflow-y-auto">
         <UiSpinner class="text-primary" />
       </div>
-      <UiButton class="m-4" size="lg" variant="default">
+      <UiButton
+        class="m-4"
+        size="lg"
+        variant="default"
+        type="submit"
+        :disabled="isLoading || !selectedOne"
+      >
         {{ $t('ui.save') }}
       </UiButton>
     </form>
