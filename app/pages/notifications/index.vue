@@ -1,140 +1,14 @@
 <script lang="ts" setup>
-import { useInfiniteQuery, useQueryClient } from '@tanstack/vue-query';
-import { useWindowVirtualizer } from '@tanstack/vue-virtual';
 import { Like, Follow, Repost, Reply, QuoteMention } from '~/components/notifications';
-import { notificationsService } from '~/services/notifications/notificationsService';
-import type {
-  ActorSummary,
-  ActorSummaryContainer,
-  Notification,
-} from '~~/shared/types/notifications';
+import { useNotificationsList } from '~/composables/useNotificationsList';
 
 definePageMeta({
   layout: 'notifications',
 });
 
-const lastNotification = inject<Ref<Notification | null>>('lastNotification')!;
+/* eslint-disable @typescript-eslint/no-explicit-any */
+const lastNotification = inject<Ref<any>>('lastNotification')!;
 const unseenNotificationsCount = inject<Ref<number>>('unseenNotificationsCount')!;
-const queryClient = useQueryClient();
-
-// infinite query to fetch notifications
-const {
-  data: response,
-  fetchNextPage,
-  hasNextPage,
-  isFetchingNextPage,
-  isLoading,
-} = useInfiniteQuery({
-  queryKey: ['notifications-main'],
-  initialPageParam: null as string | null,
-  queryFn: async ({ pageParam = null }) =>
-    await notificationsService.getNotifications({ cursor: pageParam, limit: 20 }),
-  getNextPageParam: (lastPage) =>
-    lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined,
-  structuralSharing: false,
-  retry: false,
-});
-
-const notifications = computed<Notification[]>(() => {
-  const pagesVal = response.value?.pages ?? [];
-  const items = pagesVal.flatMap((p: unknown) => {
-    const page = p as { data?: unknown[] };
-    return page.data ?? [];
-  });
-  return items as unknown as Notification[];
-});
-const { mutate: followUser } = useFollowMutation();
-
-// mark all as seen in the cache
-await notificationsService.markAllSeen();
-unseenNotificationsCount.value = 0;
-queryClient.setQueryData(['notifications-main'], (oldData: unknown) => {
-  if (!oldData || typeof oldData !== 'object') return oldData;
-  const od = oldData as {
-    pages?: Array<{ data?: Notification[] }>;
-    [k: string]: unknown;
-  };
-  return {
-    ...od,
-    pages: od.pages?.map((page) => {
-      const typedPage = page as { data?: Notification[] };
-      return {
-        ...typedPage,
-        data: typedPage.data?.map((notif) => ({
-          ...notif,
-          isSeen: true,
-        })),
-      };
-    }),
-  };
-});
-
-// Virtualization
-const parentRef = ref<HTMLElement | null>(null);
-const parentOffsetRef = ref(0);
-
-onMounted(() => {
-  parentOffsetRef.value = parentRef.value?.offsetTop ?? 0;
-});
-
-const rowVirtualizerOptions = computed(() => {
-  return {
-    count: hasNextPage.value ? notifications.value.length + 1 : notifications.value.length,
-    estimateSize: () => 100,
-    overscan: 3,
-    scrollMargin: parentOffsetRef.value,
-    getItemKey: (index: number) => notifications.value[index]?.id || index,
-  };
-});
-
-const rowVirtualizer = useWindowVirtualizer(rowVirtualizerOptions);
-const virtualRows = computed(() => rowVirtualizer.value.getVirtualItems());
-const totalSize = computed(() => rowVirtualizer.value.getTotalSize());
-
-const measureElement = (el: Element | ComponentPublicInstance | null) => {
-  if (!el) return;
-  const element = 'nodeType' in el ? (el as HTMLElement) : (el as ComponentPublicInstance).$el;
-  rowVirtualizer.value.measureElement(element);
-};
-
-watch(
-  () => notifications.value.length,
-  () => {
-    setTimeout(() => {
-      if (parentRef.value) {
-        parentOffsetRef.value = parentRef.value.offsetTop;
-      }
-    }, 100);
-  },
-  { flush: 'post' },
-);
-
-// auto-fetch more when scrolling near the end
-watchEffect(() => {
-  const [lastItem] = [...virtualRows.value].reverse();
-
-  if (!lastItem) {
-    return;
-  }
-
-  if (
-    lastItem.index >= notifications.value.length - 3 &&
-    hasNextPage.value &&
-    !isFetchingNextPage.value
-  ) {
-    fetchNextPage();
-  }
-});
-
-function getPrimaryActor(actorSummary?: ActorSummaryContainer | null): ActorSummary {
-  return (
-    actorSummary?.previewActors?.[0] ?? {
-      username: 'unknown',
-      displayName: 'Unknown',
-      avatarUrl: '/default_profile.png',
-    }
-  );
-}
 
 function componentForType(type: string) {
   switch (type) {
@@ -155,59 +29,40 @@ function componentForType(type: string) {
   }
 }
 
-watch(
-  () => lastNotification.value,
-  (notif) => {
-    if (!notif) return;
+const {
+  notifications,
+  virtualRows,
+  totalSize,
+  measureElement,
+  hasNextPage,
+  isFetchingNextPage,
+  isLoading,
+  markAllSeen,
+  getPrimaryActor,
+} = useNotificationsList({
+  queryKey: ['notifications-main'],
+  filter: null,
+  lastNotification,
+  relatedQueryKeys: [['notifications-mentions']],
+  unseenRef: unseenNotificationsCount,
+});
 
-    // Prepend new notification to page 0
-    queryClient.setQueryData(['notifications-main'], (oldData: unknown) => {
-      if (!oldData || typeof oldData !== 'object') return oldData;
+const { mutate: followUser } = useFollowMutation();
 
-      const od = oldData as {
-        pages?: Array<{ data?: Notification[] }>;
-        [k: string]: unknown;
-      };
-
-      const firstPage = od.pages?.[0];
-      if (!firstPage) return oldData;
-
-      const firstPageTyped = firstPage as { data?: Notification[] };
-
-      // avoid duplicates
-      const alreadyExists = od.pages?.some((p) =>
-        (p as { data?: Notification[] }).data?.some((n) => n.id === notif.id),
-      );
-
-      if (alreadyExists) return oldData;
-
-      return {
-        ...od,
-        pages: [
-          {
-            ...firstPageTyped,
-            data: [notif, ...(firstPageTyped.data ?? [])],
-          },
-          ...(od.pages?.slice(1) ?? []),
-        ],
-      };
-    });
-  },
-);
-
-watch(
-  () => lastNotification.value,
-  async () => {
-    await nextTick();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  },
-);
+onMounted(() => {
+  const hasUnseen = notifications.value.some((n) => !n.isSeen);
+  if (hasUnseen) {
+    setTimeout(() => {}, 500);
+    markAllSeen();
+    unseenNotificationsCount.value = 0;
+  }
+});
 </script>
 
 <template>
   <div class="mx-auto max-w-[700px]">
     <ClientOnly>
-      <div v-if="notifications" ref="parentRef">
+      <div v-if="notifications">
         <div
           :style="{
             height: `${totalSize}px`,
@@ -221,9 +76,7 @@ watch(
               top: 0,
               left: 0,
               width: '100%',
-              transform: `translateY(${
-                virtualRows[0] ? virtualRows[0].start - rowVirtualizer.options.scrollMargin : 0
-              }px)`,
+              transform: `translateY(${virtualRows[0] ? virtualRows[0].start - 0 : 0}px)`,
             }"
           >
             <div
