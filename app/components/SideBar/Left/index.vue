@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/vue-query';
 import { ref } from 'vue';
 import { useI18n } from '#imports';
 import { useTheme } from '~/composables/useTheme';
+import Avatar from '~/components/ui/Avatar.vue';
 
 const dmUnseenCount = inject<Ref<number>>('dmUnseenCount', ref(0));
 
@@ -15,7 +16,7 @@ const queryClient = useQueryClient();
 
 const handleLogout = async () => {
   await loginService.logout();
-  queryClient.removeQueries({ queryKey: ['layout-data'] });
+  await queryClient.clear();
 };
 
 const lang = ref(locale.value);
@@ -75,14 +76,63 @@ const switchLanguage = () => {
           size="24"
         />
       </UiButton>
-      <UiButton
-        variant="ghost-default"
-        size="icon-xl"
-        data-cy="logout-button"
-        @click="handleLogout"
-      >
-        <Icon name="ic:outline-logout" size="24" />
-      </UiButton>
+    </div>
+    <div class="flex w-full flex-grow p-2 pb-4">
+      <UiAlertDialog>
+        <UiDropdownMenu>
+          <UiDropdownMenuTrigger as-child>
+            <UiButton
+              variant="ghost-default"
+              size="2xl"
+              class="mx-auto mt-auto xl:w-full"
+              data-cy="logout-btn-trigger"
+            >
+              <div class="flex w-full items-center gap-3">
+                <Avatar
+                  :img="userStore.user?.avatarUrl || ''"
+                  :alt="userStore.user?.displayName || 'User Avatar'"
+                  size="sm"
+                />
+                <div class="hidden text-start xl:block">
+                  <p>{{ userStore.user?.displayName || 'User' }}</p>
+                  <p class="text-muted-foreground text-sm">
+                    {{ '@' + (userStore.user?.username || 'username') }}
+                  </p>
+                </div>
+                <div class="ms-auto hidden xl:flex">
+                  <Icon name="lucide:more-horizontal" class="pe-2" />
+                </div>
+              </div>
+            </UiButton>
+          </UiDropdownMenuTrigger>
+          <UiDropdownMenuContent align="center" class="bg-background">
+            <UiAlertDialogTrigger>
+              <UiDropdownMenuItem data-cy="logout-button">
+                {{ $t('ui.logout.label', { username: userStore.user?.username || 'username' }) }}
+              </UiDropdownMenuItem>
+            </UiAlertDialogTrigger>
+          </UiDropdownMenuContent>
+        </UiDropdownMenu>
+
+        <UiAlertDialogContent>
+          <UiAlertDialogHeader>
+            <UiAlertDialogTitle>
+              {{ $t('ui.logout.title') }}
+            </UiAlertDialogTitle>
+            <UiAlertDialogDescription>
+              {{ $t('ui.logout.description') }}
+            </UiAlertDialogDescription>
+          </UiAlertDialogHeader>
+          <UiAlertDialogFooter>
+            <UiAlertDialogAction data-cy="confirm-logout-button" @click="handleLogout">
+              {{ $t('ui.logout.confirm') }}
+            </UiAlertDialogAction>
+            <UiAlertDialogCancel>
+              {{ $t('ui.cancel') }}
+            </UiAlertDialogCancel>
+          </UiAlertDialogFooter>
+        </UiAlertDialogContent>
+      </UiAlertDialog>
     </div>
   </div>
 </template>

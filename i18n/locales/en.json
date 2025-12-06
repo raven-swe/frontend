@@ -240,6 +240,12 @@
       "search-list": {
         "placeholder": "Try searching for people, lists, or keywords"
       }
+    },
+    "logout": {
+      "label": "Log out {'@'}{username}",
+      "title": "Log out of Raven?",
+      "description": "You can always log back in at any time.",
+      "confirm": "Log out"
     }
   },
   "errors": {
