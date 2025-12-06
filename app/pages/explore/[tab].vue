@@ -49,9 +49,14 @@ watch(
     <div v-if="isLoading" class="text-primary mt-50 flex shrink-0 items-center justify-center">
       <UiSpinner />
     </div>
-    <template v-else-if="trendingHashtags && trendingHashtags.length > 0">
-      <Hashtag v-for="hashtag in trendingHashtags" :key="hashtag.hashtag" :hashtag="hashtag" />
-    </template>
+    <div v-else-if="trendingHashtags && trendingHashtags.length > 0" class="py-2">
+      <Hashtag
+        v-for="(hashtag, index) in trendingHashtags"
+        :key="hashtag.hashtag"
+        :hashtag="hashtag"
+        :rank="index"
+      />
+    </div>
     <div v-else class="text-muted-foreground mt-20 text-center">
       <h1 class="text-xl font-semibold">{{ $t('explore.no-trending-hashtags') }}</h1>
     </div>

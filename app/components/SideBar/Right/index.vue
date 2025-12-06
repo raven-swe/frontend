@@ -21,8 +21,8 @@ const peopleFilter = computed(() => {
 const loadHashtags = async () => {
   isLoading.value = true;
   try {
-    const response = await exploreService.getExploreTab('for-you');
-    trendingHashtags.value = response.data;
+    const response = await exploreService.getExploreTab('trending');
+    trendingHashtags.value = response.data.slice(0, 5);
   } catch (error) {
     console.error('Failed to load trending hashtags:', error);
   } finally {
@@ -131,10 +131,11 @@ const whoToFollowItems = [
         <UiSpinner />
       </div>
       <Hashtag
-        v-for="hashtag in trendingHashtags"
+        v-for="(hashtag, index) in trendingHashtags"
         v-else
         :key="hashtag.hashtag"
         :hashtag="hashtag"
+        :rank="index"
       />
       <UiButton variant="ghost-primary" size="sm" @click="goToExplore">
         {{ $t('rightsidebar.show-more') }}
