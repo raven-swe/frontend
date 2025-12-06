@@ -1,6 +1,7 @@
 import type { DmSseEventMap } from '~~/shared/types/dm';
 import { EventSourcePolyfill } from 'event-source-polyfill';
 import type { Notification } from '~~/shared/types/notifications';
+import { useQueryClient } from '@tanstack/vue-query';
 
 interface UseDmSseOptions {
   autoReconnect?: boolean;
@@ -18,6 +19,7 @@ export function useDmSse(options: UseDmSseOptions = {}) {
   const isConnected = ref<boolean>(false);
   const error = ref<Event | null>(null);
   const reconnectAttempts = ref<number>(0);
+  const queryClient = useQueryClient();
 
   let es: EventSource | null = null;
   let reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -115,10 +117,33 @@ export function useDmSse(options: UseDmSseOptions = {}) {
 
       es.addEventListener('notifications.new', (evt: MessageEvent) => {
         try {
-          const data = JSON.parse(evt.data) as Notification;
-          // update the last notification somewhere
-          lastNotification.value = data;
-          console.log('Received notifications.new event:', data);
+          const notif = JSON.parse(evt.data) as Notification;
+          lastNotification.value = notif;
+          queryClient.setQueryData(['notifications-main'], (oldData: unknown) => {
+            if (!oldData || typeof oldData !== 'object') return oldData;
+
+            const od = oldData as {
+              pages?: Array<{ data?: unknown[] }>;
+              [k: string]: unknown;
+            };
+
+            const first = od.pages?.[0];
+            if (!first) return oldData;
+
+            const firstTyped = first as { data?: Notification[] };
+
+            return {
+              ...od,
+              pages: [
+                {
+                  ...firstTyped,
+                  data: [notif, ...(firstTyped.data ?? [])],
+                },
+                ...(od.pages?.slice(1) ?? []),
+              ],
+            };
+          });
+          console.log('Received notifications.new event:', notif);
         } catch {
           createError('Failed to parse notifications.new event data');
         }
