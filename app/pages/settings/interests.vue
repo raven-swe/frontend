@@ -6,26 +6,41 @@ import { useFieldArray, useForm } from 'vee-validate';
 import InterestEntry from '~/components/Settings/InterestEntry.vue';
 
 definePageMeta({ layout: 'settings' });
+
+const formSchema = yup.object({
+  interests: yup
+    .array()
+    .of(yup.string().required())
+    .min(1, $t('errors.interests.REQUIRED'))
+    .required(),
+});
+
+const extractSelected = (newData: ApiSuccessResponse<Interest[]> | undefined) => {
+  if (!newData) return [] as string[];
+  return newData.data.filter((interest) => interest.isSelected).map((interest) => interest.code);
+};
+
 const { t } = useI18n();
 const queryClient = useQueryClient();
 
-const interestsSchema = yup.array().of(yup.string()).min(1, $t('errors.interests.REQUIRED'));
+const {
+  data: interestsResponse,
+  suspense,
+  isLoading,
+} = useQuery({
+  queryKey: ['interests'],
+  queryFn: async () => await settingsService.getInterests(),
+  staleTime: Infinity,
+});
 
-const { handleSubmit, setErrors } = useForm({
-  validationSchema: yup.object({
-    interests: interestsSchema,
-  }),
+const { handleSubmit, setErrors, resetForm } = useForm<yup.InferType<typeof formSchema>>({
+  validationSchema: formSchema,
   initialValues: {
     interests: [],
   },
 });
 
-const { data: interestsResponse, suspense } = useQuery({
-  queryKey: ['interests'],
-  queryFn: async () => await settingsService.getInterests(),
-  staleTime: Infinity,
-  structuralSharing: false,
-});
+const { fields, push, remove } = useFieldArray<string>('interests');
 
 const updateInterestsMutation = useMutation({
   mutationFn: (interests: string[]) => settingsService.updateInterests(interests),
@@ -50,26 +65,6 @@ const onSubmit = handleSubmit((values) => {
   updateInterestsMutation.mutate(values.interests);
 });
 
-const initilizeSelectedInterests = (newData: ApiSuccessResponse<Interest[]> | undefined) => {
-  if (newData?.data) {
-    const selected = newData.data
-      .filter((interest) => interest.isSelected)
-      .map((interest) => interest.code);
-    replace(selected);
-  }
-};
-
-watch(
-  () => interestsResponse.value,
-  (newData) => {
-    initilizeSelectedInterests(newData);
-  },
-);
-
-const { fields, push, remove, replace } = useFieldArray<string>('interests');
-
-const selectedSet = computed(() => new Set(fields.value.map((f) => f.value)));
-
 const handleToggleInterest = (code: string) => {
   const index = fields.value.findIndex((field) => field.value === code);
   if (index !== -1) {
@@ -80,12 +75,29 @@ const handleToggleInterest = (code: string) => {
 };
 
 const isInterestActive = (code: string) => {
-  return selectedSet.value.has(code);
+  return fields.value.some((field) => field.value === code);
 };
+
+watch(
+  () => interestsResponse.value,
+  (newData) => {
+    if (!newData) return;
+    resetForm({
+      values: {
+        interests: extractSelected(newData),
+      },
+    });
+  },
+  { immediate: true },
+);
 
 onServerPrefetch(async () => {
   await suspense();
-  initilizeSelectedInterests(interestsResponse.value);
+  resetForm({
+    values: {
+      interests: extractSelected(interestsResponse.value) || [],
+    },
+  });
 });
 </script>
 
@@ -116,6 +128,9 @@ onServerPrefetch(async () => {
           :is-active="isInterestActive(interest.code)"
           @toggle-interest="handleToggleInterest(interest.code)"
         />
+      </div>
+      <div v-if="isLoading" class="flex flex-1 items-center justify-center overflow-y-auto">
+        <UiSpinner class="text-primary" />
       </div>
       <UiButton class="m-4" size="lg" variant="default">
         {{ $t('ui.save') }}
