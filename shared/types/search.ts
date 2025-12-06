@@ -10,7 +10,7 @@ export interface SearchQuery {
   pagination: PaginationParams;
   query: string;
   peopleFilter: PeopleFilter;
-  removeBlocked: boolean;
+  excludeMutedAndBlocked: boolean;
 }
 
 export interface TweetsSearchQuery extends SearchQuery {

@@ -3,12 +3,12 @@ import { defineStore } from 'pinia';
 export const useSearchStore = defineStore('search', {
   state: () => ({
     searchQuery: '',
-    removeBlocked: false,
+    excludeMutedAndBlocked: true,
   }),
 
   actions: {
-    setRemoveBlocked(value: boolean) {
-      this.removeBlocked = value;
+    setexcludeMutedAndBlocked(value: boolean) {
+      this.excludeMutedAndBlocked = value;
     },
     setSearchQuery(value: string) {
       this.searchQuery = value;

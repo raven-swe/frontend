@@ -1,23 +1,30 @@
 <script setup lang="ts">
 import { VisuallyHidden } from 'reka-ui';
 import { storeToRefs } from 'pinia';
+import { ref, watch } from 'vue';
 import { useSearchStore } from '~/stores/search';
+import { useQueryClient } from '@tanstack/vue-query';
 
 const props = defineProps<{ open: boolean }>();
 const emit = defineEmits<{ (e: 'update:open', value: boolean): void }>();
 
 const searchStore = useSearchStore();
-const { removeBlocked } = storeToRefs(searchStore);
+const { excludeMutedAndBlocked } = storeToRefs(searchStore);
+const hasChanged = ref(false);
+const queryClient = useQueryClient();
 
 const handleOpenChange = (value: boolean) => {
+  if (!value && hasChanged.value) {
+    // Invalidate all search-related queries to trigger refetch
+    queryClient.invalidateQueries({ queryKey: ['search'] });
+    hasChanged.value = false;
+  }
   emit('update:open', value);
 };
 
-const handleCheckboxChange = (value: boolean | 'indeterminate') => {
-  if (typeof value === 'boolean') {
-    searchStore.setRemoveBlocked(value);
-  }
-};
+watch(excludeMutedAndBlocked, () => {
+  hasChanged.value = true;
+});
 </script>
 
 <template>
@@ -49,11 +56,7 @@ const handleCheckboxChange = (value: boolean | 'indeterminate') => {
           {{ $t('search.settings.remove-block') }}
         </Label>
 
-        <UiCheckbox
-          id="remove-blocked"
-          :checked="removeBlocked"
-          @update:checked="handleCheckboxChange"
-        />
+        <UiCheckbox id="remove-blocked" v-model="excludeMutedAndBlocked" />
       </div>
 
       <p class="text-muted-foreground mt-1 text-xs">

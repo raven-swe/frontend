@@ -13,7 +13,7 @@ export default defineWrappedResponseHandler(async (event) => {
       limit: query.limit,
       cursor: query.cursor ?? undefined,
       peopleFilter: query.peopleFilter,
-      excludeMutedAndBlocked: query.removeBlocked,
+      excludeMutedAndBlocked: query.excludeMutedAndBlocked,
     },
   });
 });

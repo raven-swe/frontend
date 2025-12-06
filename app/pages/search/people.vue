@@ -36,12 +36,17 @@ watch(
 
 // Fetch function for user search
 const fetcherFn = async (cursor: string | null, signal: AbortSignal) => {
+  console.log('Fetching people with query:', {
+    query: searchQuery.value,
+    peopleFilter: peopleFilter.value,
+    excludeMutedAndBlocked: searchStore.excludeMutedAndBlocked,
+  });
   return await searchService.getPeople(
     {
       pagination: { limit: 20, cursor },
       query: searchQuery.value,
       peopleFilter: peopleFilter.value,
-      removeBlocked: searchStore.removeBlocked,
+      excludeMutedAndBlocked: searchStore.excludeMutedAndBlocked,
     },
     signal,
   );
@@ -53,7 +58,7 @@ const fetcherFn = async (cursor: string | null, signal: AbortSignal) => {
     <UserList
       :fetcher-fn="fetcherFn"
       :current-username="'search'"
-      :query-key-suffix="`search-people-${searchQuery}-${peopleFilter}-${searchStore.removeBlocked}`"
+      :query-key-suffix="`search-people-${searchQuery}-${peopleFilter}-${searchStore.excludeMutedAndBlocked}`"
       :empty-title="$t('search.no-results', { query: searchQuery })"
       :empty-description="$t('search.try-searching')"
       :show-dropdown="false"

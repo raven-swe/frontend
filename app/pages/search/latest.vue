@@ -58,7 +58,7 @@ const {
     'latest',
     searchQuery.value,
     peopleFilter.value,
-    searchStore.removeBlocked,
+    searchStore.excludeMutedAndBlocked,
   ]),
   initialPageParam: null as string | null,
   queryFn: async ({ pageParam = null }) =>
@@ -67,7 +67,7 @@ const {
       query: searchQuery.value,
       tab: 'latest',
       peopleFilter: peopleFilter.value,
-      removeBlocked: searchStore.removeBlocked,
+      excludeMutedAndBlocked: searchStore.excludeMutedAndBlocked,
     }),
   getNextPageParam: (lastPage) =>
     lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined,

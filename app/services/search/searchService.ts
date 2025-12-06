@@ -16,7 +16,7 @@ export const searchService = {
       pagination: { cursor: null, limit: 10 },
       query: query,
       peopleFilter: PeopleFilter.anyone,
-      removeBlocked: false,
+      excludeMutedAndBlocked: false,
     });
     const users = usersResponse.data;
     const hashtagsResponse = await this.getTopThreeHashtags(query);
@@ -36,12 +36,13 @@ export const searchService = {
         limit: tweetsSearchQuery.pagination.limit,
         cursor: tweetsSearchQuery.pagination.cursor ?? undefined,
         peopleFilter: tweetsSearchQuery.peopleFilter,
-        excludeMutedAndBlocked: tweetsSearchQuery.removeBlocked,
+        excludeMutedAndBlocked: tweetsSearchQuery.excludeMutedAndBlocked,
       },
     });
   },
 
   async getPeople(peopleSearchQuery: SearchQuery, signal?: AbortSignal) {
+    console.log('getPeople called with:', peopleSearchQuery);
     return apiFetch(`/api/search/users`, {
       method: 'GET',
       query: {
@@ -49,7 +50,7 @@ export const searchService = {
         limit: peopleSearchQuery.pagination.limit,
         cursor: peopleSearchQuery.pagination.cursor ?? undefined,
         peopleFilter: peopleSearchQuery.peopleFilter,
-        excludeMutedAndBlocked: peopleSearchQuery.removeBlocked,
+        excludeMutedAndBlocked: peopleSearchQuery.excludeMutedAndBlocked,
       },
       signal,
     });

@@ -88,7 +88,7 @@ export const handlers = [
     if (excludeMutedAndBlocked) {
       matchedUsers = matchedUsers.filter(
         (user) =>
-          !user.relationship.blocking && !user.relationship.blockedBy && !user.relationship.muted,
+          !user.relationship.blocking || !user.relationship.blockedBy || !user.relationship.muted,
       );
     }
 

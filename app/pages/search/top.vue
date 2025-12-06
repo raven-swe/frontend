@@ -44,7 +44,7 @@ const usersFetcherFn = async (cursor: string | null, signal: AbortSignal) => {
       pagination: { limit: 3, cursor },
       query: searchQuery.value,
       peopleFilter: peopleFilter.value,
-      removeBlocked: searchStore.removeBlocked,
+      excludeMutedAndBlocked: searchStore.excludeMutedAndBlocked,
     },
     signal,
   );
@@ -66,7 +66,7 @@ const { data: usersResponse, isFetching: isUsersLoading } = useInfiniteQuery({
     'top',
     searchQuery.value,
     peopleFilter.value,
-    searchStore.removeBlocked,
+    searchStore.excludeMutedAndBlocked,
   ]),
   initialPageParam: null as string | null,
   queryFn: async ({ pageParam = null, signal }) => await usersFetcherFn(pageParam, signal),
@@ -90,7 +90,7 @@ const {
     'top',
     searchQuery.value,
     peopleFilter.value,
-    searchStore.removeBlocked,
+    searchStore.excludeMutedAndBlocked,
   ]),
   initialPageParam: null as string | null,
   queryFn: async ({ pageParam = null }) =>
@@ -99,7 +99,7 @@ const {
       query: searchQuery.value,
       tab: 'top',
       peopleFilter: peopleFilter.value,
-      removeBlocked: searchStore.removeBlocked,
+      excludeMutedAndBlocked: searchStore.excludeMutedAndBlocked,
     }),
   getNextPageParam: (lastPage) =>
     lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined,
@@ -192,7 +192,7 @@ watch(
       <UserList
         :fetcher-fn="usersFetcherFn"
         :current-username="'search-top'"
-        :query-key-suffix="`search-top-users-${searchQuery}-${peopleFilter}-${searchStore.removeBlocked}`"
+        :query-key-suffix="`search-top-users-${searchQuery}-${peopleFilter}-${searchStore.excludeMutedAndBlocked}`"
         :empty-title="''"
         :empty-description="''"
         :show-dropdown="false"
