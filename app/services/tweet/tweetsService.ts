@@ -24,3 +24,12 @@ export const tweetsService = {
     });
   },
 };
+
+export const tweetAiSummary = async (id: string) => {
+  return await apiFetch<ApiSuccessResponse<{ id: string; summary: string }>>(
+    `/api/tweets/${id}/summary`,
+    {
+      method: 'GET',
+    },
+  );
+};
