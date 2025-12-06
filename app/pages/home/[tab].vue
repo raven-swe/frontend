@@ -126,7 +126,7 @@ watch(
 </script>
 
 <template>
-  <div class="border-border mx-auto max-w-[700px]">
+  <div class="border-border mx-auto max-w-[700px] px-2">
     <TweetComposer class="mt-15 border-b-1" @posted="handlePost" />
     <ClientOnly>
       <div v-if="tweets" ref="parentRef">
