@@ -41,6 +41,9 @@ importers:
       '@types/event-source-polyfill':
         specifier: ^1.0.5
         version: 1.0.5
+      '@videojs-player/vue':
+        specifier: ^1.0.0
+        version: 1.0.0(@types/video.js@7.3.58)(video.js@8.23.4)(vue@3.5.22(typescript@5.9.3))
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -1984,6 +1987,9 @@ packages:
   '@types/tmp@0.2.6':
     resolution: {integrity: sha512-chhaNf2oKHlRkDGt+tiKE2Z5aJ6qalm7Z9rlLdBwmOiAAf09YQvvoLXjWK4HWPF1xU/fqvMgfNfpVoBscA/tKA==}
 
+  '@types/video.js@7.3.58':
+    resolution: {integrity: sha512-1CQjuSrgbv1/dhmcfQ83eVyYbvGyqhTvb2Opxr0QCV+iJ4J6/J+XWQ3Om59WiwCd1MN3rDUHasx5XRrpUtewYQ==}
+
   '@types/web-bluetooth@0.0.21':
     resolution: {integrity: sha512-oIQLCGWtcFZy2JW77j9k8nHzAOpqMHLQejDA48XXMWH6tjCQHz5RCFz1bzsmROyL6PUm+LLnUiI4BCn221inxA==}
 
@@ -2162,6 +2168,13 @@ packages:
     resolution: {integrity: sha512-pquXF3XZFg/T3TBor08rUhIGgOhdSilbn7WQLVP/aVSSO+25Rs4H/m3nxNDQ2x3znX7Z3yYjryN8xaLwypcwQg==}
     engines: {node: '>=18'}
     hasBin: true
+
+  '@videojs-player/vue@1.0.0':
+    resolution: {integrity: sha512-WonTezRfKu3fYdQLt/ta+nuKH6gMZUv8l40Jke/j4Lae7IqeO/+lLAmBnh3ni88bwR+vkFXIlZ2Ci7VKInIYJg==}
+    peerDependencies:
+      '@types/video.js': 7.x
+      video.js: 7.x
+      vue: 3.x
 
   '@videojs/http-streaming@3.17.2':
     resolution: {integrity: sha512-VBQ3W4wnKnVKb/limLdtSD2rAd5cmHN70xoMf4OmuDd0t2kfJX04G+sfw6u2j8oOm2BXYM9E1f4acHruqKnM1g==}
@@ -8589,6 +8602,8 @@ snapshots:
 
   '@types/tmp@0.2.6': {}
 
+  '@types/video.js@7.3.58': {}
+
   '@types/web-bluetooth@0.0.21': {}
 
   '@types/whatwg-mimetype@3.0.2': {}
@@ -8780,6 +8795,12 @@ snapshots:
       - encoding
       - rollup
       - supports-color
+
+  '@videojs-player/vue@1.0.0(@types/video.js@7.3.58)(video.js@8.23.4)(vue@3.5.22(typescript@5.9.3))':
+    dependencies:
+      '@types/video.js': 7.3.58
+      video.js: 8.23.4
+      vue: 3.5.22(typescript@5.9.3)
 
   '@videojs/http-streaming@3.17.2(video.js@8.23.4)':
     dependencies:
