@@ -1,6 +1,14 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { mountSuspended } from '@nuxt/test-utils/runtime';
 import DmHeader from '@/components/dm/DmHeader.vue';
+
+// Mock the DmNewMessageDialog to avoid i18n and composable issues in tests
+vi.mock('@/components/dm/DmNewMessageDialog.vue', () => ({
+  default: {
+    name: 'DmNewMessageDialog',
+    template: '<div data-test="dialog"></div>',
+  },
+}));
 
 describe('DmHeader Component', () => {
   it('renders the header with correct structure', async () => {
@@ -24,23 +32,28 @@ describe('DmHeader Component', () => {
     expect(title.classes()).toContain('font-bold');
   });
 
-  it('renders settings and email icons', async () => {
+  it('renders the email icon button', async () => {
     const wrapper = await mountSuspended(DmHeader);
 
     const html = wrapper.html();
-    // Check for icons container
-    const iconsContainer = wrapper.find('.flex.space-x-4');
-    expect(iconsContainer.exists()).toBe(true);
+    // Check for the email icon button
+    const button = wrapper.find('button');
+    expect(button.exists()).toBe(true);
 
-    // Check for icon names in the HTML
-    expect(html).toContain('ic:outline-settings');
+    // Check for icon name in the HTML
     expect(html).toContain('ic:twotone-attach-email');
   });
 
-  it('has proper spacing between icons', async () => {
+  it('opens dialog when button is clicked', async () => {
     const wrapper = await mountSuspended(DmHeader);
 
-    const iconsContainer = wrapper.find('.space-x-4');
-    expect(iconsContainer.exists()).toBe(true);
+    const button = wrapper.find('button');
+    expect(button.exists()).toBe(true);
+
+    await button.trigger('click');
+
+    // Dialog should be present in the DOM
+    const dialog = wrapper.find('[data-test="dialog"]');
+    expect(dialog.exists()).toBe(true);
   });
 });

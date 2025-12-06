@@ -52,7 +52,7 @@ describe('DmMessagesList Component', () => {
       props: { messages },
     });
 
-    const container = wrapper.find('div.flex.flex-col');
+    const container = wrapper.find('div.flex.flex-col-reverse');
     expect(container.exists()).toBe(true);
     expect(container.classes()).toContain('gap-2');
     expect(container.classes()).toContain('p-3');
@@ -85,7 +85,7 @@ describe('DmMessagesList Component', () => {
       props: { messages: [] },
     });
 
-    const container = wrapper.find('div.flex.flex-col');
+    const container = wrapper.find('div.flex.flex-col-reverse');
     expect(container.exists()).toBe(true);
 
     const messageBubbles = wrapper.findAll('.rounded-3xl');
@@ -113,7 +113,7 @@ describe('DmMessagesList Component', () => {
       props: { messages },
     });
 
-    const container = wrapper.find('div.flex.flex-col');
+    const container = wrapper.find('div.flex.flex-col-reverse');
     expect(container.classes()).toContain('gap-2');
   });
 
