@@ -86,10 +86,7 @@ export const handlers = [
 
     // Apply blocked/muted filter
     if (excludeMutedAndBlocked) {
-      matchedUsers = matchedUsers.filter(
-        (user) =>
-          !user.relationship.blocking || !user.relationship.blockedBy || !user.relationship.muted,
-      );
+      matchedUsers = matchedUsers.filter((user) => !user.relationship.blocking);
     }
 
     // Simple pagination
