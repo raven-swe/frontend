@@ -27,9 +27,9 @@ const deleteFromHistory = (event: Event) => {
   >
     <div class="flex w-full items-center justify-between ps-3">
       <div class="flex min-w-0 flex-1 items-center gap-3">
-        <Avatar :img="(props.content as User).profileImage" alt="Profile Image" size="sm" />
+        <Avatar :img="(props.content as User).avatarUrl" alt="Profile Image" size="sm" />
         <div>
-          <p class="font-bold">{{ (props.content as User).name }}</p>
+          <p class="font-bold">{{ (props.content as User).displayName }}</p>
           <p class="text-muted-foreground text-sm">
             {{ $t(`@${(props.content as User).username}`) }}
           </p>

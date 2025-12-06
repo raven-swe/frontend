@@ -59,6 +59,24 @@ const usersFetcherFn = async (cursor: string | null, signal: AbortSignal) => {
   };
 };
 
+const { data: usersResponse, isFetching: isUsersLoading } = useInfiniteQuery({
+  queryKey: computed(() => [
+    'search',
+    'users',
+    'top',
+    searchQuery.value,
+    peopleFilter.value,
+    searchStore.removeBlocked,
+  ]),
+  initialPageParam: null as string | null,
+  queryFn: async ({ pageParam = null, signal }) => await usersFetcherFn(pageParam, signal),
+  getNextPageParam: (lastPage) =>
+    lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined,
+  structuralSharing: false,
+});
+
+const users = computed(() => usersResponse.value?.pages.flatMap((page) => page.data) || []);
+
 const {
   data: response,
   fetchNextPage,
@@ -91,7 +109,7 @@ const {
 const tweets = computed(() => response.value?.pages.flatMap((page) => page.data) || []);
 
 // Combined loading state
-const isLoading = computed(() => isTweetsLoading.value);
+const isLoading = computed(() => isTweetsLoading.value || isUsersLoading.value);
 
 //  Virtualization setup
 const parentRef = ref<HTMLElement | null>(null);
@@ -157,16 +175,19 @@ watch(
 
 <template>
   <div class="border-border mx-auto max-w-[700px]">
-    <div v-if="tweets.length === 0 && !isLoading" class="p-20 break-words">
-      <p class="text-foreground text-3xl font-bold">
+    <div
+      v-if="tweets.length === 0 && users.length === 0 && !isLoading"
+      class="mx-auto my-10 max-w-90 px-8 text-start break-words"
+    >
+      <h2 class="text-[2rem] leading-tight font-black">
         {{ $t('search.no-results', { query: searchQuery }) }}
-      </p>
-      <p class="text-md text-muted-foreground mt-5">
+      </h2>
+      <p class="text-muted-foreground mt-1 leading-tight">
         {{ $t('search.try-searching') }}
       </p>
     </div>
     <!-- Users Section -->
-    <div class="border-border border-b">
+    <div v-if="users.length > 0" class="border-border border-b">
       <h2 class="px-4 py-4 text-xl font-bold">{{ $t('search.people.tab') }}</h2>
       <UserList
         :fetcher-fn="usersFetcherFn"
