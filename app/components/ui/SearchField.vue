@@ -6,7 +6,6 @@ import { searchService } from '~/services/search/searchService';
 import type { User } from '~~/shared/types/user';
 import Hashtag from '~/components/search/Hashtag.vue';
 import HistoryItem from '~/components/search/HistoryItem.vue';
-import ClearHistoryDialog from '~/components/search/ClearHistoryDialog.vue';
 
 interface Props {
   showBackOnFocus?: boolean;
@@ -211,18 +210,18 @@ onMounted(() => {
             <div v-if="searchResults.users.length > 0">
               <NuxtLink
                 v-for="user in searchResults.users"
-                :key="user.id"
+                :key="user.username"
                 :to="`/profile/${user.username}`"
                 class="hover:bg-accent flex items-center gap-3 px-4 py-3 transition-colors"
                 @click="saveInHistory({ type: 'user', content: user })"
               >
                 <img
-                  :src="user.profileImage"
-                  :alt="user.name"
+                  :src="user.avatarUrl"
+                  :alt="user.displayName"
                   class="h-10 w-10 rounded-full object-cover"
                 />
                 <div class="flex-1 overflow-hidden">
-                  <div class="text-foreground truncate font-semibold">{{ user.name }}</div>
+                  <div class="text-foreground truncate font-semibold">{{ user.displayName }}</div>
                   <div class="text-muted-foreground truncate text-sm">
                     {{ $t('@') }}{{ user.username }}
                   </div>
@@ -243,9 +242,27 @@ onMounted(() => {
       </div>
     </div>
   </div>
-  <ClearHistoryDialog
-    :open="showClearHistoryDialog"
-    @cancel="showClearHistoryDialog = false"
-    @clear="ConfirmClearAllHistory"
-  />
+  <UiAlertDialog :open="showClearHistoryDialog" @update:open="showClearHistoryDialog = $event">
+    <UiAlertDialogContent>
+      <UiAlertDialogHeader>
+        <UiAlertDialogTitle>
+          {{ $t('ui.search.clear-dialog.title') }}
+        </UiAlertDialogTitle>
+        <UiAlertDialogDescription>
+          {{ $t('ui.search.clear-dialog.description') }}
+        </UiAlertDialogDescription>
+      </UiAlertDialogHeader>
+      <UiAlertDialogFooter>
+        <UiAlertDialogAction
+          class="bg-destructive text-background hover:bg-destructive/90 focus-visible:bg-destructive/90 focus-visible:ring-ring-destructive dark:text-foreground"
+          @click="ConfirmClearAllHistory"
+        >
+          {{ $t('ui.clear') }}
+        </UiAlertDialogAction>
+        <UiAlertDialogCancel @click="showClearHistoryDialog = false">
+          {{ $t('ui.cancel') }}
+        </UiAlertDialogCancel>
+      </UiAlertDialogFooter>
+    </UiAlertDialogContent>
+  </UiAlertDialog>
 </template>
