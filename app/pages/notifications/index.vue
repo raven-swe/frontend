@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { useInfiniteQuery } from '@tanstack/vue-query';
 import { useWindowVirtualizer } from '@tanstack/vue-virtual';
-import Follow from '~/components/notifications/Follow.vue';
-import Like from '~/components/notifications/Like.vue';
-import Repost from '~/components/notifications/Repost.vue';
-import Reply from '~/components/notifications/Reply.vue';
-import QuoteMention from '~/components/notifications/QuoteMention.vue';
+import { Like, Follow, Repost, Reply, QuoteMention } from '~/components/notifications';
 import { notificationsService } from '~/services/notifications/notificationsService';
-import type { ActorSummary, ActorSummaryContainer } from '~~/shared/types/notifications';
+import type {
+  ActorSummary,
+  ActorSummaryContainer,
+  Notification,
+} from '~~/shared/types/notifications';
 
 definePageMeta({
   layout: 'notifications',
@@ -30,7 +30,14 @@ const {
   structuralSharing: false,
 });
 
-const notifications = computed(() => response.value?.pages.flatMap((page) => page.data) || []);
+const notifications = computed<Notification[]>(() => {
+  const pagesVal = response.value?.pages ?? [];
+  const items = pagesVal.flatMap((p: unknown) => {
+    const page = p as { data?: unknown[] };
+    return page.data ?? [];
+  });
+  return items as unknown as Notification[];
+});
 const { mutate: followUser } = useFollowMutation();
 
 // Virtualization
