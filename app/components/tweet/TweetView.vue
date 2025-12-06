@@ -45,7 +45,7 @@ const onUndoRetweetSuccess = () => {
 </script>
 
 <template>
-  <article class="w-full max-w-[700px] gap-3 border-b px-4 py-2">
+  <article class="w-full max-w-[700px] gap-3 border-b px-4 pt-3 pb-2">
     <div class="flex w-full items-center justify-between">
       <div class="flex">
         <NuxtLink

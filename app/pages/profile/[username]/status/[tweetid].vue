@@ -22,13 +22,36 @@ const {
   refetchOnWindowFocus: false,
   refetchOnMount: false,
   retry: false,
+  structuralSharing: false,
 });
 
+const mainTweetRef = useTemplateRef<typeof TweetView>('main-tweet');
+
+function scrollMainTweetIntoView() {
+  const el = mainTweetRef.value?.$el as HTMLElement | undefined;
+  if (!el) return;
+
+  const header = document.querySelector('#header-ref') as HTMLElement | null;
+  const headerHeight = header?.offsetHeight ?? 0;
+
+  const topOfElement = window.pageYOffset + el.getBoundingClientRect().top - headerHeight;
+
+  window.scrollTo({
+    top: topOfElement,
+    behavior: 'instant',
+  });
+}
+
 watch(
-  tweetData,
+  () => tweetData.value,
   async (newTweet) => {
-    if (newTweet && newTweet.author.username !== username.value) {
-      await router.replace(`/profile/${newTweet.author.username}/status/${newTweet.id}`);
+    if (newTweet) {
+      if (newTweet.author.username !== username.value) {
+        await router.replace(`/profile/${newTweet.author.username}/status/${newTweet.id}`);
+      }
+      await nextTick(() => {
+        scrollMainTweetIntoView();
+      });
     }
   },
   { immediate: true },
@@ -81,6 +104,12 @@ function handleReplied(tweet: Tweet) {
   });
 }
 
+onMounted(async () => {
+  await nextTick(() => {
+    scrollMainTweetIntoView();
+  });
+});
+
 onServerPrefetch(async () => {
   await suspense();
 });
@@ -94,15 +123,18 @@ onServerPrefetch(async () => {
     v-else-if="
       error && (isApiValidationError(error) || (isApiError(error) && error.status === 404))
     "
-    class="mt-20 flex flex-col items-center justify-center p-8 text-center"
+    class="flexflex-col mt-20 items-center justify-center p-8 text-center"
   >
     <h1 class="mb-5 text-3xl font-bold">{{ $t('errors.TWEET_NOT_FOUND') }}</h1>
     <UiButton variant="link" size="link" class="text-primary underline" @click="goBackToHome">{{
       $t('errors.GO_BACK_HOME')
     }}</UiButton>
   </div>
-  <div v-else-if="tweetData">
-    <header class="bg-background/65 sticky top-0 z-10 flex items-center gap-6 p-2 backdrop-blur-md">
+  <div v-else-if="tweetData" :key="tweetData.id" class="min-h-screen w-full">
+    <header
+      id="header-ref"
+      class="bg-background/65 sticky top-0 z-10 flex h-12 items-center gap-6 px-2 backdrop-blur-md"
+    >
       <UiButton
         variant="ghost-default"
         size="icon-sm"
@@ -117,31 +149,43 @@ onServerPrefetch(async () => {
       </h1>
     </header>
 
-    <TweetView :tweet="tweetData" />
-
-    <div class="border-b">
-      <TweetComposer :reply-to-tweet-id="tweetData?.id" type="reply" @posted="handleReplied" />
-    </div>
-
     <ClientOnly>
-      <CommonVirtualInfiniteScroller
-        :items="tweets"
-        :estimate-size="120"
-        :has-next-page="hasNextPage"
-        :is-fetching-next-page="isFetchingNextPage"
-        :fetch-next-page="fetchNextPage"
-        :get-key="(tweet, idx, key) => tweet.id ?? key"
-      >
-        <template #item="{ item: tweet }">
-          <TweetDefaultCard v-if="tweet" :tweet="tweet" />
-        </template>
-      </CommonVirtualInfiniteScroller>
-      <div
-        v-if="(hasNextPage && isFetchingNextPage) || isRepliesLoading"
-        class="text-primary flex shrink-0 items-center justify-center py-4"
-      >
-        <UiSpinner />
-      </div>
+      <TweetDefaultCard v-if="tweetData.rootTweet" is-parent :tweet="tweetData.rootTweet" />
+      <TweetDefaultCard
+        v-for="tweet in tweetData.parentTweets"
+        :key="tweet.id"
+        is-parent
+        :tweet="tweet"
+      />
     </ClientOnly>
+
+    <div class="min-h-[calc(100vh_-_3rem)]">
+      <TweetView ref="main-tweet" :tweet="tweetData" />
+
+      <div class="border-b">
+        <TweetComposer :reply-to-tweet-id="tweetData?.id" type="reply" @posted="handleReplied" />
+      </div>
+
+      <ClientOnly>
+        <CommonVirtualInfiniteScroller
+          :items="tweets"
+          :estimate-size="120"
+          :has-next-page="hasNextPage"
+          :is-fetching-next-page="isFetchingNextPage"
+          :fetch-next-page="fetchNextPage"
+          :get-key="(tweet, idx, key) => tweet.id ?? key"
+        >
+          <template #item="{ item: tweet }">
+            <TweetDefaultCard v-if="tweet" :tweet="tweet" />
+          </template>
+        </CommonVirtualInfiniteScroller>
+        <div
+          v-if="(hasNextPage && isFetchingNextPage) || isRepliesLoading"
+          class="text-primary flex shrink-0 items-center justify-center py-4"
+        >
+          <UiSpinner />
+        </div>
+      </ClientOnly>
+    </div>
   </div>
 </template>
