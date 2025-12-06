@@ -112,7 +112,8 @@
   },
   "explore": {
     "for-you": {
-      "tab": "لك"
+      "tab": "لك",
+      "posts-for-you": "المنشورات لك"
     },
     "trending": {
       "tab": "رائج"
@@ -127,7 +128,7 @@
       "tab": "ترفيه"
     },
     "no-trending-hashtags": "لا توجد علامات تصنيف رائجة",
-    "hashtag": "{rank} . رائج في {location}"
+    "hashtag": "{rank} . رائج في {category}"
   },
   "search": {
     "top": {

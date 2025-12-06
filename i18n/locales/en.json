@@ -139,7 +139,8 @@
   },
   "explore": {
     "for-you": {
-      "tab": "For You"
+      "tab": "For You",
+      "posts-for-you": "Posts for you"
     },
     "trending": {
       "tab": "Trending"
@@ -154,7 +155,7 @@
       "tab": "Entertainment"
     },
     "no-trending-hashtags": "No trending hashtags found",
-    "hashtag": "{rank} . Trending in {location}"
+    "hashtag": "{rank} . Trending in {category}"
   },
   "search": {
     "top": {
