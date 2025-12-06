@@ -13,6 +13,7 @@ export const handlers = [
       const url = new URL(request.url);
       const cursor = url.searchParams.get('cursor');
       const limitParam = url.searchParams.get('limit');
+      // const limitParam = 5;
       const limit = limitParam ? Math.max(1, parseInt(limitParam, 10)) : 20;
 
       const allNotifications: Notification[] = mockNotifications.data || [];

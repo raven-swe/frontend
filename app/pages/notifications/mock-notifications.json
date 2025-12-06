@@ -3,7 +3,7 @@
   "message": "Notifications retrieved successfully",
   "data": [
     {
-      "id": "notif_follow_002",
+      "id": "notif_follow_1",
       "type": "FOLLOW",
       "actorSummary": {
         "previewActors": [
@@ -193,7 +193,7 @@
       "isSeen": false
     },
     {
-      "id": "notif_like_002",
+      "id": "notif_like_1",
       "type": "LIKE",
       "actorSummary": {
         "previewActors": [
@@ -239,7 +239,7 @@
       "isSeen": true
     },
     {
-      "id": "notif_follow_001",
+      "id": "notif_follow_002",
       "type": "FOLLOW",
       "actorSummary": {
         "previewActors": [
@@ -403,7 +403,7 @@
       "isSeen": true
     },
     {
-      "id": "notif_reply_001",
+      "id": "notif_reply_0010",
       "type": "REPLY",
       "actorSummary": {
         "previewActors": [
@@ -865,7 +865,7 @@
       "isSeen": true
     },
     {
-      "id": "notif_follow_001",
+      "id": "notif_follow_00199",
       "type": "FOLLOW",
       "actorSummary": {
         "previewActors": [
@@ -887,7 +887,7 @@
       "isSeen": false
     },
     {
-      "id": "notif_retweet_4401",
+      "id": "notif_retweet_440144",
       "type": "RETWEET",
       "actorSummary": {
         "previewActors": [
@@ -1323,7 +1323,7 @@
       "isSeen": false
     },
     {
-      "id": "notif_follow_002",
+      "id": "notif_follow_002678",
       "type": "MENTION",
       "actorSummary": {
         "previewActors": [

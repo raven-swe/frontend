@@ -24,7 +24,7 @@ const {
   queryKey: ['notifications'],
   initialPageParam: null as string | null,
   queryFn: async ({ pageParam = null }) =>
-    await notificationsService.getNotificationsMock({ cursor: pageParam, limit: 20 }),
+    await notificationsService.getNotifications({ cursor: pageParam, limit: 20 }),
   getNextPageParam: (lastPage) =>
     lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined,
   structuralSharing: false,
