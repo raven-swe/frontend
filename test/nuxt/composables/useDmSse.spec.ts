@@ -96,7 +96,7 @@ describe('useDmSse', () => {
     result.connect();
 
     expect(EventSourcePolyfill).toHaveBeenCalledWith(
-      '/api/dm/stream?topics=dm',
+      '/api/stream?topics=dm',
       expect.objectContaining({
         withCredentials: true,
         heartbeatTimeout: 120_000,
