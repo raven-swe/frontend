@@ -568,6 +568,15 @@
       "title": "Mute and block",
       "description": "Manage your muted and blocked accounts."
     },
+    "content-you-see": {
+      "title": "Content you see",
+      "description": "Decide what you see on Raven based on your Interests"
+    },
+    "interests": {
+      "title": "Interests",
+      "description": "These are some of the interests selected. These are used to personalize your experience across Raven. You can adjust your interests if something doesn't look right. Any changes you make may take a little while to go into effect.",
+      "update-success": "Successfully updated interests"
+    },
     "muted": {
       "title": "Muted accounts",
       "description": "Here's everyone you muted. You can add or remove them from this list.",
