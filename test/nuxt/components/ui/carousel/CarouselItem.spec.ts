@@ -80,8 +80,8 @@ describe('CarouselItem.vue', () => {
     });
 
     const item = wrapper.find('[data-slot="carousel-item"]');
-    expect(item.classes()).toContain('pl-4');
-    expect(item.classes()).not.toContain('pt-4');
+    expect(item.classes()).toContain('pl-8');
+    expect(item.classes()).not.toContain('pt-8');
   });
 
   it('applies vertical padding when orientation is vertical', () => {
@@ -92,8 +92,8 @@ describe('CarouselItem.vue', () => {
     });
 
     const item = wrapper.find('[data-slot="carousel-item"]');
-    expect(item.classes()).toContain('pt-4');
-    expect(item.classes()).not.toContain('pl-4');
+    expect(item.classes()).toContain('pt-8');
+    expect(item.classes()).not.toContain('pl-8');
   });
 
   it('applies custom class', () => {
@@ -140,7 +140,7 @@ describe('CarouselItem.vue', () => {
     expect(item.classes()).toContain('shrink-0');
     expect(item.classes()).toContain('grow-0');
     expect(item.classes()).toContain('basis-full');
-    expect(item.classes()).toContain('pl-4');
+    expect(item.classes()).toContain('pl-8');
     expect(item.classes()).toContain('my-custom-class');
     expect(item.classes()).toContain('another-class');
   });
