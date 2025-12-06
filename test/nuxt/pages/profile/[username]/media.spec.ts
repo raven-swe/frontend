@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime';
+import { mockNuxtImport, mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime';
 import type { User } from '#shared/types/user';
 import { computed } from 'vue';
 import type { Tweet } from '#shared/types/tweets';
@@ -35,7 +35,19 @@ const mockUser: User = {
   },
 };
 
-describe('user tweets page', () => {
+const userStoreMock = vi.hoisted(() => {
+  return {
+    user: {
+      username: 'notcurrentuser',
+    },
+  };
+});
+
+mockNuxtImport('useUserStore', () => {
+  return () => userStoreMock;
+});
+
+describe('media page', () => {
   let queryClient: QueryClient;
 
   beforeEach(() => {
@@ -47,20 +59,20 @@ describe('user tweets page', () => {
   });
 
   it('renders empty state when no tweets are available', async () => {
-    registerEndpoint(`/api/users/${mockUser.username}/tweets`, () => ({
+    registerEndpoint(`/api/users/${mockUser.username}/media`, () => ({
       data: [],
     }));
-    const { default: ProfilePage } = await import('~/pages/profile/[username]/index.vue');
+    const { default: ProfilePage } = await import('~/pages/profile/[username]/media.vue');
     const wrapper = await mountSuspended(ProfilePage, {
       route: {
-        params: { username: mockUser.username, tab: '' },
+        params: { username: mockUser.username },
       },
       global: {
         provide: {
           'user-data': computed(() => mockUser),
         },
         stubs: {
-          TweetDefaultCard: true,
+          Thumbnail: true,
         },
         plugins: [[VueQueryPlugin, { queryClient }]],
       },
@@ -68,12 +80,46 @@ describe('user tweets page', () => {
 
     await flushPromises();
 
-    const heading = wrapper.find('h1');
+    const heading = wrapper.find('h2');
     expect(heading.exists()).toBe(true);
-    expect(heading.text()).toBe('Tweet not found');
+    expect(heading.text()).toBe("@testuser hasn't posted media");
+    const description = wrapper.find('[data-test="empty-description"]');
+    expect(description.exists()).toBe(true);
+    expect(description.text()).toBe('Once they do, those posts will show up here.');
   });
 
-  it('renders TweetDefaultCard components when tweets exist', async () => {
+  it('renders differnt text when same user no tweets are available', async () => {
+    userStoreMock.user.username = mockUser.username;
+    registerEndpoint(`/api/users/${mockUser.username}/media`, () => ({
+      data: [],
+    }));
+    const { default: ProfilePage } = await import('~/pages/profile/[username]/media.vue');
+    const wrapper = await mountSuspended(ProfilePage, {
+      route: {
+        params: { username: mockUser.username },
+      },
+      global: {
+        provide: {
+          'user-data': computed(() => mockUser),
+        },
+        stubs: {
+          Thumbnail: true,
+        },
+        plugins: [[VueQueryPlugin, { queryClient }]],
+      },
+    });
+
+    await flushPromises();
+
+    const heading = wrapper.find('h2');
+    expect(heading.exists()).toBe(true);
+    expect(heading.text()).toBe('Lights, camera … attachments!');
+    const description = wrapper.find('[data-test="empty-description"]');
+    expect(description.exists()).toBe(true);
+    expect(description.text()).toBe('When you post photos or videos, they will show up here.');
+  });
+
+  it('renders Thumbnail components when tweets exist', async () => {
     const mockTweets: Tweet[] = [
       {
         id: 'tweet-1',
@@ -92,7 +138,15 @@ describe('user tweets page', () => {
         isLiked: false,
         isRetweeted: false,
         entities: { mentions: [], hashtags: [] },
-        media: [],
+        media: [
+          {
+            type: 'IMAGE' as const,
+            url: '/media1.jpg',
+            altText: 'Media 1',
+            width: 800,
+            height: 600,
+          },
+        ],
       },
       {
         id: 'tweet-2',
@@ -111,35 +165,46 @@ describe('user tweets page', () => {
         isLiked: false,
         isRetweeted: false,
         entities: { mentions: [], hashtags: [] },
-        media: [],
+        media: [
+          {
+            type: 'IMAGE' as const,
+            url: '/media2.jpg',
+            altText: 'Media 2',
+            width: 800,
+            height: 600,
+          },
+        ],
       },
     ];
 
-    registerEndpoint(`/api/users/${mockUser.username}/tweets`, () => ({
+    registerEndpoint(`/api/users/${mockUser.username}/media`, () => ({
       data: mockTweets,
     }));
 
-    const { default: ProfilePage } = await import('~/pages/profile/[username]/index.vue');
+    const { default: ProfilePage } = await import('~/pages/profile/[username]/media.vue');
 
     const wrapper = await mountSuspended(ProfilePage, {
       route: {
-        params: { username: mockUser.username, tab: '' },
+        params: { username: mockUser.username },
       },
       global: {
         provide: {
           'user-data': computed(() => mockUser),
         },
-        stubs: { TweetDefaultCard: true },
+        stubs: { Thumbnail: true },
         plugins: [[VueQueryPlugin, { queryClient }]],
       },
     });
 
     await flushPromises();
 
-    const tweetCards = wrapper.findAllComponents({ name: 'TweetDefaultCard' });
-    expect(tweetCards.length).toBe(2);
+    const thumbnails = wrapper.findAllComponents({ name: 'Thumbnail' });
+    expect(thumbnails.length).toBe(2);
 
-    const heading = wrapper.find('h1');
+    const heading = wrapper.find('h2');
     expect(heading.exists()).toBe(false);
+
+    const description = wrapper.find('[data-test="empty-description"]');
+    expect(description.exists()).toBe(false);
   });
 });
