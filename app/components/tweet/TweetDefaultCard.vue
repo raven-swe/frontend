@@ -88,7 +88,6 @@ function handleTweetClick() {
           <span class="cursor-pointer font-semibold hover:underline">{{
             props.tweet.author.displayName
           }}</span>
-          {{ props.tweet.id }}
           <span class="text-muted-foreground ms-1" v-text="'@' + props.tweet.author.username" />
           <span class="text-muted-foreground">·</span>
         </NuxtLink>
