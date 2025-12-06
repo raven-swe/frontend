@@ -9,8 +9,8 @@ export type HashtagEntity = {
 };
 
 export type ContentEntities = {
-  mentions: MentionEntity[];
-  hashtags: HashtagEntity[];
+  mentions: MentionEntity[] | null;
+  hashtags: HashtagEntity[] | null;
 };
 
 export type ParsedToken = {

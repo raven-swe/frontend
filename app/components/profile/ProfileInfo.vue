@@ -35,12 +35,7 @@ const displayUrl = computed(() => {
       >
         <UiContentEntitiesRenderer
           :content="userProfile?.bio ?? ''"
-          :entities="
-            userProfile?.bioEntities ?? {
-              mentions: [],
-              hashtags: [],
-            }
-          "
+          :entities="userProfile?.bioEntities"
         />
       </p>
 

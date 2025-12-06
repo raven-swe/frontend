@@ -8,9 +8,9 @@ type ParsedToken = {
 
 export function parseContentEntities(
   content: string | null,
-  contentEntities: ContentEntities,
+  contentEntities: ContentEntities | null | undefined,
 ): ParsedToken[] {
-  if (content === null || contentEntities === null) {
+  if (content === null) {
     return [];
   }
 
@@ -23,7 +23,7 @@ export function parseContentEntities(
     display?: string;
   }[] = [];
 
-  contentEntities.mentions.forEach((m) =>
+  contentEntities?.mentions?.forEach((m) =>
     entities.push({
       start: m.startPosition,
       end: m.startPosition + m.username.length + 1,
@@ -32,7 +32,7 @@ export function parseContentEntities(
       display: `@${m.username}`,
     }),
   );
-  contentEntities.hashtags.forEach((h) =>
+  contentEntities?.hashtags?.forEach((h) =>
     entities.push({
       start: h.startPosition,
       end: h.startPosition + h.hashtag.length + 1,

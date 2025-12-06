@@ -1,18 +1,10 @@
 <script lang="ts" setup>
 const props = defineProps<{
   content: string;
-  entities: ContentEntities;
+  entities: ContentEntities | null | undefined;
 }>();
 
-const parsedBioTokens = computed(() =>
-  parseContentEntities(
-    props.content,
-    props.entities || {
-      mentions: [],
-      hashtags: [],
-    },
-  ),
-);
+const parsedBioTokens = computed(() => parseContentEntities(props.content, props.entities));
 </script>
 <template>
   <template v-for="token in parsedBioTokens" :key="token.key">

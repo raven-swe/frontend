@@ -118,10 +118,7 @@ const isCurrentUser = computed(() => {
         </div>
       </div>
       <p class="text-md line-clamp-3 break-all">
-        <UiContentEntitiesRenderer
-          :content="user.bio ?? ''"
-          :entities="user.bioEntities ?? { mentions: [], hashtags: [] }"
-        />
+        <UiContentEntitiesRenderer :content="user.bio ?? ''" :entities="user.bioEntities" />
       </p>
     </div>
   </div>
