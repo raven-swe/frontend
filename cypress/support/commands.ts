@@ -88,6 +88,37 @@ Cypress.Commands.add('login', (email: string, password: string) => {
   );
 });
 
+// Mute or unmute a user
+Cypress.Commands.add('muteUser', (userName: string, mute: boolean = true) => {
+  const action = mute ? 'POST' : 'DELETE';
+  cy.getCookie('access_token').then((cookie) => {
+    cy.request({
+      method: action,
+      url: `${Cypress.env('API_URL')}/me/mutes/${userName}`,
+      headers: {
+        Authorization: `Bearer ${cookie?.value}`,
+      },
+    }).as('muteUserRequest');
+
+    cy.get('@muteUserRequest').its('status').should('be.oneOf', [200, 201]);
+  });
+});
+
+// Block or unblock a user
+Cypress.Commands.add('blockUser', (userName: string, block: boolean = true) => {
+  const action = block ? 'POST' : 'DELETE';
+  cy.getCookie('access_token').then((cookie) => {
+    cy.request({
+      method: action,
+      url: `${Cypress.env('API_URL')}/me/blocks/${userName}`,
+      headers: {
+        Authorization: `Bearer ${cookie?.value}`,
+      },
+    }).as('blockUserRequest');
+    cy.get('@blockUserRequest').its('status').should('be.oneOf', [200, 201]);
+  });
+});
+
 //
 // -- This is a parent command --
 // Cypress.Commands.add('login', (email, password) => { ... })
