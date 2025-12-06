@@ -10,7 +10,7 @@ interface UseDmSseOptions {
 export function useDmSse(options: UseDmSseOptions = {}) {
   const { autoReconnect = true, maxReconnectAttempts = 5, baseReconnectDelay = 1000 } = options;
 
-  const SSEendpoint = `/api/stream?topics=dm`;
+  const SSEendpoint = `/api/stream?topics=dm,notifications`;
   const unseenCount = ref<number>(0);
   const lastNewMessageinfo = ref<DmSseEventMap['dm.new_message'] | null>(null);
   const isConnected = ref<boolean>(false);
