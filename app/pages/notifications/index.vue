@@ -44,6 +44,29 @@ const notifications = computed<Notification[]>(() => {
 });
 const { mutate: followUser } = useFollowMutation();
 
+// mark all as seen in the cache
+await notificationsService.markAllSeen();
+queryClient.setQueryData(['notifications-main'], (oldData: unknown) => {
+  if (!oldData || typeof oldData !== 'object') return oldData;
+  const od = oldData as {
+    pages?: Array<{ data?: Notification[] }>;
+    [k: string]: unknown;
+  };
+  return {
+    ...od,
+    pages: od.pages?.map((page) => {
+      const typedPage = page as { data?: Notification[] };
+      return {
+        ...typedPage,
+        data: typedPage.data?.map((notif) => ({
+          ...notif,
+          isSeen: true,
+        })),
+      };
+    }),
+  };
+});
+
 // Virtualization
 const parentRef = ref<HTMLElement | null>(null);
 const parentOffsetRef = ref(0);

@@ -56,7 +56,7 @@ export const handlers = [
   }),
 
   // Mark all notifications as seen
-  http.patch(`${API_URL}/notifications/mark-all-seen`, async () => {
+  http.patch(`${API_URL}/notifications/seen`, async () => {
     try {
       await new Promise((r) => setTimeout(r, 200));
 

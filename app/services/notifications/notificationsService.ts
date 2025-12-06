@@ -18,6 +18,6 @@ export const notificationsService = {
   },
 
   markAllSeen: async () => {
-    return await apiFetch('/api/notifications/mark-all-seen', { method: 'PATCH' });
+    return await apiFetch('/api/notifications/seen', { method: 'PATCH' });
   },
 };
