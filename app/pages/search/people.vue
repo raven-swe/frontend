@@ -36,11 +36,6 @@ watch(
 
 // Fetch function for user search
 const fetcherFn = async (cursor: string | null, signal: AbortSignal) => {
-  console.log('Fetching people with query:', {
-    query: searchQuery.value,
-    peopleFilter: peopleFilter.value,
-    excludeMutedAndBlocked: searchStore.excludeMutedAndBlocked,
-  });
   return await searchService.getPeople(
     {
       pagination: { limit: 20, cursor },

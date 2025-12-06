@@ -42,7 +42,6 @@ export const searchService = {
   },
 
   async getPeople(peopleSearchQuery: SearchQuery, signal?: AbortSignal) {
-    console.log('getPeople called with:', peopleSearchQuery);
     return apiFetch(`/api/search/users`, {
       method: 'GET',
       query: {
