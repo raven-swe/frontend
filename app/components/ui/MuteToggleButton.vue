@@ -5,6 +5,7 @@
     class="bg-transparent"
     size="icon-sm"
     data-test="unmute-button"
+    data-cy="unmute-button"
     @click.prevent.stop="$emit('unmute')"
   >
     <Icon name="lucide:volume-off" />
@@ -15,6 +16,7 @@
     class="bg-transparent"
     size="icon-sm"
     data-test="mute-button"
+    data-cy="mute-button"
     @click.prevent.stop="$emit('mute')"
   >
     <Icon name="lucide:volume" />
