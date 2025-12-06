@@ -69,13 +69,13 @@ const onUndoRetweetSuccess = () => {
         </NuxtLink>
       </div>
     </div>
-    <div class="border-b-border mt-3 border-b-1 pb-3">
-      <p class="mt-1 text-lg leading-relaxed break-words whitespace-pre-wrap">
+    <div class="border-b-border border-b-1">
+      <p class="py-2 text-lg leading-relaxed break-words whitespace-pre-wrap">
         <ContentEntitiesRenderer :content="tweetClone.content" :entities="tweetClone.entities" />
       </p>
       <TweetMedia :media="tweetClone.media" />
 
-      <div class="mt-2">
+      <div class="pb-2">
         <time
           :title="formatDate(tweetClone.createdAt)"
           :datetime="tweetClone.createdAt"

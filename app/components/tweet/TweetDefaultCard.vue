@@ -52,7 +52,7 @@ function handleTweetClick() {
 <template>
   <article
     :id="'tweet-' + props.tweet.id"
-    class="border-b-border flex w-full max-w-[700px] cursor-pointer gap-2 ps-4 pe-3 pt-3 pb-2"
+    class="border-b-border flex w-full max-w-[700px] cursor-pointer gap-2 px-4 pt-3 pb-2"
     :class="{
       'border-b-1': !isParent,
     }"
@@ -100,7 +100,7 @@ function handleTweetClick() {
       </div>
 
       <!-- Content -->
-      <p class="mt-1 leading-relaxed break-words whitespace-pre-wrap">
+      <p class="leading-relaxed break-words whitespace-pre-wrap">
         <UiContentEntitiesRenderer :content="tweet.content" :entities="tweet.entities" />
       </p>
 
