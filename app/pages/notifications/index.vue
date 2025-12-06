@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { Like, Follow, Repost, Reply, QuoteMention } from '~/components/notifications';
 import { useNotificationsList } from '~/composables/useNotificationsList';
+import type { Notification } from '~~/shared/types/notifications';
 
 definePageMeta({
   layout: 'notifications',
 });
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-const lastNotification = inject<Ref<any>>('lastNotification')!;
+const lastNotification = inject<Ref<Notification | null>>('lastNotification')!;
 const unseenNotificationsCount = inject<Ref<number>>('unseenNotificationsCount')!;
 
 function componentForType(type: string) {
