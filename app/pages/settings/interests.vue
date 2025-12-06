@@ -46,6 +46,9 @@ const { isLoading, onSubmit, interests, handleToggleInterest, isInterestActive }
 
 <style scoped>
 .scroll-theme {
+  scrollbar-color: rgb(185, 202, 211) rgb(247, 249, 249);
+}
+.dark .scroll-theme {
   scrollbar-color: rgb(62, 65, 68) rgb(22, 24, 28);
 }
 </style>
