@@ -12,9 +12,9 @@ export const useInterestsForm = () => {
   const formSchema = yup.object({
     interests: yup
       .array()
-      .of(yup.string().required())
+      .required()
       .min(1, t('errors.interests.REQUIRED'))
-      .required(),
+      .of(yup.string().required()),
   });
 
   const extractSelected = (newData: ApiSuccessResponse<Interest[]> | undefined) => {
@@ -32,7 +32,9 @@ export const useInterestsForm = () => {
     staleTime: Infinity,
   });
 
-  const { handleSubmit, setErrors, resetForm } = useForm<yup.InferType<typeof formSchema>>({
+  const { handleSubmit, setErrors, resetForm, isSubmitting } = useForm<
+    yup.InferType<typeof formSchema>
+  >({
     validationSchema: formSchema,
     initialValues: {
       interests: [],
@@ -60,8 +62,8 @@ export const useInterestsForm = () => {
     },
   });
 
-  const onSubmit = handleSubmit((values) => {
-    updateInterestsMutation.mutate(values.interests);
+  const onSubmit = handleSubmit(async (values) => {
+    await updateInterestsMutation.mutateAsync(values.interests);
   });
 
   const handleToggleInterest = (code: string) => {
@@ -102,6 +104,7 @@ export const useInterestsForm = () => {
 
   return {
     isLoading,
+    isSubmitting,
     interests: computed(() => interestsResponse.value?.data),
     selectedOne: computed(() => fields.value.length > 0),
     onSubmit,
