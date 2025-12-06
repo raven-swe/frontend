@@ -2,6 +2,8 @@ import { http, HttpResponse } from 'msw';
 import type { TrendingHashtag } from '../../shared/types/hashtag';
 import type { ExploreTab } from '../../shared/types/timeline';
 import hashtagsData from '../data/mock-hashtags-categorized.json' assert { type: 'json' };
+import tweetsData from '../data/mock-tweets.json' assert { type: 'json' };
+import { faker } from '@faker-js/faker';
 
 const API_URL = process.env.BACKEND_URL;
 
@@ -59,17 +61,26 @@ export const handlers = [
 
   // GET /explore/for-you
   http.get(`${API_URL}/explore/for-you`, () => {
-    const mixedHashtags = [
-      ...categorizedHashtags.trending.slice(0, 2),
-      ...categorizedHashtags.news.slice(0, 1),
-      ...categorizedHashtags.sports.slice(0, 1),
-      ...categorizedHashtags.entertainment.slice(0, 1),
-    ];
+    const categories = ['news', 'sports', 'entertainment'];
+
+    const categoriesData = categories.map((category) => {
+      // Get random number of tweets between 3 and 5
+      const tweetCount = faker.number.int({ min: 3, max: 5 });
+      // Get random tweets from the mock data
+      const shuffledTweets = faker.helpers.shuffle([...tweetsData]);
+      const tweets = shuffledTweets.slice(0, tweetCount);
+
+      return {
+        category,
+        tweets,
+      };
+    });
+
     return HttpResponse.json(
       {
         success: true,
         message: 'For you content fetched successfully.',
-        data: mixedHashtags,
+        data: { categories: categoriesData },
       },
       { status: 200 },
     );

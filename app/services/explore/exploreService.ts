@@ -1,7 +1,7 @@
 import { apiFetch } from '~/api';
 import type { ExploreTab } from '~~/shared/types/timeline';
-// import type { PaginationParams } from '~~/shared/types/pagination';
 import type { TrendingHashtag } from '~~/shared/types/hashtag';
+import type { Tweet } from '~~/shared/types/tweet';
 
 export const exploreService = {
   async getExploreTab(tab: ExploreTab) {
@@ -10,8 +10,10 @@ export const exploreService = {
     });
   },
 
-  async getForYou() {
-    return await apiFetch<ApiSuccessResponse<TrendingHashtag[]>>('/api/explore/for-you', {
+  async getCategorizedTweets() {
+    return await apiFetch<
+      ApiSuccessResponse<{ categories: { category: string; tweets: Tweet[] }[] }>
+    >('/api/explore/for-you', {
       method: 'GET',
     });
   },

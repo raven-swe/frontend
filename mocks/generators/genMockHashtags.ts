@@ -8,25 +8,6 @@ import type { ExploreTab } from '../../shared/types/timeline';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Predefined hashtags for each category
-const trendingHashtags = [
-  'TechTrends2025',
-  'ViralMoment',
-  'GlobalNews',
-  'MustWatch',
-  'TrendingNow',
-  'HotTopic',
-  'BreakingNews',
-  'Trending',
-  'WorldWide',
-  'PopularNow',
-  'TrendAlert',
-  'DailyTrends',
-  'SocialBuzz',
-  'GoingViral',
-  'TopTrending',
-];
-
 const newsHashtags = [
   'BreakingNews',
   'WorldNews',
@@ -94,38 +75,44 @@ const entertainmentHashtags = [
 function generateHashtagsForCategory(
   hashtags: string[],
   count: number,
-  interest: string,
+  category: string,
 ): TrendingHashtag[] {
   const shuffled = faker.helpers.shuffle([...hashtags]);
-  const countries = [
-    'United States',
-    'United Kingdom',
-    'Canada',
-    'Australia',
-    'Germany',
-    'France',
-    'Japan',
-    'Brazil',
-  ];
 
-  return shuffled.slice(0, Math.min(count, hashtags.length)).map((hashtag, index) => {
-    const includeCountry = faker.datatype.boolean();
+  return shuffled.slice(0, Math.min(count, hashtags.length)).map((hashtag) => {
+    // 50% chance to add # prefix, 50% keep as normal word
+    const hasHashSymbol = faker.datatype.boolean();
+    const formattedHashtag = hasHashSymbol ? `#${hashtag}` : hashtag;
+
     return {
-      rank: index + 1,
-      hashtag,
+      hashtag: formattedHashtag,
       tweetsCount: faker.number.int({ min: 1000, max: 1000000 }),
-      ...(includeCountry ? { country: faker.helpers.arrayElement(countries) } : {}),
-      interest,
+      category,
     };
   });
 }
 
 function generateAllHashtags() {
+  const newsHashtagsList = generateHashtagsForCategory(newsHashtags, 15, 'news');
+  const sportsHashtagsList = generateHashtagsForCategory(sportsHashtags, 20, 'sports');
+  const entertainmentHashtagsList = generateHashtagsForCategory(
+    entertainmentHashtags,
+    20,
+    'entertainment',
+  );
+
+  // Trending is a mix of all categories
+  const trendingList = faker.helpers.shuffle([
+    ...newsHashtagsList.slice(0, 5),
+    ...sportsHashtagsList.slice(0, 5),
+    ...entertainmentHashtagsList.slice(0, 5),
+  ]);
+
   const categorizedHashtags: Record<ExploreTab, TrendingHashtag[]> = {
-    trending: generateHashtagsForCategory(trendingHashtags, 15, 'Trending'),
-    news: generateHashtagsForCategory(newsHashtags, 15, 'News'),
-    sports: generateHashtagsForCategory(sportsHashtags, 20, 'Sports'),
-    entertainment: generateHashtagsForCategory(entertainmentHashtags, 20, 'Entertainment'),
+    trending: trendingList,
+    news: newsHashtagsList,
+    sports: sportsHashtagsList,
+    entertainment: entertainmentHashtagsList,
   };
 
   return categorizedHashtags;

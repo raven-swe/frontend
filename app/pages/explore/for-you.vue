@@ -7,6 +7,7 @@ import { homeService } from '~/services/home/homeService';
 import { useInfiniteQuery } from '@tanstack/vue-query';
 import { useWindowVirtualizer } from '@tanstack/vue-virtual';
 import type { TrendingHashtag } from '~~/shared/types/hashtag';
+import type { Tweet } from '~~/shared/types/tweet';
 
 definePageMeta({
   layout: 'explore',
@@ -18,12 +19,27 @@ const isHashtagsLoading = ref(false);
 const loadHashtags = async () => {
   isHashtagsLoading.value = true;
   try {
-    const response = await exploreService.getForYou();
-    trendingHashtags.value = response.data;
+    const response = await exploreService.getExploreTab('trending');
+    trendingHashtags.value = response.data.slice(0, 5);
   } catch (error) {
     console.error('Failed to load trending hashtags:', error);
   } finally {
     isHashtagsLoading.value = false;
+  }
+};
+
+const categorizedTweets = ref<{ category: string; tweets: Tweet[] }[]>([]);
+const isCategorizedTweetsLoading = ref(false);
+
+const loadCategorizedTweets = async () => {
+  isCategorizedTweetsLoading.value = true;
+  try {
+    const response = await exploreService.getCategorizedTweets();
+    categorizedTweets.value = response.data.categories;
+  } catch (error) {
+    console.error('Failed to load categorized tweets:', error);
+  } finally {
+    isCategorizedTweetsLoading.value = false;
   }
 };
 
@@ -52,6 +68,7 @@ const parentOffsetRef = ref(0);
 
 onMounted(() => {
   loadHashtags();
+  loadCategorizedTweets();
 });
 
 // Recalculate offset whenever content changes
@@ -119,12 +136,22 @@ watch(
 <template>
   <div class="border-border mx-auto max-w-[700px]">
     <!-- Hashtags Section -->
-    <div v-if="trendingHashtags.length > 0" class="border-border border-b">
-      <Hashtag v-for="hashtag in trendingHashtags" :key="hashtag.hashtag" :hashtag="hashtag" />
+    <div v-if="trendingHashtags.length > 0" class="border-border border-b py-2">
+      <Hashtag
+        v-for="(hashtag, index) in trendingHashtags"
+        :key="hashtag.hashtag"
+        :hashtag="hashtag"
+        :rank="index"
+      />
+    </div>
+
+    <div v-for="categoryData in categorizedTweets" :key="categoryData.category" class="px-2">
+      <h1 class="ps-2 pt-2 pb-3 text-2xl font-extrabold">{{ categoryData.category }}</h1>
+      <TweetDefaultCard v-for="tweet in categoryData.tweets" :key="tweet.id" :tweet="tweet" />
     </div>
 
     <!-- Tweets Section -->
-    <div ref="parentRef" class="border-border mx-auto max-w-[700px]">
+    <div ref="parentRef" class="border-border mx-auto max-w-[700px] px-2">
       <ClientOnly>
         <div v-if="tweets">
           <div
@@ -145,6 +172,9 @@ watch(
                 }px)`,
               }"
             >
+              <h1 class="py-4 ps-2 text-2xl font-extrabold">
+                {{ $t('explore.for-you.posts-for-you') }}
+              </h1>
               <div
                 v-for="virtualRow in virtualRows"
                 :key="tweets[virtualRow.index]?.id || String(virtualRow.key)"
