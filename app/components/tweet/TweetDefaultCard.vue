@@ -7,6 +7,7 @@ import TweetActionButtons from './TweetActionButtons.vue';
 import TweetQuoteCard from './TweetQuoteCard.vue';
 interface Props {
   tweet: Tweet;
+  isParent?: boolean;
 }
 const props = defineProps<Props>();
 const router = useRouter();
@@ -51,16 +52,33 @@ function handleTweetClick() {
 <template>
   <article
     :id="'tweet-' + props.tweet.id"
-    class="border-b-border flex w-full max-w-[700px] cursor-pointer gap-3 border-b-1 p-2"
+    class="border-b-border flex w-full max-w-[700px] cursor-pointer gap-3 ps-4 pe-3 pt-3 pb-2"
+    :class="{
+      'border-b-1': !isParent,
+    }"
     @click.prevent.stop="handleTweetClick"
   >
-    <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
-      <Avatar
-        :img="props.tweet.author.avatarUrl || '/default_profile.png'"
-        size="sm"
-        variant="primary"
-      />
-    </NuxtLink>
+    <div class="flex flex-col items-center">
+      <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
+        <Avatar
+          :img="props.tweet.author.avatarUrl || '/default_profile.png'"
+          size="sm"
+          variant="primary"
+        />
+      </NuxtLink>
+      <div class="relative w-full flex-1">
+        <div
+          v-if="isParent"
+          class="bg-muted-foreground/50 absolute w-0.5 shrink-0"
+          :style="{
+            top: '0.25rem',
+            bottom: '-1rem',
+            left: '50%',
+            transform: 'translate(-50%, 0%)',
+          }"
+        ></div>
+      </div>
+    </div>
 
     <!-- Main -->
     <div class="min-w-0 flex-1">
