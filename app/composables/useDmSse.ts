@@ -1,5 +1,6 @@
 import type { DmSseEventMap } from '~~/shared/types/dm';
 import { EventSourcePolyfill } from 'event-source-polyfill';
+import type { Notification } from '~~/shared/types/notifications';
 
 interface UseDmSseOptions {
   autoReconnect?: boolean;
@@ -98,6 +99,26 @@ export function useDmSse(options: UseDmSseOptions = {}) {
           console.log('Received new_message event:', data);
         } catch {
           createError('Failed to parse new_message event data');
+        }
+      });
+
+      es.addEventListener('notifications.count_update', (evt: MessageEvent) => {
+        try {
+          const data = JSON.parse(evt.data) as { count: number };
+          // update the count somewhere
+          console.log('Received notifications.count_update event:', data);
+        } catch {
+          createError('Failed to parse notifications.count_update event data');
+        }
+      });
+
+      es.addEventListener('notifications.new', (evt: MessageEvent) => {
+        try {
+          const data = JSON.parse(evt.data) as Notification;
+          // update the last notification somewhere
+          console.log('Received notifications.new event:', data);
+        } catch {
+          createError('Failed to parse notifications.new event data');
         }
       });
     } catch {
