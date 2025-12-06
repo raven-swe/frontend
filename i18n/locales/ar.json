@@ -1,4 +1,12 @@
 {
+  "ai-summary": {
+    "retry": "إعادة المحاولة",
+    "summary": "ملخص الذكاء الاصطناعي",
+    "generate-summary": "إنشاء ملخص",
+    "loading-summary": "جارٍ إنشاء الملخص...",
+    "something-went-wrong": "حدث خطأ أثناء إنشاء الملخص.",
+    "no-summary": "لا يوجد ملخص متاح."
+  },
   "testing": {
     "user": {
       "name": "جون دو",
