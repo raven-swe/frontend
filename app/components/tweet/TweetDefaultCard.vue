@@ -52,7 +52,7 @@ function handleTweetClick() {
 <template>
   <article
     :id="'tweet-' + props.tweet.id"
-    class="border-b-border flex w-full max-w-[700px] cursor-pointer gap-3 ps-4 pe-3 pt-3 pb-2"
+    class="border-b-border flex w-full max-w-[700px] cursor-pointer gap-2 ps-4 pe-3 pt-3 pb-2"
     :class="{
       'border-b-1': !isParent,
     }"
@@ -69,7 +69,7 @@ function handleTweetClick() {
       <div class="relative w-full flex-1">
         <div
           v-if="isParent"
-          class="bg-muted-foreground/50 absolute w-0.5 shrink-0"
+          class="bg-thread-foreground absolute w-0.5 shrink-0"
           :style="{
             top: '0.25rem',
             bottom: '-1rem',
@@ -88,6 +88,7 @@ function handleTweetClick() {
           <span class="cursor-pointer font-semibold hover:underline">{{
             props.tweet.author.displayName
           }}</span>
+          {{ props.tweet.id }}
           <span class="text-muted-foreground ms-1" v-text="'@' + props.tweet.author.username" />
           <span class="text-muted-foreground">·</span>
         </NuxtLink>

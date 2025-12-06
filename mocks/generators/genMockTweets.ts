@@ -94,7 +94,7 @@ function makeBaseTweet(id: string, content?: string, author?: TweetAuthor): Twee
   };
 }
 
-function makeData() {
+async function makeData() {
   const NUM_TWEETS = 400;
   const usersPath = path.resolve(__dirname, '../data/mock-users.json');
   let users: User[] = [];
@@ -112,6 +112,7 @@ function makeData() {
   const tweetMap = new Map<string, Tweet>();
   for (let i = 0; i < NUM_THREAD_TWEETS; ++i) {
     const randomUser = faker.helpers.arrayElement(users);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     const tweet = makeBaseTweet('tw-thread-' + i, undefined, makeAuthorFromUser(randomUser));
     tweetMap.set(tweet.id, tweet);
   }
@@ -172,12 +173,12 @@ function makeData() {
   return tweets;
 }
 
-function main() {
-  const data = makeData();
+async function main() {
+  const data = await makeData();
   const outDir = path.resolve(__dirname, '../data');
   const outFile = path.join(outDir, 'mock-tweets.json');
   mkdirSync(outDir, { recursive: true });
   writeFileSync(outFile, JSON.stringify(data, null, 2), 'utf-8');
 }
 
-main();
+await main();

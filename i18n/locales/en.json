@@ -207,7 +207,8 @@
       "reply": "Reply",
       "like": "Like",
       "unlike": "Unlike"
-    }
+    },
+    "show-more-parents": "Show more parent tweets"
   },
   "notifications": {
     "title": "Notifications",

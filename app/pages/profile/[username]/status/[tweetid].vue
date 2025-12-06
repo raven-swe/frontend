@@ -25,17 +25,23 @@ const {
   structuralSharing: false,
 });
 
-const mainTweetRef = useTemplateRef<typeof TweetView>('main-tweet');
+const sortedParentTweets = computed(() => {
+  if (!tweetData.value) return [];
+  return structuredClone(toRaw(tweetData.value.parentTweets))?.sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+  );
+});
+const oldestParent = computed(() => sortedParentTweets.value?.[0] || null);
+
+const mainTweetContRef = useTemplateRef<HTMLElement>('main-tweet-cont');
+const headerRef = useTemplateRef<HTMLElement>('header-ref');
 
 function scrollMainTweetIntoView() {
-  const el = mainTweetRef.value?.$el as HTMLElement | undefined;
-  if (!el) return;
-
-  const header = document.querySelector('#header-ref') as HTMLElement | null;
-  const headerHeight = header?.offsetHeight ?? 0;
-
+  const el = mainTweetContRef.value;
+  const header = headerRef.value;
+  if (!el || !header) return;
+  const headerHeight = header.offsetHeight;
   const topOfElement = window.pageYOffset + el.getBoundingClientRect().top - headerHeight;
-
   window.scrollTo({
     top: topOfElement,
     behavior: 'instant',
@@ -58,7 +64,7 @@ watch(
 );
 
 const {
-  data: response,
+  data: repliesResponse,
   fetchNextPage,
   hasNextPage,
   isFetchingNextPage,
@@ -73,11 +79,7 @@ const {
   enabled: computed(() => !!tweetData.value),
 });
 
-const tweets = computed(() => response.value?.pages.flatMap((page) => page.data) || []);
-
-function goBackToHome() {
-  router.back();
-}
+const replies = computed(() => repliesResponse.value?.pages.flatMap((page) => page.data) || []);
 
 function handleReplied(tweet: Tweet) {
   if (tweet.replyToTweetId !== tweetid.value) return;
@@ -126,14 +128,14 @@ onServerPrefetch(async () => {
     class="flexflex-col mt-20 items-center justify-center p-8 text-center"
   >
     <h1 class="mb-5 text-3xl font-bold">{{ $t('errors.TWEET_NOT_FOUND') }}</h1>
-    <UiButton variant="link" size="link" class="text-primary underline" @click="goBackToHome">{{
+    <UiButton variant="link" size="link" class="text-primary underline" @click="$router.back()">{{
       $t('errors.GO_BACK_HOME')
     }}</UiButton>
   </div>
   <div v-else-if="tweetData" :key="tweetData.id" class="min-h-screen w-full">
     <header
-      id="header-ref"
-      class="bg-background/65 sticky top-0 z-10 flex h-12 items-center gap-6 px-2 backdrop-blur-md"
+      ref="header-ref"
+      class="bg-background/65 sticky top-0 z-10 flex h-13 items-center gap-6 px-2 backdrop-blur-md"
     >
       <UiButton
         variant="ghost-default"
@@ -151,16 +153,34 @@ onServerPrefetch(async () => {
 
     <ClientOnly>
       <TweetDefaultCard v-if="tweetData.rootTweet" is-parent :tweet="tweetData.rootTweet" />
+      <NuxtLink
+        v-if="tweetData.hasMoreParents && oldestParent"
+        class="bg-background z-20 flex h-7 cursor-pointer flex-row items-end gap-2 px-4"
+        :to="`/profile/${oldestParent.author.username}/status/${oldestParent.id}`"
+      >
+        <div class="relative flex h-full w-full flex-row items-end gap-2">
+          <div
+            class="bg-background absolute start-5 flex h-full -translate-x-1/2 flex-col items-center justify-end gap-1.5"
+          >
+            <div class="bg-thread-foreground size-0.5"></div>
+            <div class="bg-thread-foreground size-0.5"></div>
+            <div class="bg-thread-foreground size-0.5"></div>
+          </div>
+          <p class="text-primary ps-12 leading-tight select-none hover:underline">
+            {{ $t('tweet.show-more-parents') }}
+          </p>
+        </div>
+      </NuxtLink>
       <TweetDefaultCard
-        v-for="tweet in tweetData.parentTweets"
+        v-for="tweet in sortedParentTweets"
         :key="tweet.id"
         is-parent
         :tweet="tweet"
       />
     </ClientOnly>
 
-    <div class="min-h-[calc(100vh_-_3rem)]">
-      <TweetView ref="main-tweet" :tweet="tweetData" />
+    <div ref="main-tweet-cont" class="min-h-[calc(100vh_-_3.25rem)]">
+      <TweetView :tweet="tweetData" />
 
       <div class="border-b">
         <TweetComposer :reply-to-tweet-id="tweetData?.id" type="reply" @posted="handleReplied" />
@@ -168,7 +188,7 @@ onServerPrefetch(async () => {
 
       <ClientOnly>
         <CommonVirtualInfiniteScroller
-          :items="tweets"
+          :items="replies"
           :estimate-size="120"
           :has-next-page="hasNextPage"
           :is-fetching-next-page="isFetchingNextPage"
