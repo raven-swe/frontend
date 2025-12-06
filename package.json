@@ -32,8 +32,6 @@
     "@tanstack/vue-query": "^5.90.5",
     "@tanstack/vue-virtual": "^3.13.12",
     "@types/event-source-polyfill": "^1.0.5",
-    "@tanstack/vue-virtual": "3.13.12",
-    "@videojs-player/vue": "^1.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "event-source-polyfill": "^1.0.31",
