@@ -1,4 +1,8 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import useMyProfileQuery from '~/composables/useMyProfileQuery';
+
+useMyProfileQuery();
+</script>
 
 <template>
   <!-- Main content -->
