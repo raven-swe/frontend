@@ -89,8 +89,8 @@ function handleTweetClick() {
             props.tweet.author.displayName
           }}</span>
           <span class="text-muted-foreground ms-1" v-text="'@' + props.tweet.author.username" />
-          <span class="text-muted-foreground">·</span>
         </NuxtLink>
+        <span class="text-muted-foreground">·</span>
         <time
           :title="formatDate(tweet.createdAt, $i18n.locale)"
           :datetime="tweet.createdAt"
