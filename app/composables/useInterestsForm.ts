@@ -4,6 +4,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { useI18n } from 'vue-i18n';
 import { onServerPrefetch, watch } from 'vue';
 import { settingsService } from '~/services/settingsService';
+import { showToaster } from '~/utils/showToaster';
+import {
+  isApiError,
+  isApiValidationError,
+  backendValidationToFormErrors,
+} from '~/utils/errorUtils';
 
 export const useInterestsForm = () => {
   const { t } = useI18n();
@@ -32,7 +38,7 @@ export const useInterestsForm = () => {
     staleTime: Infinity,
   });
 
-  const { handleSubmit, setErrors, resetForm, isSubmitting } = useForm<
+  const { handleSubmit, setErrors, resetForm, isSubmitting, errors } = useForm<
     yup.InferType<typeof formSchema>
   >({
     validationSchema: formSchema,
@@ -63,7 +69,12 @@ export const useInterestsForm = () => {
   });
 
   const onSubmit = handleSubmit(async (values) => {
-    await updateInterestsMutation.mutateAsync(values.interests);
+    try {
+      await updateInterestsMutation.mutateAsync(values.interests);
+    } catch {
+      // error handling is done in onError of the mutation
+      // we only catch here to prevent unhandled promise rejection
+    }
   });
 
   const handleToggleInterest = (code: string) => {
@@ -104,6 +115,7 @@ export const useInterestsForm = () => {
 
   return {
     isLoading,
+    errors,
     isSubmitting,
     interests: computed(() => interestsResponse.value?.data),
     selectedOne: computed(() => fields.value.length > 0),
