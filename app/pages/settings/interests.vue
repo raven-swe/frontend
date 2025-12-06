@@ -82,6 +82,7 @@ watch(
   () => interestsResponse.value,
   (newData) => {
     if (!newData) return;
+    if (import.meta.env.SSR) return;
     resetForm({
       values: {
         interests: extractSelected(newData),
@@ -120,7 +121,7 @@ onServerPrefetch(async () => {
       </p>
     </div>
     <form class="mt-3 flex h-full flex-1 flex-col overflow-hidden" @submit.prevent="onSubmit">
-      <div v-if="interestsResponse" class="flex-1 overflow-y-auto">
+      <div v-if="interestsResponse" class="scroll-theme flex-1 overflow-y-auto">
         <InterestEntry
           v-for="interest in interestsResponse.data"
           :key="interest.code"
@@ -138,3 +139,9 @@ onServerPrefetch(async () => {
     </form>
   </div>
 </template>
+
+<style scoped>
+.scroll-theme {
+  scrollbar-color: rgb(62, 65, 68) rgb(22, 24, 28);
+}
+</style>
