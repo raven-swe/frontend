@@ -23,6 +23,7 @@ const {
   unseenCount,
   lastNewMessageinfo,
   lastNotification,
+  unseenNotificationsCount,
 } = useDmSse({
   autoReconnect: true,
   maxReconnectAttempts: 5,
@@ -36,6 +37,7 @@ const lastProcessedMessageId = ref<string | null>(null);
 provide('dmUnseenCount', unseenCount);
 provide('lastNewMessageinfo', lastNewMessageinfo);
 provide('lastNotification', lastNotification);
+provide('unseenNotificationsCount', unseenNotificationsCount);
 
 watch(
   () => lastNewMessageinfo.value,

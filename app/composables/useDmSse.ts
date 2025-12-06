@@ -16,6 +16,7 @@ export function useDmSse(options: UseDmSseOptions = {}) {
   const unseenCount = ref<number>(0);
   const lastNewMessageinfo = ref<DmSseEventMap['dm.new_message'] | null>(null);
   const lastNotification = ref<Notification | null>(null);
+  const unseenNotificationsCount = ref<number>(0);
   const isConnected = ref<boolean>(false);
   const error = ref<Event | null>(null);
   const reconnectAttempts = ref<number>(0);
@@ -89,7 +90,7 @@ export function useDmSse(options: UseDmSseOptions = {}) {
         try {
           const data = JSON.parse(evt.data) as DmSseEventMap['dm.unseen_conversations_count'];
           unseenCount.value = data.count;
-          console.log('Received unseen_conversations_count event:', data);
+          // console.log('Received unseen_conversations_count event:', data);
         } catch {
           createError('Failed to parse unseen_conversations_count event data');
         }
@@ -99,7 +100,7 @@ export function useDmSse(options: UseDmSseOptions = {}) {
         try {
           const data = JSON.parse(evt.data) as DmSseEventMap['dm.new_message'];
           lastNewMessageinfo.value = data;
-          console.log('Received new_message event:', data);
+          // console.log('Received new_message event:', data);
         } catch {
           createError('Failed to parse new_message event data');
         }
@@ -108,8 +109,8 @@ export function useDmSse(options: UseDmSseOptions = {}) {
       es.addEventListener('notifications.count_update', (evt: MessageEvent) => {
         try {
           const data = JSON.parse(evt.data) as { count: number };
-          // update the count somewhere
-          console.log('Received notifications.count_update event:', data);
+          unseenNotificationsCount.value = data.count;
+          // console.log('Received notifications.count_update event:', unseenNotificationsCount.value);
         } catch {
           createError('Failed to parse notifications.count_update event data');
         }
@@ -143,7 +144,7 @@ export function useDmSse(options: UseDmSseOptions = {}) {
               ],
             };
           });
-          console.log('Received notifications.new event:', notif);
+          // console.log('Received notifications.new event:', notif);
         } catch {
           createError('Failed to parse notifications.new event data');
         }
@@ -179,6 +180,7 @@ export function useDmSse(options: UseDmSseOptions = {}) {
     unseenCount,
     lastNewMessageinfo,
     lastNotification,
+    unseenNotificationsCount,
     isConnected,
     error,
     reconnectAttempts,

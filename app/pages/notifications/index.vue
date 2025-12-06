@@ -14,6 +14,7 @@ definePageMeta({
 });
 
 const lastNotification = inject<Ref<Notification | null>>('lastNotification')!;
+const unseenNotificationsCount = inject<Ref<number>>('unseenNotificationsCount')!;
 const queryClient = useQueryClient();
 
 // infinite query to fetch notifications
@@ -46,6 +47,7 @@ const { mutate: followUser } = useFollowMutation();
 
 // mark all as seen in the cache
 await notificationsService.markAllSeen();
+unseenNotificationsCount.value = 0;
 queryClient.setQueryData(['notifications-main'], (oldData: unknown) => {
   if (!oldData || typeof oldData !== 'object') return oldData;
   const od = oldData as {
@@ -163,7 +165,7 @@ watch(
       if (!oldData || typeof oldData !== 'object') return oldData;
 
       const od = oldData as {
-        pages?: Array<{ data?: unknown[] }>;
+        pages?: Array<{ data?: Notification[] }>;
         [k: string]: unknown;
       };
 
@@ -171,6 +173,13 @@ watch(
       if (!firstPage) return oldData;
 
       const firstPageTyped = firstPage as { data?: Notification[] };
+
+      // avoid duplicates
+      const alreadyExists = od.pages?.some((p) =>
+        (p as { data?: Notification[] }).data?.some((n) => n.id === notif.id),
+      );
+
+      if (alreadyExists) return oldData;
 
       return {
         ...od,

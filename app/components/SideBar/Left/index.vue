@@ -6,6 +6,7 @@ import { useI18n } from '#imports';
 import { useTheme } from '~/composables/useTheme';
 
 const dmUnseenCount = inject<Ref<number>>('dmUnseenCount', ref(0));
+const notificationUnseenCount = inject<Ref<number>>('unseenNotificationsCount', ref(0));
 
 const { locale, setLocale } = useI18n();
 const { mode, toggleTheme } = useTheme();
@@ -43,7 +44,12 @@ const switchLanguage = () => {
         :tab="{ label: 'explore', icon: 'search', route: '/explore' }"
       ></SideBarLeftTab>
       <SideBarLeftTab
-        :tab="{ label: 'notifications', icon: 'notifications', route: '/notifications' }"
+        :tab="{
+          label: 'notifications',
+          icon: 'notifications',
+          route: '/notifications',
+          badgeCount: notificationUnseenCount,
+        }"
       ></SideBarLeftTab>
       <SideBarLeftTab
         :tab="{
