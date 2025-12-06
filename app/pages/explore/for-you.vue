@@ -172,7 +172,7 @@ watch(
                 }px)`,
               }"
             >
-              <h1 class="py-4 ps-2 text-2xl font-extrabold">
+              <h1 v-if="tweets.length > 0" class="py-4 ps-2 text-2xl font-extrabold">
                 {{ $t('explore.for-you.posts-for-you') }}
               </h1>
               <div
