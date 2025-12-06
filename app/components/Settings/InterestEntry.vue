@@ -23,6 +23,7 @@ const translatedInterest = (interest: Interest) => {
         {{ translatedInterest(props.interest) }}
       </p>
       <div
+        data-test="checkbox-hover"
         class="flex items-center justify-center rounded-full p-2 transition-colors duration-200"
         :class="{
           'group-hover:bg-primary/10': props.isActive,
