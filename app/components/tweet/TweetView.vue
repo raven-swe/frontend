@@ -10,120 +10,86 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const tweet = ref(props.tweet);
+const tweetClone = ref(structuredClone(toRaw(props.tweet)));
 
 // Update local tweet state when like/unlike succeeds
 const onLikeSuccess = () => {
-  if (!tweet.value.isLiked) {
-    tweet.value.isLiked = true;
-    tweet.value.likeCount = (tweet.value.likeCount ?? 0) + 1;
+  if (!tweetClone.value.isLiked) {
+    tweetClone.value.isLiked = true;
+    tweetClone.value.likeCount = (tweetClone.value.likeCount ?? 0) + 1;
   }
 };
 
 const onUnlikeSuccess = () => {
-  if (tweet.value.isLiked) {
-    tweet.value.isLiked = false;
-    const next = (tweet.value.likeCount ?? 0) - 1;
-    tweet.value.likeCount = next < 0 ? 0 : next;
+  if (tweetClone.value.isLiked) {
+    tweetClone.value.isLiked = false;
+    const next = (tweetClone.value.likeCount ?? 0) - 1;
+    tweetClone.value.likeCount = next < 0 ? 0 : next;
   }
 };
 
 const onRetweetSuccess = () => {
-  if (!tweet.value.isRetweeted) {
-    tweet.value.isRetweeted = true;
-    tweet.value.retweetCount += 1;
+  if (!tweetClone.value.isRetweeted) {
+    tweetClone.value.isRetweeted = true;
+    tweetClone.value.retweetCount += 1;
   }
 };
 
 const onUndoRetweetSuccess = () => {
-  if (tweet.value.isRetweeted) {
-    tweet.value.isRetweeted = false;
-    const next = (tweet.value.retweetCount ?? 0) - 1;
-    tweet.value.retweetCount = next < 0 ? 0 : next;
+  if (tweetClone.value.isRetweeted) {
+    tweetClone.value.isRetweeted = false;
+    const next = (tweetClone.value.retweetCount ?? 0) - 1;
+    tweetClone.value.retweetCount = next < 0 ? 0 : next;
   }
 };
 </script>
 
 <template>
-  <article class="border-b-border w-full max-w-[700px] gap-3 border-b-1 p-4">
+  <article class="w-full max-w-[700px] gap-3 border-b px-4 py-2">
     <div class="flex w-full items-center justify-between">
       <div class="flex">
-        <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
+        <NuxtLink
+          :to="`/profile/${props.tweet.author.username}`"
+          class="flex items-center"
+          @click.stop
+        >
           <Avatar
-            :img="tweet.author.avatarUrl || '/default_profile.png'"
+            :img="tweetClone.author.avatarUrl || '/default_profile.png'"
             size="sm"
             variant="primary"
           />
-        </NuxtLink>
-
-        <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
           <div class="ms-2 flex flex-col">
-            <span class="cursor-pointer font-semibold hover:underline">{{
-              tweet.author.displayName
+            <span class="cursor-pointer leading-tight font-semibold hover:underline">{{
+              tweetClone.author.displayName
             }}</span>
-            <span class="text-muted-foreground" v-text="'@' + tweet.author.username" />
+            <span class="text-muted-foreground leading-tight">
+              {{ '@' + tweetClone.author.username }}
+            </span>
           </div>
         </NuxtLink>
       </div>
-      <div class="flex">
-        <Icon
-          class="text-foreground/50 hover:text-primary cursor-pointer"
-          name="ic:more-horiz"
-          size="1.4rem"
-        />
-      </div>
     </div>
     <div class="border-b-border mt-3 border-b-1 pb-3">
-      <p class="mt-1 leading-relaxed break-words whitespace-pre-wrap">
-        <ContentEntitiesRenderer :content="tweet.content" :entities="tweet.entities" />
+      <p class="mt-1 text-lg leading-relaxed break-words whitespace-pre-wrap">
+        <ContentEntitiesRenderer :content="tweetClone.content" :entities="tweetClone.entities" />
       </p>
-      <TweetMedia :media="tweet.media" />
+      <TweetMedia :media="tweetClone.media" />
 
       <div class="mt-2">
         <time
-          :title="formatDate(tweet.createdAt)"
-          :datetime="tweet.createdAt"
-          class="text-muted-foreground hover:cursor-pointer hover:underline"
-          >{{ formatDate(tweet.createdAt) }}</time
+          :title="formatDate(tweetClone.createdAt)"
+          :datetime="tweetClone.createdAt"
+          class="text-muted-foreground text-md"
+          >{{ formatDate(tweetClone.createdAt) }}</time
         >
       </div>
     </div>
     <TweetActionButtons
-      :tweet="tweet"
+      :tweet="tweetClone"
       @like-success="onLikeSuccess"
       @unlike-success="onUnlikeSuccess"
       @retweet-success="onRetweetSuccess"
       @undo-retweet-success="onUndoRetweetSuccess"
     />
-
-    <div v-if="false" class="min-w-0 flex-1">
-      <div class="flex flex-wrap items-center gap-x-1 text-sm">
-        <span class="text-muted-foreground" v-text="'@' + tweet.author.username" />
-        <span class="text-muted-foreground">·</span>
-        <time
-          :title="formatDate(tweet.createdAt)"
-          :datetime="tweet.createdAt"
-          class="text-muted-foreground hover:cursor-pointer hover:underline"
-          >{{ relativeTime(tweet.createdAt) }}</time
-        >
-      </div>
-
-      <!-- Content -->
-      <p class="mt-1 leading-relaxed break-words whitespace-pre-wrap">
-        <UiContentEntitiesRenderer :content="tweet.content" :entities="tweet.entities" />
-      </p>
-
-      <!-- Media (single image basic layout) -->
-      <TweetMedia :media="tweet.media" />
-
-      <!-- Actions -->
-      <TweetActionButtons
-        :tweet="tweet"
-        @like-success="onLikeSuccess"
-        @unlike-success="onUnlikeSuccess"
-        @retweet-success="onRetweetSuccess"
-        @undo-retweet-success="onUndoRetweetSuccess"
-      />
-    </div>
   </article>
 </template>
