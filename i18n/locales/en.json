@@ -6,7 +6,8 @@
     "loading-summary": "Generating summary...",
     "something-went-wrong": "Something went wrong while generating the summary.",
     "no-summary": "No summary available.",
-    "summary-label": "Summary"
+    "summary-label": "Summary",
+    "close": "Close AI summary"
   },
   "testing": {
     "user": {

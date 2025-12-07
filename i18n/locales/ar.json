@@ -5,7 +5,8 @@
     "generate-summary": "إنشاء ملخص",
     "loading-summary": "جارٍ إنشاء الملخص...",
     "something-went-wrong": "حدث خطأ أثناء إنشاء الملخص.",
-    "no-summary": "لا يوجد ملخص متاح."
+    "no-summary": "لا يوجد ملخص متاح.",
+    "close": "إغلاق ملخص الذكاء الاصطناعي"
   },
   "testing": {
     "user": {
