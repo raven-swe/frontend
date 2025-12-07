@@ -5,11 +5,15 @@ import type { Tweet } from '~~/shared/types/tweets';
 import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
 import TweetQuoteCard from './TweetQuoteCard.vue';
+import { useUserStore } from '~/stores/user';
 interface Props {
   tweet: Tweet;
 }
 const props = defineProps<Props>();
 const router = useRouter();
+
+const userStore = useUserStore();
+const originalUsername = ref<string>(userStore.user?.username || '');
 
 // Format createdAt to a short relative time like "6h", "3d", "2m"
 const tweet = ref<Tweet>(JSON.parse(JSON.stringify(props.tweet)));
@@ -49,15 +53,22 @@ function handleTweetClick() {
 </script>
 
 <template>
-  <div
-    v-if="props.tweet.isRetweeted"
+  <NuxtLink
+    v-if="props.tweet.repostedBy"
+    :to="`/profile/${props.tweet.repostedBy.username}`"
     class="text-muted-foreground ms-2 mt-1 flex items-center gap-1 px-6"
   >
     <Icon name="tabler:repeat" size="1.2rem" />
-    <span class="text-muted-foreground text-sm">
+    <span
+      v-if="props.tweet.repostedBy.username === originalUsername"
+      class="text-muted-foreground text-sm"
+    >
       {{ $t('tweet.retweeted-by-you') }}
     </span>
-  </div>
+    <span v-else class="text-muted-foreground text-sm">{{
+      $t('tweet.retweeted-by', { username: props.tweet.repostedBy.displayName })
+    }}</span>
+  </NuxtLink>
   <article
     :id="'tweet-' + props.tweet.id"
     class="border-b-border flex w-full max-w-[700px] cursor-pointer gap-3 border-b-1 p-2"
@@ -80,7 +91,7 @@ function handleTweetClick() {
             props.tweet.author.displayName
           }}</span>
           <span class="text-muted-foreground ms-1" v-text="'@' + props.tweet.author.username" />
-          <span class="text-muted-foreground">·</span>
+          <span class="text-muted-foreground ms-1">·</span>
         </NuxtLink>
         <time
           :title="formatDate(tweet.createdAt, $i18n.locale)"

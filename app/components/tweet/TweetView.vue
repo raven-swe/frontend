@@ -5,10 +5,13 @@ import type { Tweet } from '~~/shared/types/tweets';
 import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
 import ContentEntitiesRenderer from '../ui/ContentEntitiesRenderer.vue';
+import { useUserStore } from '~/stores/user';
 interface Props {
   tweet: Tweet;
 }
 const props = defineProps<Props>();
+const userStore = useUserStore();
+const originalUsername = ref<string>(userStore.user?.username || '');
 
 const tweet = ref(props.tweet);
 
@@ -45,6 +48,22 @@ const onUndoRetweetSuccess = () => {
 </script>
 
 <template>
+  <NuxtLink
+    v-if="props.tweet.repostedBy"
+    :to="`/profile/${props.tweet.repostedBy.username}`"
+    class="text-muted-foreground ms-2 mt-13 flex items-center gap-1 px-6"
+  >
+    <Icon name="tabler:repeat" size="1.2rem" />
+    <span
+      v-if="props.tweet.repostedBy.username === originalUsername"
+      class="text-muted-foreground text-sm"
+    >
+      {{ $t('tweet.retweeted-by-you') }}
+    </span>
+    <span v-else class="text-muted-foreground text-sm">{{
+      $t('tweet.retweeted-by', { username: props.tweet.repostedBy.displayName })
+    }}</span>
+  </NuxtLink>
   <article class="border-b-border w-full max-w-[700px] gap-3 border-b-1 p-4">
     <div class="flex w-full items-center justify-between">
       <div class="flex">
