@@ -25,6 +25,7 @@ export function useDmConversations() {
         }
         return undefined;
       },
+      staleTime: 0,
     });
 
   const { highlightedIds } = useDmHighlight();

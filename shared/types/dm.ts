@@ -46,6 +46,8 @@ export interface DmMessage {
 }
 
 // WebSocket Types
+
+// Client → Server
 export interface DmWsSendMessagePayload {
   type: 'send_message';
   conversationId: string;
@@ -59,8 +61,31 @@ export interface DmWsMarkSeenPayload {
   lastSeenMessageId: string;
 }
 
-export type DmWsClientMessage = DmWsSendMessagePayload | DmWsMarkSeenPayload;
+export interface DmWsTypingStartPayload {
+  type: 'typing_start';
+  conversationId: string;
+}
 
+export interface DmWsTypingStopPayload {
+  type: 'typing_stop';
+  conversationId: string;
+}
+
+export interface DmWsSendReactionPayload {
+  type: 'send_reaction';
+  conversationId: string;
+  messageId: string;
+  reaction: string;
+}
+
+export type DmWsClientMessage =
+  | DmWsSendMessagePayload
+  | DmWsMarkSeenPayload
+  | DmWsTypingStartPayload
+  | DmWsTypingStopPayload
+  | DmWsSendReactionPayload;
+
+// Server → Client
 export interface DmWsMessageReceived {
   type: 'message_received';
   conversationId: string;
@@ -93,6 +118,36 @@ export interface DmWsConversationSeenUpdate {
   seenAt: string;
 }
 
+export interface DmWsUserTyping {
+  type: 'user_typing';
+  conversationId: string;
+  username: string;
+}
+
+export interface DmWsUserTypingStop {
+  type: 'user_typing_stop';
+  conversationId: string;
+  username: string;
+}
+
+export interface DmReactionUser {
+  username: string;
+  displayName: string;
+  avatarUrl: string;
+  reaction: string | null;
+  reactedAt: string | null;
+}
+
+export interface DmWsReactionReceived {
+  type: 'reaction_received';
+  conversationId: string;
+  messageId: string;
+  reactions: {
+    sender: DmReactionUser;
+    receiver: DmReactionUser;
+  };
+}
+
 export interface DmWsError {
   type: 'error';
   clientMessageId: string;
@@ -104,6 +159,9 @@ export type DmWsServerMessage =
   | DmWsMessageReceived
   | DmWsMessageDeleted
   | DmWsConversationSeenUpdate
+  | DmWsUserTyping
+  | DmWsUserTypingStop
+  | DmWsReactionReceived
   | DmWsError;
 export interface DmConversationMessagesResponse {
   participant: {

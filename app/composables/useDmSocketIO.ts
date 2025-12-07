@@ -1,6 +1,12 @@
 import { io } from 'socket.io-client';
 import type { Socket } from 'socket.io-client';
-import type { DmMessage } from '~~/shared/types/dm';
+import type {
+  DmMessage,
+  DmWsConversationSeenUpdate,
+  DmWsUserTyping,
+  DmWsUserTypingStop,
+  DmWsReactionReceived,
+} from '~~/shared/types/dm';
 import { getAccessToken } from '~/services/auth/authService';
 
 interface ServerMessageReceivedPayload {
@@ -24,6 +30,16 @@ export function useDmSocketIO() {
 
   const onMessageCallback = ref<((m: DmMessage) => void) | null>(null);
   const onErrorCallback = ref<((e: string) => void) | null>(null);
+  const onSeenUpdateCallback = ref<
+    ((data: Omit<DmWsConversationSeenUpdate, 'type'>) => void) | null
+  >(null);
+  const onUserTypingCallback = ref<((data: Omit<DmWsUserTyping, 'type'>) => void) | null>(null);
+  const onUserTypingStopCallback = ref<((data: Omit<DmWsUserTypingStop, 'type'>) => void) | null>(
+    null,
+  );
+  const onReactionReceivedCallback = ref<
+    ((data: Omit<DmWsReactionReceived, 'type'>) => void) | null
+  >(null);
 
   function connect() {
     if (socket.value?.connected) return;
@@ -66,6 +82,26 @@ export function useDmSocketIO() {
       };
       onMessageCallback.value?.(message);
     });
+
+    socket.value.on(
+      'conversation_seen_update',
+      (payload: Omit<DmWsConversationSeenUpdate, 'type'>) => {
+        onSeenUpdateCallback.value?.(payload);
+      },
+    );
+
+    socket.value.on('user_typing', (payload: Omit<DmWsUserTyping, 'type'>) => {
+      onUserTypingCallback.value?.(payload);
+    });
+
+    socket.value.on('user_typing_stop', (payload: Omit<DmWsUserTypingStop, 'type'>) => {
+      onUserTypingStopCallback.value?.(payload);
+    });
+
+    socket.value.on('reaction_received', (payload: Omit<DmWsReactionReceived, 'type'>) => {
+      onReactionReceivedCallback.value?.(payload);
+    });
+
     socket.value.on('error', (msg: string) => {
       lastError.value = `server_error:${msg}`;
       if (onErrorCallback.value) onErrorCallback.value(msg);
@@ -96,17 +132,45 @@ export function useDmSocketIO() {
     socket.value?.emit('mark_seen', { conversationId, lastSeenMessageId });
   }
 
+  function typingStart(conversationId: string) {
+    socket.value?.emit('typing_start', { conversationId });
+  }
+
+  function typingStop(conversationId: string) {
+    socket.value?.emit('typing_stop', { conversationId });
+  }
+
+  function sendReaction(conversationId: string, messageId: string, reaction: string) {
+    socket.value?.emit('send_reaction', { conversationId, messageId, reaction });
+  }
+
   function onMessage(cb: (m: DmMessage) => void) {
     onMessageCallback.value = cb;
   }
   function onError(cb: (e: string) => void) {
     onErrorCallback.value = cb;
   }
+  function onSeenUpdate(cb: (data: Omit<DmWsConversationSeenUpdate, 'type'>) => void) {
+    onSeenUpdateCallback.value = cb;
+  }
+  function onUserTyping(cb: (data: Omit<DmWsUserTyping, 'type'>) => void) {
+    onUserTypingCallback.value = cb;
+  }
+  function onUserTypingStop(cb: (data: Omit<DmWsUserTypingStop, 'type'>) => void) {
+    onUserTypingStopCallback.value = cb;
+  }
+  function onReactionReceived(cb: (data: Omit<DmWsReactionReceived, 'type'>) => void) {
+    onReactionReceivedCallback.value = cb;
+  }
 
   onUnmounted(() => {
     disconnect();
     onMessageCallback.value = null;
     onErrorCallback.value = null;
+    onSeenUpdateCallback.value = null;
+    onUserTypingCallback.value = null;
+    onUserTypingStopCallback.value = null;
+    onReactionReceivedCallback.value = null;
   });
 
   return {
@@ -116,9 +180,18 @@ export function useDmSocketIO() {
     attemptedUrl: readonly(attemptedUrl),
     connect,
     disconnect,
+    // Client → Server
     sendMessage,
     markSeen,
+    typingStart,
+    typingStop,
+    sendReaction,
+    // Server → Client callbacks
     onMessage,
     onError,
+    onSeenUpdate,
+    onUserTyping,
+    onUserTypingStop,
+    onReactionReceived,
   };
 }

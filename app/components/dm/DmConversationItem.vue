@@ -7,8 +7,11 @@ const props = defineProps<{
   isSelected?: boolean;
 }>();
 
-const { isHighlighted } = useDmHighlight();
+const { isHighlighted, removeHighlight } = useDmHighlight();
 const highlighted = computed(() => isHighlighted(props.conversation.id) && !props.isSelected);
+if (props.isSelected) {
+  removeHighlight(props.conversation.id);
+}
 </script>
 <template>
   <div

@@ -10,10 +10,11 @@ const props = defineProps<{
   hasNextPage?: boolean;
   isFetchingNextPage?: boolean;
   onLoadMore?: () => void;
+  lastSeenMessageId?: string | null;
 }>();
 
+// console.log('DmMessagesList props.messages:', props.messages.length);
 const parentRef = ref<HTMLElement | null>(null);
-
 const scrollToBottom = () => {
   if (rowVirtualizer.value && props.messages.length > 0) {
     rowVirtualizer.value.scrollToIndex(props.messages.length - 1, {
@@ -146,7 +147,10 @@ defineExpose({ parentRef, scrollToBottom });
         }"
       >
         <template v-if="messages[virtualRow.index]">
-          <DmMessageItem :message="messages[virtualRow.index]!" />
+          <DmMessageItem
+            :message="messages[virtualRow.index]!"
+            :is-seen="messages[virtualRow.index]!.id === props.lastSeenMessageId"
+          />
         </template>
       </div>
     </div>

@@ -30,13 +30,16 @@ export function useDmMessages(conversationId: () => string | null) {
       getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
       initialPageParam: undefined as string | undefined,
       enabled: computed(() => !!idRef.value),
+      staleTime: 0,
+      gcTime: 0,
+      refetchOnMount: 'always',
     });
 
   const allMessages = computed(() => {
     if (!data.value) return [];
-    // Flatten all pages and reverse to get chronological order (oldest first)
     const flatMessages = data.value.pages.flatMap((page) => page.messages);
-    return flatMessages.reverse();
+    const reversed = flatMessages.reverse();
+    return reversed;
   });
 
   return {

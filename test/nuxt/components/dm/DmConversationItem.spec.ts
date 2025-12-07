@@ -7,9 +7,11 @@ import { relativeTime } from '@/utils/time';
 
 // Mock useDmHighlight composable
 const mockIsHighlighted = vi.fn();
+const mockRemoveHighlight = vi.fn();
 vi.mock('@/composables/useDmHighlight', () => ({
   useDmHighlight: () => ({
     isHighlighted: mockIsHighlighted,
+    removeHighlight: mockRemoveHighlight,
   }),
 }));
 
@@ -33,6 +35,7 @@ describe('DmConversationItem Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockIsHighlighted.mockReturnValue(false);
+    mockRemoveHighlight.mockReturnValue(undefined);
   });
 
   it('renders conversation item with correct structure', async () => {

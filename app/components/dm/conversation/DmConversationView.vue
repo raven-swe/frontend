@@ -10,6 +10,9 @@ import type { DmMessage } from '~~/shared/types/dm';
 const route = useRoute();
 const conversationId = computed(() => route.params.conversationId as string | null);
 
+const userStore = useUserStore();
+const currentUsername = computed(() => userStore.user.username);
+
 const {
   conversations,
   loading: conversationsLoading,
@@ -34,10 +37,14 @@ const ws = useDmSocketIO();
 provide('dmSocket', ws);
 const liveMessages = ref<DmMessage[]>([]);
 
+const lastSeenMessageId = ref<string | null>(null);
+
 const messages = computed(() => {
   const initial = initialMessages.value || [];
   // Add live messages at the END (bottom) so they appear as newest
-  return [...initial, ...liveMessages.value];
+  const combined = [...initial, ...liveMessages.value];
+
+  return combined;
 });
 
 watch(
@@ -49,23 +56,24 @@ watch(
         ws.connect();
       }
 
-      // Reset live messages when switching conversations
+      // Reset live messages and seen state when switching conversations
       liveMessages.value = [];
+      lastSeenMessageId.value = null;
+    }
+  },
+  { immediate: true },
+);
 
-      // Wait for socket to be connected before switching
-      const checkConnection = () => {
-        if (ws.isConnected.value) {
-          const lastMessage = messages.value[messages.value.length - 1];
-          if (lastMessage?.id) {
-            ws.markSeen(newId, lastMessage.id);
-          }
-        } else {
-          // retry until connected
-          setTimeout(checkConnection, 200);
-        }
-      };
-
-      checkConnection();
+// Mark messages as seen when messages load and we're connected
+// This needs to wait for messages to actually load
+watch(
+  [() => messages.value, () => ws.isConnected.value, conversationId],
+  ([msgs, connected, convId]) => {
+    if (connected && convId && msgs.length > 0) {
+      const lastMessage = msgs[msgs.length - 1];
+      if (lastMessage?.id && !lastMessage.isMine) {
+        ws.markSeen(convId, lastMessage.id);
+      }
     }
   },
   { immediate: true },
@@ -77,6 +85,12 @@ onMounted(() => {
     if (conversationId.value && message) {
       // Push new messages to the end (bottom of chat)
       liveMessages.value.push(message);
+    }
+  });
+
+  ws.onSeenUpdate((data) => {
+    if (data.conversationId === conversationId.value && data.username === currentUsername.value) {
+      lastSeenMessageId.value = data.lastSeenMessageId;
     }
   });
 
@@ -109,6 +123,7 @@ watch(conversationsError, (val) => val && showToaster('error', 'Failed to load c
         :has-next-page="hasNextPage || false"
         :is-fetching-next-page="isFetchingNextPage || false"
         :on-load-more="fetchNextPage"
+        :last-seen-message-id="lastSeenMessageId"
       />
     </div>
     <DmConversationDmMessageInput />
