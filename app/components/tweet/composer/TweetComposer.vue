@@ -51,7 +51,7 @@ const handlePostWrapper = async () => {
   emit('posted', newTweet);
 
   // Cleanup
-  media.value.forEach((item) => URL.revokeObjectURL(item.url));
+  media.value.forEach((item: MediaItem) => URL.revokeObjectURL(item.url));
   tweetContent.value = '';
   media.value = [];
   tweetEditorRef.value?.resetHeight();
@@ -66,7 +66,7 @@ const handleInsertEmoji = (emoji: string) => {
 <template>
   <div class="bg-background relative max-w-[598px] p-4 pb-15">
     <div class="mb-3 flex gap-3">
-      <div class="flex-shrink-0">
+      <div class="shrink-0">
         <Avatar
           :img="userStore.user?.avatarUrl"
           :alt="$t('tweet.composer.profile-alt', { name: userStore.user?.username || '' })"
@@ -98,19 +98,20 @@ const handleInsertEmoji = (emoji: string) => {
         <span>{{ loadingMessage }}</span>
       </div>
 
-    <Toolbar
-      :disabled="!tweetContent.trim() && media.length === 0"
-      :character-count="characterCount"
-      :max-length="MAX_LENGTH"
-      :is-over-limit="isOverLimit"
-      :has-media="media.length > 0"
-      :can-add-media="media.length < MAX_MEDIA"
-      :button-text="$t('tweet.composer.button.' + props.type)"
-      :is-posting="isPosting"
-      :composer-type="type"
-      @post="handlePostWrapper"
-      @add-media="handleAddMedia"
-      @insert-emoji="handleInsertEmoji"
-    />
+      <Toolbar
+        :disabled="!tweetContent.trim() && media.length === 0"
+        :character-count="characterCount"
+        :max-length="MAX_LENGTH"
+        :is-over-limit="isOverLimit"
+        :has-media="media.length > 0"
+        :can-add-media="media.length < MAX_MEDIA"
+        :button-text="$t('tweet.composer.button.' + props.type)"
+        :is-posting="isPosting"
+        :composer-type="type"
+        @post="handlePostWrapper"
+        @add-media="handleAddMedia"
+        @insert-emoji="handleInsertEmoji"
+      />
+    </div>
   </div>
 </template>
