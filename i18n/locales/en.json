@@ -125,6 +125,16 @@
           "description": "When someone you know follows them, they'll be listed here."
         }
       }
+    },
+    "media": {
+      "no-media": {
+        "title": "{'@'}{username} hasn't posted media",
+        "description": "Once they do, those posts will show up here."
+      },
+      "current-user-no-media": {
+        "title": "Lights, camera … attachments!",
+        "description": "When you post photos or videos, they will show up here."
+      }
     }
   },
   "home": {
@@ -250,6 +260,20 @@
       "unlike": "Unlike"
     }
   },
+  "notifications": {
+    "title": "Notifications",
+    "tabs": {
+      "all": "All",
+      "mentions": "Mentions"
+    },
+    "no-notifications": "No notifications yet",
+    "message": {
+      "follow": "started following you",
+      "like": " liked your post",
+      "reply": "replied to your post",
+      "repost": "reposted your post"
+    }
+  },
   "ui": {
     "close": "Close",
     "next": "Next",
@@ -286,6 +310,12 @@
         "title": "Clear all recent searches?",
         "description": "This can’t be undone and you’ll remove all your recent searches."
       }
+    },
+    "logout": {
+      "label": "Log out {'@'}{username}",
+      "title": "Log out of Raven?",
+      "description": "You can always log back in at any time.",
+      "confirm": "Log out"
     }
   },
   "errors": {
@@ -540,6 +570,13 @@
       "select": "Select a message",
       "description": "Choose from your existing conversations, start a new one, or just keep swimming.",
       "new": "New message"
+    },
+    "dialog": {
+      "new-message": "New message",
+      "search-people": "Search people",
+      "next": "Next",
+      "you-follow": "Following",
+      "follow-each-other": "You follow each other"
     }
   },
   "toaster": {

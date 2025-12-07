@@ -23,7 +23,7 @@ const textColor = props.message.isMine ? 'text-white' : 'text-foreground';
       </template>
       <template v-if="message.content">
         <div
-          class="w-fit rounded-3xl px-4 py-2 text-sm leading-relaxed break-words"
+          class="rounded-3xl px-4 py-2 text-sm leading-relaxed break-all whitespace-pre-wrap"
           :class="message.isMine ? 'bg-primary text-white' : 'bg-accent text-foreground'"
         >
           <template v-for="(segment, idx) in renderSegments(message)" :key="idx">

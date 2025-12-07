@@ -3,6 +3,14 @@ import { mountSuspended } from '@nuxt/test-utils/runtime';
 import { ref } from 'vue';
 import DmConversationsSection from '@/components/dm/DmConversationsSection.vue';
 
+// Mock the DmNewMessageDialog to avoid i18n issues
+vi.mock('@/components/dm/DmNewMessageDialog.vue', () => ({
+  default: {
+    name: 'DmNewMessageDialog',
+    template: '<div data-test="dialog"></div>',
+  },
+}));
+
 const mockConversations = [
   {
     id: '1',
@@ -43,13 +51,6 @@ describe('DmConversationsSection Component', () => {
     expect(header.exists()).toBe(true);
   });
 
-  it('renders DmSearchBar component', async () => {
-    const wrapper = await mountSuspended(DmConversationsSection);
-
-    const searchBar = wrapper.findComponent({ name: 'DmSearchBar' });
-    expect(searchBar.exists()).toBe(true);
-  });
-
   it('renders DmConversationList component when loading false', async () => {
     const wrapper = await mountSuspended(DmConversationsSection);
     // Component should now render list because loading mocked to false
@@ -57,10 +58,9 @@ describe('DmConversationsSection Component', () => {
     expect(conversationList.exists()).toBe(true);
   });
 
-  it('has header, search bar, and conversation list present', async () => {
+  it('has header and conversation list present', async () => {
     const wrapper = await mountSuspended(DmConversationsSection);
     expect(wrapper.findComponent({ name: 'DmHeader' }).exists()).toBe(true);
-    expect(wrapper.findComponent({ name: 'DmSearchBar' }).exists()).toBe(true);
     expect(wrapper.findComponent({ name: 'DmConversationList' }).exists()).toBe(true);
   });
 });

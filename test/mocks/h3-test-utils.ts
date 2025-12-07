@@ -73,8 +73,22 @@ export function useH3TestUtils() {
           }
         }
         event.headers.append('Set-Cookie', cookieString);
+        event.headers.append('cookie', cookieString);
       },
     ),
+    getCookie: vi.fn((event: H3Event, name: string) => {
+      const cookies = event.headers.get('cookie');
+      if (!cookies) return undefined;
+
+      const cookieArray = cookies.split(';').map((cookie) => cookie.trim());
+      for (const cookie of cookieArray) {
+        const [cookieName, cookieValue] = cookie.split('=');
+        if (cookieName === name) {
+          return cookieValue ? decodeURIComponent(cookieValue) : undefined;
+        }
+      }
+      return undefined;
+    }),
   }));
 
   // Stub global functions to emulate Nuxt auto-imports
@@ -89,6 +103,7 @@ export function useH3TestUtils() {
   vi.stubGlobal('getValidatedRouterParams', h3.getValidatedRouterParams);
   vi.stubGlobal('getRequestIP', h3.getRequestIP);
   vi.stubGlobal('setCookie', h3.setCookie);
+  vi.stubGlobal('getCookie', h3.getCookie);
 
   return h3;
 }
