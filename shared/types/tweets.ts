@@ -33,6 +33,10 @@ export type Tweet = {
   replyToTweetId?: string | null;
   quoteToTweetId?: string;
   quotedTweet?: Tweet;
+  repostedBy?: {
+    displayName: string;
+    username: string;
+  };
 };
 
 export type CreateTweetRequest = {
