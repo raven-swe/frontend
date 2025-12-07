@@ -7,12 +7,25 @@ import TweetMedia from '@/components/tweet/TweetMedia.vue';
 import TweetActionButtons from '@/components/tweet/TweetActionButtons.vue';
 import type { Tweet } from '~~/shared/types/tweets';
 import { mockNuxtImport } from '@nuxt/test-utils/runtime';
+import en from '~~/i18n/locales/en.json';
+import { createI18n } from 'vue-i18n';
 
-// Mock i18n
-const i18nMock = {
+// Set up i18n
+const i18n = createI18n({
   locale: 'en',
-  t: (key: string) => key,
-};
+  messages: {
+    en,
+  },
+});
+
+vi.mock('~/composables/useProfileMutation', () => ({
+  useFollowMutation: () => ({
+    mutate: vi.fn(),
+  }),
+  useBlockMutation: () => ({
+    mutate: vi.fn(),
+  }),
+}));
 
 const routerMock = vi.hoisted(() => {
   return {
@@ -40,9 +53,7 @@ const stubs = {
 
 const globalConfig = {
   stubs,
-  mocks: {
-    $i18n: i18nMock,
-  },
+  plugins: [i18n],
 };
 
 function makeTweet(overrides: Partial<Tweet> = {}): Tweet {

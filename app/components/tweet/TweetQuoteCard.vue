@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import Avatar from '~/components/ui/Avatar.vue';
 import type { Tweet } from '~~/shared/types/tweets';
 import TweetMedia from './TweetMedia.vue';
+import { useFollowMutation, useBlockMutation } from '~/composables/useProfileMutation';
 interface Props {
   tweet: Tweet;
   isPreview?: boolean;

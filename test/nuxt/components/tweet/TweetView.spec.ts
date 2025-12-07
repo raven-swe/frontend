@@ -6,9 +6,19 @@ import TweetMedia from '@/components/tweet/TweetMedia.vue';
 import TweetActionButtons from '@/components/tweet/TweetActionButtons.vue';
 import type { Tweet } from '~~/shared/types/tweets';
 import type { Ref } from 'vue';
+import en from '~~/i18n/locales/en.json';
+import { createI18n } from 'vue-i18n';
+
+// Set up i18n
+const i18n = createI18n({
+  locale: 'en',
+  messages: {
+    en,
+  },
+});
 
 interface TweetViewVM {
-  tweet: Ref<Tweet>;
+  tweetClone: Ref<Tweet>;
 }
 
 function makeTweet(overrides: Partial<Tweet> = {}): Tweet {
@@ -51,7 +61,7 @@ describe('TweetView.vue', () => {
     const tweet = makeTweet();
     const wrapper = await mountSuspended(TweetView, {
       props: { tweet },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: { stubs: { NuxtImg: true, Icon: true }, plugins: [i18n] },
     });
 
     const avatar = wrapper.findComponent(Avatar);
@@ -68,7 +78,7 @@ describe('TweetView.vue', () => {
     const tweet = makeTweet();
     const wrapper = await mountSuspended(TweetView, {
       props: { tweet },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: { stubs: { NuxtImg: true, Icon: true }, plugins: [i18n] },
     });
 
     const mention = wrapper.find('a[href="/profile/alice"]');
@@ -84,7 +94,7 @@ describe('TweetView.vue', () => {
     const tweet = makeTweet();
     const wrapper = await mountSuspended(TweetView, {
       props: { tweet },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: { stubs: { NuxtImg: true, Icon: true }, plugins: [i18n] },
     });
 
     const media = wrapper.findComponent(TweetMedia);
@@ -101,7 +111,7 @@ describe('TweetView.vue', () => {
     const tweet = makeTweet({ isLiked: false, likeCount: 5 });
     const wrapper = await mountSuspended(TweetView, {
       props: { tweet },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: { stubs: { NuxtImg: true, Icon: true }, plugins: [i18n] },
     });
 
     const actions = wrapper.findComponent(TweetActionButtons);
@@ -112,22 +122,22 @@ describe('TweetView.vue', () => {
 
     // Access the reactive tweet ref
     const vm = wrapper.vm as unknown as TweetViewVM;
-    expect(vm.tweet.value.isLiked).toBe(true);
-    expect(vm.tweet.value.likeCount).toBe(6);
+    expect(vm.tweetClone.value.isLiked).toBe(true);
+    expect(vm.tweetClone.value.likeCount).toBe(6);
 
     // Emit unlike-success event
     await actions.vm.$emit('unlike-success');
     await wrapper.vm.$nextTick();
 
-    expect(vm.tweet.value.isLiked).toBe(false);
-    expect(vm.tweet.value.likeCount).toBe(5);
+    expect(vm.tweetClone.value.isLiked).toBe(false);
+    expect(vm.tweetClone.value.likeCount).toBe(5);
   });
 
   it('handles retweet/undo events and updates state', async () => {
     const tweet = makeTweet({ isRetweeted: false, retweetCount: 10 });
     const wrapper = await mountSuspended(TweetView, {
       props: { tweet },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: { stubs: { NuxtImg: true, Icon: true }, plugins: [i18n] },
     });
 
     const actions = wrapper.findComponent(TweetActionButtons);
@@ -138,14 +148,14 @@ describe('TweetView.vue', () => {
 
     // Access the reactive tweet ref
     const vm = wrapper.vm as unknown as TweetViewVM;
-    expect(vm.tweet.value.isRetweeted).toBe(true);
-    expect(vm.tweet.value.retweetCount).toBe(11);
+    expect(vm.tweetClone.value.isRetweeted).toBe(true);
+    expect(vm.tweetClone.value.retweetCount).toBe(11);
 
     // Emit undo-retweet-success event
     await actions.vm.$emit('undo-retweet-success');
     await wrapper.vm.$nextTick();
 
-    expect(vm.tweet.value.isRetweeted).toBe(false);
-    expect(vm.tweet.value.retweetCount).toBe(10);
+    expect(vm.tweetClone.value.isRetweeted).toBe(false);
+    expect(vm.tweetClone.value.retweetCount).toBe(10);
   });
 });

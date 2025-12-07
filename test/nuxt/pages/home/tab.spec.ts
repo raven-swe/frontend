@@ -3,6 +3,16 @@ import { mountSuspended } from '@nuxt/test-utils/runtime';
 import { ref } from 'vue';
 import type { Tweet } from '~~/shared/types/tweets';
 import TabPage from '~/pages/home/[tab].vue';
+import en from '~~/i18n/locales/en.json';
+import { createI18n } from 'vue-i18n';
+
+// Set up i18n
+const i18n = createI18n({
+  locale: 'en',
+  messages: {
+    en,
+  },
+});
 
 const mockTweet: Tweet = {
   id: 'tw-1',
@@ -147,6 +157,7 @@ describe('Home [tab].vue', () => {
         stubs: {
           TweetComposer: true,
         },
+        plugins: [i18n],
       },
     });
 
