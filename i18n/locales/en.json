@@ -329,6 +329,7 @@
   "ui": {
     "close": "Close",
     "next": "Next",
+    "back": "Back",
     "loading": "Loading",
     "skip-for-now": "Skip for now",
     "save": "Save",
