@@ -7,7 +7,7 @@ export default defineWrappedResponseHandler(async (event) => {
   const { id } = await getValidatedRouterParams(event, (data) => paramsSchema.validate(data));
   const query = getQuery(event);
   const fetcher = serverApiFetch(event);
-  const response = await fetcher<ApiSuccessResponse<Tweet[]>>(`/tweets/${id}/replies`, {
+  const response = await fetcher<ApiSuccessResponse<Tweet[]>>(`/tweets/${id}/quotes`, {
     method: 'GET',
     query: query,
   });
