@@ -107,11 +107,21 @@ function openCategory(cat: Category) {
     <UiDialog :open="true">
       <UiDialogContent
         class="m-0 h-auto max-w-lg p-0"
-        content-height="h-[600px] max-h-[95vh]"
+        content-height="h-[600px]"
         content-padding="px-0"
+        :hide-close-button="true"
       >
         <UiDialogHeader class="max-w-2xl ps-6 pe-6">
-          <UiSearchBar v-model="searchQuery" v-model:is-focused="isFocused" />
+          <div class="flex items-center gap-3">
+            <button
+              class="hover:bg-muted-foreground/50 flex items-center justify-center rounded p-1 transition"
+              @click="selectedCategory ? (selectedCategory = null) : $emit('close')"
+            >
+              <Icon v-if="!selectedCategory" name="lucide:x" size="1.1rem"></Icon>
+              <Icon v-else name="lucide:arrow-left" size="1.1rem"></Icon>
+            </button>
+            <UiSearchBar v-model="searchQuery" v-model:is-focused="isFocused" class="flex-1" />
+          </div>
         </UiDialogHeader>
 
         <div class="w-full p-0">
@@ -140,12 +150,6 @@ function openCategory(cat: Category) {
 
           <!-- category result -->
           <div v-else>
-            <button
-              class="bg-background mb-3 rounded px-3 py-1 text-sm hover:bg-gray-300"
-              @click="selectedCategory = null"
-            >
-              {{ $t('ui.back') }}
-            </button>
             <UiSpinner v-if="loading" class="mx-auto my-10 h-10 w-10" />
             <div v-if="error" class="text-destructive">{{ error }}</div>
 
