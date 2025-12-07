@@ -18,6 +18,10 @@ export type TweetMedia = {
   height: number;
 };
 
+export type DeletedTweet = {
+  isDeleted: true;
+};
+
 export type Tweet = {
   id: string;
   content: string;
@@ -32,9 +36,12 @@ export type Tweet = {
   media: TweetMedia[];
   replyToTweetId?: string | null;
   quoteToTweetId?: string | null;
-  quotedTweet?: Tweet | null;
-  rootTweet?: Tweet | null;
-  parentTweets?: Tweet[] | null;
+  quotedTweet?: Tweet | DeletedTweet | null;
+};
+
+export type TweetWithParents = Tweet & {
+  rootTweet?: Tweet | DeletedTweet | null;
+  parentTweets?: (Tweet | DeletedTweet)[] | null;
   hasMoreParents?: boolean;
 };
 

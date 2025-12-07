@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import TweetView from '~/components/tweet/TweetView.vue';
-import type { Tweet } from '~~/shared/types/tweets';
+import type { Tweet, TweetWithParents } from '~~/shared/types/tweets';
 import type { ApiErrorResponse, ApiSuccessResponse } from '~~/shared/types/api';
 import { tweetsService } from '~/services/tweet/tweetsService';
 import { isApiError, isApiValidationError } from '~/utils/errorUtils';
 import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/vue-query';
+import { isTweetDeleted } from '~/utils/tweetDeleted';
+import DeletedTweetPlaceholder from '~/components/tweet/DeletedTweetPlaceholder.vue';
 
 const router = useRouter();
 const queryClient = useQueryClient();
@@ -16,7 +18,7 @@ const {
   suspense,
   isPending,
   error,
-} = useQuery<Tweet, ApiErrorResponse>({
+} = useQuery<TweetWithParents, ApiErrorResponse>({
   queryKey: ['tweet', tweetid],
   queryFn: async () => (await tweetsService.tweet(tweetid.value)).data,
   refetchOnWindowFocus: false,
@@ -25,13 +27,7 @@ const {
   structuralSharing: false,
 });
 
-const sortedParentTweets = computed(() => {
-  if (!tweetData.value) return [];
-  return structuredClone(toRaw(tweetData.value.parentTweets))?.sort(
-    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-  );
-});
-const oldestParent = computed(() => sortedParentTweets.value?.[0] || null);
+const oldestParent = computed(() => tweetData.value?.parentTweets?.at(-1) || null);
 
 const mainTweetContRef = useTemplateRef<HTMLElement>('main-tweet-cont');
 const headerRef = useTemplateRef<HTMLElement>('header-ref');
@@ -152,9 +148,13 @@ onServerPrefetch(async () => {
     </header>
 
     <ClientOnly>
-      <TweetDefaultCard v-if="tweetData.rootTweet" is-parent :tweet="tweetData.rootTweet" />
+      <TweetDefaultCard
+        v-if="tweetData.rootTweet && !isTweetDeleted(tweetData.rootTweet)"
+        is-parent
+        :tweet="tweetData.rootTweet"
+      />
       <NuxtLink
-        v-if="tweetData.hasMoreParents && oldestParent"
+        v-if="tweetData.hasMoreParents && oldestParent && !isTweetDeleted(oldestParent)"
         class="bg-background z-20 flex h-7 cursor-pointer flex-row items-end gap-2 px-4"
         :to="`/profile/${oldestParent.author.username}/status/${oldestParent.id}`"
       >
@@ -171,12 +171,16 @@ onServerPrefetch(async () => {
           </p>
         </div>
       </NuxtLink>
-      <TweetDefaultCard
-        v-for="tweet in sortedParentTweets"
-        :key="tweet.id"
-        is-parent
-        :tweet="tweet"
-      />
+      <template v-for="(tweet, i) in tweetData.parentTweets ?? []" :key="i">
+        <TweetDefaultCard v-if="!isTweetDeleted(tweet)" :tweet="tweet" is-parent />
+        <div v-else class="bg-background relative h-16">
+          <div class="absolute start-1/2 top-1/2 w-full -translate-x-1/2 -translate-y-1/2 px-4">
+            <DeletedTweetPlaceholder>
+              {{ $t('tweet.deleted-parent') }}
+            </DeletedTweetPlaceholder>
+          </div>
+        </div>
+      </template>
     </ClientOnly>
 
     <div ref="main-tweet-cont" class="min-h-[calc(100vh_-_3.25rem)]">

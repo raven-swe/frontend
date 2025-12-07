@@ -7,7 +7,7 @@ export default defineWrappedResponseHandler(async (event) => {
   const { id } = await getValidatedRouterParams(event, (data) => paramsSchema.validate(data));
 
   const fetcher = serverApiFetch(event);
-  return await fetcher<ApiSuccessResponse<Tweet>>(`/tweets/${id}`, {
+  return await fetcher<ApiSuccessResponse<TweetWithParents>>(`/tweets/${id}`, {
     method: 'GET',
   });
 });

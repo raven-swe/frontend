@@ -4,6 +4,7 @@ import type { Tweet } from '~~/shared/types/tweets';
 import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
 import ContentEntitiesRenderer from '../ui/ContentEntitiesRenderer.vue';
+import QuotedTweetCard from './QuotedTweetCard.vue';
 interface Props {
   tweet: Tweet;
 }
@@ -69,12 +70,15 @@ const onUndoRetweetSuccess = () => {
       </div>
     </div>
     <div class="border-b-border border-b-1">
-      <p class="py-2 text-lg leading-relaxed break-words whitespace-pre-wrap">
+      <p class="pt-2 text-lg leading-relaxed break-words whitespace-pre-wrap">
         <ContentEntitiesRenderer :content="tweetClone.content" :entities="tweetClone.entities" />
       </p>
       <TweetMedia :media="tweetClone.media" />
 
-      <div class="pb-2">
+      <!-- Quoted Tweet -->
+      <QuotedTweetCard v-if="tweetClone.quotedTweet" :tweet="tweetClone.quotedTweet" />
+
+      <div class="py-2">
         <time
           :title="formatDate(tweetClone.createdAt)"
           :datetime="tweetClone.createdAt"

@@ -4,7 +4,7 @@ import Avatar from '~/components/ui/Avatar.vue';
 import type { Tweet } from '~~/shared/types/tweets';
 import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
-import TweetQuoteCard from './TweetQuoteCard.vue';
+import QuotedTweetCard from './QuotedTweetCard.vue';
 interface Props {
   tweet: Tweet;
   isParent?: boolean;
@@ -52,7 +52,7 @@ function handleTweetClick() {
 <template>
   <article
     :id="'tweet-' + props.tweet.id"
-    class="border-b-border flex w-full max-w-[700px] cursor-pointer gap-2 px-4 pt-3 pb-2"
+    class="border-b-border bg-background hover:bg-foreground/5 flex w-full max-w-[700px] cursor-pointer gap-2 px-4 pt-3 pb-2 transition-colors duration-100"
     :class="{
       'border-b-1': !isParent,
     }"
@@ -108,7 +108,8 @@ function handleTweetClick() {
       <TweetMedia :media="tweet.media" />
 
       <!-- Quoted Tweet -->
-      <TweetQuoteCard v-if="tweet.quotedTweet" :tweet="tweet.quotedTweet" />
+
+      <QuotedTweetCard v-if="tweet.quotedTweet" :tweet="tweet.quotedTweet" />
 
       <!-- Actions -->
       <TweetActionButtons

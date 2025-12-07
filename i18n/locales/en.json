@@ -208,7 +208,9 @@
       "like": "Like",
       "unlike": "Unlike"
     },
-    "show-more-parents": "Show more tweets"
+    "show-more-parents": "Show more tweets",
+    "deleted-quote": "This post is unavailable.",
+    "deleted-parent": "This Post was deleted by the Post author."
   },
   "notifications": {
     "title": "Notifications",
