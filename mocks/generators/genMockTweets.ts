@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import { mkdirSync, writeFileSync, readFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import type { Tweet, TweetAuthor } from '../../shared/types/tweets';
+import type { Tweet, TweetAuthor, TweetWithParents } from '../../shared/types/tweets';
 import type { User } from '#shared/types/user';
 import { generateBioWithEntities } from './genMockUsers';
 const __filename = fileURLToPath(import.meta.url);
@@ -67,7 +67,7 @@ function randomMedia() {
   ] as Tweet['media'];
 }
 
-function makeBaseTweet(id: string, content?: string, author?: TweetAuthor): Tweet {
+function makeBaseTweet(id: string, content?: string, author?: TweetAuthor): TweetWithParents {
   const contentGenerated = generateBioWithEntities();
   return {
     id,
@@ -105,11 +105,11 @@ async function makeData() {
     users = [];
   }
 
-  const tweets: Tweet[] = [];
+  const tweets: (Tweet | TweetWithParents)[] = [];
 
   const NUM_THREAD_TWEETS = 10;
 
-  const tweetMap = new Map<string, Tweet>();
+  const tweetMap = new Map<string, Tweet | TweetWithParents>();
   for (let i = 0; i < NUM_THREAD_TWEETS; ++i) {
     const randomUser = faker.helpers.arrayElement(users);
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -118,7 +118,7 @@ async function makeData() {
   }
 
   for (let i = NUM_THREAD_TWEETS - 1; i > 0; --i) {
-    const currentTweet = tweetMap.get('tw-thread-' + i) as Tweet;
+    const currentTweet = tweetMap.get('tw-thread-' + i) as TweetWithParents;
     const rootTweet = tweetMap.get('tw-thread-0');
     currentTweet.replyToTweetId = 'tw-thread-' + (i - 1);
     currentTweet.rootTweet = rootTweet;
@@ -131,6 +131,11 @@ async function makeData() {
       currentTweet.hasMoreParents = true;
       parentTweets.splice(4);
     }
+    parentTweets.sort((a, b) => {
+      const dateA = new Date(a.createdAt).getTime();
+      const dateB = new Date(b.createdAt).getTime();
+      return dateA - dateB;
+    });
     currentTweet.parentTweets = parentTweets;
   }
 
