@@ -442,7 +442,10 @@ describe('TweetDefaultCard.vue', () => {
       global: globalConfig,
     });
 
-    await wrapper.trigger('click');
+    // Click the article element to ensure the handler runs
+    const article = wrapper.find('article');
+    expect(article.exists()).toBe(true);
+    await article.trigger('click');
 
     expect(routerMock.push).toHaveBeenCalledWith(
       `/profile/${tweet.author.username}/status/${tweet.id}`,
