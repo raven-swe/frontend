@@ -24,12 +24,12 @@ definePageMeta({ layout: 'settings' });
       <SettingsItem
         :title="$t('setting.muted.title')"
         to="/settings/muted"
-        data-cy="username-settings-btn"
+        data-cy="mutes-settings-btn"
       />
       <SettingsItem
         :title="$t('setting.blocked.title')"
         to="/settings/blocked"
-        data-cy="username-settings-btn"
+        data-cy="blocks-settings-btn"
       />
     </div>
   </div>

@@ -118,6 +118,16 @@
         }
       }
     },
+    "media": {
+      "no-media": {
+        "title": "{'@'}{username} hasn't posted media",
+        "description": "Once they do, those posts will show up here."
+      },
+      "current-user-no-media": {
+        "title": "Lights, camera … attachments!",
+        "description": "When you post photos or videos, they will show up here."
+      }
+    },
     "mutual": "Followed by {user1} | Followed by {user1} and {user2} | Followed by {user1}, {user2}, and {user3} | Followed by {user1}, {user2}, and {count} others"
   },
   "home": {
@@ -242,6 +252,12 @@
       "search-list": {
         "placeholder": "Try searching for people, lists, or keywords"
       }
+    },
+    "logout": {
+      "label": "Log out {'@'}{username}",
+      "title": "Log out of Raven?",
+      "description": "You can always log back in at any time.",
+      "confirm": "Log out"
     }
   },
   "errors": {
@@ -496,6 +512,13 @@
       "select": "Select a message",
       "description": "Choose from your existing conversations, start a new one, or just keep swimming.",
       "new": "New message"
+    },
+    "dialog": {
+      "new-message": "New message",
+      "search-people": "Search people",
+      "next": "Next",
+      "you-follow": "Following",
+      "follow-each-other": "You follow each other"
     }
   },
   "toaster": {

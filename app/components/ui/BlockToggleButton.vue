@@ -15,6 +15,7 @@ defineEmits<{
     size="xs"
     data-test="unblock-button"
     class="group grid-stack"
+    data-cy="unblock-button"
     @click.prevent.stop="$emit('unblock')"
   >
     <span class="invisible group-hover:visible">
@@ -30,6 +31,7 @@ defineEmits<{
     variant="outline-destructive"
     size="xs"
     data-test="block-button"
+    data-cy="block-button"
     @click.prevent.stop="$emit('block')"
   >
     {{ $t('ui.block') }}

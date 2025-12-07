@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, defineEmits, toRef } from 'vue';
+import { ref, toRef } from 'vue';
 import { useUserStore } from '@/stores/user';
 import TweetEditor from './TweetEditor.vue';
 import Toolbar from './Toolbar.vue';

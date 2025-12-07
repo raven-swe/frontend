@@ -1,4 +1,4 @@
-describe('Settings Actions', function () {
+describe('Account Settings Actions', function () {
   beforeEach(() => {
     // Create a test user and store it as an alias
     cy.createTestUser().then((user) => {
@@ -7,14 +7,12 @@ describe('Settings Actions', function () {
     });
 
     // Visit settings and wait for hydration
-    cy.visitAndWaitForHydration('/settings/account');
+    cy.visitAndWaitForHydration('/settings');
+    cy.get('a[data-cy="account-settings-btn"]').should('be.visible').click();
+    cy.url().should('include', '/settings/account');
   });
 
   describe('Your account settings', function () {
-    beforeEach(() => {
-      //   cy.get('[data-cy="account-settings-btn"]').should('be.visible').click();
-      cy.url().should('include', '/settings/account');
-    });
     describe('Username settings', function () {
       beforeEach(() => {
         cy.get('[data-cy="username-settings-btn"]').should('be.visible').click();

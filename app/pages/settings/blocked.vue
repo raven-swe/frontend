@@ -8,7 +8,7 @@ const username = computed(() => userStore.user?.username.toLowerCase() || null);
 </script>
 
 <template>
-  <div class="scroll-y-auto">
+  <div class="scroll-y-auto" data-cy="blocked-settings-page">
     <div class="border-b-border border-b-1 p-4">
       <header class="flex flex-row gap-4">
         <UiButton

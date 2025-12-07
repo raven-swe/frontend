@@ -2,7 +2,6 @@ import { registerEndpoint } from '@nuxt/test-utils/runtime';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { profileTabsService } from '@/services/profile/profileTabsService';
-import type { Tab } from '~~/shared/types/profile-tabs';
 
 const apiModule = await import('~/api');
 const { DEFAULT_PAGE_SIZE } = await import('~/constants/pagination');
@@ -39,7 +38,7 @@ describe('profileTabsService', () => {
     }));
 
     const apiFetchSpy = vi.spyOn(apiModule, 'apiFetch');
-    const result = await profileTabsService.getProfileTweetsPaginated('john', '' as Tab, '0', 5);
+    const result = await profileTabsService.getProfileTweetsPaginated('john', 'tweets', '0', 5);
 
     expect(result).toEqual({
       data: [{ id: 't1' }],
@@ -64,7 +63,7 @@ describe('profileTabsService', () => {
     const apiFetchSpy = vi.spyOn(apiModule, 'apiFetch');
     const result = await profileTabsService.getProfileTweetsPaginated(
       'john',
-      'replies' as Tab,
+      'replies',
       null,
       undefined,
     );
