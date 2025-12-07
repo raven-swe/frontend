@@ -5,7 +5,7 @@ import type { Tweet } from '~~/shared/types/tweets';
 import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
 import TweetQuoteCard from './TweetQuoteCard.vue';
-import { tweetAiSummary } from '~/services/tweet/tweetsService';
+import AiSummary from './AiSummary.vue';
 interface Props {
   tweet: Tweet;
 }
@@ -14,10 +14,7 @@ const router = useRouter();
 
 // Format createdAt to a short relative time like "6h", "3d", "2m"
 const tweet = ref<Tweet>(JSON.parse(JSON.stringify(props.tweet)));
-const aiSummary = ref<string | null>(null);
-const showAiSummary = ref(false);
-const aiSummaryLoading = ref(false);
-const aiSummaryError = ref(false);
+const aiSummaryRef = ref<InstanceType<typeof AiSummary> | null>(null);
 
 const onLikeSuccess = () => {
   if (!tweet.value.isLiked) {
@@ -48,23 +45,8 @@ const onUndoRetweetSuccess = () => {
   }
 };
 
-async function handleAiSummary() {
-  try {
-    aiSummaryLoading.value = true;
-    aiSummaryError.value = false;
-    const res = await tweetAiSummary(props.tweet.id);
-    if (res.success && res.data.summary) {
-      aiSummary.value = res.data.summary;
-      showAiSummary.value = true;
-    } else {
-      showAiSummary.value = false;
-    }
-  } catch (error) {
-    console.error('Error fetching AI summary:', error);
-    aiSummaryError.value = true;
-  } finally {
-    aiSummaryLoading.value = false;
-  }
+function handleAiSummary() {
+  aiSummaryRef.value?.handleAiSummary?.();
 }
 
 function handleTweetClick() {
@@ -134,50 +116,7 @@ function handleTweetClick() {
       <TweetQuoteCard v-if="tweet.quotedTweet" :tweet="tweet.quotedTweet" />
 
       <div class="mt-2">
-        <!-- Skeleton shimmer while loading -->
-        <div v-if="aiSummaryLoading" class="ai-summary-bg ai-summary-anim space-y-2 rounded-xl p-3">
-          <div class="skeleton-shimmer h-3 w-10/12 rounded"></div>
-          <div class="skeleton-shimmer h-3 w-9/12 rounded"></div>
-          <div class="skeleton-shimmer h-3 w-7/12 rounded"></div>
-        </div>
-
-        <!-- Error state with icon and retry -->
-        <div
-          v-else-if="true"
-          class="ai-summary-bg ai-summary-anim flex items-center gap-2 rounded-xl p-3"
-        >
-          <Icon
-            name="material-symbols:error-outline-rounded"
-            class="text-destructive"
-            size="1.2rem"
-            aria-hidden="true"
-          />
-          <span class="text-foreground/80 text-sm">{{
-            $t?.('ai-summary.something-went-wrong')
-          }}</span>
-          <Button
-            variant="primary"
-            size="sm"
-            class="border-ring text-foreground/80 hover:bg-accent/50 ms-auto flex items-center rounded-md border px-3 py-1"
-            @click.prevent.stop="handleAiSummary"
-          >
-            <Icon
-              name="material-symbols:refresh-rounded"
-              class="me-1"
-              size="1rem"
-              aria-hidden="true"
-            ></Icon>
-            {{ $t?.('ai-summary.retry') }}
-          </Button>
-        </div>
-
-        <!-- Summary content -->
-        <div v-else-if="showAiSummary" class="ai-summary-bg ai-summary-anim rounded-xl p-3">
-          <h3>
-            {{ $t?.('ai-summary.summary') }}
-          </h3>
-          <p class="text-foreground text-sm">{{ aiSummary }}</p>
-        </div>
+        <AiSummary ref="aiSummaryRef" :tweet-id="props.tweet.id" />
       </div>
 
       <!-- Actions -->
@@ -192,66 +131,4 @@ function handleTweetClick() {
     </div>
   </article>
 </template>
-<style scoped>
-.ai-summary-bg {
-  background: linear-gradient(
-    135deg,
-    var(--accent) 0%,
-    color-mix(in oklch, var(--brand-blue) 18%, var(--accent)) 30%,
-    color-mix(in oklch, var(--brand-turquoise) 18%, var(--accent)) 60%,
-    var(--accent) 100%
-  );
-  background-size: 200% 200%;
-}
-
-@keyframes aiGradientShift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-.ai-summary-anim {
-  animation: aiGradientShift 3s ease-in-out infinite;
-}
-
-/* Shimmer skeleton using gradient and animation */
-.skeleton-shimmer {
-  position: relative;
-  overflow: hidden;
-  background: transparent; /* let the AI gradient show through */
-}
-.skeleton-shimmer::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    color-mix(in oklch, var(--ring-primary) 25%, transparent) 45%,
-    color-mix(in oklch, var(--ring-primary) 35%, transparent) 50%,
-    color-mix(in oklch, var(--ring-primary) 25%, transparent) 55%,
-    transparent 100%
-  );
-  transform: translateX(-100%);
-  animation: skeletonSweep 1.4s ease-in-out infinite;
-  mix-blend-mode: lighten;
-  opacity: 0.6;
-}
-@keyframes skeletonSweep {
-  0% {
-    transform: translateX(-100%);
-  }
-  50% {
-    transform: translateX(0%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
-</style>
+<style scoped></style>
