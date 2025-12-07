@@ -28,7 +28,7 @@ export type Tweet = {
   likeCount: number;
   isLiked: boolean;
   isRetweeted: boolean;
-  entities: ContentEntities;
+  entities?: ContentEntities | null;
   media: TweetMedia[];
   replyToTweetId?: string | null;
   quoteToTweetId?: string | null;
