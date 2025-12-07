@@ -90,38 +90,52 @@ const { mutate: blockUser } = useBlockMutation();
     <!-- Main -->
     <div class="min-w-0 flex-1 pt-3 pb-2">
       <!-- Header: display name, username, time -->
-      <div class="flex flex-wrap items-center gap-x-1 text-sm">
-        <UserHoverCard
-          :username="props.tweet.author.username"
-          @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
-          @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
-          @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
-          @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
-        >
-          <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
-            <span class="cursor-pointer font-semibold hover:underline">{{
-              props.tweet.author.displayName
-            }}</span>
-          </NuxtLink>
-        </UserHoverCard>
-        <UserHoverCard
-          :username="props.tweet.author.username"
-          @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
-          @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
-          @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
-          @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
-        >
-          <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
-            <span class="text-muted-foreground ms-1" v-text="'@' + props.tweet.author.username" />
-          </NuxtLink>
-        </UserHoverCard>
-        <span class="text-muted-foreground">·</span>
-        <time
-          :title="formatDate(tweet.createdAt, $i18n.locale)"
-          :datetime="tweet.createdAt"
-          class="text-muted-foreground hover:cursor-pointer hover:underline"
-          >{{ relativeTime(tweet.createdAt, $i18n.locale) }}</time
-        >
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex flex-wrap items-center gap-x-1 text-sm">
+          <UserHoverCard
+            :username="props.tweet.author.username"
+            @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
+            @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
+            @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
+            @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
+          >
+            <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
+              <span class="cursor-pointer font-semibold hover:underline">{{
+                props.tweet.author.displayName
+              }}</span>
+            </NuxtLink>
+          </UserHoverCard>
+          <UserHoverCard
+            :username="props.tweet.author.username"
+            @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
+            @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
+            @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
+            @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
+          >
+            <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
+              <span class="text-muted-foreground ms-1" v-text="'@' + props.tweet.author.username" />
+            </NuxtLink>
+          </UserHoverCard>
+          <span class="text-muted-foreground">·</span>
+          <time
+            :title="formatDate(tweet.createdAt, $i18n.locale)"
+            :datetime="tweet.createdAt"
+            class="text-muted-foreground hover:cursor-pointer hover:underline"
+            >{{ relativeTime(tweet.createdAt, $i18n.locale) }}</time
+          >
+        </div>
+        <div class="relative">
+          <TweetDropdown :tweet="props.tweet">
+            <UiButton
+              variant="ghost-default"
+              size="icon-xs"
+              class="text-muted-foreground absolute end-0 top-1/2 translate-x-2.5 -translate-y-1/2"
+              @click.stop
+            >
+              <Icon name="lucide:more-horizontal" />
+            </UiButton>
+          </TweetDropdown>
+        </div>
       </div>
 
       <!-- Content -->

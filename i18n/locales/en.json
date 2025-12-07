@@ -210,7 +210,32 @@
     },
     "show-more-parents": "Show more tweets",
     "deleted-quote": "This post is unavailable.",
-    "deleted-parent": "This Post was deleted by the Post author."
+    "deleted-parent": "This Post was deleted by the Post author.",
+    "engagement": {
+      "label": "View post engagement",
+      "title": "Post engagements",
+      "likes": {
+        "title": "Likes",
+        "empty": {
+          "title": "No likes yet",
+          "description": "When someone taps the heart to Like this post, it'll show up here."
+        }
+      },
+      "reposts": {
+        "title": "Reposts",
+        "empty": {
+          "title": "No Reposts yet",
+          "description": "Share someone else's post on your timeline by reposting it. When you do, it'll show up here."
+        }
+      },
+      "quotes": {
+        "title": "Quotes",
+        "empty": {
+          "title": "No Quotes yet",
+          "description": "You will find a list of everyone who quoted this post here."
+        }
+      }
+    }
   },
   "notifications": {
     "title": "Notifications",
