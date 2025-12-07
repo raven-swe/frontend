@@ -1,5 +1,3 @@
-// cypress/e2e/auth/signup.cy.ts
-
 import { createTestUser } from '../../support/helpers/createTestUser';
 
 describe('Signup Flow', () => {
@@ -153,7 +151,6 @@ describe('Signup Flow', () => {
       cy.get('button[data-cy="signup-next-button"]').should('be.disabled');
     });
     it('should handle resend OTP', () => {
-      // TODO: Check retryAfter, error showing, time countdown, etc.
       const user = createTestUser();
 
       // Step 1: Fill registration info

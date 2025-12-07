@@ -269,6 +269,36 @@ export const handlers = [
     );
   }),
 
+  http.get(`${API_URL}/tweets/:id/replies`, ({ params, request }) => {
+    const { id } = params as { id: string };
+    const url = new URL(request.url);
+    const cursor = url.searchParams.get('cursor') || null;
+    const limit = Number(url.searchParams.get('limit') || '20');
+
+    const tweet = getTweet(id);
+    if (!tweet) {
+      return HttpResponse.json({ message: `Tweet "${id}" not found` }, { status: 404 });
+    }
+    const allTweets = Array.from(tweets.values()).filter((t) => t.isReplyToTweetId === id);
+    const startIndex = cursor ? Math.max(0, Number(cursor)) : 0;
+    const paginatedTweets = allTweets.slice(startIndex, startIndex + limit);
+    const nextIndex = startIndex + paginatedTweets.length;
+    const nextCursor = nextIndex < allTweets.length ? String(nextIndex) : null;
+
+    return HttpResponse.json(
+      {
+        success: true,
+        message: 'Replies fetched successfully.',
+        data: paginatedTweets,
+        pagination: {
+          cursor: String(startIndex),
+          nextCursor,
+          hasNextPage: !!nextCursor,
+        },
+      } as ApiSuccessResponse<Tweet[]>,
+      { status: 200 },
+    );
+  }),
   // GET /timeline/for-you
   http.get(`${API_URL}/timeline/for-you`, ({ request }) => {
     const url = new URL(request.url);

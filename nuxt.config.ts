@@ -3,7 +3,7 @@ import tailwindcss from '@tailwindcss/vite';
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
-  css: ['@/assets/css/main.css'],
+  css: ['@/assets/css/main.css', 'video.js/dist/video-js.css'],
   runtimeConfig: {
     public: {
       useMocks: process.env.NUXT_PUBLIC_USE_MOCKS === 'true',
@@ -16,6 +16,8 @@ export default defineNuxtConfig({
       googleScope: process.env.NUXT_PUBLIC_GOOGLE_SCOPE || '',
       siteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY || '',
       baseUrl: process.env.NUXT_PUBLIC_BASE_URL || 'http://localhost:5173',
+      dmWebSocketUrl: process.env.NUXT_PUBLIC_DM_WS_URL || 'wss://api.raven.cmp27.space/ws/dm',
+      dmSseUrl: process.env.NUXT_PUBLIC_DM_SSE_URL || '',
     },
   },
   devtools: {

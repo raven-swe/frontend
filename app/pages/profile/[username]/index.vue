@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import type { Tweet } from '~~/shared/types/tweets';
+import { useInfiniteQuery } from '@tanstack/vue-query';
+import VirtualInfiniteScroller from '~/components/common/VirtualInfiniteScroller.vue';
+import { profileTabsService } from '~/services/profile/profileTabsService';
+
 definePageMeta({
   layout: 'profile',
 });
@@ -7,12 +10,32 @@ definePageMeta({
 const user = inject<ComputedRef<User>>('user-data');
 const isBlockedBy = computed(() => user?.value.relationship.blockedBy || false);
 
-const tweets = ref<Tweet[]>([]);
+const {
+  data: response,
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage,
+  isLoading,
+  suspense,
+} = useInfiniteQuery({
+  queryKey: ['profile', user?.value.username, 'tweets'],
+  initialPageParam: null as string | null,
+  queryFn: async ({ pageParam = null }) =>
+    await profileTabsService.getProfileTweetsPaginated(
+      user?.value.username || '',
+      'tweets',
+      pageParam,
+    ),
 
-const { data: tweetsData, error } = await useFetch<{ data: Tweet[] }>('/api/tweets');
-tweets.value = tweetsData.value?.data || [];
+  getNextPageParam: (lastPage) =>
+    lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined,
+});
 
-if (error.value) console.error(error.value);
+const tweets = computed(() => response.value?.pages.flatMap((page) => page.data) || []);
+
+onServerPrefetch(async () => {
+  await suspense();
+});
 </script>
 
 <template>
@@ -25,12 +48,32 @@ if (error.value) console.error(error.value);
         {{ $t('profile.messages.blocked-by.description', { username: user?.username || '' }) }}
       </p>
     </div>
-    <div v-if="tweets.length > 0" class="mb-4">
-      <div class="mt-4 flex w-full max-w-[700px] flex-col gap-4">
-        <TweetDefaultCard v-for="tweet in tweets" :key="tweet.id" :tweet="tweet" />
+
+    <ClientOnly>
+      <VirtualInfiniteScroller
+        v-if="!isBlockedBy"
+        :items="tweets"
+        :has-next-page="hasNextPage"
+        :is-fetching-next-page="isFetchingNextPage"
+        :fetch-next-page="fetchNextPage"
+      >
+        <template #item="{ item }">
+          <TweetDefaultCard v-if="item" :tweet="item" />
+        </template>
+      </VirtualInfiniteScroller>
+
+      <div
+        v-if="(hasNextPage && isFetchingNextPage) || isLoading"
+        class="text-primary flex shrink-0 items-center justify-center py-4"
+      >
+        <UiSpinner />
       </div>
-    </div>
-    <div v-else data-testid="empty-state" class="text-muted-foreground mt-10 text-center">
+    </ClientOnly>
+    <div
+      v-if="tweets.length === 0 && !isFetchingNextPage && !isLoading"
+      data-testid="empty-state"
+      class="text-muted-foreground mt-10 text-center"
+    >
       <h1 class="text-xl font-semibold">{{ $t('testing.tweets.tweet-not-found') }}</h1>
     </div>
   </div>

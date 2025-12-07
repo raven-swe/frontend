@@ -1,123 +1,150 @@
 <script lang="ts" setup>
-import type { DmMessage } from '#shared/types/dm';
 import DmMessagesList from './DmMessagesList.vue';
+import { useRoute } from 'vue-router';
+import { useDmMessages } from '@/composables/useDmMessages';
 
-const me = {
-  username: 'hussein',
-  displayName: 'Hussein',
-  avatarUrl: 'https://i.pravatar.cc/150?img=2',
-};
+import { useDmSocketIO } from '@/composables/useDmSocketIO';
+import { showToaster } from '@/utils/showToaster';
+import Spinner from '~/components/ui/Spinner.vue';
+import type { DmMessage } from '~~/shared/types/dm';
 
-const other = {
-  username: '@btngana',
-  displayName: 'Ahmed Amr',
-  avatarUrl: 'https://i.pravatar.cc/150?img=3',
-};
+const route = useRoute();
+const conversationId = computed(() => route.params.conversationId as string | null);
 
-const now = () => new Date().toISOString();
+const {
+  conversations,
+  loading: conversationsLoading,
+  error: conversationsError,
+} = useDmConversations();
 
-const messages: DmMessage[] = [
-  {
-    id: 'msg_1',
-    sender: { ...me },
-    content: 'Hey! How are you?',
-    entities: { mentions: [], hashtags: [] },
-    mediaUrl: null,
-    createdAt: now(),
-    isMine: true,
+const conversation = computed<DmConversation | null>(() => {
+  if (!conversationId.value) return null;
+  return conversations.value?.find((c) => c.id === conversationId.value) || null;
+});
+
+const {
+  messages: initialMessages,
+  loading: messagesLoading,
+  error: messagesError,
+} = useDmMessages(() => conversationId.value);
+
+const ws = useDmSocketIO();
+provide('dmSocket', ws);
+const liveMessages = ref<DmMessage[]>([]);
+
+const messages = computed(() => {
+  const initial = initialMessages.value || [];
+  return [...liveMessages.value, ...initial];
+});
+
+const messagesContainer = ref<HTMLElement | null>(null);
+
+function autoScroll() {
+  const el = messagesContainer.value;
+  if (!el) return;
+
+  const threshold = 200;
+
+  const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
+
+  if (isNearBottom) {
+    requestAnimationFrame(() => {
+      el.scrollTop = el.scrollHeight;
+    });
+  }
+}
+
+watch(
+  conversationId,
+  (newId) => {
+    if (newId) {
+      // Connect socket if not already connected
+      if (!ws.isConnected.value) {
+        ws.connect();
+      }
+
+      // Reset live messages when switching conversations
+      liveMessages.value = [];
+
+      // Wait for socket to be connected before switching
+      const checkConnection = () => {
+        if (ws.isConnected.value) {
+          const lastMessage = messages.value[messages.value.length - 1];
+          if (lastMessage?.id) {
+            ws.markSeen(newId, lastMessage.id);
+          }
+        } else {
+          // retry until connected
+          setTimeout(checkConnection, 200);
+        }
+      };
+
+      checkConnection();
+      // Force scroll to bottom when switching conversations
+      nextTick(() => {
+        const el = messagesContainer.value;
+        if (el) {
+          requestAnimationFrame(() => {
+            el.scrollTop = el.scrollHeight;
+          });
+        }
+      });
+    }
   },
-  {
-    id: 'msg_2',
-    sender: { ...other },
-    content: 'I’m good! Working on the project.',
-    entities: { mentions: [], hashtags: [] },
-    mediaUrl: null,
-    createdAt: now(),
-    isMine: false,
-  },
-  {
-    id: 'msg_3',
-    sender: { ...me },
-    content: `Great! Let’s push the latest changes. ${other.username}`,
-    entities: {
-      mentions: [{ username: other.username.replace(/^@/, ''), startPosition: 39 }],
-      hashtags: [],
-    },
-    mediaUrl: null,
-    createdAt: now(),
-    isMine: true,
-  },
-  {
-    id: 'msg_4',
-    sender: { ...me },
-    content: 'Check this out #update',
-    entities: { mentions: [], hashtags: [{ hashtag: 'update', startPosition: 15 }] },
-    mediaUrl: 'https://picsum.photos/seed/dm/300/200',
-    createdAt: now(),
-    isMine: true,
-  },
-  {
-    id: 'msg_1',
-    sender: { ...me },
-    content: 'Hey! How are you?',
-    entities: { mentions: [], hashtags: [] },
-    mediaUrl: null,
-    createdAt: now(),
-    isMine: true,
-  },
-  {
-    id: 'msg_2',
-    sender: { ...other },
-    content: 'I’m good! Working on the project.',
-    entities: { mentions: [], hashtags: [] },
-    mediaUrl: null,
-    createdAt: now(),
-    isMine: false,
-  },
-  {
-    id: 'msg_1',
-    sender: { ...me },
-    content: 'Hey! How are you?',
-    entities: { mentions: [], hashtags: [] },
-    mediaUrl: null,
-    createdAt: now(),
-    isMine: true,
-  },
-  {
-    id: 'msg_2',
-    sender: { ...other },
-    content: 'I’m good! Working on the project.',
-    entities: { mentions: [], hashtags: [] },
-    mediaUrl: null,
-    createdAt: now(),
-    isMine: false,
-  },
-  {
-    id: 'msg_1',
-    sender: { ...me },
-    content: 'Hey! How are you?',
-    entities: { mentions: [], hashtags: [] },
-    mediaUrl: null,
-    createdAt: now(),
-    isMine: true,
-  },
-  {
-    id: 'msg_2',
-    sender: { ...other },
-    content: 'I’m good! Working on the project.',
-    entities: { mentions: [], hashtags: [] },
-    mediaUrl: null,
-    createdAt: now(),
-    isMine: false,
-  },
-];
+  { immediate: true },
+);
+
+// Scroll to bottom when messages load or change
+watch(messages, () => {
+  nextTick(() => autoScroll());
+});
+
+// Force scroll to bottom when messages finish loading initially
+watch(messagesLoading, (isLoading, wasLoading) => {
+  if (wasLoading && !isLoading) {
+    // Messages just finished loading
+    nextTick(() => {
+      const el = messagesContainer.value;
+      if (el) {
+        requestAnimationFrame(() => {
+          el.scrollTop = el.scrollHeight;
+        });
+      }
+    });
+  }
+});
+
+// Handle incoming Socket messages
+onMounted(() => {
+  ws.onMessage((message) => {
+    if (conversationId.value && message) {
+      liveMessages.value.unshift(message);
+    }
+  });
+
+  ws.onError((error) => {
+    showToaster('error', `Socket error: ${error}`);
+  });
+});
+
+watch(messagesError, (val) => val && showToaster('error', 'Failed to load messages'));
+watch(conversationsError, (val) => val && showToaster('error', 'Failed to load conversation'));
 </script>
 <template>
   <div class="flex h-full flex-col overflow-hidden">
-    <DmConversationHeader :username="me.username" :avatar-url="me.avatarUrl" />
-    <div class="flex-1 overflow-y-auto p-4">
-      <DmConversationInfo />
-      <DmMessagesList :messages="messages" />
+    <DmConversationHeader
+      :username="conversation?.participant.username || conversationId"
+      :avatar-url="conversation?.participant.avatarUrl || ''"
+    />
+    <div ref="messagesContainer" class="flex-1 overflow-y-auto p-4">
+      <DmConversationInfo :conversation="conversation || null" />
+      <div
+        v-if="conversationsLoading || messagesLoading"
+        class="flex items-center justify-center p-4"
+      >
+        <Spinner size="1.5rem" />
+      </div>
+      <DmMessagesList v-else :messages="messages || []" />
     </div>
     <DmConversationDmMessageInput />
   </div>

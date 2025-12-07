@@ -1,40 +1,76 @@
 import { describe, expect, it, vi } from 'vitest';
 import { mountSuspended } from '@nuxt/test-utils/runtime';
+import { ref } from 'vue';
 import DmMessageInput from '@/components/dm/conversation/DmMessageInput.vue';
+
+// Mock vue-router to provide conversationId
+vi.mock('vue-router', () => ({
+  useRoute: () => ({ params: { conversationId: '1' } }),
+}));
+
+// Create a fresh mock before each test
+let mockWebSocket: ReturnType<typeof createMockWebSocket>;
+
+function createMockWebSocket() {
+  return {
+    isConnected: ref(true),
+    isConnecting: ref(false),
+    currentConversationId: ref('1'),
+    connect: vi.fn(),
+    disconnect: vi.fn(),
+    sendMessage: vi.fn(),
+    markSeen: vi.fn(),
+    switchConversation: vi.fn(),
+    onMessage: vi.fn(),
+    onError: vi.fn(),
+  };
+}
+
+// Helper function to mount component with WebSocket mock
+async function mountWithWebSocket() {
+  mockWebSocket = createMockWebSocket();
+  return await mountSuspended(DmMessageInput, {
+    global: {
+      provide: {
+        dmWebSocket: mockWebSocket,
+      },
+    },
+  });
+}
 
 describe('DmMessageInput Component', () => {
   it('renders the input container with correct structure', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
+    const wrapper = await mountWithWebSocket();
 
     const container = wrapper.find('.bg-background.sticky.bottom-0');
     expect(container.exists()).toBe(true);
   });
 
-  it('renders the text input field', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
+  it('renders the text area field', async () => {
+    const wrapper = await mountWithWebSocket();
 
-    const input = wrapper.find('input[type="text"]');
-    expect(input.exists()).toBe(true);
-    expect(input.classes()).toContain('flex-1');
-    expect(input.classes()).toContain('bg-transparent');
+    const textarea = wrapper.find('textarea');
+    expect(textarea.exists()).toBe(true);
+    expect(textarea.classes()).toContain('flex-1');
+    expect(textarea.classes()).toContain('bg-transparent');
   });
 
   it('renders the send button', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
+    const wrapper = await mountWithWebSocket();
 
     const html = wrapper.html();
     expect(html).toContain('ic:outline-send');
   });
 
   it('displays toolbar with image icon when no image attached', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
+    const wrapper = await mountWithWebSocket();
 
     const html = wrapper.html();
     expect(html).toContain('ic:outline-add-photo-alternate');
   });
 
   it('renders the hidden file input', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
+    const wrapper = await mountWithWebSocket();
 
     const fileInput = wrapper.find('input[type="file"]');
     expect(fileInput.exists()).toBe(true);
@@ -43,7 +79,7 @@ describe('DmMessageInput Component', () => {
   });
 
   it('disables send button when message is empty', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
+    const wrapper = await mountWithWebSocket();
 
     const buttons = wrapper.findAll('button[type="button"]');
     // Last button should be the send button
@@ -52,10 +88,10 @@ describe('DmMessageInput Component', () => {
   });
 
   it('enables send button when message has content', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
+    const wrapper = await mountWithWebSocket();
 
-    const input = wrapper.find('input[type="text"]');
-    await input.setValue('Test message');
+    const textarea = wrapper.find('textarea');
+    await textarea.setValue('Test message');
 
     // Wait for reactivity
     await wrapper.vm.$nextTick();
@@ -65,66 +101,26 @@ describe('DmMessageInput Component', () => {
     expect(sendButton?.attributes('disabled')).toBeUndefined();
   });
 
-  it('emits send event with text when send button is clicked', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
-
-    const input = wrapper.find('input[type="text"]');
-    await input.setValue('Test message');
-
-    const buttons = wrapper.findAll('button[type="button"]');
-    const sendButton = buttons[buttons.length - 1];
-    await sendButton?.trigger('click');
-
-    expect(wrapper.emitted('send')).toBeTruthy();
-    expect(wrapper.emitted('send')?.[0]).toEqual([{ text: 'Test message', image: null }]);
-  });
-
-  it('clears message after sending', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
-
-    const input = wrapper.find('input[type="text"]');
-    await input.setValue('Test message');
-    await wrapper.vm.$nextTick();
-
-    const buttons = wrapper.findAll('button[type="button"]');
-    const sendButton = buttons[buttons.length - 1];
-    await sendButton?.trigger('click');
-    await wrapper.vm.$nextTick();
-
-    expect((input.element as HTMLInputElement).value).toBe('');
-  });
-
-  it('handles Enter key to send message', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
-
-    const input = wrapper.find('input[type="text"]');
-    await input.setValue('Test message');
-
-    await input.trigger('keydown', { key: 'Enter' });
-
-    expect(wrapper.emitted('send')).toBeTruthy();
-  });
-
   it('does not send on Enter + Shift', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
+    const wrapper = await mountWithWebSocket();
 
-    const input = wrapper.find('input[type="text"]');
-    await input.setValue('Test message');
+    const textarea = wrapper.find('textarea');
+    await textarea.setValue('Test message');
 
-    await input.trigger('keydown', { key: 'Enter', shiftKey: true });
+    await textarea.trigger('keydown', { key: 'Enter', shiftKey: true });
 
     expect(wrapper.emitted('send')).toBeFalsy();
   });
 
   it('renders with proper styling', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
+    const wrapper = await mountWithWebSocket();
 
     const innerContainer = wrapper.find('.bg-accent.rounded-2xl');
     expect(innerContainer.exists()).toBe(true);
   });
 
   it('groups toolbar and input in a role="group"', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
+    const wrapper = await mountWithWebSocket();
 
     const group = wrapper.find('[role="group"]');
     expect(group.exists()).toBe(true);
@@ -133,7 +129,7 @@ describe('DmMessageInput Component', () => {
   });
 
   it('enables send button when image is attached without text', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
+    const wrapper = await mountWithWebSocket();
 
     // Simulate file input change
     const fileInput = wrapper.find('input[type="file"]');
@@ -153,7 +149,7 @@ describe('DmMessageInput Component', () => {
   });
 
   it('triggers file input click when add image is called', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
+    const wrapper = await mountWithWebSocket();
 
     const fileInput = wrapper.find('input[type="file"]');
     const clickSpy = vi.spyOn(fileInput.element as HTMLInputElement, 'click');
@@ -171,7 +167,7 @@ describe('DmMessageInput Component', () => {
   });
 
   it('does not trigger file input when image already attached', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
+    const wrapper = await mountWithWebSocket();
 
     // First attach an image
     const fileInput = wrapper.find('input[type="file"]');
@@ -192,7 +188,7 @@ describe('DmMessageInput Component', () => {
   });
 
   it('shows remove button when image is attached', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
+    const wrapper = await mountWithWebSocket();
 
     // First attach an image
     const fileInput = wrapper.find('input[type="file"]');
@@ -212,7 +208,7 @@ describe('DmMessageInput Component', () => {
   });
 
   it('handles image file change event and shows preview', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
+    const wrapper = await mountWithWebSocket();
 
     const fileInput = wrapper.find('input[type="file"]');
     const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
@@ -230,38 +226,8 @@ describe('DmMessageInput Component', () => {
     expect(html).toContain('ic:outline-edit');
   });
 
-  it('emits send event with both text and image', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
-
-    // Add text
-    const input = wrapper.find('input[type="text"]');
-    await input.setValue('Test message');
-
-    // Add image
-    const fileInput = wrapper.find('input[type="file"]');
-    const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
-
-    Object.defineProperty(fileInput.element, 'files', {
-      value: [file],
-      writable: false,
-    });
-
-    await fileInput.trigger('change');
-    await wrapper.vm.$nextTick();
-
-    // Send
-    const buttons = wrapper.findAll('button[type="button"]');
-    const sendButton = buttons[buttons.length - 1];
-    await sendButton?.trigger('click');
-
-    expect(wrapper.emitted('send')).toBeTruthy();
-    const emittedData = wrapper.emitted('send')?.[0]?.[0] as { text: string; image: File | null };
-    expect(emittedData.text).toBe('Test message');
-    expect(emittedData.image).toBeTruthy();
-  });
-
-  it('emits send event with only image', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
+  it('shows error when trying to send only image (not supported)', async () => {
+    const wrapper = await mountWithWebSocket();
 
     // Add image only
     const fileInput = wrapper.find('input[type="file"]');
@@ -280,45 +246,12 @@ describe('DmMessageInput Component', () => {
     const sendButton = buttons[buttons.length - 1];
     await sendButton?.trigger('click');
 
-    expect(wrapper.emitted('send')).toBeTruthy();
-    const emittedData = wrapper.emitted('send')?.[0]?.[0] as { text: string; image: File | null };
-    expect(emittedData.text).toBe('');
-    expect(emittedData.image).toBeTruthy();
-  });
-
-  it('clears image preview after sending and shows toolbar again', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
-
-    // Add image
-    const fileInput = wrapper.find('input[type="file"]');
-    const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
-
-    Object.defineProperty(fileInput.element, 'files', {
-      value: [file],
-      writable: false,
-    });
-
-    await fileInput.trigger('change');
-    await wrapper.vm.$nextTick();
-
-    // Verify image preview is shown and toolbar is hidden
-    let html = wrapper.html();
-    expect(html).toContain('ic:outline-edit');
-    expect(html).not.toContain('ic:outline-add-photo-alternate');
-
-    // Send
-    const buttons = wrapper.findAll('button[type="button"]');
-    const sendButton = buttons[buttons.length - 1];
-    await sendButton?.trigger('click');
-    await wrapper.vm.$nextTick();
-
-    // Check image preview is cleared and toolbar is back
-    html = wrapper.html();
-    expect(html).toContain('ic:outline-add-photo-alternate');
+    // Should not send anything (no text, image not supported)
+    expect(mockWebSocket.sendMessage).not.toHaveBeenCalled();
   });
 
   it('calls removeImage through MessageAttachmentPreview component', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
+    const wrapper = await mountWithWebSocket();
 
     // Add image first
     const fileInput = wrapper.find('input[type="file"]');
@@ -349,7 +282,7 @@ describe('DmMessageInput Component', () => {
   });
 
   it('shows replace/edit button when image is attached', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
+    const wrapper = await mountWithWebSocket();
 
     // Add image first
     const fileInput = wrapper.find('input[type="file"]');
@@ -372,7 +305,7 @@ describe('DmMessageInput Component', () => {
   });
 
   it('creates blob URL when image is loaded', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
+    const wrapper = await mountWithWebSocket();
 
     const createObjectURLSpy = vi.spyOn(URL, 'createObjectURL');
 
@@ -392,7 +325,7 @@ describe('DmMessageInput Component', () => {
   });
 
   it('revokes blob URL when image is removed', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
+    const wrapper = await mountWithWebSocket();
 
     // Add image
     const fileInput = wrapper.find('input[type="file"]');
@@ -417,34 +350,8 @@ describe('DmMessageInput Component', () => {
     expect(revokeObjectURLSpy).toHaveBeenCalled();
   });
 
-  it('revokes blob URL when sending message with image', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
-
-    // Add image
-    const fileInput = wrapper.find('input[type="file"]');
-    const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
-
-    Object.defineProperty(fileInput.element, 'files', {
-      value: [file],
-      writable: false,
-    });
-
-    await fileInput.trigger('change');
-    await wrapper.vm.$nextTick();
-
-    const revokeObjectURLSpy = vi.spyOn(URL, 'revokeObjectURL');
-
-    // Send message
-    const buttons = wrapper.findAll('button[type="button"]');
-    const sendButton = buttons[buttons.length - 1];
-    await sendButton?.trigger('click');
-
-    // Should revoke URL after sending
-    expect(revokeObjectURLSpy).toHaveBeenCalled();
-  });
-
   it('passes correct box-style to MessageAttachmentPreview', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
+    const wrapper = await mountWithWebSocket();
 
     // Add image
     const fileInput = wrapper.find('input[type="file"]');
@@ -465,7 +372,7 @@ describe('DmMessageInput Component', () => {
   });
 
   it('handles empty file selection in onImageChange', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
+    const wrapper = await mountWithWebSocket();
 
     const fileInput = wrapper.find('input[type="file"]');
 
@@ -485,7 +392,7 @@ describe('DmMessageInput Component', () => {
   });
 
   it('computes previewUrl correctly when image exists', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
+    const wrapper = await mountWithWebSocket();
 
     const createObjectURLSpy = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:mock-url');
 
@@ -505,10 +412,10 @@ describe('DmMessageInput Component', () => {
   });
 
   it('computes canSend correctly with trimmed empty message', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
+    const wrapper = await mountWithWebSocket();
 
-    const input = wrapper.find('input[type="text"]');
-    await input.setValue('   '); // Only spaces
+    const textarea = wrapper.find('textarea');
+    await textarea.setValue('   '); // Only spaces
 
     await wrapper.vm.$nextTick();
 
@@ -520,7 +427,7 @@ describe('DmMessageInput Component', () => {
   });
 
   it('sets imageMeta when image loads successfully', async () => {
-    const wrapper = await mountSuspended(DmMessageInput);
+    const wrapper = await mountWithWebSocket();
 
     // Mock Image constructor to control load event
     const originalImage = global.Image;

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { buttonVariants } from '~~/shared/types/ui';
+import type { ButtonVariants } from '@/components/ui/button/variants';
 
 const props = defineProps<{
   open: boolean;
@@ -17,7 +17,7 @@ const actionButton = computed(() => {
   const isLocationSet = location.value.trim().length > 0;
   return {
     text: isLocationSet ? $t('ui.next') : $t('ui.skip-for-now'),
-    variant: (isLocationSet ? 'primary' : 'outline') as buttonVariants,
+    variant: (isLocationSet ? 'primary' : 'outline') as ButtonVariants['variant'],
   };
 });
 
@@ -69,17 +69,24 @@ watch(
           {{ $t('profile.setup.location-desc') }}
         </UiDialogDescription>
       </UiDialogHeader>
-      <div class="mx-2 mt-2 mb-auto p-4">
+      <div class="mx-2 mt-2 mb-auto p-4" data-cy="profile-setup-location-dialog">
         <uiInput
           v-model="location"
           type="text"
           placeholder="location"
           class="w-full max-w-md"
           maxlength="30"
+          data-cy="profile-setup-location-input"
         />
       </div>
       <UiDialogFooter>
-        <UiButton :variant="actionButton.variant" class="w-100" size="xl" @click="handleSubmit">
+        <UiButton
+          :variant="actionButton.variant"
+          class="w-100"
+          size="xl"
+          data-cy="profile-setup-next-button"
+          @click="handleSubmit"
+        >
           {{ actionButton.text }}
         </UiButton>
       </UiDialogFooter>

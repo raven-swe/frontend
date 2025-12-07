@@ -4,6 +4,7 @@ import type { MediaItem } from '~~/shared/types/shared';
 
 interface Props {
   media?: MediaItem[];
+  composerType?: string;
 }
 
 interface Emits {
@@ -12,12 +13,12 @@ interface Emits {
 
 const props = withDefaults(defineProps<Props>(), {
   media: () => [],
+  composerType: 'default',
 });
 
 const emit = defineEmits<Emits>();
 
 const currentIndex = ref(0);
-// const fileInputRef = ref<HTMLInputElement | null>(null);
 
 const hasMultipleMedia = computed(() => props.media.length > 1);
 const canNavigateLeft = computed(() => currentIndex.value > 0);
@@ -67,7 +68,11 @@ const removeMedia = (id: string) => {
 </script>
 
 <template>
-  <div v-if="media.length > 0" class="relative ms-[60px] mb-3">
+  <div
+    v-if="media.length > 0"
+    class="relative mb-3"
+    :class="props.composerType === 'quote' ? 'ms-0' : 'ms-[60px]'"
+  >
     <!-- Carousel Container -->
     <div class="border-border overflow-hidden rounded-2xl border">
       <!-- Sliding Track -->

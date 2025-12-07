@@ -1,12 +1,69 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import { mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime';
-import ProfilePage from '~/pages/profile/[username]/index.vue';
+import type { User } from '#shared/types/user';
+import { computed } from 'vue';
+import type { Tweet } from '#shared/types/tweets';
+import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query';
 
-describe('ProfilePage', () => {
+const mockUser: User = {
+  joinedAt: '2020-07-15T12:34:56Z',
+  bioEntities: {
+    mentions: [],
+    hashtags: [],
+  },
+  username: 'testuser',
+  email: 'testemail@gmail.com',
+  avatarUrl: '/avatar.jpg',
+  bannerUrl: '/banner.jpg',
+  bio: 'This is a test bio',
+  location: 'Test Location',
+  birthDate: '1990-01-01',
+  websiteUrl: 'https://testwebsite.com',
+  followersCount: 0,
+  followingCount: 0,
+  languageCode: 'en',
+  displayName: 'Test User',
+  phone: '',
+  mutualsCount: 0,
+  relationship: {
+    blocking: false,
+    blockedBy: false,
+    following: false,
+    follower: false,
+    muted: false,
+  },
+};
+
+describe('user tweets page', () => {
+  let queryClient: QueryClient;
+
+  beforeEach(() => {
+    vi.resetModules();
+    vi.clearAllMocks();
+    vi.resetAllMocks();
+    queryClient = new QueryClient();
+    queryClient.clear();
+  });
+
   it('renders empty state when no tweets are available', async () => {
+    registerEndpoint(`/api/users/${mockUser.username}/tweets`, () => ({
+      data: [],
+    }));
+    const { default: ProfilePage } = await import('~/pages/profile/[username]/index.vue');
     const wrapper = await mountSuspended(ProfilePage, {
-      global: { stubs: { TweetDefaultCard: true } },
+      route: {
+        params: { username: mockUser.username, tab: '' },
+      },
+      global: {
+        provide: {
+          'user-data': computed(() => mockUser),
+        },
+        stubs: {
+          TweetDefaultCard: true,
+        },
+        plugins: [[VueQueryPlugin, { queryClient }]],
+      },
     });
 
     await flushPromises();
@@ -17,7 +74,7 @@ describe('ProfilePage', () => {
   });
 
   it('renders TweetDefaultCard components when tweets exist', async () => {
-    const mockTweets = [
+    const mockTweets: Tweet[] = [
       {
         id: 'tweet-1',
         content: 'First tweet',
@@ -58,12 +115,23 @@ describe('ProfilePage', () => {
       },
     ];
 
-    registerEndpoint('/api/tweets', () => ({
+    registerEndpoint(`/api/users/${mockUser.username}/tweets`, () => ({
       data: mockTweets,
     }));
 
+    const { default: ProfilePage } = await import('~/pages/profile/[username]/index.vue');
+
     const wrapper = await mountSuspended(ProfilePage, {
-      global: { stubs: { TweetDefaultCard: true } },
+      route: {
+        params: { username: mockUser.username, tab: '' },
+      },
+      global: {
+        provide: {
+          'user-data': computed(() => mockUser),
+        },
+        stubs: { TweetDefaultCard: true },
+        plugins: [[VueQueryPlugin, { queryClient }]],
+      },
     });
 
     await flushPromises();

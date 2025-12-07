@@ -1,58 +1,220 @@
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
+import { useMutation } from '@tanstack/vue-query';
 import type { FetchError } from 'ofetch';
+import { profileInteractionService } from '~/services/profile/profileInteractionService';
 
-export function useProfileMutation<T, Q = void>({
+type Actions = 'follow' | 'unfollow' | 'mute' | 'unmute' | 'block' | 'unblock';
+
+function isNoOpError(action: Actions, err: FetchError<FetchError<ApiErrorResponse>>) {
+  const code = err?.data?.data?.error?.code;
+  switch (action) {
+    case 'follow':
+      return code === 'ALREADY_FOLLOWING';
+    case 'unfollow':
+      return code === 'ALREADY_NOT_FOLLOWING';
+    case 'mute':
+      return code === 'ALREADY_MUTED';
+    case 'unmute':
+      return code === 'NOT_MUTED';
+    case 'block':
+      return code === 'ALREADY_BLOCKED';
+    case 'unblock':
+      return code === 'NOT_BLOCKED';
+    default:
+      return false;
+  }
+}
+
+export function useProfileMutation<ActionType extends Actions, Q = void>({
   mutationFn,
-  username,
   optimisticUpdateFn,
 }: {
-  mutationFn: (action: T) => Promise<Q>;
-  username: string;
-  optimisticUpdateFn: (data: User, action: T) => void;
+  mutationFn: ({ username, action }: { username: string; action: ActionType }) => Promise<Q>;
+  optimisticUpdateFn: (data: CompactUser | User, action: ActionType) => CompactUser | User;
 }) {
-  const queryClient = useQueryClient();
   const { t } = useI18n();
-
   return useMutation<
     Q,
     FetchError<FetchError<ApiErrorResponse>>,
-    T,
+    { username: string; action: ActionType },
     {
-      previousData?: User;
+      previousLists?: [
+        readonly unknown[],
+        (
+          | {
+              pages: ApiSuccessResponse<CompactUser[]>[];
+            }
+          | undefined
+        ),
+      ][];
+      previousUser?: User;
     }
   >({
+    mutationKey: ['profile-interaction'],
     mutationFn,
-    onMutate: async (action: T) => {
-      const queryKey = ['profile', username.toLowerCase()];
-      // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey });
-
+    onMutate: async (
+      { username: usenameMutate, action }: { username: string; action: ActionType },
+      { client },
+    ) => {
+      const usernameToMutate = usenameMutate.toLowerCase();
+      const profileQueryKey = ['profile', usernameToMutate];
       // Get previous data
-      const previousData = queryClient.getQueryData<User>(queryKey);
-      if (previousData) {
-        const updatedUser = { ...previousData };
-
-        optimisticUpdateFn(updatedUser, action);
-        queryClient.setQueryData(queryKey, updatedUser);
+      const previousUser = client.getQueryData<User>(profileQueryKey);
+      if (previousUser) {
+        client.setQueryData<User>(profileQueryKey, (old) => {
+          if (!old) return old;
+          const prevUser = toRaw(old);
+          return optimisticUpdateFn(prevUser, action) as User;
+        });
       }
 
-      return { previousData };
+      const previousLists = client.getQueriesData<{
+        pages: ApiSuccessResponse<CompactUser[]>[];
+      }>({
+        predicate: (query) => query.queryKey[0] === 'user-list',
+      });
+
+      // Optimistically update all user-lists
+      client.setQueriesData<{
+        pages: ApiSuccessResponse<CompactUser[]>[];
+      }>(
+        {
+          predicate: (query) => query.queryKey[0] === 'user-list',
+        },
+        (oldData) => {
+          if (!oldData) return oldData;
+          const updatedPages = oldData.pages.map((page) => {
+            const updatedData = page.data.map((user) => {
+              if (user.username.toLowerCase() === usernameToMutate) {
+                const prevUser = toRaw(user);
+                return optimisticUpdateFn(prevUser, action);
+              }
+              return user;
+            });
+            return { ...page, data: updatedData };
+          });
+          return { ...oldData, pages: updatedPages };
+        },
+      );
+
+      return {
+        previousLists,
+        previousUser,
+      };
     },
 
     // Rollback on error
-    onError: (_err, _action, ctx) => {
-      if (ctx?.previousData) {
-        queryClient.setQueryData(['profile', username], ctx.previousData);
+    onError: (err, { username, action }, mutationResult, { client }) => {
+      const usernameToMutate = username.toLowerCase();
+      if (isNoOpError(action, err)) {
+        return;
       }
-      showToaster('error', t(`errors.${_err?.data?.data?.error.code || 'UNKNOWN_ERROR'}`));
+
+      if (mutationResult?.previousUser) {
+        const profileQueryKey = ['profile', usernameToMutate];
+        client.setQueryData(profileQueryKey, mutationResult.previousUser);
+      }
+      // Rollback all previous user-lists
+      if (mutationResult?.previousLists) {
+        mutationResult.previousLists.forEach(([queryKey, previousData]) => {
+          client.setQueryData(queryKey, previousData);
+        });
+      }
+
+      const errorCode = err?.data?.data?.error?.code;
+      console.error('Profile mutation error:', err);
+
+      showToaster(
+        'error',
+        t(`errors.${errorCode}`, err.data?.data?.error.message || t('errors.UNKNOWN_ERROR')),
+      );
     },
 
     // Invalidate queries on finishing request
     // To sync up with the backend
-    onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['profile', username],
+    onSettled: (_data, _err, { username }, mutationResult, { client }) => {
+      const loweredUsername = username.toLowerCase();
+      const stillRunning = client.isMutating({
+        mutationKey: ['profile-interaction'],
       });
+
+      if (stillRunning > 0) {
+        // Another follow/unfollow/mute/block is still running; let the last one do the invalidation
+        return;
+      }
+      client.invalidateQueries({
+        queryKey: ['profile', loweredUsername],
+      });
+    },
+  });
+}
+
+export function useFollowMutation() {
+  return useProfileMutation<'follow' | 'unfollow'>({
+    mutationFn: async ({ username: usernameToMutate, action }) => {
+      if (action === 'follow') {
+        await profileInteractionService.followUser(usernameToMutate.toLowerCase());
+      } else {
+        await profileInteractionService.unfollowUser(usernameToMutate.toLowerCase());
+      }
+    },
+    optimisticUpdateFn: (user, action) => {
+      const newUser = structuredClone(user);
+      if (action === 'follow') {
+        newUser.relationship.following = true;
+        if ('followersCount' in newUser) {
+          newUser.followersCount += 1;
+        }
+      } else {
+        newUser.relationship.following = false;
+        if ('followersCount' in newUser) {
+          newUser.followersCount -= 1;
+        }
+      }
+      return newUser;
+    },
+  });
+}
+
+export function useMuteMutation() {
+  return useProfileMutation<'mute' | 'unmute'>({
+    mutationFn: async ({ action, username: usernameToMutate }) => {
+      if (action === 'mute') {
+        await profileInteractionService.muteUser(usernameToMutate.toLowerCase());
+      } else {
+        await profileInteractionService.unmuteUser(usernameToMutate.toLowerCase());
+      }
+    },
+    optimisticUpdateFn: (user, action) => {
+      const newUser = structuredClone(user);
+      if (action === 'mute') {
+        newUser.relationship.muted = true;
+      } else {
+        newUser.relationship.muted = false;
+      }
+      return newUser;
+    },
+  });
+}
+
+export function useBlockMutation() {
+  return useProfileMutation<'block' | 'unblock'>({
+    mutationFn: async ({ action, username: usernameToMutate }) => {
+      if (action === 'block') {
+        await profileInteractionService.blockUser(usernameToMutate.toLowerCase());
+      } else {
+        await profileInteractionService.unblockUser(usernameToMutate.toLowerCase());
+      }
+    },
+    optimisticUpdateFn: (user, action) => {
+      const newUser = structuredClone(user);
+      if (action === 'block') {
+        newUser.relationship.blocking = true;
+        newUser.relationship.following = false;
+      } else {
+        newUser.relationship.following = false;
+        newUser.relationship.blocking = false;
+      }
+      return newUser;
     },
   });
 }

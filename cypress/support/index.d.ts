@@ -46,5 +46,23 @@ declare namespace Cypress {
      * @example cy.login('user@example.com', 'password123')
      */
     login(email: string, password: string): Chainable<void>;
+
+    /**
+     * Custom command to mute or unmute a user
+     * @param userName - Username of the user to mute/unmute
+     * @param mute - true to mute, false to unmute (default: true)
+     * @example cy.muteUser('someuser', true) // Mute user
+     * @example cy.muteUser('someuser', false) // Unmute user
+     */
+    muteUser(userName: string, mute?: boolean): Chainable<void>;
+
+    /**
+     * Custom command to block or unblock a user
+     * @param userName - Username of the user to block/unblock
+     * @param block - true to block, false to unblock (default: true)
+     * @example cy.blockUser('someuser', true) // Block user
+     * @example cy.blockUser('someuser', false) // Unblock user
+     */
+    blockUser(userName: string, block?: boolean): Chainable<void>;
   }
 }
