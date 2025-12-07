@@ -54,17 +54,13 @@ function randomMedia() {
     case 'IMAGE': {
       const width = faker.number.int({ min: 400, max: 1200 });
       const height = faker.number.int({ min: 300, max: 900 });
-      url = `https://picsum.photos/${width}/${height}?random=${faker.number.int(10000)}`;
+      const seed = faker.number.int(10000);
+      url = `https://picsum.photos/seed/${seed}/${width}/${height}`;
       break;
     }
 
     case 'GIF': {
-      const gifIds = [
-        '3oEjI6SIIHBdRxXI40',
-        'l0MYC0LajbaPoEADu',
-        '26tPplGWjN0xLybiU',
-        '3ohhwNqj9QjvE3lI8E',
-      ];
+      const gifIds = ['3oEjI6SIIHBdRxXI40', 'l0MYC0LajbaPoEADu', '26tPplGWjN0xLybiU'];
       const gifId = faker.helpers.arrayElement(gifIds);
       url = `https://media.giphy.com/media/${gifId}/giphy.gif`;
       break;
@@ -76,14 +72,6 @@ function randomMedia() {
         'https://media.w3.org/2010/05/sintel/trailer_hd.mp4',
         'https://vjs.zencdn.net/v/oceans.mp4',
         'https://www.w3schools.com/html/mov_bbb.mp4',
-        'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-        'https://test-streams.mux.dev/x36xhzz/url_6/193039199_mp4_h264_aac_hq_7.m3u8',
-        'https://test-streams.mux.dev/test_001/stream.m3u8',
-        'https://test-streams.mux.dev/dai-discontinuity-deltatre/manifest.m3u8',
-        'https://test-streams.mux.dev/issue666/playlists/cisq0gim60007xzvi505emlxx.m3u8',
-        'https://test-streams.mux.dev/bbbAES/playlists/sample_aes/index.m3u8',
-        'https://test-streams.mux.dev/pts_shift/master.m3u8',
-        'https://test-streams.mux.dev/tos_ismc/main.m3u8',
       ];
       url = faker.helpers.arrayElement(videoSources);
       break;

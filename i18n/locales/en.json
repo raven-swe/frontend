@@ -117,6 +117,16 @@
           "description": "When someone you know follows them, they'll be listed here."
         }
       }
+    },
+    "media": {
+      "no-media": {
+        "title": "{'@'}{username} hasn't posted media",
+        "description": "Once they do, those posts will show up here."
+      },
+      "current-user-no-media": {
+        "title": "Lights, camera … attachments!",
+        "description": "When you post photos or videos, they will show up here."
+      }
     }
   },
   "home": {

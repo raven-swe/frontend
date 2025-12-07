@@ -1,5 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
+// Mock useQueryClient from @tanstack/vue-query
+vi.mock('@tanstack/vue-query', () => ({
+  useQueryClient: vi.fn(() => ({
+    setQueryData: vi.fn(),
+  })),
+}));
+
 // Mock EventSource globally
 const MockEventSource = {
   CONNECTING: 0,
@@ -96,7 +103,7 @@ describe('useDmSse', () => {
     result.connect();
 
     expect(EventSourcePolyfill).toHaveBeenCalledWith(
-      '/api/stream?topics=dm',
+      '/api/stream?topics=dm,notifications',
       expect.objectContaining({
         withCredentials: true,
         heartbeatTimeout: 120_000,

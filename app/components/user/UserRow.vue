@@ -34,6 +34,7 @@ const isCurrentUser = computed(() => {
   <div
     class="border-border hover:bg-foreground/5 flex cursor-pointer gap-2 py-3 ps-4 pe-2 transition-colors duration-100"
     :class="{ 'pe-3': !props.showDropdown }"
+    data-cy="user-row"
     @click="router.push(`/profile/${user.username}`)"
   >
     <div class="flex-shrink-0">
@@ -59,7 +60,7 @@ const isCurrentUser = computed(() => {
             <p class="text-md font-semibold">{{ user.displayName }}</p>
           </UserHoverCard>
 
-          <p class="text-muted-foreground text-sm">
+          <p class="text-muted-foreground text-sm" data-cy="user-row-username">
             <UserHoverCard
               :username="user.username"
               @follow="$emit('follow', user.username)"
@@ -118,10 +119,7 @@ const isCurrentUser = computed(() => {
         </div>
       </div>
       <p class="text-md line-clamp-3 break-all">
-        <UiContentEntitiesRenderer
-          :content="user.bio ?? ''"
-          :entities="user.bioEntities ?? { mentions: [], hashtags: [] }"
-        />
+        <UiContentEntitiesRenderer :content="user.bio ?? ''" :entities="user.bioEntities" />
       </p>
     </div>
   </div>
