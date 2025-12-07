@@ -6,7 +6,7 @@ describe('SideBar Right PreviewCard Component', () => {
   it("doesn't render with no title", async () => {
     const wrapper = await mountSuspended(PreviewCard);
 
-    // Check if title is rendered
+    // Check if title is NOT rendered when no prop provided
     const title = wrapper.find('h1');
     expect(title.exists()).toBe(false);
   });

@@ -9,6 +9,15 @@ const i18n = createI18n({
   messages: { en },
 });
 
+// Mock useMyProfileQuery composable
+mockNuxtImport('useMyProfileQuery', () => {
+  return () => ({
+    data: { value: null },
+    isLoading: { value: false },
+    error: { value: null },
+  });
+});
+
 describe('Default Layout', () => {
   it('renders the layout with three main sections', async () => {
     const wrapper = await mountSuspended(DefaultLayout, {
