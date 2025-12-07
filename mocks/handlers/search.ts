@@ -129,7 +129,7 @@ export const handlers = [
     const peopleFilter = url.searchParams.get('peopleFilter') || 'anyone'; // 'anyone' or 'following'
     const excludeMutedAndBlocked = url.searchParams.get('excludeMutedAndBlocked') === 'true';
 
-    if (!query.trim()) {
+    if (!query.trim() && tab !== 'media') {
       return HttpResponse.json(
         {
           success: true,
@@ -146,6 +146,9 @@ export const handlers = [
 
     // Filter tweets that match the query (content, hashtags, or mentions)
     let matchedTweets = tweetsData.filter((tweet) => {
+      if (tab === 'media' && !query.trim()) {
+        return tweet.media && tweet.media.length > 0;
+      }
       const contentMatch = tweet.content.toLowerCase().includes(query.toLowerCase());
       const hashtagMatch = tweet.entities?.hashtags?.some((h) =>
         h.hashtag.toLowerCase().includes(query.toLowerCase().replace('#', '')),
@@ -155,6 +158,11 @@ export const handlers = [
       );
       return contentMatch || hashtagMatch || mentionMatch;
     });
+
+    // Filter by media if on media tab
+    if (tab === 'media') {
+      matchedTweets = matchedTweets.filter((tweet) => tweet.media && tweet.media.length > 0);
+    }
 
     // Apply people filter (following only) - filter by tweet author
     if (peopleFilter === 'following') {

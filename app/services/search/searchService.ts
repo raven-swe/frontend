@@ -20,7 +20,7 @@ export const searchService = {
     });
     const users = usersResponse.data;
     const hashtagsResponse = await this.getTopThreeHashtags(query);
-    const hashtags: [string] = hashtagsResponse.data;
+    const hashtags: string[] = hashtagsResponse.data;
     return {
       users,
       hashtags,
