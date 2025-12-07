@@ -8,6 +8,7 @@ import QuotedTweetCard from './QuotedTweetCard.vue';
 interface Props {
   tweet: Tweet;
   isParent?: boolean;
+  isRoot?: boolean;
 }
 const props = defineProps<Props>();
 const router = useRouter();
@@ -52,13 +53,19 @@ function handleTweetClick() {
 <template>
   <article
     :id="'tweet-' + props.tweet.id"
-    class="border-b-border bg-background hover:bg-foreground/5 flex w-full max-w-[700px] cursor-pointer gap-2 px-4 pt-3 pb-2 transition-colors duration-100"
+    class="border-b-border bg-background hover:bg-foreground/5 flex w-full max-w-[700px] cursor-pointer gap-2 px-4 transition-colors duration-100"
     :class="{
-      'border-b-1': !isParent,
+      'border-b-1': !isParent && !isRoot,
     }"
     @click.prevent.stop="handleTweetClick"
   >
-    <div class="flex flex-col items-center">
+    <div class="flex flex-col items-center gap-1">
+      <div
+        class="h-2 w-0.5 shrink-0"
+        :class="{
+          'bg-thread-foreground': isParent,
+        }"
+      ></div>
       <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
         <Avatar
           :img="props.tweet.author.avatarUrl || '/default_profile.png'"
@@ -66,22 +73,11 @@ function handleTweetClick() {
           variant="primary"
         />
       </NuxtLink>
-      <div class="relative w-full flex-1">
-        <div
-          v-if="isParent"
-          class="bg-thread-foreground absolute w-0.5 shrink-0"
-          :style="{
-            top: '0.25rem',
-            bottom: '-1rem',
-            left: '50%',
-            transform: 'translate(-50%, 0%)',
-          }"
-        ></div>
-      </div>
+      <div v-if="isParent || isRoot" class="bg-thread-foreground h-full w-0.5"></div>
     </div>
 
     <!-- Main -->
-    <div class="min-w-0 flex-1">
+    <div class="min-w-0 flex-1 pt-3 pb-2">
       <!-- Header: display name, username, time -->
       <div class="flex flex-wrap items-center gap-x-1 text-sm">
         <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>

@@ -140,7 +140,7 @@ onServerPrefetch(async () => {
         data-test="back-button"
         @click="$router.back()"
       >
-        <Icon name="ic:round-arrow-back" size="20" />
+        <Icon name="lucide:arrow-left" size="1.2rem" />
       </UiButton>
       <h1 class="text-foreground text-center text-xl font-semibold">
         {{ $t('ui.post') }}
@@ -150,35 +150,36 @@ onServerPrefetch(async () => {
     <ClientOnly>
       <TweetDefaultCard
         v-if="tweetData.rootTweet && !isTweetDeleted(tweetData.rootTweet)"
-        is-parent
+        is-root
         :tweet="tweetData.rootTweet"
       />
+      <div v-else-if="tweetData.rootTweet" class="bg-background relative h-14">
+        <div class="px-4 pb-2">
+          <DeletedTweetPlaceholder>
+            {{ $t('tweet.deleted-parent') }}
+          </DeletedTweetPlaceholder>
+        </div>
+      </div>
       <NuxtLink
         v-if="tweetData.hasMoreParents && oldestParent && !isTweetDeleted(oldestParent)"
-        class="bg-background z-20 flex h-7 cursor-pointer flex-row items-end gap-2 px-4"
+        class="bg-background hover:bg-foreground/5 z-20 flex cursor-pointer flex-row items-center gap-2 px-4"
         :to="`/profile/${oldestParent.author.username}/status/${oldestParent.id}`"
       >
-        <div class="relative flex h-full w-full flex-row items-end gap-2">
-          <div
-            class="bg-background absolute start-5 flex h-full -translate-x-1/2 flex-col items-center justify-end gap-1.5"
-          >
-            <div class="bg-thread-foreground size-0.5"></div>
-            <div class="bg-thread-foreground size-0.5"></div>
-            <div class="bg-thread-foreground size-0.5"></div>
-          </div>
-          <p class="text-primary ps-12 leading-tight select-none hover:underline">
-            {{ $t('tweet.show-more-parents') }}
-          </p>
+        <div class="flex h-8 w-10 flex-col items-center justify-center gap-1">
+          <div class="bg-thread-foreground size-0.5"></div>
+          <div class="bg-thread-foreground size-0.5"></div>
+          <div class="bg-thread-foreground size-0.5"></div>
         </div>
+        <p class="text-primary leading-tight select-none hover:underline">
+          {{ $t('tweet.show-more-parents') }}
+        </p>
       </NuxtLink>
       <template v-for="(tweet, i) in tweetData.parentTweets ?? []" :key="i">
         <TweetDefaultCard v-if="!isTweetDeleted(tweet)" :tweet="tweet" is-parent />
-        <div v-else class="bg-background relative h-16">
-          <div class="absolute start-1/2 top-1/2 w-full -translate-x-1/2 -translate-y-1/2 px-4">
-            <DeletedTweetPlaceholder>
-              {{ $t('tweet.deleted-parent') }}
-            </DeletedTweetPlaceholder>
-          </div>
+        <div v-else class="px-4 py-2">
+          <DeletedTweetPlaceholder>
+            {{ $t('tweet.deleted-parent') }}
+          </DeletedTweetPlaceholder>
         </div>
       </template>
     </ClientOnly>

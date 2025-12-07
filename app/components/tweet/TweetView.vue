@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import Avatar from '~/components/ui/Avatar.vue';
-import type { Tweet } from '~~/shared/types/tweets';
 import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
 import ContentEntitiesRenderer from '../ui/ContentEntitiesRenderer.vue';
 import QuotedTweetCard from './QuotedTweetCard.vue';
 interface Props {
-  tweet: Tweet;
+  tweet: TweetWithParents;
 }
 const props = defineProps<Props>();
 
@@ -45,29 +44,26 @@ const onUndoRetweetSuccess = () => {
 </script>
 
 <template>
-  <article class="w-full max-w-[700px] gap-3 border-b px-4 pt-3 pb-2">
-    <div class="flex w-full items-center justify-between">
-      <div class="flex">
-        <NuxtLink
-          :to="`/profile/${props.tweet.author.username}`"
-          class="flex items-center"
-          @click.stop
-        >
+  <article class="w-full max-w-[700px] gap-3 border-b px-4 pb-2">
+    <div class="flex w-full flex-col gap-1">
+      <NuxtLink :to="`/profile/${props.tweet.author.username}`" class="flex items-end" @click.stop>
+        <div class="relative flex flex-col items-center gap-1">
+          <div v-if="tweetClone.rootTweet" class="bg-thread-foreground h-2 w-0.5"></div>
           <Avatar
             :img="tweetClone.author.avatarUrl || '/default_profile.png'"
             size="sm"
             variant="primary"
           />
-          <div class="ms-2 flex flex-col">
-            <span class="cursor-pointer leading-tight font-semibold hover:underline">{{
-              tweetClone.author.displayName
-            }}</span>
-            <span class="text-muted-foreground leading-tight">
-              {{ '@' + tweetClone.author.username }}
-            </span>
-          </div>
-        </NuxtLink>
-      </div>
+        </div>
+        <div class="ms-2 flex flex-col">
+          <span class="cursor-pointer leading-tight font-semibold hover:underline">{{
+            tweetClone.author.displayName
+          }}</span>
+          <span class="text-muted-foreground leading-tight">
+            {{ '@' + tweetClone.author.username }}
+          </span>
+        </div>
+      </NuxtLink>
     </div>
     <div class="border-b-border border-b-1">
       <p class="pt-2 text-lg leading-relaxed break-words whitespace-pre-wrap">
