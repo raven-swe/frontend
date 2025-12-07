@@ -124,8 +124,12 @@ async function makeData() {
     currentTweet.rootTweet = rootTweet;
     const parentTweets: Tweet[] = [];
     for (let j = i - 1; j > 0; --j) {
-      const parentTweet = tweetMap.get('tw-thread-' + j) as Tweet;
-      parentTweets.push(parentTweet);
+      const parentTweet = tweetMap.get('tw-thread-' + j) as TweetWithParents;
+      const copiedTweet = structuredClone(parentTweet);
+      delete copiedTweet.parentTweets;
+      delete copiedTweet.rootTweet;
+      delete copiedTweet.hasMoreParents;
+      parentTweets.push(copiedTweet);
     }
     if (parentTweets.length > 4) {
       currentTweet.hasMoreParents = true;
