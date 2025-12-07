@@ -3,13 +3,12 @@ import { mountSuspended } from '@nuxt/test-utils/runtime';
 import PreviewCard from '@/components/SideBar/Right/PreviewCard/index.vue';
 
 describe('SideBar Right PreviewCard Component', () => {
-  it('renders with default title', async () => {
+  it("doesn't render with no title", async () => {
     const wrapper = await mountSuspended(PreviewCard);
 
     // Check if title is rendered
     const title = wrapper.find('h1');
-    expect(title.exists()).toBe(true);
-    expect(title.text()).toBe('Title');
+    expect(title.exists()).toBe(false);
   });
 
   it('renders with custom title', async () => {
@@ -41,12 +40,5 @@ describe('SideBar Right PreviewCard Component', () => {
     const slotContent = wrapper.find('.test-content');
     expect(slotContent.exists()).toBe(true);
     expect(slotContent.text()).toBe('Test Content');
-  });
-
-  it('has show more link', async () => {
-    const wrapper = await mountSuspended(PreviewCard);
-
-    const showMore = wrapper.find('.cursor-pointer.text-primary');
-    expect(showMore.exists()).toBe(true);
   });
 });

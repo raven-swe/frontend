@@ -1,17 +1,20 @@
 import { describe, expect, it } from 'vitest';
-import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime';
+import { mountSuspended } from '@nuxt/test-utils/runtime';
 import DefaultLayout from '@/layouts/default.vue';
+import en from '~~/i18n/locales/en.json';
+import { createI18n } from 'vue-i18n';
 
-mockNuxtImport('useI18n', () => {
-  return () => ({
-    locale: { value: 'en' },
-    localeProperties: { value: { dir: 'ltr' } },
-  });
+const i18n = createI18n({
+  locale: 'en',
+  messages: { en },
 });
 
 describe('Default Layout', () => {
   it('renders the layout with three main sections', async () => {
     const wrapper = await mountSuspended(DefaultLayout, {
+      global: {
+        plugins: [i18n],
+      },
       slots: {
         default: '<div>Main Content</div>',
       },
@@ -21,7 +24,11 @@ describe('Default Layout', () => {
   });
 
   it('renders the left sidebar', async () => {
-    const wrapper = await mountSuspended(DefaultLayout);
+    const wrapper = await mountSuspended(DefaultLayout, {
+      global: {
+        plugins: [i18n],
+      },
+    });
 
     // Check if SideBarLeft component exists
     expect(wrapper.html()).toContain('w-16');
@@ -32,6 +39,9 @@ describe('Default Layout', () => {
       slots: {
         default: '<div class="test-content">Test</div>',
       },
+      global: {
+        plugins: [i18n],
+      },
     });
 
     // Check for main content area
@@ -41,7 +51,11 @@ describe('Default Layout', () => {
   });
 
   it('renders the right sidebar in a hidden container', async () => {
-    const wrapper = await mountSuspended(DefaultLayout);
+    const wrapper = await mountSuspended(DefaultLayout, {
+      global: {
+        plugins: [i18n],
+      },
+    });
 
     // Check for right sidebar container with hidden class
     expect(wrapper.html()).toContain('hidden');
@@ -49,7 +63,11 @@ describe('Default Layout', () => {
   });
 
   it('has proper responsive layout structure', async () => {
-    const wrapper = await mountSuspended(DefaultLayout);
+    const wrapper = await mountSuspended(DefaultLayout, {
+      global: {
+        plugins: [i18n],
+      },
+    });
 
     // Check for max-width container
     expect(wrapper.html()).toContain('max-w-7xl');
@@ -57,7 +75,11 @@ describe('Default Layout', () => {
   });
 
   it('applies theme classes', async () => {
-    const wrapper = await mountSuspended(DefaultLayout);
+    const wrapper = await mountSuspended(DefaultLayout, {
+      global: {
+        plugins: [i18n],
+      },
+    });
 
     expect(wrapper.html()).toContain('bg-background');
     expect(wrapper.html()).toContain('border-border');
