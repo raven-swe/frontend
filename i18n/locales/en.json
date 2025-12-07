@@ -207,7 +207,9 @@
       "reply": "Reply",
       "like": "Like",
       "unlike": "Unlike"
-    }
+    },
+    "retweeted-by-you": "You Reposted",
+    "retweeted-by": "{username} Reposted"
   },
   "notifications": {
     "title": "Notifications",
@@ -221,8 +223,7 @@
       "like": " liked your post",
       "reply": "replied to your post",
       "repost": "reposted your post"
-    },
-    "retweeted-by-you": "You reposted"
+    }
   },
   "ui": {
     "close": "Close",
