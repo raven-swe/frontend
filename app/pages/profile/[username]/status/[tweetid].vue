@@ -27,7 +27,7 @@ const {
   structuralSharing: false,
 });
 
-const oldestParent = computed(() => tweetData.value?.parentTweets?.at(-1) || null);
+const oldestParent = computed(() => tweetData.value?.parentTweets?.at(0) || null);
 
 const mainTweetContRef = useTemplateRef<HTMLElement>('main-tweet-cont');
 const headerRef = useTemplateRef<HTMLElement>('header-ref');
@@ -101,7 +101,6 @@ function handleReplied(tweet: Tweet) {
     };
   });
 }
-
 onMounted(async () => {
   await nextTick(() => {
     scrollMainTweetIntoView();
@@ -191,10 +190,10 @@ onServerPrefetch(async () => {
         <TweetComposer :reply-to-tweet-id="tweetData?.id" type="reply" @posted="handleReplied" />
       </div>
 
-      <ClientOnly>
+      <ClientOnly placeholder-tag="div">
         <CommonVirtualInfiniteScroller
           :items="replies"
-          :estimate-size="120"
+          :estimate-size="200"
           :has-next-page="hasNextPage"
           :is-fetching-next-page="isFetchingNextPage"
           :fetch-next-page="fetchNextPage"
@@ -210,6 +209,11 @@ onServerPrefetch(async () => {
         >
           <UiSpinner />
         </div>
+        <template #fallback>
+          <div class="text-primary flex shrink-0 items-center justify-center py-4">
+            <UiSpinner />
+          </div>
+        </template>
       </ClientOnly>
     </div>
   </div>
