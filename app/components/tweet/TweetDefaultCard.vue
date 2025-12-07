@@ -48,6 +48,9 @@ const onUndoRetweetSuccess = () => {
 function handleTweetClick() {
   router.push(`/profile/${props.tweet.author.username}/status/${props.tweet.id}`);
 }
+
+const { mutate: followUser } = useFollowMutation();
+const { mutate: blockUser } = useBlockMutation();
 </script>
 
 <template>
@@ -66,13 +69,21 @@ function handleTweetClick() {
           'bg-thread-foreground': isParent,
         }"
       ></div>
-      <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
-        <Avatar
-          :img="props.tweet.author.avatarUrl || '/default_profile.png'"
-          size="sm"
-          variant="primary"
-        />
-      </NuxtLink>
+      <UserHoverCard
+        :username="props.tweet.author.username"
+        @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
+        @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
+        @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
+        @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
+      >
+        <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
+          <Avatar
+            :img="props.tweet.author.avatarUrl || '/default_profile.png'"
+            size="sm"
+            variant="primary"
+          />
+        </NuxtLink>
+      </UserHoverCard>
       <div v-if="isParent || isRoot" class="bg-thread-foreground h-full w-0.5"></div>
     </div>
 
@@ -80,12 +91,30 @@ function handleTweetClick() {
     <div class="min-w-0 flex-1 pt-3 pb-2">
       <!-- Header: display name, username, time -->
       <div class="flex flex-wrap items-center gap-x-1 text-sm">
-        <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
-          <span class="cursor-pointer font-semibold hover:underline">{{
-            props.tweet.author.displayName
-          }}</span>
-          <span class="text-muted-foreground ms-1" v-text="'@' + props.tweet.author.username" />
-        </NuxtLink>
+        <UserHoverCard
+          :username="props.tweet.author.username"
+          @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
+          @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
+          @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
+          @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
+        >
+          <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
+            <span class="cursor-pointer font-semibold hover:underline">{{
+              props.tweet.author.displayName
+            }}</span>
+          </NuxtLink>
+        </UserHoverCard>
+        <UserHoverCard
+          :username="props.tweet.author.username"
+          @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
+          @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
+          @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
+          @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
+        >
+          <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
+            <span class="text-muted-foreground ms-1" v-text="'@' + props.tweet.author.username" />
+          </NuxtLink>
+        </UserHoverCard>
         <span class="text-muted-foreground">·</span>
         <time
           :title="formatDate(tweet.createdAt, $i18n.locale)"

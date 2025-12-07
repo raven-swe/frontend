@@ -41,29 +41,67 @@ const onUndoRetweetSuccess = () => {
     tweetClone.value.retweetCount = next < 0 ? 0 : next;
   }
 };
+
+const { mutate: followUser } = useFollowMutation();
+const { mutate: blockUser } = useBlockMutation();
 </script>
 
 <template>
   <article class="w-full max-w-[700px] gap-3 border-b px-4 pb-2">
     <div class="flex w-full flex-col gap-1">
-      <NuxtLink :to="`/profile/${props.tweet.author.username}`" class="flex items-end" @click.stop>
+      <div class="flex flex-row gap-2">
         <div class="relative flex flex-col items-center gap-1">
           <div v-if="tweetClone.rootTweet" class="bg-thread-foreground h-2 w-0.5"></div>
-          <Avatar
-            :img="tweetClone.author.avatarUrl || '/default_profile.png'"
-            size="sm"
-            variant="primary"
-          />
+          <UserHoverCard
+            :username="props.tweet.author.username"
+            @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
+            @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
+            @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
+            @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
+          >
+            <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
+              <Avatar
+                :img="tweetClone.author.avatarUrl || '/default_profile.png'"
+                size="sm"
+                variant="primary"
+                class="shrink-0"
+              />
+            </NuxtLink>
+          </UserHoverCard>
         </div>
-        <div class="ms-2 flex flex-col">
-          <span class="cursor-pointer leading-tight font-semibold hover:underline">{{
-            tweetClone.author.displayName
-          }}</span>
-          <span class="text-muted-foreground leading-tight">
-            {{ '@' + tweetClone.author.username }}
-          </span>
+        <div class="flex flex-col justify-end">
+          <UserHoverCard
+            :username="props.tweet.author.username"
+            @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
+            @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
+            @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
+            @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
+          >
+            <NuxtLink
+              :to="`/profile/${props.tweet.author.username}`"
+              class="cursor-pointer leading-tight font-semibold hover:underline"
+              @click.stop
+            >
+              {{ tweetClone.author.displayName }}
+            </NuxtLink>
+          </UserHoverCard>
+          <UserHoverCard
+            :username="props.tweet.author.username"
+            @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
+            @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
+            @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
+            @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
+          >
+            <NuxtLink
+              :to="`/profile/${props.tweet.author.username}`"
+              class="text-muted-foreground leading-tight"
+              @click.stop
+            >
+              {{ '@' + tweetClone.author.username }}
+            </NuxtLink>
+          </UserHoverCard>
         </div>
-      </NuxtLink>
+      </div>
     </div>
     <div class="border-b-border border-b-1">
       <p class="pt-2 text-lg leading-relaxed break-words whitespace-pre-wrap">

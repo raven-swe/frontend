@@ -16,6 +16,9 @@ function handleTweetClick() {
   if (props.isPreview) return;
   router.push(`/profile/${props.tweet.author.username}/status/${props.tweet.id}`);
 }
+
+const { mutate: followUser } = useFollowMutation();
+const { mutate: blockUser } = useBlockMutation();
 </script>
 
 <template>
@@ -26,30 +29,60 @@ function handleTweetClick() {
     @click.prevent.stop="handleTweetClick"
   >
     <!-- Header: avatar + names inline -->
-    <div class="mb-1 flex items-center gap-2">
-      <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
-        <Avatar :img="props.tweet.author.avatarUrl || '/default_profile.png'" class="h-6 w-6" />
-      </NuxtLink>
-      <NuxtLink
-        :to="`/profile/${props.tweet.author.username}`"
-        class="flex items-center"
-        @click.stop
+    <div class="mb-1 flex items-center">
+      <UserHoverCard
+        :username="props.tweet.author.username"
+        @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
+        @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
+        @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
+        @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
       >
-        <span class="max-w-[8rem] truncate font-semibold hover:underline">{{
-          props.tweet.author.displayName
-        }}</span>
-        <span
-          class="text-muted-foreground ms-1 max-w-[6rem] truncate"
-          v-text="'@' + props.tweet.author.username"
-        />
-        <span class="text-muted-foreground mx-1">·</span>
-        <time
-          :title="formatDate(tweet.createdAt, $i18n.locale)"
-          :datetime="tweet.createdAt"
-          class="text-muted-foreground hover:underline"
-          >{{ relativeTime(tweet.createdAt, $i18n.locale) }}</time
+        <NuxtLink :to="`/profile/${props.tweet.author.username}`" class="pe-2" @click.stop>
+          <Avatar :img="props.tweet.author.avatarUrl || '/default_profile.png'" class="h-6 w-6" />
+        </NuxtLink>
+      </UserHoverCard>
+      <UserHoverCard
+        :username="props.tweet.author.username"
+        @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
+        @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
+        @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
+        @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
+      >
+        <NuxtLink
+          :to="`/profile/${props.tweet.author.username}`"
+          class="flex items-center"
+          @click.stop
         >
-      </NuxtLink>
+          <span class="max-w-[8rem] truncate font-semibold hover:underline">{{
+            props.tweet.author.displayName
+          }}</span>
+        </NuxtLink>
+      </UserHoverCard>
+      <UserHoverCard
+        :username="props.tweet.author.username"
+        @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
+        @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
+        @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
+        @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
+      >
+        <NuxtLink
+          :to="`/profile/${props.tweet.author.username}`"
+          class="flex items-center"
+          @click.stop
+        >
+          <span
+            class="text-muted-foreground ms-1 max-w-[6rem] truncate"
+            v-text="'@' + props.tweet.author.username"
+          />
+        </NuxtLink>
+      </UserHoverCard>
+      <span class="text-muted-foreground mx-1">·</span>
+      <time
+        :title="formatDate(tweet.createdAt, $i18n.locale)"
+        :datetime="tweet.createdAt"
+        class="text-muted-foreground hover:underline"
+        >{{ relativeTime(tweet.createdAt, $i18n.locale) }}</time
+      >
     </div>
 
     <!-- Content -->
