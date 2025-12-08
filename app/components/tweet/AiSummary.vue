@@ -4,6 +4,7 @@ interface Props {
   tweetId: string;
 }
 const props = defineProps<Props>();
+const { locale } = useI18n();
 const aiSummary = ref<string | null>(null);
 const showAiSummary = ref(false);
 const aiSummaryLoading = ref(false);
@@ -15,7 +16,7 @@ async function handleAiSummary() {
   try {
     aiSummaryLoading.value = true;
     aiSummaryError.value = false;
-    const res = await tweetAiSummary(props.tweetId);
+    const res = await tweetAiSummary(props.tweetId, locale.value);
     if (res.success && res.data.summary) {
       aiSummary.value = res.data.summary;
       showAiSummary.value = true;
