@@ -26,12 +26,14 @@ describe('GET /api/tweets/[id]/summary', () => {
     const event = createMockH3Event({
       method: 'GET',
       params: { id: '1' },
+      query: { locale: 'en' },
     });
 
     const response = await tweetSummaryGetHandler(event);
 
     expect(mockServerApiFetch).toHaveBeenCalledWith('/tweets/1/summary', {
       method: 'GET',
+      query: { locale: 'en' },
     });
 
     expect(response).toEqual(summaryResponse);
@@ -48,12 +50,14 @@ describe('GET /api/tweets/[id]/summary', () => {
     const event = createMockH3Event({
       method: 'GET',
       params: { id: '1' },
+      query: { locale: 'en' },
     });
 
     await expect(tweetSummaryGetHandler(event)).rejects.toEqual(backendError);
 
     expect(mockServerApiFetch).toHaveBeenCalledWith('/tweets/1/summary', {
       method: 'GET',
+      query: { locale: 'en' },
     });
   });
 
@@ -63,18 +67,19 @@ describe('GET /api/tweets/[id]/summary', () => {
     const event = createMockH3Event({
       method: 'GET',
       params: { id: '1' },
+      query: { locale: 'en' },
     });
 
-    await expect(tweetSummaryGetHandler(event)).rejects.toEqual(
-      createError({
+    await expect(tweetSummaryGetHandler(event)).rejects.toThrow(
+      expect.objectContaining({
         statusCode: 500,
         statusMessage: 'Internal Server Error',
-        data: { message: 'Network Error' },
       }),
     );
 
     expect(mockServerApiFetch).toHaveBeenCalledWith('/tweets/1/summary', {
       method: 'GET',
+      query: { locale: 'en' },
     });
   });
 

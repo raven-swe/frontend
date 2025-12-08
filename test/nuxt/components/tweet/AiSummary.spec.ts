@@ -4,6 +4,7 @@ import { mount } from '@vue/test-utils';
 import { nextTick } from 'vue';
 import AiSummary from '~~/app/components/tweet/AiSummary.vue';
 import { tweetAiSummary } from '~/services/tweet/tweetsService';
+import { mockNuxtImport } from '@nuxt/test-utils/runtime';
 
 // Mock i18n $t
 const t = (key: string) => key;
@@ -12,6 +13,13 @@ const t = (key: string) => key;
 vi.mock('~/services/tweet/tweetsService', () => ({
   tweetAiSummary: vi.fn(),
 }));
+
+mockNuxtImport('useI18n', () => {
+  return () => ({
+    locale: { value: 'en' },
+    t: (key: string) => key,
+  });
+});
 
 function mountComponent(props: { tweetId: string }) {
   return mount(AiSummary, {
@@ -51,7 +59,7 @@ describe('AiSummary.vue', () => {
     // After await, loading should be false and summary should render
     expect(wrapper.text()).toContain('ai-summary.summary');
     expect(wrapper.text()).toContain('AI summary content');
-    expect(tweetAiSummary).toHaveBeenCalledWith('123');
+    expect(tweetAiSummary).toHaveBeenCalledWith('123', 'en');
   });
 
   it('shows error state and allows retry', async () => {
