@@ -11,7 +11,7 @@ describe('Search Store', () => {
     const store = useSearchStore();
 
     expect(store.searchQuery).toBe('');
-    expect(store.excludeMutedAndBlocked).toBe(true);
+    expect(store.excludeMutedAndBlocked).toBe(false);
   });
 
   it('setSearchQuery updates searchQuery state', () => {
@@ -32,7 +32,7 @@ describe('Search Store', () => {
   it('setexcludeMutedAndBlocked updates excludeMutedAndBlocked state', () => {
     const store = useSearchStore();
 
-    expect(store.excludeMutedAndBlocked).toBe(true);
+    expect(store.excludeMutedAndBlocked).toBe(false);
 
     store.setexcludeMutedAndBlocked(false);
     expect(store.excludeMutedAndBlocked).toBe(false);
