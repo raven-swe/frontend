@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { VisuallyHidden } from 'reka-ui';
-import { storeToRefs } from 'pinia';
 import { ref, watch } from 'vue';
 import { useSearchStore } from '~/stores/search';
 import { useQueryClient } from '@tanstack/vue-query';
@@ -9,22 +8,29 @@ const props = defineProps<{ open: boolean }>();
 const emit = defineEmits<{ (e: 'update:open', value: boolean): void }>();
 
 const searchStore = useSearchStore();
-const { excludeMutedAndBlocked } = storeToRefs(searchStore);
-const hasChanged = ref(false);
+const localExcludeMutedAndBlocked = ref(searchStore.excludeMutedAndBlocked);
 const queryClient = useQueryClient();
 
+// Sync local value with store when dialog opens
+watch(
+  () => props.open,
+  (isOpen) => {
+    if (isOpen) {
+      localExcludeMutedAndBlocked.value = searchStore.excludeMutedAndBlocked;
+    }
+  },
+);
+
 const handleOpenChange = (value: boolean) => {
-  if (!value && hasChanged.value) {
-    // Invalidate all search-related queries to trigger refetch
-    queryClient.invalidateQueries({ queryKey: ['search'] });
-    hasChanged.value = false;
+  if (!value) {
+    // Only update store and invalidate when closing if value changed
+    if (localExcludeMutedAndBlocked.value !== searchStore.excludeMutedAndBlocked) {
+      searchStore.excludeMutedAndBlocked = localExcludeMutedAndBlocked.value;
+      queryClient.invalidateQueries({ queryKey: ['search'] });
+    }
   }
   emit('update:open', value);
 };
-
-watch(excludeMutedAndBlocked, () => {
-  hasChanged.value = true;
-});
 </script>
 
 <template>
@@ -56,7 +62,7 @@ watch(excludeMutedAndBlocked, () => {
           {{ $t('search.settings.remove-block') }}
         </Label>
 
-        <UiCheckbox id="remove-blocked" v-model="excludeMutedAndBlocked" />
+        <UiCheckbox id="remove-blocked" v-model="localExcludeMutedAndBlocked" />
       </div>
 
       <p class="text-muted-foreground mt-1 text-xs">
