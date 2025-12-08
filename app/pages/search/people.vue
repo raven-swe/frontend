@@ -19,7 +19,7 @@ const peopleFilter = computed(() =>
   route.query.pf === 'on' ? PeopleFilter.following : PeopleFilter.anyone,
 );
 
-// Initialize search query from URL
+// Initialize search query from URL - must happen before defining fetcherFn
 onMounted(() => {
   initializeFromRoute();
 });
@@ -32,11 +32,12 @@ watch(
       searchQuery.value = newQuery;
     }
   },
+  { immediate: true }, // Run immediately to catch initial route value
 );
 
-// Fetch function for user search
-const fetcherFn = async (cursor: string | null, signal: AbortSignal) => {
-  return await searchService.getPeople(
+// Fetch function for user search - returns current searchQuery value
+const fetcherFn = (cursor: string | null, signal: AbortSignal) => {
+  return searchService.getPeople(
     {
       pagination: { limit: 20, cursor },
       query: searchQuery.value,

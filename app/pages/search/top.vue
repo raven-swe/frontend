@@ -8,6 +8,8 @@ import { useWindowVirtualizer } from '@tanstack/vue-virtual';
 import { useSearchQuery } from '~/composables/useSearchQuery';
 import { useSearchStore } from '~/stores/search';
 import { PeopleFilter } from '~~/shared/types/search';
+import type { CompactUser } from '~~/shared/types/user';
+import type { ApiSuccessResponse } from '~~/shared/types/api';
 
 definePageMeta({
   layout: 'search',
@@ -35,6 +37,7 @@ watch(
       searchQuery.value = newQuery;
     }
   },
+  { immediate: true },
 );
 
 // Fetch function for users (limited to 3)
@@ -51,12 +54,13 @@ const usersFetcherFn = async (cursor: string | null, signal: AbortSignal) => {
 
   // Only return first page, no pagination for top results
   return {
-    ...response,
+    success: true,
+    data: response.data,
     pagination: {
       hasNextPage: false,
       nextCursor: null,
     },
-  };
+  } as ApiSuccessResponse<CompactUser[]>;
 };
 
 const { data: usersResponse, isFetching: isUsersLoading } = useInfiniteQuery({

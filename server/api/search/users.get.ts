@@ -5,7 +5,7 @@ export default defineWrappedResponseHandler(async (event) => {
   const fetcher = serverApiFetch(event);
   const query = getQuery(event);
 
-  return await fetcher<ApiSuccessResponse<CompactUser[]>>('/search/users', {
+  const response = await fetcher<ApiSuccessResponse<{ users: CompactUser[] }>>('/search/users', {
     method: 'GET',
     query: {
       query: query.query,
@@ -15,4 +15,11 @@ export default defineWrappedResponseHandler(async (event) => {
       excludeMutedAndBlocked: query.excludeMutedAndBlocked,
     },
   });
+
+  // Transform response to match expected structure
+  return {
+    success: true,
+    data: response.data.users,
+    pagination: response.pagination,
+  } as ApiSuccessResponse<CompactUser[]>;
 });

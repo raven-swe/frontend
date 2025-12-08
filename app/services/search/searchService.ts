@@ -41,7 +41,10 @@ export const searchService = {
     });
   },
 
-  async getPeople(peopleSearchQuery: SearchQuery, signal?: AbortSignal) {
+  async getPeople(
+    peopleSearchQuery: SearchQuery,
+    signal?: AbortSignal,
+  ): Promise<ApiSuccessResponse<CompactUser[]>> {
     return apiFetch(`/api/search/users`, {
       method: 'GET',
       query: {
