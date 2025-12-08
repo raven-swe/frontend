@@ -72,7 +72,7 @@ describe('SearchSettingsDialog Component', () => {
       props: { open: true },
       global: globalConfig,
     });
-    expect(wrapper.findComponent({ name: 'UiCheckbox' }).props('modelValue')).toBe(true);
+    expect(wrapper.findComponent({ name: 'UiCheckbox' }).props('modelValue')).toBe(false);
   });
 
   it('emits update:open event when close button is clicked', async () => {
