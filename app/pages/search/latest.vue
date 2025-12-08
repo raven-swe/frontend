@@ -42,6 +42,7 @@ watch(
       searchQuery.value = newQuery;
     }
   },
+  { immediate: true },
 );
 
 const {
