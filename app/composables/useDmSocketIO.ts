@@ -123,7 +123,7 @@ export function useDmSocketIO() {
 
   function sendMessage(conversationId: string, body: string) {
     const clientMessageId = crypto.randomUUID();
-    // console.log('Sending message via Socket.IO:', { conversationId, body, clientMessageId });
+    console.log('Sending message via Socket.IO:', { conversationId, body, clientMessageId });
     socket.value?.emit('send_message', { conversationId, body, clientMessageId });
     return clientMessageId;
   }
