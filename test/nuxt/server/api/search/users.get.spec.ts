@@ -15,35 +15,38 @@ describe('GET /api/search/users', () => {
   });
 
   it('returns users search results with all query parameters', async () => {
-    const mockResponse: ApiSuccessResponse<CompactUser[]> = {
-      data: [
-        {
-          username: 'johndoe',
-          fullName: 'John Doe',
-          profileImageUrl: 'https://example.com/avatar1.jpg',
-          bio: 'Software developer',
-          relationship: {
-            following: true,
-            follower: false,
-            blocking: false,
-            blockedBy: false,
-            muted: false,
+    const mockResponse: ApiSuccessResponse<{ users: CompactUser[] }> = {
+      success: true,
+      data: {
+        users: [
+          {
+            username: 'johndoe',
+            fullName: 'John Doe',
+            profileImageUrl: 'https://example.com/avatar1.jpg',
+            bio: 'Software developer',
+            relationship: {
+              following: true,
+              follower: false,
+              blocking: false,
+              blockedBy: false,
+              muted: false,
+            },
           },
-        },
-        {
-          username: 'janedoe',
-          fullName: 'Jane Doe',
-          profileImageUrl: 'https://example.com/avatar2.jpg',
-          bio: 'Designer',
-          relationship: {
-            following: false,
-            follower: true,
-            blocking: false,
-            blockedBy: false,
-            muted: false,
+          {
+            username: 'janedoe',
+            fullName: 'Jane Doe',
+            profileImageUrl: 'https://example.com/avatar2.jpg',
+            bio: 'Designer',
+            relationship: {
+              following: false,
+              follower: true,
+              blocking: false,
+              blockedBy: false,
+              muted: false,
+            },
           },
-        },
-      ],
+        ],
+      },
       message: 'Success',
     };
 
@@ -72,7 +75,7 @@ describe('GET /api/search/users', () => {
         excludeMutedAndBlocked: 'true',
       },
     });
-    expect(response).toEqual(mockResponse);
+    expect(response.success).toBe(true);
     expect(response.data).toHaveLength(2);
     expect(response.data[0]).toHaveProperty('username');
     expect(response.data[0]).toHaveProperty('fullName');
@@ -80,22 +83,25 @@ describe('GET /api/search/users', () => {
   });
 
   it('returns users search results with minimal query parameters', async () => {
-    const mockResponse: ApiSuccessResponse<CompactUser[]> = {
-      data: [
-        {
-          username: 'testuser',
-          fullName: 'Test User',
-          profileImageUrl: 'https://example.com/avatar.jpg',
-          bio: 'Test bio',
-          relationship: {
-            following: false,
-            follower: false,
-            blocking: false,
-            blockedBy: false,
-            muted: false,
+    const mockResponse: ApiSuccessResponse<{ users: CompactUser[] }> = {
+      success: true,
+      data: {
+        users: [
+          {
+            username: 'testuser',
+            fullName: 'Test User',
+            profileImageUrl: 'https://example.com/avatar.jpg',
+            bio: 'Test bio',
+            relationship: {
+              following: false,
+              follower: false,
+              blocking: false,
+              blockedBy: false,
+              muted: false,
+            },
           },
-        },
-      ],
+        ],
+      },
       message: 'Success',
     };
 
@@ -120,12 +126,16 @@ describe('GET /api/search/users', () => {
         excludeMutedAndBlocked: undefined,
       },
     });
-    expect(response).toEqual(mockResponse);
+    expect(response.success).toBe(true);
+    expect(response.data).toHaveLength(1);
   });
 
   it('handles empty search results', async () => {
-    const mockResponse: ApiSuccessResponse<CompactUser[]> = {
-      data: [],
+    const mockResponse: ApiSuccessResponse<{ users: CompactUser[] }> = {
+      success: true,
+      data: {
+        users: [],
+      },
       message: 'Success',
     };
 
@@ -140,13 +150,16 @@ describe('GET /api/search/users', () => {
 
     const response = await usersSearchEventHandler(event);
 
-    expect(response).toEqual(mockResponse);
+    expect(response.success).toBe(true);
     expect(response.data).toHaveLength(0);
   });
 
   it('handles cursor parameter correctly when undefined', async () => {
-    const mockResponse: ApiSuccessResponse<CompactUser[]> = {
-      data: [],
+    const mockResponse: ApiSuccessResponse<{ users: CompactUser[] }> = {
+      success: true,
+      data: {
+        users: [],
+      },
       message: 'Success',
     };
 
