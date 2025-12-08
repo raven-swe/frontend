@@ -461,7 +461,8 @@
       "search-people": "ابحث عن أشخاص",
       "next": "التالي",
       "you-follow": "تتابع",
-      "follow-each-other": "تتابعان بعضكما البعض"
+      "follow-each-other": "تتابعان بعضكما البعض",
+      "cant-message": "لا يمكن مراسلة"
     }
   },
   "toaster": {

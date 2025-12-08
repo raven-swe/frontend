@@ -73,8 +73,6 @@ watch(
       const lastMessage = msgs[msgs.length - 1];
       if (lastMessage?.id && !lastMessage.isMine) {
         ws.markSeen(convId, lastMessage.id);
-        console.log('conversationId:', convId);
-        console.log('Marking messages as seen up to ID:', lastMessage.id);
       }
     }
   },

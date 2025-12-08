@@ -517,7 +517,8 @@
       "search-people": "Search people",
       "next": "Next",
       "you-follow": "Following",
-      "follow-each-other": "You follow each other"
+      "follow-each-other": "You follow each other",
+      "cant-message": "can't be messaged"
     }
   },
   "toaster": {

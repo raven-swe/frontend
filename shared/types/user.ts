@@ -42,19 +42,3 @@ export type SearchedUser = {
   isFollowing: boolean;
   isFollower: boolean;
 };
-
-export type SearchedUser = {
-  username: string;
-  displayName: string;
-  avatarUrl: string;
-  isFollowing: boolean;
-  isFollower: boolean;
-};
-
-export type SearchedUser = {
-  username: string;
-  displayName: string;
-  avatarUrl: string;
-  isFollowing: boolean;
-  isFollower: boolean;
-};

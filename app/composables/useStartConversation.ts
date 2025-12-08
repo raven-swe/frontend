@@ -1,11 +1,10 @@
-import { useMutation, useQueryClient, type InfiniteData } from '@tanstack/vue-query';
+import { useMutation } from '@tanstack/vue-query';
 import type { DmConversation } from '~~/shared/types/dm';
 import type { ApiSuccessResponse } from '~~/shared/types/api';
 import { apiFetch } from '@/api';
+import { addPendingConversation } from './useDmConversations';
 
 export function useStartConversation() {
-  const queryClient = useQueryClient();
-
   const mutation = useMutation({
     mutationKey: ['start-conversation'],
     mutationFn: async (username: string) => {
@@ -19,33 +18,8 @@ export function useStartConversation() {
       return resp.data;
     },
     onSuccess: (newConversation) => {
-      // Add the new conversation to the cache immediately
-      queryClient.setQueryData<InfiniteData<ApiSuccessResponse<DmConversation[]>>>(
-        ['dm-conversations'],
-        (oldData) => {
-          if (!oldData) return oldData;
-
-          // Check if conversation already exists in any page
-          const exists = oldData.pages.some((page) =>
-            page.data.some((c) => c.id === newConversation.id),
-          );
-          if (exists) return oldData;
-
-          // Add new conversation to the first page
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page, index) => {
-              if (index === 0) {
-                return {
-                  ...page,
-                  data: [newConversation, ...page.data],
-                };
-              }
-              return page;
-            }),
-          };
-        },
-      );
+      // Add to pending conversations - will show immediately in the list
+      addPendingConversation(newConversation);
     },
   });
 
