@@ -55,33 +55,23 @@ defineExpose({ handleAiSummary });
         aria-hidden="true"
       />
       <span class="text-foreground/80 text-sm">{{ $t('ai-summary.something-went-wrong') }}</span>
-      <Button
-        variant="primary"
-        size="sm"
-        class="border-ring text-foreground/80 hover:bg-accent/50 ms-auto flex items-center rounded-md border px-3 py-1"
-        @click.prevent.stop="handleAiSummary"
-      >
-        <Icon
-          name="material-symbols:refresh-rounded"
-          class="me-1"
-          size="1rem"
-          aria-hidden="true"
-        ></Icon>
+      <UiButton variant="primary" size="sm" class="ms-auto" @click.prevent.stop="handleAiSummary">
+        <Icon name="material-symbols:refresh-rounded" size="1rem" aria-hidden="true"></Icon>
         {{ $t('ai-summary.retry') }}
-      </Button>
+      </UiButton>
     </div>
 
     <!-- Summary content -->
     <div v-else-if="showAiSummary" class="ai-summary-bg ai-summary-anim relative rounded-xl p-3">
-      <Button
-        variant="ghost"
-        size="icon-sm"
-        class="text-foreground/70 hover:text-foreground absolute end-2 top-2"
+      <UiButton
+        variant="ghost-default"
+        size="icon-xs"
+        class="text-foreground/70 hover:text-foreground absolute end-2 top-2 bg-transparent"
         :aria-label="$t('ai-summary.close')"
         @click.prevent.stop="closeSummary"
       >
         <Icon name="material-symbols:close-rounded" size="1rem" aria-hidden="true" />
-      </Button>
+      </UiButton>
       <h3 class="font-semibold">
         {{ $t('ai-summary.summary') }}
       </h3>

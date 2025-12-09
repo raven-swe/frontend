@@ -4,6 +4,16 @@ import TweetQuoteCard from '@/components/tweet/TweetQuoteCard.vue';
 import Avatar from '@/components/ui/Avatar.vue';
 import TweetMedia from '@/components/tweet/TweetMedia.vue';
 import type { Tweet } from '~~/shared/types/tweets';
+import en from '~~/i18n/locales/en.json';
+import { createI18n } from 'vue-i18n';
+
+// Set up i18n
+const i18n = createI18n({
+  locale: 'en',
+  messages: {
+    en,
+  },
+});
 
 // Mock useRouter to capture push calls
 let pushMock: ReturnType<typeof vi.fn> | undefined;
@@ -13,11 +23,14 @@ vi.mock('vue-router', () => ({
   }),
 }));
 
-// Mock i18n
-const i18nMock = {
-  locale: 'en',
-  t: (key: string) => key,
-};
+vi.mock('~/composables/useProfileMutation', () => ({
+  useFollowMutation: () => ({
+    mutate: vi.fn(),
+  }),
+  useBlockMutation: () => ({
+    mutate: vi.fn(),
+  }),
+}));
 
 // Common stubs
 const stubs = {
@@ -34,9 +47,7 @@ const stubs = {
 
 const globalConfig = {
   stubs,
-  mocks: {
-    $i18n: i18nMock,
-  },
+  plugins: [i18n],
 };
 
 function makeTweet(overrides: Partial<Tweet> = {}): Tweet {

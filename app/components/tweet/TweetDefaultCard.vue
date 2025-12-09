@@ -4,10 +4,12 @@ import Avatar from '~/components/ui/Avatar.vue';
 import type { Tweet } from '~~/shared/types/tweets';
 import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
-import TweetQuoteCard from './TweetQuoteCard.vue';
+import QuotedTweetCard from './QuotedTweetCard.vue';
 import AiSummary from './AiSummary.vue';
 interface Props {
   tweet: Tweet;
+  isParent?: boolean;
+  isRoot?: boolean;
 }
 const props = defineProps<Props>();
 const router = useRouter();
@@ -52,55 +54,92 @@ function handleAiSummary() {
 function handleTweetClick() {
   router.push(`/profile/${props.tweet.author.username}/status/${props.tweet.id}`);
 }
+
+const { mutate: followUser } = useFollowMutation();
+const { mutate: blockUser } = useBlockMutation();
 </script>
 
 <template>
   <article
     :id="'tweet-' + props.tweet.id"
-    class="border-b-border flex w-full max-w-[700px] cursor-pointer gap-3 border-b-1 p-2"
+    class="border-b-border bg-background hover:bg-foreground/5 flex w-full max-w-[700px] cursor-pointer gap-2 px-4 transition-colors duration-100"
+    :class="{
+      'border-b-1': !isParent && !isRoot,
+    }"
     @click.prevent.stop="handleTweetClick"
   >
-    <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
-      <Avatar
-        :img="props.tweet.author.avatarUrl || '/default_profile.png'"
-        size="sm"
-        variant="primary"
-      />
-    </NuxtLink>
+    <div class="flex flex-col items-center gap-1">
+      <div
+        class="h-2 w-0.5 shrink-0"
+        :class="{
+          'bg-thread-foreground': isParent,
+        }"
+      ></div>
+      <UserHoverCard
+        :username="props.tweet.author.username"
+        @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
+        @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
+        @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
+        @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
+      >
+        <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
+          <Avatar
+            :img="props.tweet.author.avatarUrl || '/default_profile.png'"
+            size="sm"
+            variant="primary"
+          />
+        </NuxtLink>
+      </UserHoverCard>
+      <div v-if="isParent || isRoot" class="bg-thread-foreground h-full w-0.5"></div>
+    </div>
 
     <!-- Main -->
-    <div class="min-w-0 flex-1">
+    <div class="min-w-0 flex-1 pt-3 pb-2">
       <!-- Header: display name, username, time -->
-      <div class="flex flex-wrap items-center justify-between gap-x-1 text-sm">
-        <div class="flex">
+      <div class="flex flex-wrap items-center gap-x-1 text-sm">
+        <UserHoverCard
+          :username="props.tweet.author.username"
+          @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
+          @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
+          @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
+          @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
+        >
           <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
             <span class="cursor-pointer font-semibold hover:underline">{{
               props.tweet.author.displayName
             }}</span>
-            <span class="text-muted-foreground ms-1" v-text="'@' + props.tweet.author.username" />
-            <span class="text-muted-foreground">·</span>
           </NuxtLink>
-          <time
-            :title="formatDate(tweet.createdAt, $i18n.locale)"
-            :datetime="tweet.createdAt"
-            class="text-muted-foreground hover:cursor-pointer hover:underline"
-            >{{ relativeTime(tweet.createdAt, $i18n.locale) }}</time
-          >
-        </div>
-        <div class="flex flex-row items-center gap-2">
-          <Button
-            variant="tweet-icon-blue"
-            size="icon-md"
-            class="hover:text-brand-blue"
-            @click.prevent.stop="handleAiSummary"
-          >
-            <Icon name="vscode-icons:file-type-gemini" size="1.2rem" />
-          </Button>
-        </div>
+        </UserHoverCard>
+        <UserHoverCard
+          :username="props.tweet.author.username"
+          @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
+          @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
+          @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
+          @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
+        >
+          <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
+            <span class="text-muted-foreground ms-1" v-text="'@' + props.tweet.author.username" />
+          </NuxtLink>
+        </UserHoverCard>
+        <span class="text-muted-foreground">·</span>
+        <time
+          :title="formatDate(tweet.createdAt, $i18n.locale)"
+          :datetime="tweet.createdAt"
+          class="text-muted-foreground hover:cursor-pointer hover:underline"
+          >{{ relativeTime(tweet.createdAt, $i18n.locale) }}</time
+        >
+        <UiButton
+          variant="ghost-default"
+          size="icon-sm"
+          class="text-foreground/70 hover:text-foreground ms-auto"
+          @click.stop="handleAiSummary"
+        >
+          <Icon name="vscode-icons:file-type-gemini" size="1.2rem" />
+        </UiButton>
       </div>
 
       <!-- Content -->
-      <p class="mt-1 leading-relaxed break-words whitespace-pre-wrap">
+      <p class="leading-relaxed break-words whitespace-pre-wrap">
         <UiContentEntitiesRenderer :content="tweet.content" :entities="tweet.entities" />
       </p>
 
@@ -108,11 +147,10 @@ function handleTweetClick() {
       <TweetMedia :media="tweet.media" />
 
       <!-- Quoted Tweet -->
-      <TweetQuoteCard v-if="tweet.quotedTweet" :tweet="tweet.quotedTweet" />
 
-      <div class="mt-2">
-        <AiSummary ref="aiSummaryRef" :tweet-id="props.tweet.id" />
-      </div>
+      <QuotedTweetCard v-if="tweet.quotedTweet" :tweet="tweet.quotedTweet" />
+
+      <AiSummary ref="aiSummaryRef" :tweet-id="props.tweet.id" />
 
       <!-- Actions -->
       <TweetActionButtons
@@ -126,4 +164,3 @@ function handleTweetClick() {
     </div>
   </article>
 </template>
-<style scoped></style>
