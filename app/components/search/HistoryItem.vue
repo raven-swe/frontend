@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import type { User } from '~~/shared/types/user';
 import Avatar from '~/components/ui/Avatar.vue';
+import type { CompactUser } from '~~/shared/types/user';
 
 const props = defineProps<{
   type: string;
-  content: string | User;
+  content: string | CompactUser;
 }>();
 
 const emit = defineEmits<{
@@ -22,16 +22,16 @@ const deleteFromHistory = (event: Event) => {
 <template>
   <NuxtLink
     v-if="props.type === 'user'"
-    :to="`/profile/${(props.content as User).username}`"
+    :to="`/profile/${(props.content as CompactUser).username}`"
     class="hover:bg-accent flex items-center p-3 transition-colors"
   >
     <div class="flex w-full items-center justify-between ps-3">
       <div class="flex min-w-0 flex-1 items-center gap-3">
-        <Avatar :img="(props.content as User).avatarUrl" alt="Profile Image" size="sm" />
+        <Avatar :img="(props.content as CompactUser).avatarUrl" alt="Profile Image" size="sm" />
         <div>
-          <p class="font-bold">{{ (props.content as User).displayName }}</p>
+          <p class="font-bold">{{ (props.content as CompactUser).displayName }}</p>
           <p class="text-muted-foreground text-sm">
-            {{ $t(`@${(props.content as User).username}`) }}
+            {{ $t(`@${(props.content as CompactUser).username}`) }}
           </p>
         </div>
       </div>

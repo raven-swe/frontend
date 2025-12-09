@@ -16,10 +16,8 @@ export default defineWrappedResponseHandler(async (event) => {
     },
   });
 
-  // Transform response to match expected structure
   return {
-    success: true,
+    ...response,
     data: response.data.users,
-    pagination: response.pagination,
-  } as ApiSuccessResponse<CompactUser[]>;
+  };
 });

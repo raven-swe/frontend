@@ -3,7 +3,7 @@ import { ref, watch, onMounted } from 'vue';
 import { useDebounceFn } from '@vueuse/core';
 import { useSearchQuery } from '~/composables/useSearchQuery';
 import { searchService } from '~/services/search/searchService';
-import type { User } from '~~/shared/types/user';
+import type { CompactUser } from '~~/shared/types/user';
 import Hashtag from '~/components/search/Hashtag.vue';
 import HistoryItem from '~/components/search/HistoryItem.vue';
 
@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 interface History {
   type: 'user' | 'hashtag' | 'text';
-  content: string | User;
+  content: string | CompactUser;
 }
 
 const route = useRoute();
@@ -25,7 +25,7 @@ const { searchQuery, initializeFromRoute, navigateToSearch } = useSearchQuery();
 const isFocused = ref(false);
 const isLoading = ref(false);
 const searchResults = ref<{
-  users: User[];
+  users: CompactUser[];
   hashtags: string[];
 } | null>(null);
 const localStorageKey = 'searchHistory';
@@ -102,7 +102,9 @@ const saveInHistory = (item: History) => {
   // Avoid duplicates
   searchHistory.value = searchHistory.value.filter((historyItem) => {
     if (item.type === 'user' && historyItem.type === 'user') {
-      return (historyItem.content as User).id !== (item.content as User).id;
+      return (
+        (historyItem.content as CompactUser).username !== (item.content as CompactUser).username
+      );
     }
     return historyItem.content !== item.content;
   });
