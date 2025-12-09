@@ -36,7 +36,7 @@ export const handlers = [
     const matchedHashtags = allHashtags
       .filter((hashtag) => hashtag.hashtag.toLowerCase().includes(query.toLowerCase()))
       .slice(0, 3)
-      .map((h) => `#${h.hashtag}`);
+      .map((h) => `${h.hashtag}`);
 
     return HttpResponse.json(
       {
@@ -62,7 +62,9 @@ export const handlers = [
         {
           success: true,
           message: 'Users fetched successfully.',
-          data: [],
+          data: {
+            users: [],
+          },
           pagination: {
             hasNextPage: false,
             nextCursor: null,
@@ -109,7 +111,9 @@ export const handlers = [
       {
         success: true,
         message: 'Users fetched successfully.',
-        data: users,
+        data: {
+          users,
+        },
         pagination: {
           hasNextPage,
           nextCursor: hasNextPage ? endIndex.toString() : null,
