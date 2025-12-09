@@ -77,7 +77,7 @@ describe('Explore [tab].vue', () => {
     await wrapper.vm.$nextTick();
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    const emptyState = wrapper.find('h1');
+    const emptyState = wrapper.find('[data-test="no-results"]');
     expect(emptyState.exists()).toBe(true);
   });
 
@@ -195,9 +195,9 @@ describe('Explore [tab].vue', () => {
     await new Promise((resolve) => setTimeout(resolve, 50));
 
     const hashtagComponents = wrapper.findAllComponents({ name: 'Hashtag' });
-    expect(hashtagComponents[0].props('hashtag')).toEqual(hashtags[0]);
-    expect(hashtagComponents[0].props('rank')).toBe(0);
-    expect(hashtagComponents[1].props('hashtag')).toEqual(hashtags[1]);
-    expect(hashtagComponents[1].props('rank')).toBe(1);
+    expect(hashtagComponents[0]?.props('hashtag')).toEqual(hashtags[0]);
+    expect(hashtagComponents[0]?.props('rank')).toBe(0);
+    expect(hashtagComponents[1]?.props('hashtag')).toEqual(hashtags[1]);
+    expect(hashtagComponents[1]?.props('rank')).toBe(1);
   });
 });

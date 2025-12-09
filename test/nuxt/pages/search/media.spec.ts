@@ -139,9 +139,9 @@ describe('Search media.vue', () => {
       },
     });
 
-    const heading = wrapper.find('p.text-\\[2rem\\]');
-    expect(heading.exists()).toBe(true);
-    expect(heading.text()).toContain('test');
+    const noResultsDiv = wrapper.find('[data-test="no-results"]');
+    expect(noResultsDiv.exists()).toBe(true);
+    expect(noResultsDiv.text()).toContain('test');
   });
 
   it('calls searchService.getTweets with correct parameters', async () => {

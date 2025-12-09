@@ -117,6 +117,7 @@ onServerPrefetch(async () => {
     <div
       v-if="!isLoading && tweets.length === 0"
       class="mx-auto my-10 max-w-90 px-8 text-start break-words"
+      data-test="no-results"
     >
       <h2 class="text-[2rem] leading-tight font-black">
         {{ $t('search.no-results', { query: searchQuery }) }}
