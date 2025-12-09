@@ -80,10 +80,8 @@ const onUndoRetweetSuccess = () => {
         <ContentEntitiesRenderer :content="tweet.content" :entities="tweet.entities" />
       </p>
       <div v-if="showMedia">
-        <NuxtLink :to="`/media/${props.tweet.id}`" @click.stop>
-          <!-- Media (single image basic layout) -->
-          <TweetMedia :media="tweet.media" />
-        </NuxtLink>
+        <!-- Media (single image basic layout) -->
+        <TweetMedia :media="tweet.media" :tweet-id="tweet.id" />
       </div>
 
       <div class="mt-2">

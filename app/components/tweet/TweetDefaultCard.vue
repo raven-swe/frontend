@@ -86,10 +86,8 @@ function handleTweetClick() {
         <UiContentEntitiesRenderer :content="tweet.content" :entities="tweet.entities" />
       </p>
 
-      <NuxtLink :to="`/media/${props.tweet.id}`" @click.stop>
-        <!-- Media (single image basic layout) -->
-        <TweetMedia :media="tweet.media" :size-class="props.sizeClass" />
-      </NuxtLink>
+      <!-- Media (single image basic layout) -->
+      <TweetMedia :media="tweet.media" :tweet-id="tweet.id" @click.stop />
 
       <!-- Quoted Tweet -->
       <TweetQuoteCard v-if="tweet.quotedTweet" :tweet="tweet.quotedTweet" />

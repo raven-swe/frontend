@@ -44,7 +44,19 @@ async function loadMainTweet() {
   isMainTweetFound.value = true;
   try {
     const resp = await tweetsService.tweet(tweetid.value);
-    tweetData.value = resp.data;
+    const tweet = resp.data;
+
+    // If the first media item is a video and there are multiple items, swap it with the second one
+    if (tweet.media && tweet.media.length > 1 && tweet.media[0]?.type === 'VIDEO') {
+      const first = tweet.media[0];
+      const second = tweet.media[1];
+      if (first && second) {
+        tweet.media[0] = second;
+        tweet.media[1] = first;
+      }
+    }
+
+    tweetData.value = tweet;
   } catch (error) {
     if ((isApiError(error) && error.data?.statusCode === 404) || isApiValidationError(error)) {
       isMainTweetFound.value = false;
@@ -112,7 +124,7 @@ const totalSize = computed(() => rowVirtualizer.value.getTotalSize());
 
 const measureElement = (el: Element | ComponentPublicInstance | null) => {
   if (!el) return;
-  const element = 'nodeType' in el ? (el as HTMLElement) : (el as ComponentPublicInstance).$el;
+  const element = el as HTMLElement;
   rowVirtualizer.value.measureElement(element);
 };
 
@@ -161,7 +173,7 @@ function handleReplied(tweet: Tweet) {
     queryClient.setQueryData<{
       pages: Array<{ data: Tweet[]; pagination?: CursorPagination }>;
       pageParams: Array<string | null>;
-    }>(['tweet-replies', tweetid], (oldData) => {
+    }>(['tweet-replies', tweetid.value], (oldData) => {
       if (!oldData) return oldData;
 
       // Add the new tweet to the beginning of the first page
