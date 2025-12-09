@@ -1,8 +1,7 @@
-import { useInfiniteQuery } from '@tanstack/vue-query';
-import type { DmConversation, DmSseEventMap } from '~~/shared/types/dm';
+import { useInfiniteQuery, type useQueryClient } from '@tanstack/vue-query';
+import type { DmConversation } from '~~/shared/types/dm';
 import type { ApiSuccessResponse } from '~~/shared/types/api';
 import { apiFetch } from '~/api';
-import { useDmHighlight } from './useDmHighlight';
 
 // Shared state for pending new conversations (not yet returned by backend)
 const pendingNewConversations = ref<DmConversation[]>([]);
@@ -18,6 +17,58 @@ export function removePendingConversation(conversationId: string) {
   pendingNewConversations.value = pendingNewConversations.value.filter(
     (c) => c.id !== conversationId,
   );
+}
+
+type ConversationsCache = {
+  pages: ApiSuccessResponse<DmConversation[]>[];
+  pageParams: (string | undefined)[];
+};
+
+// Helper to update a conversation in the cache
+function updateConversationInCache(
+  queryClient: ReturnType<typeof useQueryClient>,
+  conversationId: string,
+  updater: (conversation: DmConversation) => DmConversation,
+) {
+  queryClient.setQueryData<ConversationsCache>(['dm-conversations'], (oldData) => {
+    if (!oldData) return oldData;
+
+    return {
+      ...oldData,
+      pages: oldData.pages.map((page) => ({
+        ...page,
+        data: page.data.map((conv) => (conv.id === conversationId ? updater(conv) : conv)),
+      })),
+    };
+  });
+}
+
+// Update lastMessage when new SSE message arrives
+export function updateConversationLastMessage(
+  queryClient: ReturnType<typeof useQueryClient>,
+  conversationId: string,
+  lastMessage: {
+    content: string;
+    senderUsername: string;
+    sentAt: string;
+    seen: boolean;
+  },
+) {
+  updateConversationInCache(queryClient, conversationId, (conv) => ({
+    ...conv,
+    lastMessage,
+  }));
+}
+
+// Mark conversation as seen
+export function markConversationSeenInCache(
+  queryClient: ReturnType<typeof useQueryClient>,
+  conversationId: string,
+) {
+  updateConversationInCache(queryClient, conversationId, (conv) => ({
+    ...conv,
+    lastMessage: conv.lastMessage ? { ...conv.lastMessage, seen: true } : null,
+  }));
 }
 
 export function useDmConversations() {
@@ -48,20 +99,7 @@ export function useDmConversations() {
         }
         return undefined;
       },
-      // staleTime: 0,
     });
-
-  const { highlightedIds } = useDmHighlight();
-
-  // Track conversations that have been moved to top
-  const movedToTopIds = useState<Set<string>>('dm-moved-to-top-ids', () => new Set());
-
-  const lastNewMessageinfo = inject<Ref<DmSseEventMap['dm.new_message'] | null>>(
-    'lastNewMessageinfo',
-    ref(null),
-  );
-
-  const lastProcessedMessageId = ref<string | null>(null);
 
   // Flatten all pages into a single array and merge with pending new conversations
   const allConversations = computed(() => {
@@ -75,47 +113,19 @@ export function useDmConversations() {
     return [...uniquePending, ...fetched];
   });
 
-  watch(
-    () => lastNewMessageinfo.value,
-    (newMessage) => {
-      if (!newMessage || !allConversations.value.length) return;
-
-      if (newMessage.messageId === lastProcessedMessageId.value) return;
-      lastProcessedMessageId.value = newMessage.messageId;
-
-      const conversation = allConversations.value.find((c) => c.id === newMessage.conversationId);
-      if (conversation) {
-        conversation.lastMessage = {
-          content: newMessage.bodySnippet,
-          senderUsername: newMessage.sender.username,
-          sentAt: newMessage.createdAt,
-        };
-      }
-    },
-    { immediate: false },
-  );
-
-  watch(
-    highlightedIds,
-    (newIds) => {
-      newIds.forEach((id) => {
-        movedToTopIds.value.add(id);
-      });
-    },
-    { deep: true },
-  );
-
+  // Sort conversations: unseen messages first, then by most recent
   const sortedConversations = computed(() => {
     if (!allConversations.value.length) return [];
 
     const list = [...allConversations.value];
 
     list.sort((a, b) => {
-      const aIsTop = movedToTopIds.value.has(a.id);
-      const bIsTop = movedToTopIds.value.has(b.id);
+      const aIsUnseen = a.lastMessage && !a.lastMessage.seen;
+      const bIsUnseen = b.lastMessage && !b.lastMessage.seen;
 
-      if (aIsTop && !bIsTop) return -1;
-      if (!aIsTop && bIsTop) return 1;
+      // Unseen conversations come first
+      if (aIsUnseen && !bIsUnseen) return -1;
+      if (!aIsUnseen && bIsUnseen) return 1;
       return 0;
     });
 

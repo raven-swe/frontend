@@ -22,6 +22,19 @@ vi.mock('~/services/auth/authService', () => ({
   getAccessToken: vi.fn(() => 'mock-token'),
 }));
 
+// Mock useDmConversations
+vi.mock('~/composables/useDmConversations', () => ({
+  markConversationSeenInCache: vi.fn(),
+}));
+
+// Mock @tanstack/vue-query
+vi.mock('@tanstack/vue-query', () => ({
+  useQueryClient: vi.fn(() => ({
+    setQueryData: vi.fn(),
+    getQueryData: vi.fn(),
+  })),
+}));
+
 // Mock stores and config
 vi.mock('#app', async () => {
   const actual = await vi.importActual('#app');
@@ -32,6 +45,9 @@ vi.mock('#app', async () => {
     }),
     useRuntimeConfig: () => ({
       public: { dmWebSocketUrl: 'wss://test.example.com' },
+    }),
+    useRoute: () => ({
+      params: { conversationId: null },
     }),
   };
 });

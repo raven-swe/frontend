@@ -8,8 +8,11 @@ import type {
   DmWsReactionReceived,
 } from '~~/shared/types/dm';
 import { getAccessToken } from '~/services/auth/authService';
+import { markConversationSeenInCache } from '~/composables/useDmConversations';
+import { useQueryClient } from '@tanstack/vue-query';
 
 interface ServerMessageReceivedPayload {
+  conversationId: string;
   message: {
     id: string;
     body: string;
@@ -27,6 +30,11 @@ export function useDmSocketIO() {
 
   const userStore = useUserStore();
   const config = useRuntimeConfig();
+  const queryClient = useQueryClient();
+  const route = useRoute();
+
+  // Get current conversation ID from route
+  const selectedConversationId = computed(() => (route.params.conversationId as string) || null);
 
   const onMessageCallback = ref<((m: DmMessage) => void) | null>(null);
   const onErrorCallback = ref<((e: string) => void) | null>(null);
@@ -81,6 +89,14 @@ export function useDmSocketIO() {
         isMine: data.sender.username === userStore.user.username,
       };
       onMessageCallback.value?.(message);
+
+      // Auto-mark as seen if user is currently viewing this conversation and message is not mine
+      if (
+        selectedConversationId.value === payload.conversationId &&
+        data.sender.username !== userStore.user.username
+      ) {
+        markSeen(payload.conversationId, data.id);
+      }
     });
 
     socket.value.on(
@@ -129,6 +145,8 @@ export function useDmSocketIO() {
 
   function markSeen(conversationId: string, lastSeenMessageId: string) {
     socket.value?.emit('mark_seen', { conversationId, lastSeenMessageId });
+    // Update the cache to mark conversation as seen
+    markConversationSeenInCache(queryClient, conversationId);
   }
 
   function typingStart(conversationId: string) {

@@ -122,7 +122,7 @@ watch(
 defineExpose({ parentRef, scrollToBottom });
 </script>
 <template>
-  <div ref="parentRef" class="flex h-full flex-col gap-2 overflow-y-auto">
+  <div ref="parentRef" class="h-full gap-2 overflow-y-auto">
     <!-- Loader at top for loading older messages -->
     <div v-if="hasNextPage && isFetchingNextPage" class="flex items-center justify-center p-4">
       <UiSpinner size="1.5rem" />

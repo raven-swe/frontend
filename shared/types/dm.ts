@@ -9,6 +9,7 @@ export interface DmConversation {
     content: string;
     senderUsername: string;
     sentAt: string;
+    seen: boolean;
   } | null;
   isBlocking?: boolean;
   isBlockedBy?: boolean;

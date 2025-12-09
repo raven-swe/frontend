@@ -130,8 +130,6 @@ describe('DmMessagesList Component', () => {
 
     const container = wrapper.find('div');
     expect(container.classes()).toContain('overflow-y-auto');
-    expect(container.classes()).toContain('flex');
-    expect(container.classes()).toContain('flex-col');
   });
 
   it('shows spinner when fetching next page', async () => {
