@@ -149,7 +149,7 @@ describe('TweetDefaultCard.vue', () => {
     expect(mention.text()).toContain('@john_doe');
 
     // Hashtag link
-    const hashtag = wrapper.find('a[href="/hashtag/Nuxt3"]');
+    const hashtag = wrapper.find('a[href="/search/top?q=%23Nuxt3"]');
     expect(hashtag.exists()).toBe(true);
     expect(hashtag.text()).toContain('#Nuxt3');
 
@@ -201,7 +201,7 @@ describe('TweetDefaultCard.vue', () => {
 
     // Find links within the tweet content area (excluding author username link)
     const mentionLink = wrapper.find('a[href="/profile/john_doe"]');
-    const hashtagLink = wrapper.find('a[href="/hashtag/Nuxt3"]');
+    const hashtagLink = wrapper.find('a[href="/search/top?q=%23Nuxt3"]');
 
     expect(mentionLink.exists()).toBe(true);
     expect(mentionLink.text()).toContain('@john_doe');
