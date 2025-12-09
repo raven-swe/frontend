@@ -517,6 +517,7 @@
     "header-title": "الرسائل",
     "placeholder-start-message": "ابدأ رسالة جديدة",
     "attachedImage": "صورة مرفقة",
+    "seen": "تمت المشاهدة",
     "empty": {
       "select": "اختر رسالة",
       "description": "اختر من محادثاتك الحالية، ابدأ محادثة جديدة، أو استمر في التصفح.",
@@ -527,7 +528,8 @@
       "search-people": "ابحث عن أشخاص",
       "next": "التالي",
       "you-follow": "تتابع",
-      "follow-each-other": "تتابعان بعضكما البعض"
+      "follow-each-other": "تتابعان بعضكما البعض",
+      "cant-message": "لا يمكن مراسلة"
     }
   },
   "toaster": {
