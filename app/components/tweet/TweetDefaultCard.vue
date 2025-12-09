@@ -5,6 +5,7 @@ import type { Tweet } from '~~/shared/types/tweets';
 import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
 import QuotedTweetCard from './QuotedTweetCard.vue';
+import AiSummary from './AiSummary.vue';
 interface Props {
   tweet: Tweet;
   isParent?: boolean;
@@ -15,6 +16,7 @@ const router = useRouter();
 
 // Format createdAt to a short relative time like "6h", "3d", "2m"
 const tweet = ref<Tweet>(JSON.parse(JSON.stringify(props.tweet)));
+const aiSummaryRef = ref<InstanceType<typeof AiSummary> | null>(null);
 
 const onLikeSuccess = () => {
   if (!tweet.value.isLiked) {
@@ -44,6 +46,10 @@ const onUndoRetweetSuccess = () => {
     tweet.value.retweetCount = next < 0 ? 0 : next;
   }
 };
+
+function handleAiSummary() {
+  aiSummaryRef.value?.handleAiSummary?.();
+}
 
 function handleTweetClick() {
   router.push(`/profile/${props.tweet.author.username}/status/${props.tweet.id}`);
@@ -122,6 +128,14 @@ const { mutate: blockUser } = useBlockMutation();
           class="text-muted-foreground hover:cursor-pointer hover:underline"
           >{{ relativeTime(tweet.createdAt, $i18n.locale) }}</time
         >
+        <UiButton
+          variant="ghost-default"
+          size="icon-sm"
+          class="text-foreground/70 hover:text-foreground ms-auto"
+          @click.stop="handleAiSummary"
+        >
+          <Icon name="vscode-icons:file-type-gemini" size="1.2rem" />
+        </UiButton>
       </div>
 
       <!-- Content -->
@@ -135,6 +149,8 @@ const { mutate: blockUser } = useBlockMutation();
       <!-- Quoted Tweet -->
 
       <QuotedTweetCard v-if="tweet.quotedTweet" :tweet="tweet.quotedTweet" />
+
+      <AiSummary ref="aiSummaryRef" :tweet-id="props.tweet.id" />
 
       <!-- Actions -->
       <TweetActionButtons

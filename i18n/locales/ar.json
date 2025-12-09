@@ -1,4 +1,13 @@
 {
+  "ai-summary": {
+    "retry": "إعادة المحاولة",
+    "summary": "ملخص الذكاء الاصطناعي",
+    "generate-summary": "إنشاء ملخص",
+    "loading-summary": "جارٍ إنشاء الملخص...",
+    "something-went-wrong": "حدث خطأ أثناء إنشاء الملخص.",
+    "no-summary": "لا يوجد ملخص متاح.",
+    "close": "إغلاق ملخص الذكاء الاصطناعي"
+  },
   "testing": {
     "user": {
       "name": "جون دو",
@@ -507,6 +516,7 @@
     "header-title": "الرسائل",
     "placeholder-start-message": "ابدأ رسالة جديدة",
     "attachedImage": "صورة مرفقة",
+    "seen": "تمت المشاهدة",
     "empty": {
       "select": "اختر رسالة",
       "description": "اختر من محادثاتك الحالية، ابدأ محادثة جديدة، أو استمر في التصفح.",
@@ -517,7 +527,8 @@
       "search-people": "ابحث عن أشخاص",
       "next": "التالي",
       "you-follow": "تتابع",
-      "follow-each-other": "تتابعان بعضكما البعض"
+      "follow-each-other": "تتابعان بعضكما البعض",
+      "cant-message": "لا يمكن مراسلة"
     }
   },
   "toaster": {

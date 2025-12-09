@@ -4,13 +4,14 @@ import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
 import ContentEntitiesRenderer from '../ui/ContentEntitiesRenderer.vue';
 import QuotedTweetCard from './QuotedTweetCard.vue';
+import AiSummary from './AiSummary.vue';
 interface Props {
   tweet: TweetWithParents;
 }
 const props = defineProps<Props>();
 
 const tweetClone = ref(structuredClone(toRaw(props.tweet)));
-
+const aiSummaryRef = ref<InstanceType<typeof AiSummary> | null>(null);
 // Update local tweet state when like/unlike succeeds
 const onLikeSuccess = () => {
   if (!tweetClone.value.isLiked) {
@@ -44,6 +45,10 @@ const onUndoRetweetSuccess = () => {
 
 const { mutate: followUser } = useFollowMutation();
 const { mutate: blockUser } = useBlockMutation();
+
+function handleAiSummary() {
+  aiSummaryRef.value?.handleAiSummary?.();
+}
 </script>
 
 <template>
@@ -101,6 +106,14 @@ const { mutate: blockUser } = useBlockMutation();
             </NuxtLink>
           </UserHoverCard>
         </div>
+        <UiButton
+          variant="ghost-default"
+          size="icon-sm"
+          class="text-foreground/70 hover:text-foreground ms-auto"
+          @click.stop="handleAiSummary"
+        >
+          <Icon name="vscode-icons:file-type-gemini" size="1.2rem" />
+        </UiButton>
       </div>
     </div>
     <div class="border-b-border border-b-1">
@@ -112,6 +125,7 @@ const { mutate: blockUser } = useBlockMutation();
       <!-- Quoted Tweet -->
       <QuotedTweetCard v-if="tweetClone.quotedTweet" :tweet="tweetClone.quotedTweet" />
 
+      <AiSummary ref="aiSummaryRef" :tweet-id="props.tweet.id" />
       <div class="py-2">
         <time
           :title="formatDate(tweetClone.createdAt)"
@@ -121,6 +135,7 @@ const { mutate: blockUser } = useBlockMutation();
         >
       </div>
     </div>
+
     <TweetActionButtons
       :tweet="tweetClone"
       @like-success="onLikeSuccess"

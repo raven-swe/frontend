@@ -1,104 +1,14 @@
 <script lang="ts" setup>
-import { useInfiniteQuery } from '@tanstack/vue-query';
-import { useWindowVirtualizer } from '@tanstack/vue-virtual';
-import Follow from '~/components/notifications/Follow.vue';
-import Like from '~/components/notifications/Like.vue';
-import Repost from '~/components/notifications/Repost.vue';
-import Reply from '~/components/notifications/Reply.vue';
-import QuoteMention from '~/components/notifications/QuoteMention.vue';
-import { notificationsService } from '~/services/notifications/notificationsService';
-import type { ActorSummary, ActorSummaryContainer } from '~~/shared/types/notifications';
+import { Like, Follow, Repost, Reply, QuoteMention } from '~/components/notifications';
+import { useNotificationsList } from '~/composables/useNotificationsList';
+import type { Notification } from '~~/shared/types/notifications';
 
 definePageMeta({
   layout: 'notifications',
 });
 
-// infinite query to fetch notifications
-const {
-  data: response,
-  fetchNextPage,
-  hasNextPage,
-  isFetchingNextPage,
-  isLoading,
-} = useInfiniteQuery({
-  queryKey: ['notifications'],
-  initialPageParam: null as string | null,
-  queryFn: async ({ pageParam = null }) =>
-    await notificationsService.getNotificationsMock({ cursor: pageParam, limit: 20 }),
-  getNextPageParam: (lastPage) =>
-    lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined,
-  structuralSharing: false,
-});
-
-const notifications = computed(() => response.value?.pages.flatMap((page) => page.data) || []);
-const { mutate: followUser } = useFollowMutation();
-
-// Virtualization
-const parentRef = ref<HTMLElement | null>(null);
-const parentOffsetRef = ref(0);
-
-onMounted(() => {
-  parentOffsetRef.value = parentRef.value?.offsetTop ?? 0;
-});
-
-const rowVirtualizerOptions = computed(() => {
-  return {
-    count: hasNextPage.value ? notifications.value.length + 1 : notifications.value.length,
-    estimateSize: () => 100,
-    overscan: 3,
-    scrollMargin: parentOffsetRef.value,
-    getItemKey: (index: number) => notifications.value[index]?.id || index,
-  };
-});
-
-const rowVirtualizer = useWindowVirtualizer(rowVirtualizerOptions);
-const virtualRows = computed(() => rowVirtualizer.value.getVirtualItems());
-const totalSize = computed(() => rowVirtualizer.value.getTotalSize());
-
-const measureElement = (el: Element | ComponentPublicInstance | null) => {
-  if (!el) return;
-  const element = 'nodeType' in el ? (el as HTMLElement) : (el as ComponentPublicInstance).$el;
-  rowVirtualizer.value.measureElement(element);
-};
-
-watch(
-  () => notifications.value.length,
-  () => {
-    setTimeout(() => {
-      if (parentRef.value) {
-        parentOffsetRef.value = parentRef.value.offsetTop;
-      }
-    }, 100);
-  },
-  { flush: 'post' },
-);
-
-// auto-fetch more when scrolling near the end
-watchEffect(() => {
-  const [lastItem] = [...virtualRows.value].reverse();
-
-  if (!lastItem) {
-    return;
-  }
-
-  if (
-    lastItem.index >= notifications.value.length - 3 &&
-    hasNextPage.value &&
-    !isFetchingNextPage.value
-  ) {
-    fetchNextPage();
-  }
-});
-
-function getPrimaryActor(actorSummary?: ActorSummaryContainer | null): ActorSummary {
-  return (
-    actorSummary?.previewActors?.[0] ?? {
-      username: 'unknown',
-      displayName: 'Unknown',
-      avatarUrl: '/default_profile.png',
-    }
-  );
-}
+const lastNotification = inject<Ref<Notification | null>>('lastNotification')!;
+const unseenNotificationsCount = inject<Ref<number>>('unseenNotificationsCount')!;
 
 function componentForType(type: string) {
   switch (type) {
@@ -118,12 +28,41 @@ function componentForType(type: string) {
       return Follow;
   }
 }
+
+const {
+  notifications,
+  virtualRows,
+  totalSize,
+  measureElement,
+  hasNextPage,
+  isFetchingNextPage,
+  isLoading,
+  markAllSeen,
+  getPrimaryActor,
+} = useNotificationsList({
+  queryKey: ['notifications-main'],
+  filter: null,
+  lastNotification,
+  relatedQueryKeys: [['notifications-mentions']],
+  unseenRef: unseenNotificationsCount,
+});
+
+const { mutate: followUser } = useFollowMutation();
+
+onMounted(() => {
+  const hasUnseen = notifications.value.some((n) => !n.isSeen);
+  if (hasUnseen) {
+    setTimeout(() => {}, 500);
+    markAllSeen();
+    unseenNotificationsCount.value = 0;
+  }
+});
 </script>
 
 <template>
   <div class="mx-auto max-w-[700px]">
     <ClientOnly>
-      <div v-if="notifications" ref="parentRef">
+      <div v-if="notifications">
         <div
           :style="{
             height: `${totalSize}px`,
@@ -137,9 +76,7 @@ function componentForType(type: string) {
               top: 0,
               left: 0,
               width: '100%',
-              transform: `translateY(${
-                virtualRows[0] ? virtualRows[0].start - rowVirtualizer.options.scrollMargin : 0
-              }px)`,
+              transform: `translateY(${virtualRows[0] ? virtualRows[0].start - 0 : 0}px)`,
             }"
           >
             <div

@@ -36,6 +36,12 @@ const routerMock = vi.hoisted(() => {
 mockNuxtImport('useRouter', () => {
   return () => routerMock;
 });
+mockNuxtImport('useI18n', () => {
+  return () => ({
+    locale: { value: 'en' },
+    t: (key: string) => key,
+  });
+});
 
 // Stub components for faster tests
 const stubs = {

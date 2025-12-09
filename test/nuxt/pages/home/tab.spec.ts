@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mountSuspended } from '@nuxt/test-utils/runtime';
+import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime';
 import { ref } from 'vue';
 import type { Tweet } from '~~/shared/types/tweets';
 import TabPage from '~/pages/home/[tab].vue';
@@ -82,6 +82,13 @@ vi.mock('@tanstack/vue-query', async () => {
       return mockInfiniteQueryResult;
     }),
   };
+});
+
+mockNuxtImport('useI18n', () => {
+  return () => ({
+    locale: { value: 'en' },
+    t: (key: string) => key,
+  });
 });
 
 describe('Home [tab].vue', () => {

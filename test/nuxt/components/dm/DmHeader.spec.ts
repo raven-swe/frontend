@@ -1,16 +1,23 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { mountSuspended } from '@nuxt/test-utils/runtime';
+import { flushPromises } from '@vue/test-utils';
 import DmHeader from '@/components/dm/DmHeader.vue';
 
 // Mock the DmNewMessageDialog to avoid i18n and composable issues in tests
 vi.mock('@/components/dm/DmNewMessageDialog.vue', () => ({
   default: {
     name: 'DmNewMessageDialog',
-    template: '<div data-test="dialog"></div>',
+    props: ['open'],
+    emits: ['update:open'],
+    template: '<div data-test="dialog" :data-open="open"></div>',
   },
 }));
 
 describe('DmHeader Component', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('renders the header with correct structure', async () => {
     const wrapper = await mountSuspended(DmHeader);
 
@@ -50,10 +57,37 @@ describe('DmHeader Component', () => {
     const button = wrapper.find('button');
     expect(button.exists()).toBe(true);
 
-    await button.trigger('click');
+    // Dialog should initially be closed
+    let dialog = wrapper.find('[data-test="dialog"]');
+    expect(dialog.attributes('data-open')).toBe('false');
 
-    // Dialog should be present in the DOM
+    await button.trigger('click');
+    await flushPromises();
+
+    // Dialog should now be open
+    dialog = wrapper.find('[data-test="dialog"]');
+    expect(dialog.attributes('data-open')).toBe('true');
+  });
+
+  it('renders DmNewMessageDialog component', async () => {
+    const wrapper = await mountSuspended(DmHeader);
+
     const dialog = wrapper.find('[data-test="dialog"]');
     expect(dialog.exists()).toBe(true);
+  });
+
+  it('button has correct variant and styling', async () => {
+    const wrapper = await mountSuspended(DmHeader);
+
+    const button = wrapper.find('button');
+    expect(button.exists()).toBe(true);
+    expect(button.classes()).toContain('flex');
+  });
+
+  it('dialog is initially closed', async () => {
+    const wrapper = await mountSuspended(DmHeader);
+
+    const dialog = wrapper.find('[data-test="dialog"]');
+    expect(dialog.attributes('data-open')).toBe('false');
   });
 });

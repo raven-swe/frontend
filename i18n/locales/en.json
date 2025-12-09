@@ -1,4 +1,14 @@
 {
+  "ai-summary": {
+    "retry": "Retry",
+    "summary": "AI Summary",
+    "generate-summary": "Generate Summary",
+    "loading-summary": "Generating summary...",
+    "something-went-wrong": "Something went wrong while generating the summary.",
+    "no-summary": "No summary available.",
+    "summary-label": "Summary",
+    "close": "Close AI summary"
+  },
   "testing": {
     "user": {
       "name": "John Doe",
@@ -509,6 +519,7 @@
     "header-title": "Messages",
     "placeholder-start-message": "Start a new message",
     "attachedImage": "Attached image",
+    "seen": "Seen",
     "empty": {
       "select": "Select a message",
       "description": "Choose from your existing conversations, start a new one, or just keep swimming.",
@@ -519,7 +530,8 @@
       "search-people": "Search people",
       "next": "Next",
       "you-follow": "Following",
-      "follow-each-other": "You follow each other"
+      "follow-each-other": "You follow each other",
+      "cant-message": "can't be messaged"
     }
   },
   "toaster": {
