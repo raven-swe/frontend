@@ -7,6 +7,7 @@ import type { DmConversation, DmMessage } from '@/../shared/types/dm';
 
 // Mock vue-router
 const mockConversationId = ref<string | null>('conv-123');
+const mockRouterReplace = vi.fn();
 vi.mock('vue-router', () => ({
   useRoute: () => ({
     params: {
@@ -17,6 +18,7 @@ vi.mock('vue-router', () => ({
   }),
   useRouter: () => ({
     push: vi.fn(),
+    replace: mockRouterReplace,
   }),
 }));
 
@@ -125,6 +127,7 @@ const createMockConversation = (overrides: Partial<DmConversation> = {}): DmConv
     content: 'Hello',
     senderUsername: 'testuser',
     sentAt: new Date().toISOString(),
+    seen: false,
   },
   isMuted: false,
   ...overrides,
@@ -156,6 +159,7 @@ describe('DmConversationView Component', () => {
     mockSocketIsConnected.value = true;
     mockHasNextPage.value = false;
     mockIsFetchingNextPage.value = false;
+    mockRouterReplace.mockClear();
   });
 
   it('renders successfully', async () => {
@@ -337,5 +341,53 @@ describe('DmConversationView Component', () => {
 
     const container = wrapper.find('div');
     expect(container.classes()).toContain('overflow-hidden');
+  });
+
+  it('does not redirect when conversation exists in the list', async () => {
+    mockConversations.value = [createMockConversation()];
+    mockMessages.value = [];
+    mockMessagesLoading.value = false;
+    mockConversationsLoading.value = false;
+
+    await mountSuspended(DmConversationView);
+    await flushPromises();
+
+    expect(mockRouterReplace).not.toHaveBeenCalled();
+  });
+
+  it('redirects to /messages when conversation not found and no messages', async () => {
+    mockConversations.value = []; // No conversation in the list
+    mockMessages.value = [];
+    mockMessagesLoading.value = false;
+    mockConversationsLoading.value = false;
+
+    await mountSuspended(DmConversationView);
+    await flushPromises();
+
+    expect(mockRouterReplace).toHaveBeenCalledWith('/messages');
+  });
+
+  it('does not redirect when loading', async () => {
+    mockConversations.value = [];
+    mockMessages.value = [];
+    mockMessagesLoading.value = true; // Still loading
+    mockConversationsLoading.value = false;
+
+    await mountSuspended(DmConversationView);
+    await flushPromises();
+
+    expect(mockRouterReplace).not.toHaveBeenCalled();
+  });
+
+  it('does not redirect when conversation has messages', async () => {
+    mockConversations.value = [];
+    mockMessages.value = [createMockMessage()]; // Has messages
+    mockMessagesLoading.value = false;
+    mockConversationsLoading.value = false;
+
+    await mountSuspended(DmConversationView);
+    await flushPromises();
+
+    expect(mockRouterReplace).not.toHaveBeenCalled();
   });
 });
