@@ -113,21 +113,13 @@ export function useDmConversations() {
     return [...uniquePending, ...fetched];
   });
 
-  // Sort conversations unseen messages first then by most recent
+  // Sort conversations by most recent message
   const sortedConversations = computed(() => {
     if (!allConversations.value.length) return [];
 
     const list = [...allConversations.value];
 
     list.sort((a, b) => {
-      const aIsUnseen = a.lastMessage && !a.lastMessage.seen;
-      const bIsUnseen = b.lastMessage && !b.lastMessage.seen;
-
-      // Unseen conversations come first
-      if (aIsUnseen && !bIsUnseen) return -1;
-      if (!aIsUnseen && bIsUnseen) return 1;
-
-      // If both have the same seen status sort by most recent message
       const aTime = a.lastMessage?.sentAt ? new Date(a.lastMessage.sentAt).getTime() : 0;
       const bTime = b.lastMessage?.sentAt ? new Date(b.lastMessage.sentAt).getTime() : 0;
       return bTime - aTime;
