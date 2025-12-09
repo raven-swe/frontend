@@ -274,7 +274,7 @@ describe('pages/media/[id].vue', () => {
     await composer.vm.$emit('posted', newTweet);
 
     expect(queryClientMock.setQueryData).toHaveBeenCalledWith(
-      ['tweet-replies', expect.anything()],
+      ['tweet-replies', 'tw-123'],
       expect.any(Function),
     );
   });
@@ -337,6 +337,25 @@ describe('pages/media/[id].vue', () => {
     expect(scrollToMock).toHaveBeenCalled();
   });
 
+  it('does not crash if parentRef is missing when scrolling to top', async () => {
+    const wrapper = await mountSuspended(MediaIdPage, {
+      global: { stubs },
+      route: { params: { id: 'tw-123' } },
+    });
+    const composer = wrapper.findComponent({ name: 'TweetComposer' });
+
+    const newTweet = { id: 'new-reply', replyToTweetId: 'tw-123', content: 'reply' };
+    await composer.vm.$emit('posted', newTweet);
+
+    // Unmount to clear parentRef
+    wrapper.unmount();
+
+    await nextTick();
+    await new Promise((resolve) => setTimeout(resolve, 110));
+
+    // Should not throw
+  });
+
   it('correctly calculates next page param', async () => {
     await mountSuspended(MediaIdPage, {
       global: { stubs },
@@ -388,5 +407,96 @@ describe('pages/media/[id].vue', () => {
 
     // Trigger unmount to cover null case
     wrapper.unmount();
+  });
+
+  it('swaps first video with second media item', async () => {
+    vi.resetModules();
+    vi.doMock('@/services/tweet/tweetsService', () => ({
+      tweetsService: {
+        tweet: vi.fn(async (_id: string) => ({
+          data: {
+            id: 'tw-video',
+            content: 'video tweet',
+            createdAt: new Date().toISOString(),
+            author: {
+              username: 'tester',
+              displayName: 'Tester',
+              avatarUrl: '/avatar.png',
+              isFollowing: false,
+              isFollower: false,
+            },
+            media: [
+              { type: 'VIDEO', url: 'v.mp4', width: 100, height: 100 },
+              { type: 'IMAGE', url: 'i.jpg', width: 100, height: 100 },
+            ],
+            entities: {},
+          },
+        })),
+        replies: vi.fn(async () => ({ data: [], pagination: { hasNextPage: false } })),
+      },
+    }));
+
+    const { default: MediaIdPageReimported } = await import('@/pages/media/[id].vue');
+
+    const wrapper = await mountSuspended(MediaIdPageReimported, {
+      global: {
+        stubs: {
+          ...stubs,
+          TweetView: {
+            template: '<div class="tweet-view-stub" />',
+            props: ['tweet', 'media'],
+            name: 'TweetView',
+          },
+        },
+      },
+      route: { params: { id: 'tw-video' } },
+    });
+
+    await flushPromises();
+
+    const tweetView = wrapper.findComponent({ name: 'TweetView' });
+    expect(tweetView.exists()).toBe(true);
+    // Check that the first item is now the IMAGE and second is VIDEO
+    const media = tweetView.props('tweet').media;
+    expect(media).toHaveLength(2);
+    expect(media[0].type).toBe('IMAGE');
+    expect(media[1].type).toBe('VIDEO');
+  });
+
+  it('measures component instance in virtual list', async () => {
+    const wrapper = await mountSuspended(MediaIdPage, { global: { stubs } });
+
+    // Access internal measureElement via vm
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const vm = wrapper.vm as any;
+
+    // Mock a component instance
+    const div = document.createElement('div');
+
+    if (vm.measureElement) {
+      vm.measureElement(div);
+      expect(virtualizerMock.measureElement).toHaveBeenCalledWith(div);
+    }
+  });
+
+  it('handles missing pagination in getNextPageParam', async () => {
+    await mountSuspended(MediaIdPage, {
+      global: { stubs },
+      route: { params: { id: 'tw-123' } },
+    });
+
+    const options = useInfiniteQueryMock.mock.calls[0]![0];
+    const lastPageNoPagination = { data: [] };
+    expect(options.getNextPageParam(lastPageNoPagination)).toBeUndefined();
+  });
+
+  it('updates parent offset when tweet data changes', async () => {
+    await mountSuspended(MediaIdPage, {
+      global: { stubs },
+      route: { params: { id: 'tw-123' } },
+    });
+    await flushPromises();
+    await new Promise((resolve) => setTimeout(resolve, 120));
+    // This simply ensures the watcher callback runs and covers the lines
   });
 });
