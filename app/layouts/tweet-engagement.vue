@@ -8,11 +8,7 @@ const tweetid = computed(() => router.currentRoute.value.params.tweetid as strin
 const username = computed(() => router.currentRoute.value.params.username as string);
 const tweetPath = computed(() => `/profile/${username.value}/status/${tweetid.value}`);
 
-const {
-  data: tweetData,
-  suspense,
-  isLoading,
-} = useQuery<TweetWithParents, ApiErrorResponse>({
+const { data: tweetData, suspense } = useQuery<TweetWithParents, ApiErrorResponse>({
   queryKey: ['tweet', tweetid],
   queryFn: async () => (await tweetsService.tweet(tweetid.value)).data,
   refetchOnWindowFocus: false,
@@ -24,8 +20,18 @@ const {
 watch(
   () => tweetData.value,
   async (newTweet) => {
-    if (newTweet && newTweet.author.username !== username.value) {
-      await router.replace(`/profile/${newTweet.author.username}/status/${newTweet.id}`);
+    if (!newTweet) return;
+
+    const route = router.currentRoute.value;
+    const correctUser = newTweet.author.username;
+
+    if (route.params.username !== correctUser) {
+      const newPath = route.fullPath.replace(
+        `/profile/${route.params.username}/`,
+        `/profile/${correctUser}/`,
+      );
+
+      await router.replace(newPath);
     }
   },
   { immediate: true },
@@ -61,15 +67,10 @@ onServerPrefetch(async () => {
         >
           <Icon name="ic:round-arrow-back" size="20" />
         </UiButton>
-        <div v-if="tweetData" class="flex flex-col items-start">
+        <div class="flex flex-col items-start">
           <h1 class="text-foreground text-md text-center font-semibold">
             {{ $t('tweet.engagement.title') }}
           </h1>
-        </div>
-        <div v-if="isLoading" class="flex flex-col items-start">
-          <div class="text-foreground text-md flex h-6 p-1 text-center font-semibold">
-            <div class="bg-muted-foreground/50 h-full w-32 animate-pulse rounded" />
-          </div>
         </div>
       </header>
       <UiTabs>
