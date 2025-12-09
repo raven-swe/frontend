@@ -22,7 +22,6 @@ const {
   queryFn: async ({ pageParam = null }) =>
     await tweetsService.quotes({
       tweetid: tweet?.value.id || '',
-      limit: 20,
       cursor: pageParam,
     }),
 

@@ -15,7 +15,6 @@ const tweetid = computed(() => router.currentRoute.value.params.tweetid as strin
       (cursor, signal) =>
         tweetsService.retweets({
           tweetid: tweetid,
-          limit: 20,
           cursor,
           signal,
         })
