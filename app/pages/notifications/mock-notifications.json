@@ -3,7 +3,7 @@
   "message": "Notifications retrieved successfully",
   "data": [
     {
-      "id": "notif_follow_002",
+      "id": "notif_follow_1",
       "type": "FOLLOW",
       "actorSummary": {
         "previewActors": [
@@ -18,6 +18,125 @@
       "tweetSummary": null,
       "latestEventAt": "2025-12-02T14:30:11.456Z",
       "isSeen": true
+    },
+    {
+      "id": "51",
+      "type": "FOLLOW",
+      "actorSummary": {
+        "totalCount": 1,
+        "previewActors": [
+          {
+            "username": "loay_ahmed",
+            "displayName": "Loay Ahmed",
+            "avatarUrl": "https://cdn.raven.cmp27.space/avatars/85b15089-bfd6-4fd8-a08b-72503b7adcdd.jpeg"
+          }
+        ]
+      },
+      "tweetSummary": {
+        "totalCount": 0,
+        "subjectIds": [],
+        "primaryTweet": null
+      },
+      "latestEventAt": "2025-12-06T14:22:54.916Z",
+      "isSeen": false
+    },
+    {
+      "id": "48",
+      "type": "LIKE",
+      "actorSummary": {
+        "totalCount": 1,
+        "previewActors": [
+          {
+            "username": "loay_ahmed",
+            "displayName": "Loay Ahmed",
+            "avatarUrl": "https://cdn.raven.cmp27.space/avatars/85b15089-bfd6-4fd8-a08b-72503b7adcdd.jpeg"
+          }
+        ]
+      },
+      "tweetSummary": {
+        "totalCount": 1,
+        "subjectIds": ["341"],
+        "primaryTweet": {
+          "id": "341",
+          "author": {
+            "username": "habiba",
+            "displayName": "habibayman",
+            "avatarUrl": "https://cdn.raven.cmp27.space/avatars/691fc500-b246-4d09-a4b7-c5b33873244f.jpg",
+            "isBlocked": false,
+            "isFollowing": false,
+            "isMuted": false
+          },
+          "content": "where is the emoji?",
+          "createdAt": "2025-12-04T18:07:17.464Z",
+          "replyCount": 0,
+          "retweetCount": 0,
+          "likeCount": 1,
+          "isLiked": false,
+          "isRetweeted": false,
+          "entities": {
+            "mentions": [],
+            "hashtags": []
+          },
+          "media": [
+            {
+              "url": "https://cdn.raven.cmp27.space/tweets/07930009-310e-4f14-b6ca-fecaecd9edbd.jpg",
+              "type": "IMAGE",
+              "altText": null,
+              "width": 736,
+              "height": 414
+            }
+          ],
+          "replyToTweetId": null,
+          "quoteToTweetId": "340"
+        }
+      },
+      "latestEventAt": "2025-12-06T14:20:27.207Z",
+      "isSeen": false
+    },
+    {
+      "id": "50",
+      "type": "RETWEET",
+      "actorSummary": {
+        "totalCount": 1,
+        "previewActors": [
+          {
+            "username": "loay_ahmed",
+            "displayName": "Loay Ahmed",
+            "avatarUrl": "https://cdn.raven.cmp27.space/avatars/85b15089-bfd6-4fd8-a08b-72503b7adcdd.jpeg"
+          }
+        ]
+      },
+      "tweetSummary": {
+        "totalCount": 1,
+        "subjectIds": ["300"],
+        "primaryTweet": {
+          "id": "300",
+          "author": {
+            "username": "habiba",
+            "displayName": "habibayman",
+            "avatarUrl": "https://cdn.raven.cmp27.space/avatars/691fc500-b246-4d09-a4b7-c5b33873244f.jpg",
+            "isBlocked": false,
+            "isFollowing": false,
+            "isMuted": false
+          },
+          "content": "I can use some sleep, but this is fun idk",
+          "createdAt": "2025-12-04T03:58:09.286Z",
+          "replyCount": 0,
+          "retweetCount": 1,
+          "likeCount": 2,
+          "isLiked": true,
+          "isRetweeted": false,
+          "entities": {
+            "mentions": [],
+            "hashtags": []
+          },
+          "media": [],
+          "replyToTweetId": null,
+          "quoteToTweetId": "167"
+        }
+      },
+      "latestEventAt": "2025-12-06T14:22:44.929Z",
+      "isSeen": false
     },
     {
       "id": "notif_like_001",
@@ -74,7 +193,7 @@
       "isSeen": false
     },
     {
-      "id": "notif_like_002",
+      "id": "notif_like_1",
       "type": "LIKE",
       "actorSummary": {
         "previewActors": [
@@ -120,7 +239,7 @@
       "isSeen": true
     },
     {
-      "id": "notif_follow_001",
+      "id": "notif_follow_002",
       "type": "FOLLOW",
       "actorSummary": {
         "previewActors": [
@@ -284,7 +403,7 @@
       "isSeen": true
     },
     {
-      "id": "notif_reply_001",
+      "id": "notif_reply_0010",
       "type": "REPLY",
       "actorSummary": {
         "previewActors": [
@@ -746,7 +865,7 @@
       "isSeen": true
     },
     {
-      "id": "notif_follow_001",
+      "id": "notif_follow_00199",
       "type": "FOLLOW",
       "actorSummary": {
         "previewActors": [
@@ -768,7 +887,7 @@
       "isSeen": false
     },
     {
-      "id": "notif_retweet_4401",
+      "id": "notif_retweet_440144",
       "type": "RETWEET",
       "actorSummary": {
         "previewActors": [
@@ -1204,7 +1323,7 @@
       "isSeen": false
     },
     {
-      "id": "notif_follow_002",
+      "id": "notif_follow_002678",
       "type": "MENTION",
       "actorSummary": {
         "previewActors": [

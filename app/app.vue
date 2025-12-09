@@ -22,41 +22,18 @@ const {
 
   unseenCount,
   lastNewMessageinfo,
+  lastNotification,
+  unseenNotificationsCount,
 } = useDmSse({
   autoReconnect: true,
   maxReconnectAttempts: 5,
   baseReconnectDelay: 1000,
 });
 
-const { addHighlight } = useDmHighlight();
-
-// Track processed messages to avoid duplicates
-const lastProcessedMessageId = ref<string | null>(null);
 provide('dmUnseenCount', unseenCount);
 provide('lastNewMessageinfo', lastNewMessageinfo);
-
-watch(
-  () => lastNewMessageinfo.value,
-  (newMessage) => {
-    if (!newMessage) return;
-
-    // Skip if we've already processed this message
-    if (newMessage.messageId === lastProcessedMessageId.value) return;
-
-    lastProcessedMessageId.value = newMessage.messageId;
-
-    const senderUsername = newMessage.sender.username;
-    const currentUsername = userStore.user.username;
-
-    // Only highlight if the sender is NOT the current user
-    const shouldHighlight = senderUsername !== currentUsername;
-
-    if (shouldHighlight) {
-      addHighlight(newMessage.conversationId);
-    }
-  },
-  { immediate: false },
-);
+provide('lastNotification', lastNotification);
+provide('unseenNotificationsCount', unseenNotificationsCount);
 
 watch(
   () => userStore.user,

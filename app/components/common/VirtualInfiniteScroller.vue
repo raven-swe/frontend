@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T">
-import { useWindowVirtualizer } from '@tanstack/vue-virtual';
+import { useWindowVirtualizer, type VirtualItem } from '@tanstack/vue-virtual';
 
 interface Props<T> {
   items: T[];
@@ -9,12 +9,18 @@ interface Props<T> {
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
   fetchNextPage: () => void;
+  getKey?: (
+    item: T,
+    index: number,
+    key?: VirtualItem['key'],
+  ) => string | number | VirtualItem['key'];
 }
 
 const props = withDefaults(defineProps<Props<T>>(), {
   estimateSize: 120,
   overscan: 3,
   scrollMargin: 0,
+  getKey: (item: T, index: number, key?: VirtualItem['key']) => key ?? index,
 });
 
 // Refs for container offset
@@ -80,7 +86,9 @@ watchEffect(() => {
       >
         <div
           v-for="virtualRow in virtualRows"
-          :key="String(virtualRow.key)"
+          :key="
+            String(props.getKey(props.items[virtualRow.index]!, virtualRow.index, virtualRow.key))
+          "
           :ref="measureElement"
           :data-index="virtualRow.index"
         >

@@ -8,8 +8,8 @@ import { mockUserInfos } from './mockUserDB';
 const API_URL = process.env.BACKEND_URL;
 // Mock user data that will be updated
 const mockUserData: UserData = {
-  username: 'johndoe',
-  displayName: 'John Doe',
+  username: 'raven_user',
+  displayName: 'Raven User',
   bio: 'Software developer passionate about open source',
   avatarUrl: 'https://i.ibb.co/qMcSYBfk/image.jpg',
   bannerUrl: 'https://i.ibb.co/Z1Yx04kS/dfghj.webp',
@@ -17,7 +17,7 @@ const mockUserData: UserData = {
   websiteUrl: 'https://johndoe.dev',
   birthDate: '1990-01-15',
   joinedAt: '2020-03-15T10:30:00Z',
-  email: 'https://github.com/',
+  email: 'raven_user@example.com',
   phone: '+1234567890',
   languageCode: 'en',
 };

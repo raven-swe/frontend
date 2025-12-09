@@ -41,20 +41,12 @@ const makeImage = (i = 1): TMedia => ({
 });
 
 describe('TweetMedia.vue (updated layout)', () => {
-  it('renders wrapper with expected base classes', async () => {
-    const wrapper = mount(TweetMedia, { props: { media: [] }, global: globalConfig });
-    const classes = wrapper.classes();
-    expect(classes).toContain('w-full');
-    expect(classes).toContain('pt-2');
-  });
-
-  it('renders no media items for empty array', async () => {
+  it('renders nothing when media array is empty', async () => {
     const wrapper = mount(TweetMedia, {
       props: { media: [] },
       global: globalConfig,
     });
-    expect(wrapper.findAll('video')).toHaveLength(0);
-    expect(wrapper.findAll('.nuxt-img-stub')).toHaveLength(0);
+    expect(wrapper.element.childNodes.length).toBe(0);
   });
 
   it('renders GIF media via NuxtImg stub with correct src/alt', async () => {

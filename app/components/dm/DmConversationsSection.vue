@@ -1,13 +1,12 @@
 <script lang="ts" setup>
 import { useDmConversations } from '@/composables/useDmConversations';
-import { useDmHighlight } from '@/composables/useDmHighlight';
 import { showToaster } from '@/utils/showToaster';
 import Spinner from '../ui/Spinner.vue';
 
 const route = useRoute();
 const router = useRouter();
-const { conversations, loading, error } = useDmConversations();
-const { removeHighlight } = useDmHighlight();
+const { conversations, loading, error, fetchNextPage, hasNextPage, isFetchingNextPage } =
+  useDmConversations();
 const selectedId = computed(() => (route.params.conversationId as string) || null);
 
 watch(error, (val) => {
@@ -17,19 +16,28 @@ watch(error, (val) => {
 });
 
 function onSelect(id: string) {
-  removeHighlight(id);
   router.push({ path: `/messages/${id}` });
+}
+
+function onLoadMore() {
+  fetchNextPage();
 }
 </script>
 <template>
-  <DmHeader />
-  <div v-if="loading" class="flex items-center justify-center p-4">
-    <Spinner size="1.5rem" />
+  <div class="flex h-full flex-col">
+    <DmHeader />
+
+    <div v-if="loading" class="flex items-center justify-center p-4">
+      <Spinner size="1.5rem" />
+    </div>
+    <DmConversationList
+      v-else
+      :conversations="conversations"
+      :selected-id="selectedId"
+      :has-next-page="hasNextPage ?? false"
+      :is-fetching-next-page="isFetchingNextPage"
+      @select="onSelect"
+      @load-more="onLoadMore"
+    />
   </div>
-  <DmConversationList
-    v-else
-    :conversations="conversations"
-    :selected-id="selectedId"
-    @select="onSelect"
-  />
 </template>
