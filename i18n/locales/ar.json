@@ -116,7 +116,8 @@
     "edit-profile": "تعديل الملف الشخصي",
     "joined": "انضم في",
     "following": "متابع",
-    "followers": "المتابعون"
+    "followers": "المتابعون",
+    "mutual": "متابع من {user1} | متابع من {user1} و {user2} | متابع من {user1}، {user2}، و {user3} | متابع من {user1}، {user2}، و {others} آخرين تتابعهم"
   },
   "root": {
     "hero": {
