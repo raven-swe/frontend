@@ -3,7 +3,7 @@ import { mountSuspended } from '@nuxt/test-utils/runtime';
 import { createI18n } from 'vue-i18n';
 import en from '@@/i18n/locales/en.json';
 import type { ComponentMountingOptions } from '@vue/test-utils';
-import type TweetIdPage from '@/pages/profile/[username]/status/[tweetid].vue';
+import type TweetIdPage from '@/pages/profile/[username]/status/[tweetid]/index.vue';
 import TweetView from '~/components/tweet/TweetView.vue';
 
 const i18n = createI18n({ locale: 'en', messages: { en } });
@@ -281,7 +281,9 @@ const createWrapper = async ({
       options?: Partial<ComponentMountingOptions<typeof TweetIdPage>>;
     }
   | undefined = {}) => {
-  const { default: tweetPage } = await import('@/pages/profile/[username]/status/[tweetid].vue');
+  const { default: tweetPage } = await import(
+    '@/pages/profile/[username]/status/[tweetid]/index.vue'
+  );
   return mountSuspended(tweetPage, {
     props,
     global: {
