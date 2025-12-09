@@ -130,17 +130,29 @@ const { mutate: blockUser } = useBlockMutation();
             >{{ relativeTime(tweet.createdAt, $i18n.locale) }}</time
           >
         </div>
-        <div class="relative">
-          <TweetDropdown :tweet="props.tweet">
+        <div class="relative flex items-center gap-1">
+          <div
+            class="absolute end-0 top-1/2 flex translate-x-2.5 -translate-y-1/2 flex-row items-center"
+          >
             <UiButton
               variant="ghost-default"
-              size="icon-xs"
-              class="text-muted-foreground absolute end-0 top-1/2 translate-x-2.5 -translate-y-1/2"
-              @click.stop
+              size="icon-sm"
+              class="text-muted-foreground"
+              @click.stop="handleAiSummary"
             >
-              <Icon name="lucide:more-horizontal" />
+              <Icon name="vscode-icons:file-type-gemini" size="1.2rem" />
             </UiButton>
-          </TweetDropdown>
+            <TweetDropdown :tweet="props.tweet">
+              <UiButton
+                variant="ghost-default"
+                size="icon-xs"
+                class="text-muted-foreground"
+                @click.stop
+              >
+                <Icon name="lucide:more-horizontal" />
+              </UiButton>
+            </TweetDropdown>
+          </div>
         </div>
       </div>
 

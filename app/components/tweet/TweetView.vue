@@ -113,26 +113,28 @@ function handleAiSummary() {
             </UserHoverCard>
           </div>
           <div class="relative">
-            <TweetDropdown :tweet="props.tweet">
+            <div class="absolute end-0 top-1/2 flex translate-x-2.5 flex-row items-center">
               <UiButton
                 variant="ghost-default"
-                size="icon-xs"
-                class="text-muted-foreground absolute end-0 top-2 translate-x-2.5"
-                @click.stop
+                size="icon-sm"
+                class="text-muted-foreground"
+                @click.stop="handleAiSummary"
               >
-                <Icon name="lucide:more-horizontal" />
+                <Icon name="vscode-icons:file-type-gemini" size="1.2rem" />
               </UiButton>
-            </TweetDropdown>
+              <TweetDropdown :tweet="props.tweet">
+                <UiButton
+                  variant="ghost-default"
+                  size="icon-xs"
+                  class="text-muted-foreground"
+                  @click.stop
+                >
+                  <Icon name="lucide:more-horizontal" />
+                </UiButton>
+              </TweetDropdown>
+            </div>
           </div>
         </div>
-        <UiButton
-          variant="ghost-default"
-          size="icon-sm"
-          class="text-foreground/70 hover:text-foreground ms-auto"
-          @click.stop="handleAiSummary"
-        >
-          <Icon name="vscode-icons:file-type-gemini" size="1.2rem" />
-        </UiButton>
       </div>
     </div>
     <div class="border-b-border border-b-1">
