@@ -1,8 +1,17 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime';
 import { ref, nextTick } from 'vue';
+import { createI18n } from 'vue-i18n';
+import messages from '~~/i18n/locales/en.json' assert { type: 'json' };
 import SearchField from '~/components/ui/SearchField.vue';
 import type { CompactUser } from '~~/shared/types/user';
+
+const i18n = createI18n({
+  locale: 'en',
+  messages: {
+    en: messages,
+  },
+});
 
 const mockUser: CompactUser = {
   username: 'testuser',
@@ -88,6 +97,7 @@ describe('SearchField.vue', () => {
   it('renders search bar', async () => {
     const wrapper = await mountSuspended(SearchField, {
       global: {
+        plugins: [i18n],
         stubs: {
           UiButton: true,
           UiSearchBar: true,
@@ -105,6 +115,7 @@ describe('SearchField.vue', () => {
 
     await mountSuspended(SearchField, {
       global: {
+        plugins: [i18n],
         stubs: {
           UiButton: true,
           UiSearchBar: true,
@@ -123,6 +134,7 @@ describe('SearchField.vue', () => {
         showBackOnFocus: true,
       },
       global: {
+        plugins: [i18n],
         stubs: {
           UiButton: true,
           UiSearchBar: true,
@@ -144,6 +156,7 @@ describe('SearchField.vue', () => {
   it('triggers search when query changes', async () => {
     const _wrapper = await mountSuspended(SearchField, {
       global: {
+        plugins: [i18n],
         stubs: {
           UiButton: true,
           UiSearchBar: true,
@@ -168,6 +181,7 @@ describe('SearchField.vue', () => {
 
     const wrapper = await mountSuspended(SearchField, {
       global: {
+        plugins: [i18n],
         stubs: {
           UiButton: true,
           UiSearchBar: true,
@@ -192,6 +206,7 @@ describe('SearchField.vue', () => {
   it('clears search results when query is empty', async () => {
     const _wrapper = await mountSuspended(SearchField, {
       global: {
+        plugins: [i18n],
         stubs: {
           UiButton: true,
           UiSearchBar: true,
@@ -215,6 +230,7 @@ describe('SearchField.vue', () => {
   it('handles search submit', async () => {
     const wrapper = await mountSuspended(SearchField, {
       global: {
+        plugins: [i18n],
         stubs: {
           UiButton: true,
           UiSearchBar: true,
@@ -233,6 +249,7 @@ describe('SearchField.vue', () => {
   it('validates username correctly', async () => {
     const wrapper = await mountSuspended(SearchField, {
       global: {
+        plugins: [i18n],
         stubs: {
           UiButton: true,
           UiSearchBar: true,
@@ -252,6 +269,7 @@ describe('SearchField.vue', () => {
   it('cleans username by removing @ prefix', async () => {
     const wrapper = await mountSuspended(SearchField, {
       global: {
+        plugins: [i18n],
         stubs: {
           UiButton: true,
           UiSearchBar: true,
@@ -271,6 +289,7 @@ describe('SearchField.vue', () => {
   it('saves search to history', async () => {
     const wrapper = await mountSuspended(SearchField, {
       global: {
+        plugins: [i18n],
         stubs: {
           UiButton: true,
           UiSearchBar: true,
@@ -297,6 +316,7 @@ describe('SearchField.vue', () => {
 
     const wrapper = await mountSuspended(SearchField, {
       global: {
+        plugins: [i18n],
         stubs: {
           UiButton: true,
           UiSearchBar: true,
@@ -320,6 +340,7 @@ describe('SearchField.vue', () => {
 
     const wrapper = await mountSuspended(SearchField, {
       global: {
+        plugins: [i18n],
         stubs: {
           UiButton: true,
           UiSearchBar: true,
@@ -339,6 +360,7 @@ describe('SearchField.vue', () => {
   it('shows clear all history dialog', async () => {
     const wrapper = await mountSuspended(SearchField, {
       global: {
+        plugins: [i18n],
         stubs: {
           UiButton: true,
           UiSearchBar: true,
@@ -368,6 +390,7 @@ describe('SearchField.vue', () => {
 
     const wrapper = await mountSuspended(SearchField, {
       global: {
+        plugins: [i18n],
         stubs: {
           UiButton: true,
           UiSearchBar: true,
@@ -395,6 +418,7 @@ describe('SearchField.vue', () => {
   it('has watch configured to close dropdown on route path change', async () => {
     const wrapper = await mountSuspended(SearchField, {
       global: {
+        plugins: [i18n],
         stubs: {
           UiButton: true,
           UiSearchBar: true,
@@ -427,6 +451,7 @@ describe('SearchField.vue', () => {
 
     const _wrapper = await mountSuspended(SearchField, {
       global: {
+        plugins: [i18n],
         stubs: {
           UiButton: true,
           UiSearchBar: true,
@@ -447,6 +472,7 @@ describe('SearchField.vue', () => {
   it('limits history to 10 items', async () => {
     const wrapper = await mountSuspended(SearchField, {
       global: {
+        plugins: [i18n],
         stubs: {
           UiButton: true,
           UiSearchBar: true,
@@ -467,6 +493,7 @@ describe('SearchField.vue', () => {
   it('avoids duplicate entries in history', async () => {
     const wrapper = await mountSuspended(SearchField, {
       global: {
+        plugins: [i18n],
         stubs: {
           UiButton: true,
           UiSearchBar: true,
@@ -489,6 +516,7 @@ describe('SearchField.vue', () => {
 
     const _wrapper = await mountSuspended(SearchField, {
       global: {
+        plugins: [i18n],
         stubs: {
           UiButton: true,
           UiSearchBar: true,
@@ -506,6 +534,7 @@ describe('SearchField.vue', () => {
   it('displays empty placeholder when no history and not searching', async () => {
     const wrapper = await mountSuspended(SearchField, {
       global: {
+        plugins: [i18n],
         stubs: {
           UiButton: true,
           UiSearchBar: true,
