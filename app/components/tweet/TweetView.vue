@@ -56,7 +56,12 @@ function handleAiSummary() {
     <div class="flex w-full flex-col gap-1">
       <div class="flex flex-row gap-2">
         <div class="relative flex flex-col items-center gap-1">
-          <div v-if="tweetClone.rootTweet" class="bg-thread-foreground h-2 w-0.5"></div>
+          <div
+            class="h-2 w-0.5"
+            :class="{
+              'bg-thread-foreground': !!tweet.rootTweet,
+            }"
+          ></div>
           <UserHoverCard
             :username="props.tweet.author.username"
             @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
