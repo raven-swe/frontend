@@ -18,7 +18,7 @@ interface Props<T> {
 
 const props = withDefaults(defineProps<Props<T>>(), {
   estimateSize: 120,
-  overscan: 3,
+  overscan: 2,
   scrollMargin: 0,
   getKey: (item: T, index: number, key?: VirtualItem['key']) => key ?? index,
 });
