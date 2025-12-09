@@ -8,7 +8,7 @@ useH3TestUtils();
 const mockServerApiFetch = vi.fn();
 vi.stubGlobal('serverApiFetch', () => mockServerApiFetch);
 
-describe('GET /api/search/top', () => {
+describe('GET /api/search/hashtags/top', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
