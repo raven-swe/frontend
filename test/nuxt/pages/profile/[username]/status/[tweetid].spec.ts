@@ -281,7 +281,9 @@ const createWrapper = async ({
       options?: Partial<ComponentMountingOptions<typeof TweetIdPage>>;
     }
   | undefined = {}) => {
-  const { default: tweetPage } = await import('@/pages/profile/[username]/status/[tweetid].vue');
+  const { default: tweetPage } = await import(
+    '~/pages/profile/[username]/status/[tweetid]/index.vue'
+  );
   return mountSuspended(tweetPage, {
     props,
     global: {
