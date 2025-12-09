@@ -6,6 +6,7 @@ import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
 import QuotedTweetCard from './QuotedTweetCard.vue';
 import AiSummary from './AiSummary.vue';
+import { useUserStore } from '~/stores/user';
 interface Props {
   tweet: Tweet;
   isParent?: boolean;
@@ -13,6 +14,8 @@ interface Props {
 }
 const props = defineProps<Props>();
 const router = useRouter();
+const userStore = useUserStore();
+const originalUsername = ref<string>(userStore.user?.username || '');
 
 // Format createdAt to a short relative time like "6h", "3d", "2m"
 const tweet = ref<Tweet>(JSON.parse(JSON.stringify(props.tweet)));
@@ -142,7 +145,7 @@ const { mutate: blockUser } = useBlockMutation();
             >
               <Icon name="vscode-icons:file-type-gemini" size="1.2rem" />
             </UiButton>
-            <TweetDropdown :tweet="props.tweet">
+            <TweetDropdown :tweet="props.tweet" :username="originalUsername">
               <UiButton
                 variant="ghost-default"
                 size="icon-xs"

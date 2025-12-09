@@ -6,6 +6,7 @@ import type { Tweet } from '~~/shared/types/tweets';
 
 const props = defineProps<{
   tweet: Tweet;
+  username: string;
 }>();
 
 const queryClient = useQueryClient();
@@ -51,6 +52,7 @@ async function handleDelete() {
     showToaster('error', 'toaster.tweet.delete-error');
   }
 }
+console.log(props.username, props.tweet.author.username);
 </script>
 <template>
   <UiAlertDialog>
@@ -70,6 +72,7 @@ async function handleDelete() {
         <UiDropdownMenuItem as-child @select.prevent>
           <UiAlertDialogTrigger as-child>
             <div
+              v-if="props.username === tweet.author.username"
               class="text-destructive flex w-full cursor-pointer items-center gap-2 p-2 ltr:flex-row rtl:flex-row-reverse"
             >
               <Icon name="mi:delete" size="1.25rem" />
