@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createMockH3Event } from '~~/test/mocks/h3-event';
 import { useH3TestUtils } from '~~/test/mocks/h3-test-utils';
-import topSearchEventHandler from '~~/server/api/search/top.get';
+import topSearchEventHandler from '~~/server/api/search/hashtags/top.get';
 
 useH3TestUtils();
 
