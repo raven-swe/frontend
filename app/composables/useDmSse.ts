@@ -2,6 +2,7 @@ import type { DmSseEventMap } from '~~/shared/types/dm';
 import { EventSourcePolyfill } from 'event-source-polyfill';
 import type { Notification } from '~~/shared/types/notifications';
 import { useQueryClient } from '@tanstack/vue-query';
+import { updateConversationLastMessage } from '~/composables/useDmConversations';
 
 interface UseDmSseOptions {
   autoReconnect?: boolean;
@@ -21,6 +22,11 @@ export function useDmSse(options: UseDmSseOptions = {}) {
   const error = ref<Event | null>(null);
   const reconnectAttempts = ref<number>(0);
   const queryClient = useQueryClient();
+  const route = useRoute();
+  const userStore = useUserStore();
+  const selectedConversationId = computed(() => (route.params.conversationId as string) || null);
+  // Track last processed message to avoid duplicates
+  const lastProcessedMessageId = ref<string | null>(null);
 
   let es: EventSource | null = null;
   let reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -77,7 +83,6 @@ export function useDmSse(options: UseDmSseOptions = {}) {
       es.onerror = (evt) => {
         error.value = evt;
         isConnected.value = false;
-
         if (es) {
           es.close();
           es = null;
@@ -100,7 +105,22 @@ export function useDmSse(options: UseDmSseOptions = {}) {
         try {
           const data = JSON.parse(evt.data) as DmSseEventMap['dm.new_message'];
           lastNewMessageinfo.value = data;
-          // console.log('Received new_message event:', data);
+
+          // Avoid processing duplicate messages
+          if (data.messageId === lastProcessedMessageId.value) return;
+          lastProcessedMessageId.value = data.messageId;
+
+          // If user is currently in this conversation and is not the sender mark as seen
+          // Otherwise mark as unseen
+          const isCurrentConversation = selectedConversationId.value === data.conversationId;
+          const isNotSender = data.sender.username !== userStore.user.username;
+          const shouldMarkAsSeen = isCurrentConversation && isNotSender;
+          updateConversationLastMessage(queryClient, data.conversationId, {
+            content: data.bodySnippet,
+            senderUsername: data.sender.username,
+            sentAt: data.createdAt,
+            seen: shouldMarkAsSeen,
+          });
         } catch {
           createError('Failed to parse new_message event data');
         }

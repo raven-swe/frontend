@@ -22,6 +22,5 @@ defineProps<{
         {{ username }}
       </span>
     </div>
-    <Icon name="ic:round-report-gmailerrorred" size="24" />
   </div>
 </template>

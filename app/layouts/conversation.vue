@@ -26,10 +26,10 @@ const rightClasses = computed(() => {
 <template>
   <div>
     <div class="bg-background">
-      <div class="flex min-h-screen justify-center">
+      <div class="flex h-screen justify-center overflow-hidden">
         <div class="flex w-full max-w-7xl sm:justify-center">
           <!-- Left sidebar -->
-          <div class="w-16 flex-shrink-0 sm:w-16 md:w-24 xl:w-[306px]">
+          <div class="w-16 flex-shrink-0 sm:w-16 md:w-24 xl:w-[266px] 2xl:w-[206px]">
             <div class="sticky top-0">
               <SideBarLeft />
             </div>

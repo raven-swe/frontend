@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/vue-query';
 import type { DmConversation } from '~~/shared/types/dm';
 import type { ApiSuccessResponse } from '~~/shared/types/api';
 import { apiFetch } from '@/api';
+import { addPendingConversation } from './useDmConversations';
 
 export function useStartConversation() {
   const mutation = useMutation({
@@ -15,6 +16,10 @@ export function useStartConversation() {
         },
       );
       return resp.data;
+    },
+    onSuccess: (newConversation) => {
+      // Add to pending conversations - will show immediately in the list
+      addPendingConversation(newConversation);
     },
   });
 
