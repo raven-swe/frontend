@@ -14,13 +14,10 @@ export function useSearchUsers(searchQuery: MaybeRefOrGetter<string>) {
       if (!query.trim()) return [] as CompactUser[];
 
       try {
-        const resp = await apiFetch<ApiSuccessResponse<{ users: CompactUser[] }>>(
-          '/api/search/users',
-          {
-            method: 'GET',
-            query: { query },
-          },
-        );
+        const resp = await apiFetch<ApiSuccessResponse<CompactUser[]>>('/api/search/users', {
+          method: 'GET',
+          query: { query },
+        });
 
         const users = resp?.data ?? [];
         return Array.isArray(users) ? users : [];

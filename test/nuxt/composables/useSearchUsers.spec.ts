@@ -24,7 +24,7 @@ vi.mock('@tanstack/vue-query', () => ({
 
 vi.mock('~/api', () => ({
   apiFetch: vi.fn().mockResolvedValue({
-    data: { users: [{ username: 'user1' }, { username: 'user2' }] },
+    data: [{ username: 'user1' }, { username: 'user2' }],
   }),
 }));
 
