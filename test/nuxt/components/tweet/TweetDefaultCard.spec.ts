@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
+import { VueQueryPlugin } from '@tanstack/vue-query';
 import TweetDefaultCard from '@/components/tweet/TweetDefaultCard.vue';
 import Avatar from '@/components/ui/Avatar.vue';
 import TweetMedia from '@/components/tweet/TweetMedia.vue';
@@ -59,7 +60,7 @@ const stubs = {
 
 const globalConfig = {
   stubs,
-  plugins: [i18n],
+  plugins: [i18n, VueQueryPlugin],
 };
 
 function makeTweet(overrides: Partial<Tweet> = {}): Tweet {
