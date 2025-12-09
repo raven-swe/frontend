@@ -79,11 +79,6 @@ function handleAiSummary() {
         >
           <Icon name="vscode-icons:file-type-gemini" size="1.2rem" />
         </Button>
-        <Icon
-          class="text-foreground/50 hover:text-primary cursor-pointer"
-          name="ic:more-horiz"
-          size="1.4rem"
-        />
       </div>
     </div>
     <div class="mt-3 pb-3">
