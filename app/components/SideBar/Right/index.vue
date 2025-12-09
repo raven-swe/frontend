@@ -2,6 +2,7 @@
 import { exploreService } from '~/services/explore/exploreService';
 import type { TrendingHashtag } from '~~/shared/types/hashtag';
 import Hashtag from '~/components/explore/Hashtag.vue';
+import { Label } from 'reka-ui';
 import { onMounted, ref, computed, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { VisuallyHidden } from 'reka-ui';
+import { VisuallyHidden, Label } from 'reka-ui';
 import { ref, watch } from 'vue';
 import { useSearchStore } from '~/stores/search';
 import { useQueryClient } from '@tanstack/vue-query';
@@ -38,7 +38,7 @@ const handleOpenChange = (value: boolean) => {
     <UiDialogContent class="h-auto">
       <!-- Close Button -->
       <template #dialog-close>
-        <Button
+        <UiButton
           variant="ghost-default"
           size="icon-xs"
           class="absolute inset-2"
@@ -46,7 +46,7 @@ const handleOpenChange = (value: boolean) => {
         >
           <Icon name="lucide:x" class="size-5" />
           <span class="sr-only">{{ $t('ui.close') }}</span>
-        </Button>
+        </UiButton>
       </template>
 
       <template #header>
@@ -56,6 +56,10 @@ const handleOpenChange = (value: boolean) => {
       <UiDialogTitle>
         <VisuallyHidden />
       </UiDialogTitle>
+
+      <UiDialogDescription>
+        <VisuallyHidden />
+      </UiDialogDescription>
 
       <div class="mt-3 flex items-center justify-between">
         <Label class="cursor-pointer" for="remove-blocked">
