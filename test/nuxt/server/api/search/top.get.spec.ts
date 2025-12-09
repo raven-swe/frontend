@@ -30,7 +30,7 @@ describe('GET /api/search/hashtags/top', () => {
 
     const response = await topSearchEventHandler(event);
 
-    expect(mockServerApiFetch).toHaveBeenCalledWith('/search/top', {
+    expect(mockServerApiFetch).toHaveBeenCalledWith('/search/hashtags/top', {
       method: 'GET',
       query: {
         query: 'java',
@@ -78,7 +78,7 @@ describe('GET /api/search/hashtags/top', () => {
 
     const response = await topSearchEventHandler(event);
 
-    expect(mockServerApiFetch).toHaveBeenCalledWith('/search/top', {
+    expect(mockServerApiFetch).toHaveBeenCalledWith('/search/hashtags/top', {
       method: 'GET',
       query: {
         query: '',
