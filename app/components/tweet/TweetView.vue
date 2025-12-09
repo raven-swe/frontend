@@ -5,13 +5,14 @@ import type { Tweet } from '~~/shared/types/tweets';
 import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
 import ContentEntitiesRenderer from '../ui/ContentEntitiesRenderer.vue';
+import AiSummary from './AiSummary.vue';
 interface Props {
   tweet: Tweet;
 }
 const props = defineProps<Props>();
 
 const tweet = ref(props.tweet);
-
+const aiSummaryRef = ref<InstanceType<typeof AiSummary> | null>(null);
 // Update local tweet state when like/unlike succeeds
 const onLikeSuccess = () => {
   if (!tweet.value.isLiked) {
@@ -42,6 +43,10 @@ const onUndoRetweetSuccess = () => {
     tweet.value.retweetCount = next < 0 ? 0 : next;
   }
 };
+
+function handleAiSummary() {
+  aiSummaryRef.value?.handleAiSummary?.();
+}
 </script>
 
 <template>
@@ -65,15 +70,18 @@ const onUndoRetweetSuccess = () => {
           </div>
         </NuxtLink>
       </div>
-      <div class="flex">
-        <Icon
-          class="text-foreground/50 hover:text-primary cursor-pointer"
-          name="ic:more-horiz"
-          size="1.4rem"
-        />
+      <div class="flex flex-row items-center gap-2">
+        <Button
+          variant="tweet-icon-blue"
+          size="icon-md"
+          class="hover:text-brand-blue"
+          @click="handleAiSummary"
+        >
+          <Icon name="vscode-icons:file-type-gemini" size="1.2rem" />
+        </Button>
       </div>
     </div>
-    <div class="border-b-border mt-3 border-b-1 pb-3">
+    <div class="mt-3 pb-3">
       <p class="mt-1 leading-relaxed break-words whitespace-pre-wrap">
         <ContentEntitiesRenderer :content="tweet.content" :entities="tweet.entities" />
       </p>
@@ -88,6 +96,10 @@ const onUndoRetweetSuccess = () => {
         >
       </div>
     </div>
+
+    <div class="border-b-border mt-2 border-b-1 pb-3">
+      <AiSummary ref="aiSummaryRef" :tweet-id="props.tweet.id" />
+    </div>
     <TweetActionButtons
       :tweet="tweet"
       @like-success="onLikeSuccess"
@@ -95,35 +107,5 @@ const onUndoRetweetSuccess = () => {
       @retweet-success="onRetweetSuccess"
       @undo-retweet-success="onUndoRetweetSuccess"
     />
-
-    <div v-if="false" class="min-w-0 flex-1">
-      <div class="flex flex-wrap items-center gap-x-1 text-sm">
-        <span class="text-muted-foreground" v-text="'@' + tweet.author.username" />
-        <span class="text-muted-foreground">·</span>
-        <time
-          :title="formatDate(tweet.createdAt)"
-          :datetime="tweet.createdAt"
-          class="text-muted-foreground hover:cursor-pointer hover:underline"
-          >{{ relativeTime(tweet.createdAt) }}</time
-        >
-      </div>
-
-      <!-- Content -->
-      <p class="mt-1 leading-relaxed break-words whitespace-pre-wrap">
-        <UiContentEntitiesRenderer :content="tweet.content" :entities="tweet.entities" />
-      </p>
-
-      <!-- Media (single image basic layout) -->
-      <TweetMedia :media="tweet.media" />
-
-      <!-- Actions -->
-      <TweetActionButtons
-        :tweet="tweet"
-        @like-success="onLikeSuccess"
-        @unlike-success="onUnlikeSuccess"
-        @retweet-success="onRetweetSuccess"
-        @undo-retweet-success="onUndoRetweetSuccess"
-      />
-    </div>
   </article>
 </template>

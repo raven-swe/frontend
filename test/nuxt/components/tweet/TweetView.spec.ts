@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { mountSuspended } from '@nuxt/test-utils/runtime';
+import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime';
 import TweetView from '@/components/tweet/TweetView.vue';
 import Avatar from '@/components/ui/Avatar.vue';
 import TweetMedia from '@/components/tweet/TweetMedia.vue';
@@ -45,6 +45,14 @@ function makeTweet(overrides: Partial<Tweet> = {}): Tweet {
   };
   return { ...tweet, ...overrides };
 }
+
+// Mock useI18n to fix the "Need to install with app.use function" error
+mockNuxtImport('useI18n', () => {
+  return () => ({
+    locale: { value: 'en' },
+    t: (key: string) => key,
+  });
+});
 
 describe('TweetView.vue', () => {
   it('renders header (avatar, display name, username) and time', async () => {

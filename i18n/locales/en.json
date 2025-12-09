@@ -1,4 +1,14 @@
 {
+  "ai-summary": {
+    "retry": "Retry",
+    "summary": "AI Summary",
+    "generate-summary": "Generate Summary",
+    "loading-summary": "Generating summary...",
+    "something-went-wrong": "Something went wrong while generating the summary.",
+    "no-summary": "No summary available.",
+    "summary-label": "Summary",
+    "close": "Close AI summary"
+  },
   "testing": {
     "user": {
       "name": "John Doe",
