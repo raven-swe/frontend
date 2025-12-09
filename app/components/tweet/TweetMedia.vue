@@ -20,7 +20,7 @@ const sizeClass = computed(() => (compact.value ? 'max-h-[200px]' : 'max-h-[400p
   <div :class="[compact ? 'w-full max-w-[300px]' : 'w-full', 'pt-2']">
     <!-- 1 media -->
     <div v-if="media.length === 1" :class="['grid overflow-hidden rounded-xl', singleSizeClass]">
-      <MediaItem :media="media[0]!" :compact="compact" />
+      <MediaItem :media="media[0]!" :compact="compact" :rounded="true" />
     </div>
 
     <!-- 2 media: side by side -->
@@ -31,7 +31,7 @@ const sizeClass = computed(() => (compact.value ? 'max-h-[200px]' : 'max-h-[400p
         sizeClass,
       ]"
     >
-      <MediaItem v-for="(m, i) in media" :key="i" :media="m" :compact="compact" />
+      <MediaItem v-for="(m, i) in media" :key="i" :media="m" :compact="compact" :rounded="false" />
     </div>
 
     <!-- 3 media: first spans full height on left -->
@@ -43,10 +43,10 @@ const sizeClass = computed(() => (compact.value ? 'max-h-[200px]' : 'max-h-[400p
       ]"
     >
       <div class="col-span-1 row-span-2 flex items-center justify-center">
-        <MediaItem :media="media[0]!" :compact="compact" />
+        <MediaItem :media="media[0]!" :compact="compact" :rounded="false" />
       </div>
-      <MediaItem :media="media[1]!" :compact="compact" />
-      <MediaItem :media="media[2]!" :compact="compact" />
+      <MediaItem :media="media[1]!" :compact="compact" :rounded="false" />
+      <MediaItem :media="media[2]!" :compact="compact" :rounded="false" />
     </div>
 
     <!-- 4 media: uniform grid -->
@@ -57,7 +57,7 @@ const sizeClass = computed(() => (compact.value ? 'max-h-[200px]' : 'max-h-[400p
         sizeClass,
       ]"
     >
-      <MediaItem v-for="(m, i) in media" :key="i" :media="m!" :compact="compact" />
+      <MediaItem v-for="(m, i) in media" :key="i" :media="m!" :compact="compact" :rounded="false" />
     </div>
   </div>
 </template>

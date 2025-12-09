@@ -6,8 +6,11 @@ import VideoPlayer from '~/components/ui/VideoPlayer.vue';
 interface Props {
   media: TweetMedia;
   compact?: boolean; // when true render smaller media (quoted tweets)
+  rounded?: boolean; // when true apply rounded corners (single media only)
 }
 const props = defineProps<Props>();
+
+const shouldRound = computed(() => props.rounded !== false);
 
 const isVideo = computed(() => props.media.type === 'VIDEO');
 const isGif = computed(() => props.media.type === 'GIF');
@@ -17,7 +20,7 @@ const isImage = computed(() => props.media.type === 'IMAGE' || isGif.value);
 <template>
   <div
     class="relative h-full w-full overflow-hidden"
-    :class="props.compact ? 'rounded-lg' : 'rounded-xl'"
+    :class="shouldRound ? (props.compact ? 'rounded-lg' : 'rounded-xl') : ''"
   >
     <NuxtImg
       v-if="isImage"
@@ -30,7 +33,7 @@ const isImage = computed(() => props.media.type === 'IMAGE' || isGif.value);
     <div
       v-else-if="isVideo"
       class="flex h-full max-h-full w-full items-center justify-center overflow-hidden"
-      :class="props.compact ? 'rounded-lg' : 'rounded-xl'"
+      :class="shouldRound ? (props.compact ? 'rounded-lg' : 'rounded-xl') : ''"
     >
       <VideoPlayer
         :src="props.media.url"
