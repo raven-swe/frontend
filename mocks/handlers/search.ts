@@ -16,8 +16,8 @@ const allHashtags = [
 ];
 
 export const handlers = [
-  // GET /search/top - Get top 3 hashtags matching query
-  http.get(`${API_URL}/search/top`, ({ request }) => {
+  // GET /search/hashtags/top - Get top 3 hashtags matching query
+  http.get(`${API_URL}/search/hashtags/top`, ({ request }) => {
     const url = new URL(request.url);
     const query = url.searchParams.get('query') || '';
 

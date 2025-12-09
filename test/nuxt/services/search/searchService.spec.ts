@@ -14,7 +14,7 @@ describe('searchService', () => {
     it('calls API with correct query parameter', async () => {
       const mockHashtags = ['javascript', 'typescript', 'nodejs'];
 
-      registerEndpoint('/api/search/top', () => {
+      registerEndpoint('/api/search/hashtags/top', () => {
         return {
           data: mockHashtags,
         };
@@ -27,7 +27,7 @@ describe('searchService', () => {
     });
 
     it('handles empty hashtags response', async () => {
-      registerEndpoint('/api/search/top', () => {
+      registerEndpoint('/api/search/hashtags/top', () => {
         return {
           data: [],
         };
@@ -65,7 +65,7 @@ describe('searchService', () => {
         };
       });
 
-      registerEndpoint('/api/search/top', () => {
+      registerEndpoint('/api/search/hashtags/top', () => {
         return {
           data: mockHashtags,
         };
@@ -86,7 +86,7 @@ describe('searchService', () => {
         };
       });
 
-      registerEndpoint('/api/search/top', () => {
+      registerEndpoint('/api/search/hashtags/top', () => {
         return {
           data: [],
         };
