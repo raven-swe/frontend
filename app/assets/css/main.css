@@ -9,6 +9,7 @@
   --input: #d1d9de;
   --muted: #eff3f4;
   --muted-foreground: #536471;
+  --thread-foreground: #cfd9de;
   --primary: #1d9bf0;
   --brand-red: #f91880;
   --brand-blue: #1d9bf0;
@@ -38,6 +39,7 @@
   --border: #202224;
   --input: #536471;
   --muted: #202327;
+  --thread-foreground: #333639;
   --muted-foreground: #71767b;
   --primary: #3b82f6;
   --accent: #16181c;
@@ -65,6 +67,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-border: var(--border);
+  --color-thread-foreground: var(--thread-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-primary: var(--primary);

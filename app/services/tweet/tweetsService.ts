@@ -1,5 +1,4 @@
 import { apiFetch } from '~/api';
-import type { Tweet } from '~~/shared/types/tweets';
 export type timelineSchema = {
   limit: number;
   cursor: string | null;
@@ -11,11 +10,11 @@ export type Pagination = {
 };
 export const tweetsService = {
   async tweet(tweetId: string) {
-    return await apiFetch<ApiSuccessResponse<Tweet>>(`/api/tweets/${tweetId}`);
+    return await apiFetch(`/api/tweets/${tweetId}`);
   },
 
   async replies(tweetId: string, timeline: timelineSchema) {
-    return await apiFetch<ApiSuccessResponse<Tweet[]>>(`/api/tweets/${tweetId}/replies`, {
+    return await apiFetch(`/api/tweets/${tweetId}/replies`, {
       method: 'GET',
       query: {
         limit: timeline.limit,
@@ -23,4 +22,16 @@ export const tweetsService = {
       },
     });
   },
+};
+
+export const tweetAiSummary = async (id: string, locale: string) => {
+  return await apiFetch<ApiSuccessResponse<{ id: string; summary: string }>>(
+    `/api/tweets/${id}/summary`,
+    {
+      method: 'GET',
+      query: {
+        locale: locale,
+      },
+    },
+  );
 };

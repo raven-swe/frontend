@@ -2,17 +2,9 @@ import { faker } from '@faker-js/faker';
 import { mkdirSync, writeFileSync, readFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import type { Tweet } from '../../shared/types/tweets';
+import type { Tweet, TweetAuthor, TweetWithParents } from '../../shared/types/tweets';
 import type { User } from '#shared/types/user';
-
-type TweetAuthor = {
-  username: string;
-  displayName: string;
-  avatarUrl: string;
-  isFollowing: boolean;
-  isFollower: boolean;
-};
-
+import { generateBioWithEntities } from './genMockUsers';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -26,20 +18,6 @@ function makeAuthorFromUser(user: Partial<User> | undefined) {
     isFollowing: faker.datatype.boolean(),
     isFollower: faker.datatype.boolean(),
   };
-}
-
-function randomEntities() {
-  const mentionsCount = faker.number.int({ min: 0, max: 2 });
-  const hashtagsCount = faker.number.int({ min: 0, max: 2 });
-  const mentions = Array.from({ length: mentionsCount }, () => ({
-    username: faker.internet.username().toLowerCase(),
-    startPosition: faker.number.int({ min: 0, max: 20 }),
-  }));
-  const hashtags = Array.from({ length: hashtagsCount }, () => ({
-    hashtag: faker.hacker.noun().replace(/\s+/g, ''),
-    startPosition: faker.number.int({ min: 0, max: 20 }),
-  }));
-  return { mentions, hashtags };
 }
 
 function randomMedia() {
@@ -89,10 +67,11 @@ function randomMedia() {
   ] as Tweet['media'];
 }
 
-function makeBaseTweet(id: string, content?: string, author?: TweetAuthor): Tweet {
+function makeBaseTweet(id: string, content?: string, author?: TweetAuthor): TweetWithParents {
+  const contentGenerated = generateBioWithEntities();
   return {
     id,
-    content: content ?? faker.lorem.sentences({ min: 1, max: 3 }),
+    content: content ?? contentGenerated.bio,
     createdAt: new Date().toISOString(),
     author:
       author ??
@@ -104,13 +83,18 @@ function makeBaseTweet(id: string, content?: string, author?: TweetAuthor): Twee
     likeCount: faker.number.int({ min: 0, max: 500 }),
     isLiked: faker.datatype.boolean(),
     isRetweeted: faker.datatype.boolean(),
-    entities: randomEntities(),
+    entities: contentGenerated.bioEntities!,
     media: randomMedia(),
     replyToTweetId: undefined,
+    hasMoreParents: false,
+    parentTweets: null,
+    quoteToTweetId: null,
+    quotedTweet: null,
+    rootTweet: null,
   };
 }
 
-function makeData() {
+async function makeData() {
   const NUM_TWEETS = 400;
   const usersPath = path.resolve(__dirname, '../data/mock-users.json');
   let users: User[] = [];
@@ -121,7 +105,46 @@ function makeData() {
     users = [];
   }
 
-  const tweets: Tweet[] = [];
+  const tweets: (Tweet | TweetWithParents)[] = [];
+
+  const NUM_THREAD_TWEETS = 10;
+
+  const tweetMap = new Map<string, Tweet | TweetWithParents>();
+  for (let i = 0; i < NUM_THREAD_TWEETS; ++i) {
+    const randomUser = faker.helpers.arrayElement(users);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const tweet = makeBaseTweet('tw-thread-' + i, undefined, makeAuthorFromUser(randomUser));
+    tweetMap.set(tweet.id, tweet);
+  }
+
+  for (let i = NUM_THREAD_TWEETS - 1; i > 0; --i) {
+    const currentTweet = tweetMap.get('tw-thread-' + i) as TweetWithParents;
+    const rootTweet = tweetMap.get('tw-thread-0');
+    currentTweet.replyToTweetId = 'tw-thread-' + (i - 1);
+    currentTweet.rootTweet = rootTweet;
+    const parentTweets: Tweet[] = [];
+    for (let j = i - 1; j > 0; --j) {
+      const parentTweet = tweetMap.get('tw-thread-' + j) as TweetWithParents;
+      const copiedTweet = structuredClone(parentTweet);
+      delete copiedTweet.parentTweets;
+      delete copiedTweet.rootTweet;
+      delete copiedTweet.hasMoreParents;
+      parentTweets.push(copiedTweet);
+    }
+    if (parentTweets.length > 4) {
+      currentTweet.hasMoreParents = true;
+      parentTweets.splice(4);
+    }
+    parentTweets.sort((a, b) => {
+      const dateA = new Date(a.createdAt).getTime();
+      const dateB = new Date(b.createdAt).getTime();
+      return dateA - dateB;
+    });
+    currentTweet.parentTweets = parentTweets;
+  }
+
+  tweets.push(...Array.from(tweetMap.values()));
+
   for (let i = 0; i < 100; i++) {
     const id = 'tw-' + faker.string.nanoid(8);
     const chosenUser = users[0];
@@ -138,7 +161,7 @@ function makeData() {
     tweets.push(t);
   }
 
-  for (let i = 1; i < tweets.length; i++) {
+  for (let i = NUM_THREAD_TWEETS + 1; i < tweets.length; i++) {
     if (faker.number.int({ min: 0, max: 100 }) < 50) {
       const targetIndex = faker.number.int({ min: 0, max: i - 1 });
       tweets[i]!.replyToTweetId = tweets[targetIndex]!.id;
@@ -159,12 +182,12 @@ function makeData() {
   return tweets;
 }
 
-function main() {
-  const data = makeData();
+async function main() {
+  const data = await makeData();
   const outDir = path.resolve(__dirname, '../data');
   const outFile = path.join(outDir, 'mock-tweets.json');
   mkdirSync(outDir, { recursive: true });
   writeFileSync(outFile, JSON.stringify(data, null, 2), 'utf-8');
 }
 
-main();
+await main();

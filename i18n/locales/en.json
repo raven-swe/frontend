@@ -1,4 +1,14 @@
 {
+  "ai-summary": {
+    "retry": "Retry",
+    "summary": "AI Summary",
+    "generate-summary": "Generate Summary",
+    "loading-summary": "Generating summary...",
+    "something-went-wrong": "Something went wrong while generating the summary.",
+    "no-summary": "No summary available.",
+    "summary-label": "Summary",
+    "close": "Close AI summary"
+  },
   "testing": {
     "user": {
       "name": "John Doe",
@@ -135,7 +145,8 @@
         "title": "Lights, camera … attachments!",
         "description": "When you post photos or videos, they will show up here."
       }
-    }
+    },
+    "mutual": "Followed by {user1} | Followed by {user1} and {user2} | Followed by {user1}, {user2}, and {user3} | Followed by {user1}, {user2}, and {count} others"
   },
   "home": {
     "tabs": {
@@ -203,7 +214,8 @@
     "joined": "Joined",
     "following": "Following",
     "followers": "Followers",
-    "user-muted": "You have muted posts from this account."
+    "user-muted": "You have muted posts from this account.",
+    "mutual": "Followed by {user1} | Followed by {user1} and {user2} | Followed by {user1}, {user2}, and {user3} | Followed by {user1}, {user2}, and {others} others you follow"
   },
   "root": {
     "hero": {
@@ -258,7 +270,10 @@
       "reply": "Reply",
       "like": "Like",
       "unlike": "Unlike"
-    }
+    },
+    "show-more-parents": "Show more tweets",
+    "deleted-quote": "This post is unavailable.",
+    "deleted-parent": "This Post was deleted by the Post author."
   },
   "notifications": {
     "title": "Notifications",
