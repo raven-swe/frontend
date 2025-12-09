@@ -46,7 +46,7 @@ watch(
 
 <template>
   <div class="border-border mx-auto max-w-[700px]">
-    <div v-if="isLoading" class="text-primary mt-50 flex shrink-0 items-center justify-center">
+    <div v-if="isLoading" class="text-primary flex shrink-0 items-center justify-center py-4">
       <UiSpinner />
     </div>
     <div v-else-if="trendingHashtags && trendingHashtags.length > 0" class="py-2">
@@ -57,8 +57,8 @@ watch(
         :rank="index"
       />
     </div>
-    <div v-else class="text-muted-foreground mt-20 text-center">
-      <h1 class="text-xl font-semibold">{{ $t('explore.no-trending-hashtags') }}</h1>
+    <div v-else class="mx-auto my-10 max-w-90 px-8 text-start break-words">
+      <p class="text-[2rem] leading-tight font-black">{{ $t('explore.no-trending-hashtags') }}</p>
     </div>
   </div>
 </template>

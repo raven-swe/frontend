@@ -114,11 +114,14 @@ onServerPrefetch(async () => {
         </div>
       </ClientOnly>
     </div>
-    <div v-if="!isLoading && tweets.length === 0" class="mx-auto my-10 max-w-90 px-8 text-start">
-      <p class="text-[2rem] leading-tight font-black">
+    <div
+      v-if="!isLoading && tweets.length === 0"
+      class="mx-auto my-10 max-w-90 px-8 text-start break-words"
+    >
+      <h2 class="text-[2rem] leading-tight font-black">
         {{ $t('search.no-results', { query: searchQuery }) }}
-      </p>
-      <p class="text-muted-foreground leading-tight">
+      </h2>
+      <p class="text-muted-foreground mt-1 leading-tight">
         {{ $t('search.try-searching') }}
       </p>
     </div>

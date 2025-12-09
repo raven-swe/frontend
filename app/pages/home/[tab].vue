@@ -126,7 +126,7 @@ watch(
 </script>
 
 <template>
-  <div class="border-border mx-auto max-w-[700px] px-2">
+  <div class="border-border mx-auto max-w-[700px]">
     <TweetComposer class="mt-15 border-b-1" @posted="handlePost" />
     <ClientOnly>
       <div v-if="tweets" ref="parentRef">
@@ -173,9 +173,9 @@ watch(
     <div
       v-if="tweets.length === 0 && !isFetchingNextPage && !isLoading"
       data-testid="empty-state"
-      class="text-muted-foreground mt-20 text-center"
+      class="mx-auto my-10 max-w-90 px-8 text-start break-words"
     >
-      <h1 class="text-xl font-semibold">{{ $t('testing.tweets.tweet-not-found') }}</h1>
+      <p class="text-[2rem] leading-tight font-black">{{ $t('errors.TWEET_NOT_FOUND') }}</p>
     </div>
   </div>
 </template>

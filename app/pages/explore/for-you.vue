@@ -145,13 +145,13 @@ watch(
       />
     </div>
 
-    <div v-for="categoryData in categorizedTweets" :key="categoryData.category" class="px-2">
-      <h1 class="ps-2 pt-2 pb-3 text-2xl font-extrabold">{{ categoryData.category }}</h1>
+    <div v-for="categoryData in categorizedTweets" :key="categoryData.category">
+      <h1 class="ps-4 pt-2 pb-3 text-2xl font-extrabold">{{ categoryData.category }}</h1>
       <TweetDefaultCard v-for="tweet in categoryData.tweets" :key="tweet.id" :tweet="tweet" />
     </div>
 
     <!-- Tweets Section -->
-    <div ref="parentRef" class="border-border mx-auto max-w-[700px] px-2">
+    <div ref="parentRef" class="border-border mx-auto max-w-[700px]">
       <ClientOnly>
         <div v-if="tweets">
           <div
@@ -172,7 +172,7 @@ watch(
                 }px)`,
               }"
             >
-              <h1 v-if="tweets.length > 0" class="py-4 ps-2 text-2xl font-extrabold">
+              <h1 v-if="tweets.length > 0" class="py-4 ps-4 text-2xl font-extrabold">
                 {{ $t('explore.for-you.posts-for-you') }}
               </h1>
               <div
@@ -193,7 +193,7 @@ watch(
 
       <div
         v-if="(hasNextPage && isFetchingNextPage) || isLoading"
-        class="text-primary mt-20 flex shrink-0 items-center justify-center py-4"
+        class="text-primary flex shrink-0 items-center justify-center py-4"
       >
         <UiSpinner />
       </div>
@@ -202,9 +202,9 @@ watch(
     <div
       v-if="tweets.length === 0 && !isFetchingNextPage && !isLoading"
       data-testid="empty-state"
-      class="text-muted-foreground mt-20 text-center"
+      class="mx-auto my-10 max-w-90 px-8 text-start break-words"
     >
-      <h1 class="text-xl font-semibold">{{ $t('errors.TWEET_NOT_FOUND') }}</h1>
+      <p class="text-[2rem] leading-tight font-black">{{ $t('errors.TWEET_NOT_FOUND') }}</p>
     </div>
   </div>
 </template>
