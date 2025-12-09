@@ -9,6 +9,7 @@ const props = defineProps<{
     signal: AbortSignal,
   ) => Promise<ApiSuccessResponse<CompactUser[]>>;
   queryKeySuffix: string;
+  queryKeySuffixArray?: (string | number)[];
   emptyTitle: string;
   emptyDescription: string;
   currentUsername: string | null;
@@ -21,7 +22,12 @@ const username = computed(() => {
   return val ? val.toLowerCase() : null;
 });
 
-const queryKey = computed(() => ['user-list', username.value, props.queryKeySuffix]);
+const queryKey = computed(() => [
+  'user-list',
+  username.value,
+  ...(props.queryKeySuffixArray ?? []),
+  props.queryKeySuffix,
+]);
 const {
   data: usersPaginated,
   hasNextPage,
