@@ -22,7 +22,7 @@ export function useSearchUsers(searchQuery: MaybeRefOrGetter<string>) {
           },
         );
 
-        const users = resp?.data?.users ?? [];
+        const users = resp?.data ?? [];
         return Array.isArray(users) ? users : [];
       } catch {
         return [] as CompactUser[];

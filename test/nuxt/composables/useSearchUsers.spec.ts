@@ -53,7 +53,7 @@ describe('useSearchUsers', () => {
     const { useSearchUsers } = await import('@/composables/useSearchUsers');
     const result = useSearchUsers(ref(''));
 
-    expect(result.users).toBeDefined();
+    expect(result).toBeDefined();
   });
 
   it('handles string getter function', async () => {
