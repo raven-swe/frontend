@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import DmMessagesList from './DmMessagesList.vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useDmMessages } from '@/composables/useDmMessages';
 
 import { showToaster } from '@/utils/showToaster';
@@ -8,6 +8,7 @@ import Spinner from '~/components/ui/Spinner.vue';
 import type { DmMessage } from '~~/shared/types/dm';
 
 const route = useRoute();
+const router = useRouter();
 const conversationId = computed(() => route.params.conversationId as string | null);
 
 const userStore = useUserStore();
@@ -101,6 +102,22 @@ onMounted(() => {
 
 watch(messagesError, (val) => val && showToaster('error', 'Failed to load messages'));
 watch(conversationsError, (val) => val && showToaster('error', 'Failed to load conversation'));
+watch(
+  [
+    () => messagesLoading.value,
+    () => conversationsLoading.value,
+    () => initialMessages.value,
+    () => conversation.value,
+    conversationId,
+  ],
+  ([msgsLoading, convsLoading, msgs, conv, convId]) => {
+    if (msgsLoading || convsLoading) return;
+    if (convId && !conv && msgs && msgs.length === 0) {
+      router.replace('/messages');
+    }
+  },
+  { immediate: true },
+);
 </script>
 <template>
   <div class="flex h-full flex-col overflow-hidden">

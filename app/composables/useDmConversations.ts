@@ -3,22 +3,6 @@ import type { DmConversation } from '~~/shared/types/dm';
 import type { ApiSuccessResponse } from '~~/shared/types/api';
 import { apiFetch } from '~/api';
 
-// Shared state for pending new conversations (not yet returned by backend)
-const pendingNewConversations = ref<DmConversation[]>([]);
-
-export function addPendingConversation(conversation: DmConversation) {
-  // Add only if not already in the list
-  if (!pendingNewConversations.value.some((c) => c.id === conversation.id)) {
-    pendingNewConversations.value = [conversation, ...pendingNewConversations.value];
-  }
-}
-
-export function removePendingConversation(conversationId: string) {
-  pendingNewConversations.value = pendingNewConversations.value.filter(
-    (c) => c.id !== conversationId,
-  );
-}
-
 type ConversationsCache = {
   pages: ApiSuccessResponse<DmConversation[]>[];
   pageParams: (string | undefined)[];
@@ -84,12 +68,6 @@ export function useDmConversations() {
           },
         });
 
-        // Remove any pending conversations that are now in the backend response
-        const fetchedIds = new Set(resp.data.map((c) => c.id));
-        pendingNewConversations.value = pendingNewConversations.value.filter(
-          (c) => !fetchedIds.has(c.id),
-        );
-
         return resp;
       },
       initialPageParam: undefined as string | undefined,
@@ -101,16 +79,9 @@ export function useDmConversations() {
       },
     });
 
-  // Flatten all pages into a single array and merge with pending new conversations
+  // Flatten all pages into a single array
   const allConversations = computed(() => {
-    const fetched = data.value ? data.value.pages.flatMap((page) => page.data) : [];
-    const fetchedIds = new Set(fetched.map((c) => c.id));
-
-    // Filter out pending conversations that are already in fetched data
-    const uniquePending = pendingNewConversations.value.filter((c) => !fetchedIds.has(c.id));
-
-    // Pending conversations go first, then fetched ones
-    return [...uniquePending, ...fetched];
+    return data.value ? data.value.pages.flatMap((page) => page.data) : [];
   });
 
   // Sort conversations by most recent message
