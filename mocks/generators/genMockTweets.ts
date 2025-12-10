@@ -158,6 +158,14 @@ async function makeData() {
     const chosenUser = users.length ? faker.helpers.arrayElement(users) : undefined;
     const author = makeAuthorFromUser(chosenUser as Partial<User>);
     const t: Tweet = makeBaseTweet(id, undefined, author);
+    // Optionally mark as reposted by a random existing user
+    if (users.length && faker.number.int({ min: 0, max: 100 }) < 20) {
+      const reposter = faker.helpers.arrayElement(users);
+      t.repostedBy = {
+        displayName: reposter.displayName,
+        username: String(reposter.username).toLowerCase(),
+      };
+    }
     tweets.push(t);
   }
 
@@ -176,6 +184,15 @@ async function makeData() {
       // (quotedLight as unknown as Record<string, unknown>).isReplyToTweetId = undefined;
       tweets[i]!.quoteToTweetId = tweets[targetIndex]!.id;
       tweets[i]!.quotedTweet = quotedLight as unknown as Tweet;
+    }
+
+    // Add repostedBy for some of the existing tweets if missing
+    if (!tweets[i]!.repostedBy && users.length && faker.number.int({ min: 0, max: 100 }) < 10) {
+      const reposter = faker.helpers.arrayElement(users);
+      tweets[i]!.repostedBy = {
+        displayName: reposter.displayName,
+        username: String(reposter.username).toLowerCase(),
+      };
     }
   }
 

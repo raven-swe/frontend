@@ -4,6 +4,7 @@ import Avatar from '~/components/ui/Avatar.vue';
 import type { Tweet } from '~~/shared/types/tweets';
 import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
+import { useUserStore } from '~/stores/user';
 import QuotedTweetCard from './QuotedTweetCard.vue';
 import AiSummary from './AiSummary.vue';
 import { useUserStore } from '~/stores/user';
@@ -14,6 +15,9 @@ interface Props {
 }
 const props = defineProps<Props>();
 const router = useRouter();
+const userStore = useUserStore();
+const originalUsername = ref<string>(userStore.user?.username || '');
+
 const userStore = useUserStore();
 const originalUsername = ref<string>(userStore.user?.username || '');
 
@@ -63,6 +67,19 @@ const { mutate: blockUser } = useBlockMutation();
 </script>
 
 <template>
+  <NuxtLink
+    v-if="props.tweet.repostedBy"
+    :to="`/profile/${props.tweet.repostedBy.username}`"
+    class="text-muted-foreground ms-5 mt-1 flex items-center gap-2 px-6 text-sm"
+  >
+    <Icon name="tabler:repeat" />
+    <span v-if="props.tweet.repostedBy.username === originalUsername">
+      {{ $t('tweet.retweeted-by-you') }}
+    </span>
+    <span v-else>{{
+      $t('tweet.retweeted-by', { username: props.tweet.repostedBy.displayName })
+    }}</span>
+  </NuxtLink>
   <article
     :id="'tweet-' + props.tweet.id"
     class="border-b-border bg-background hover:bg-foreground/5 flex w-full max-w-[700px] cursor-pointer gap-2 px-4 transition-colors duration-100"
