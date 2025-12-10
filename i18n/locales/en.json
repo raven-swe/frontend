@@ -261,6 +261,7 @@
       }
     },
     "delete-tweet": "Delete",
+    "delete-success": "Tweet deleted successfully",
     "delete-dialog": {
       "title": "Delete Tweet?",
       "description": "This can't be undone and it will be removed from your profile, the timeline of any accounts that follow you, and from Twitter search results."
