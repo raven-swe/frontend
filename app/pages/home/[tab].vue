@@ -149,7 +149,7 @@ watch(
           >
             <div
               v-for="virtualRow in virtualRows"
-              :key="tweets[virtualRow.index]?.id || String(virtualRow.key)"
+              :key="String(virtualRow.key)"
               :ref="measureElement"
               :data-index="virtualRow.index"
             >

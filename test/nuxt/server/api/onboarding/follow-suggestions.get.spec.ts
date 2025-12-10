@@ -15,12 +15,28 @@ describe('GET /onboarding/follow-suggestions', () => {
   it('returns user follow suggestions', async () => {
     const mockResponse = {
       success: true,
-      data: [
-        {
-          username: 'janedoe',
-          displayName: 'Jane Doe',
-        },
-      ],
+      data: {
+        suggestions: [
+          {
+            id: '1',
+            username: 'user1',
+            displayName: 'User One',
+            avatarUrl: 'http://example.com/avatar1.png',
+            bio: 'Bio of user one',
+            bioEntities: null,
+            relationship: { isFollower: true },
+          },
+          {
+            id: '2',
+            username: 'user2',
+            displayName: 'User Two',
+            avatarUrl: 'http://example.com/avatar2.png',
+            bio: 'Bio of user two',
+            bioEntities: null,
+            relationship: { isFollower: false },
+          },
+        ],
+      },
     };
     mockServerApiFetch.mockResolvedValueOnce(mockResponse);
 
@@ -38,6 +54,37 @@ describe('GET /onboarding/follow-suggestions', () => {
       method: 'GET',
       query: { cursor: 'abc123', limit: '10' },
     });
-    expect(response).toMatchObject(mockResponse);
+    expect(response).toMatchObject({
+      data: [
+        {
+          username: 'user1',
+          displayName: 'User One',
+          avatarUrl: 'http://example.com/avatar1.png',
+          bio: 'Bio of user one',
+          bioEntities: null,
+          relationship: {
+            follower: true,
+            following: false,
+            blocking: false,
+            blockedBy: false,
+            muted: false,
+          },
+        },
+        {
+          username: 'user2',
+          displayName: 'User Two',
+          avatarUrl: 'http://example.com/avatar2.png',
+          bio: 'Bio of user two',
+          bioEntities: null,
+          relationship: {
+            follower: false,
+            following: false,
+            blocking: false,
+            blockedBy: false,
+            muted: false,
+          },
+        },
+      ],
+    });
   });
 });

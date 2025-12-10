@@ -16,12 +16,14 @@ const settingsServiceMock = vi.hoisted(() => {
   return {
     getInterests: vi.fn(() => {
       return {
-        data: [
-          { code: 'NEWS', name: 'News', isSelected: false },
-          { code: 'SPORTS', name: 'Sports', isSelected: false },
-          { code: 'MUSIC', name: 'Music', isSelected: false },
-          { code: 'ART', name: 'Art', isSelected: false },
-        ],
+        data: {
+          interests: [
+            { code: 'NEWS', name: 'News', isSelected: false },
+            { code: 'SPORTS', name: 'Sports', isSelected: false },
+            { code: 'MUSIC', name: 'Music', isSelected: false },
+            { code: 'ART', name: 'Art', isSelected: false },
+          ],
+        },
       };
     }),
   };
