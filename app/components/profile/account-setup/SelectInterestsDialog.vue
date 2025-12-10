@@ -32,7 +32,7 @@ watch(
   () => interestsData?.value,
   (newData) => {
     if (newData?.data) {
-      const selected = newData.data
+      const selected = newData.data.interests
         .filter((interest) => interest.isSelected)
         .map((interest) => interest.code);
       replace(selected);
@@ -89,7 +89,7 @@ const translatedInterest = (interest: Interest) => {
       <form class="flex h-full flex-1 flex-col overflow-y-hidden px-0" @submit.prevent="onSubmit">
         <div class="grid grid-cols-2 justify-center gap-4 overflow-y-auto px-4 py-2 sm:grid-cols-3">
           <InterestItem
-            v-for="interest in interestsData?.data || []"
+            v-for="interest in interestsData?.data.interests || []"
             :key="interest.code"
             :interest="translatedInterest(interest)"
             :is-active="isInterestActive(interest.code)"
