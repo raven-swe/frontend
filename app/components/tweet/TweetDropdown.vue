@@ -33,14 +33,15 @@ function removeTweetFromInfiniteData(
 async function handleDelete() {
   try {
     await deleteTweet(props.tweet.id);
-    showToaster('success', 'toaster.tweet.delete-success');
+    showToaster('success', $t('tweet.delete-success'));
 
     const queryKeys = [
       ['for-you'],
       ['following'],
       ['profile', props.tweet.author.username, 'tweets'],
-      ['profile', props.tweet.author.username, 'replies'],
-      ['profile', props.tweet.author.username, 'media'],
+      ['profile', props.tweet.author.username, 'tweets-replies'],
+      ['profile', props.tweet.author.username, 'tweets-media'],
+      ['profile', props.tweet.author.username, 'tweets-likes'],
     ];
 
     queryKeys.forEach((key) => {
@@ -49,10 +50,9 @@ async function handleDelete() {
       );
     });
   } catch {
-    showToaster('error', 'toaster.tweet.delete-error');
+    showToaster('error', $t('tweet.delete-error'));
   }
 }
-console.log(props.username, props.tweet.author.username);
 </script>
 <template>
   <UiAlertDialog>
@@ -70,13 +70,10 @@ console.log(props.username, props.tweet.author.username);
           </NuxtLink>
         </UiDropdownMenuItem>
         <UiDropdownMenuItem as-child @select.prevent>
-          <UiAlertDialogTrigger as-child>
-            <div
-              v-if="props.username === tweet.author.username"
-              class="text-destructive flex w-full cursor-pointer items-center gap-2 p-2 ltr:flex-row rtl:flex-row-reverse"
-            >
-              <Icon name="mi:delete" size="1.25rem" />
-              <h1>{{ $t('tweet.delete-tweet') }}</h1>
+          <UiAlertDialogTrigger as-child class="text-destructive ltr:flex-row rtl:flex-row-reverse">
+            <div v-if="props.username === props.tweet.author.username">
+              <Icon name="mi:delete" />
+              <p>{{ $t('tweet.delete-tweet') }}</p>
             </div>
           </UiAlertDialogTrigger>
         </UiDropdownMenuItem>
