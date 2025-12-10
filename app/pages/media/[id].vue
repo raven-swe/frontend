@@ -244,7 +244,7 @@ function handleReplied(tweet: Tweet) {
 
           <div v-else>
             <div v-if="tweetData" class="divide-border flex min-h-screen w-full divide-x">
-              <div class="flex min-h-screen w-[80%] items-center justify-center pt-9 align-middle">
+              <div class="flex min-h-screen flex-1 items-center justify-center pt-9 align-middle">
                 <Carousel class="h-full w-full">
                   <CarouselContent>
                     <CarouselItem
@@ -260,7 +260,7 @@ function handleReplied(tweet: Tweet) {
                 </Carousel>
               </div>
 
-              <div class="ms-auto min-h-screen w-[20%] overflow-y-auto">
+              <div class="ms-auto min-h-screen w-80 overflow-y-auto">
                 <div v-if="tweetData">
                   <TweetView :tweet="tweetData" :media="false" />
                 </div>
