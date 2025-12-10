@@ -35,6 +35,10 @@ export type Tweet = {
   entities?: ContentEntities | null;
   media: TweetMedia[];
   replyToTweetId?: string | null;
+  repostedBy?: {
+    displayName: string;
+    username: string;
+  };
   quoteToTweetId?: string | null;
   quotedTweet?: Tweet | DeletedTweet | null;
   replyToTweet?: Tweet | null; // search only

@@ -3,12 +3,15 @@ import Avatar from '~/components/ui/Avatar.vue';
 import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
 import ContentEntitiesRenderer from '../ui/ContentEntitiesRenderer.vue';
+import { useUserStore } from '~/stores/user';
 import QuotedTweetCard from './QuotedTweetCard.vue';
 import AiSummary from './AiSummary.vue';
 interface Props {
   tweet: TweetWithParents;
 }
 const props = defineProps<Props>();
+const userStore = useUserStore();
+const originalUsername = ref<string>(userStore.user?.username || '');
 
 const tweetClone = ref(structuredClone(toRaw(props.tweet)));
 const aiSummaryRef = ref<InstanceType<typeof AiSummary> | null>(null);
@@ -52,6 +55,22 @@ function handleAiSummary() {
 </script>
 
 <template>
+  <NuxtLink
+    v-if="props.tweet.repostedBy"
+    :to="`/profile/${props.tweet.repostedBy.username}`"
+    class="text-muted-foreground ms-2 mt-13 flex items-center gap-1 px-6"
+  >
+    <Icon name="tabler:repeat" size="1.2rem" />
+    <span
+      v-if="props.tweet.repostedBy.username === originalUsername"
+      class="text-muted-foreground text-sm"
+    >
+      {{ $t('tweet.retweeted-by-you') }}
+    </span>
+    <span v-else class="text-muted-foreground text-sm">{{
+      $t('tweet.retweeted-by', { username: props.tweet.repostedBy.displayName })
+    }}</span>
+  </NuxtLink>
   <article class="w-full max-w-[700px] gap-3 border-b px-4 pb-2">
     <div class="flex w-full flex-col gap-1">
       <div class="flex flex-row gap-2">
