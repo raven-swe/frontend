@@ -48,7 +48,6 @@ const rowVirtualizerOptions = computed(() => {
     count: hasNextPage ? users.value.length + 1 : users.value.length,
     estimateSize: () => 95.95, // Approximate height of UserRow component with one line of bio
     overscan: 3,
-    getItemKey: (index: number) => users.value[index]?.username || index,
     getScrollElement: () => parentRef.value,
   };
 });
@@ -95,7 +94,7 @@ const hasFollowedAtLeastOne = computed(() => {
           {{ $t('profile.account-setup.follow-user.description') }}
         </UiDialogDescription>
       </UiDialogHeader>
-      <UiSpinner v-if="isLoading" class="mx-20" />
+      <UiSpinner v-if="isLoading" class="mx-auto h-full" />
       <ClientOnly>
         <div
           v-if="users && users.length !== 0"
