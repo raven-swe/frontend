@@ -28,8 +28,18 @@ const rowVirtualizerOptions = computed(() => {
   return {
     count: props.messages.length,
     getScrollElement: () => parentRef.value,
-    estimateSize: () => 120,
+    estimateSize: (index: number) => {
+      const message = props.messages[index];
+      if (message?.mediaUrl) {
+        return 320; // Larger estimate for messages with images
+      }
+      return 80; // Default for text messages
+    },
     overscan: 5,
+    measureElement: (element: HTMLElement) => {
+      // Measure actual element height for accurate positioning
+      return element.getBoundingClientRect().height;
+    },
   };
 });
 
@@ -53,7 +63,6 @@ onMounted(() => {
 watch(
   () => props.messages.length,
   (newLength, oldLength) => {
-    // If messages were cleared (conversation switch), reset initial load state
     if (oldLength > 0 && newLength === 0) {
       isInitialLoad.value = true;
     }
@@ -97,7 +106,7 @@ watchEffect(() => {
   }
 });
 
-// Auto-scroll to bottom when new messages arrive (only if already near bottom)
+// Auto scroll to bottom when new messages arrive only if already near bottom
 watch(
   () => props.messages.length,
   (newLength, oldLength) => {
@@ -138,6 +147,8 @@ defineExpose({ parentRef, scrollToBottom });
       <div
         v-for="virtualRow in virtualRows"
         :key="String(virtualRow.key)"
+        :ref="(el) => el && rowVirtualizer.measureElement(el as HTMLElement)"
+        :data-index="virtualRow.index"
         :style="{
           position: 'absolute',
           top: 0,

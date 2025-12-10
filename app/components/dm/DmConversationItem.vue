@@ -7,12 +7,20 @@ const props = defineProps<{
 }>();
 
 const userStore = useUserStore();
+const { t } = useI18n();
 
 const highlighted = computed(() => {
   const lastMessage = props.conversation.lastMessage;
   if (!lastMessage) return false;
   const isNotSender = lastMessage.senderUsername !== userStore.user.username;
   return !lastMessage.seen && !props.isSelected && isNotSender;
+});
+
+const lastMessageText = computed(() => {
+  const lastMessage = props.conversation.lastMessage;
+  if (!lastMessage) return t('dm.no-messages-yet');
+  if (!lastMessage.content) return t('dm.sent-photo');
+  return lastMessage.content;
 });
 </script>
 <template>
@@ -60,7 +68,7 @@ const highlighted = computed(() => {
           class="block truncate"
           :class="highlighted ? 'text-primary font-bold' : 'text-muted-foreground'"
         >
-          {{ props.conversation.lastMessage?.content || 'No messages yet' }}
+          {{ lastMessageText }}
         </span>
       </div>
     </div>

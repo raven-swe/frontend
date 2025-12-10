@@ -18,6 +18,11 @@ interface ServerMessageReceivedPayload {
     body: string;
     createdAt: string;
     sender: { username: string };
+    mediaUrl: string | null;
+    type: string | null;
+    height: number | null;
+    width: number | null;
+    altText: string | null;
   };
 }
 
@@ -84,13 +89,17 @@ export function useDmSocketIO() {
         id: data.id,
         content: data.body,
         entities: { mentions: [], hashtags: [] },
-        mediaUrl: null,
+        mediaUrl: data.mediaUrl,
+        mediaType: data.type,
+        height: data.height,
+        width: data.width,
+        altText: data.altText,
         createdAt: data.createdAt,
         isMine: data.sender.username === userStore.user.username,
       };
       onMessageCallback.value?.(message);
 
-      // Auto-mark as seen if user is currently viewing this conversation and message is not mine
+      // Auto mark as seen if user is currently viewing this conversation and message is not mine
       if (
         selectedConversationId.value === payload.conversationId &&
         data.sender.username !== userStore.user.username
@@ -137,9 +146,9 @@ export function useDmSocketIO() {
     }
   }
 
-  function sendMessage(conversationId: string, body: string) {
+  function sendMessage(conversationId: string, body: string, mediaId?: string) {
     const clientMessageId = crypto.randomUUID();
-    socket.value?.emit('send_message', { conversationId, body, clientMessageId });
+    socket.value?.emit('send_message', { conversationId, body, clientMessageId, mediaId });
     return clientMessageId;
   }
 
@@ -197,13 +206,13 @@ export function useDmSocketIO() {
     attemptedUrl: readonly(attemptedUrl),
     connect,
     disconnect,
-    // Client → Server
+    // Client -> Server
     sendMessage,
     markSeen,
     typingStart,
     typingStop,
     sendReaction,
-    // Server → Client callbacks
+    // Server -> Client callbacks
     onMessage,
     onError,
     onSeenUpdate,

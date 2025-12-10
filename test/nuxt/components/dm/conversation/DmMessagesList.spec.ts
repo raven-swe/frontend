@@ -7,6 +7,7 @@ import type { DmMessage } from '@/../shared/types/dm';
 // Mock @tanstack/vue-virtual
 vi.mock('@tanstack/vue-virtual', () => ({
   useVirtualizer: vi.fn(() => ({
+    measureElement: vi.fn(),
     value: {
       getVirtualItems: () => [
         { index: 0, key: '0', start: 0 },
@@ -60,7 +61,8 @@ const mockMessages: DmMessage[] = [
 describe('DmMessagesList Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.useFakeTimers();
+    // Use real timers by default; enable fake timers only in tests that need them
+    vi.useRealTimers();
   });
 
   it('renders successfully', async () => {
@@ -103,6 +105,7 @@ describe('DmMessagesList Component', () => {
     // Mock useVirtualizer to return empty items for empty list
     const { useVirtualizer } = await import('@tanstack/vue-virtual');
     vi.mocked(useVirtualizer).mockReturnValue({
+      measureElement: vi.fn(),
       value: {
         getVirtualItems: () => [],
         getTotalSize: () => 0,
@@ -214,6 +217,7 @@ describe('DmMessagesList Component', () => {
     // Reset mock for this test
     const { useVirtualizer } = await import('@tanstack/vue-virtual');
     vi.mocked(useVirtualizer).mockReturnValue({
+      measureElement: vi.fn(),
       value: {
         getVirtualItems: () => [{ index: 0, key: '0', start: 0 }],
         getTotalSize: () => 120,
@@ -236,6 +240,7 @@ describe('DmMessagesList Component', () => {
     // Reset mock for this test
     const { useVirtualizer } = await import('@tanstack/vue-virtual');
     vi.mocked(useVirtualizer).mockReturnValue({
+      measureElement: vi.fn(),
       value: {
         getVirtualItems: () => [
           { index: 0, key: '0', start: 0 },
@@ -270,6 +275,7 @@ describe('DmMessagesList Component', () => {
     // Mock virtualizer to simulate first item visible at index 0
     const { useVirtualizer } = await import('@tanstack/vue-virtual');
     vi.mocked(useVirtualizer).mockReturnValue({
+      measureElement: vi.fn(),
       value: {
         getVirtualItems: () => [
           { index: 0, key: '0', start: 0 },
@@ -335,6 +341,7 @@ describe('DmMessagesList Component', () => {
     // Reset mock for this test
     const { useVirtualizer } = await import('@tanstack/vue-virtual');
     vi.mocked(useVirtualizer).mockReturnValue({
+      measureElement: vi.fn(),
       value: {
         getVirtualItems: () => [{ index: 0, key: '0', start: 0 }],
         getTotalSize: () => 120,
@@ -369,6 +376,7 @@ describe('DmMessagesList Component', () => {
     // Reset mock to default for this test
     const { useVirtualizer } = await import('@tanstack/vue-virtual');
     vi.mocked(useVirtualizer).mockReturnValue({
+      measureElement: vi.fn(),
       value: {
         getVirtualItems: () => [
           { index: 0, key: '0', start: 0 },
@@ -394,9 +402,11 @@ describe('DmMessagesList Component', () => {
   });
 
   it('scrollToBottom function can be called', async () => {
+    vi.useFakeTimers();
     const mockScrollToIndex = vi.fn();
     const { useVirtualizer } = await import('@tanstack/vue-virtual');
     vi.mocked(useVirtualizer).mockReturnValue({
+      measureElement: vi.fn(),
       value: {
         getVirtualItems: () => [
           { index: 0, key: '0', start: 0 },
@@ -419,12 +429,15 @@ describe('DmMessagesList Component', () => {
     // Call the exposed scrollToBottom function
     wrapper.vm.scrollToBottom();
     expect(mockScrollToIndex).toHaveBeenCalled();
+    vi.useRealTimers();
   });
 
   it('handles message length changes (new messages)', async () => {
+    vi.useFakeTimers();
     const mockScrollToIndex = vi.fn();
     const { useVirtualizer } = await import('@tanstack/vue-virtual');
     vi.mocked(useVirtualizer).mockReturnValue({
+      measureElement: vi.fn(),
       value: {
         getVirtualItems: () => [{ index: 0, key: '0', start: 0 }],
         getTotalSize: () => 120,
@@ -449,11 +462,14 @@ describe('DmMessagesList Component', () => {
     vi.runAllTimers();
 
     expect(wrapper.html()).toBeTruthy();
+    vi.useRealTimers();
   });
 
   it('handles conversation switch (messages cleared)', async () => {
+    vi.useFakeTimers();
     const { useVirtualizer } = await import('@tanstack/vue-virtual');
     vi.mocked(useVirtualizer).mockReturnValue({
+      measureElement: vi.fn(),
       value: {
         getVirtualItems: () => [],
         getTotalSize: () => 0,
@@ -478,12 +494,15 @@ describe('DmMessagesList Component', () => {
     vi.runAllTimers();
 
     expect(wrapper.html()).toBeTruthy();
+    vi.useRealTimers();
   });
 
   it('handles totalSize changes', async () => {
+    vi.useFakeTimers();
     let totalSize = 120;
     const { useVirtualizer } = await import('@tanstack/vue-virtual');
     vi.mocked(useVirtualizer).mockReturnValue({
+      measureElement: vi.fn(),
       value: {
         getVirtualItems: () => [{ index: 0, key: '0', start: 0 }],
         getTotalSize: () => totalSize,
@@ -509,6 +528,7 @@ describe('DmMessagesList Component', () => {
     vi.runAllTimers();
 
     expect(wrapper.html()).toBeTruthy();
+    vi.useRealTimers();
   });
 
   it('handles empty virtual rows', async () => {

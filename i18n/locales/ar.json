@@ -580,6 +580,8 @@
     "placeholder-start-message": "ابدأ رسالة جديدة",
     "attachedImage": "صورة مرفقة",
     "seen": "تمت المشاهدة",
+    "no-messages-yet": "لا توجد رسائل بعد",
+    "sent-photo": "تم إرسال صورة",
     "empty": {
       "select": "اختر رسالة",
       "description": "اختر من محادثاتك الحالية، ابدأ محادثة جديدة، أو استمر في التصفح.",
@@ -592,6 +594,9 @@
       "you-follow": "تتابع",
       "follow-each-other": "تتابعان بعضكما البعض",
       "cant-message": "لا يمكن مراسلة"
+    },
+    "message-input": {
+      "uploading": "جارٍ رفع الصورة..."
     }
   },
   "toaster": {

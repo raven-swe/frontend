@@ -42,6 +42,10 @@ export interface DmMessage {
   content: string;
   entities: DmMessageEntities;
   mediaUrl?: string | null;
+  mediaType?: string | null;
+  height?: number | null;
+  width?: number | null;
+  altText?: string | null;
   createdAt: string;
   isMine: boolean;
 }
@@ -54,6 +58,7 @@ export interface DmWsSendMessagePayload {
   conversationId: string;
   clientMessageId: string;
   body: string;
+  mediaId?: string;
 }
 
 export interface DmWsMarkSeenPayload {
@@ -102,6 +107,11 @@ export interface DmWsMessageReceived {
     body: string;
     createdAt: string;
   };
+  mediaUrl: string | null;
+  mediaType: string | null;
+  height: number | null;
+  width: number | null;
+  altText: string | null;
 }
 
 export interface DmWsMessageDeleted {

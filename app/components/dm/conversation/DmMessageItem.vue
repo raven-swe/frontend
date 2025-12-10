@@ -10,7 +10,7 @@ const props = defineProps<{
 const textColor = props.message.isMine ? 'text-white' : 'text-foreground';
 </script>
 <template>
-  <div :class="message.isMine ? 'flex justify-end' : 'flex justify-start'">
+  <div class="py-1" :class="message.isMine ? 'flex justify-end' : 'flex justify-start'">
     <div
       class="flex max-w-[68%] flex-col gap-1"
       :class="message.isMine ? 'items-end' : 'items-start'"

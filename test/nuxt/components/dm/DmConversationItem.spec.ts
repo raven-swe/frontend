@@ -1,9 +1,10 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { mountSuspended } from '@nuxt/test-utils/runtime';
 import { flushPromises } from '@vue/test-utils';
-import DmConversationItem from '@/components/dm/DmConversationItem.vue';
 import type { DmConversation } from '@/../shared/types/dm';
 import { relativeTime } from '@/utils/time';
+import DmConversationItem from '@/components/dm/DmConversationItem.vue';
+import { createI18n } from 'vue-i18n';
 
 // Mock useDmHighlight composable
 const mockIsHighlighted = vi.fn();
@@ -14,6 +15,34 @@ vi.mock('@/composables/useDmHighlight', () => ({
     removeHighlight: mockRemoveHighlight,
   }),
 }));
+
+// Mock Nuxt auto-imports used by components (only user store here)
+vi.mock('#imports', () => ({
+  useUserStore: () => ({
+    user: { username: 'currentuser' },
+  }),
+}));
+
+// Mock user store dependency
+vi.mock('@/stores/user', () => ({
+  useUserStore: () => ({
+    user: { username: 'currentuser' },
+  }),
+}));
+
+// Mock NuxtImg via #components registry used by Nuxt
+vi.mock('#components', () => ({
+  NuxtImg: {
+    name: 'NuxtImg',
+    props: ['src', 'alt', 'class', 'loading'],
+    template: '<img :src="src" :alt="alt" :class="class" />',
+  },
+}));
+
+// Ensure mocks are evaluated before tests run
+vi.hoisted(() => {
+  // noop – ensures the mock definitions above are hoisted
+});
 
 const nowIso = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(); // 2h ago
 const mockConversation: DmConversation = {
@@ -27,13 +56,27 @@ const mockConversation: DmConversation = {
     content: 'Hello, this is a test message',
     senderUsername: 'testuser',
     sentAt: nowIso,
+    seen: false,
   },
   isMuted: false,
 };
 
+// Minimal i18n instance installed for the component
+const i18n = createI18n({
+  legacy: false,
+  locale: 'en',
+  messages: {
+    en: {
+      'dm.no-messages-yet': 'No messages yet',
+      'dm.sent-photo': 'Sent a photo',
+    },
+  },
+});
+
 describe('DmConversationItem Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.useRealTimers();
     mockIsHighlighted.mockReturnValue(false);
     mockRemoveHighlight.mockReturnValue(undefined);
   });
@@ -43,6 +86,7 @@ describe('DmConversationItem Component', () => {
       props: {
         conversation: mockConversation,
       },
+      global: { plugins: [i18n] },
     });
 
     const container = wrapper.find('div');
@@ -57,6 +101,7 @@ describe('DmConversationItem Component', () => {
       props: {
         conversation: mockConversation,
       },
+      global: { plugins: [i18n] },
     });
 
     const avatar = wrapper.find('img');
@@ -70,6 +115,7 @@ describe('DmConversationItem Component', () => {
       props: {
         conversation: mockConversation,
       },
+      global: { plugins: [i18n] },
     });
 
     const html = wrapper.html();
@@ -81,6 +127,7 @@ describe('DmConversationItem Component', () => {
       props: {
         conversation: mockConversation,
       },
+      global: { plugins: [i18n] },
     });
 
     const html = wrapper.html();
@@ -92,6 +139,7 @@ describe('DmConversationItem Component', () => {
       props: {
         conversation: mockConversation,
       },
+      global: { plugins: [i18n] },
     });
 
     const html = wrapper.html();
@@ -103,6 +151,7 @@ describe('DmConversationItem Component', () => {
       props: {
         conversation: mockConversation,
       },
+      global: { plugins: [i18n] },
     });
 
     const expected = relativeTime(mockConversation.lastMessage!.sentAt);
@@ -115,6 +164,7 @@ describe('DmConversationItem Component', () => {
         conversation: mockConversation,
         isSelected: true,
       },
+      global: { plugins: [i18n] },
     });
 
     const container = wrapper.find('div');
@@ -127,6 +177,7 @@ describe('DmConversationItem Component', () => {
         conversation: mockConversation,
         isSelected: false,
       },
+      global: { plugins: [i18n] },
     });
 
     const container = wrapper.find('div');
@@ -138,6 +189,7 @@ describe('DmConversationItem Component', () => {
       props: {
         conversation: mockConversation,
       },
+      global: { plugins: [i18n] },
     });
 
     const container = wrapper.find('div');
@@ -154,6 +206,7 @@ describe('DmConversationItem Component', () => {
         conversation: mockConversation,
         isSelected: false,
       },
+      global: { plugins: [i18n] },
     });
 
     await flushPromises();
@@ -169,6 +222,7 @@ describe('DmConversationItem Component', () => {
         conversation: mockConversation,
         isSelected: true,
       },
+      global: { plugins: [i18n] },
     });
 
     await flushPromises();
@@ -187,6 +241,7 @@ describe('DmConversationItem Component', () => {
       props: {
         conversation: conversationWithoutMessage,
       },
+      global: { plugins: [i18n] },
     });
 
     expect(wrapper.html()).toContain('No messages yet');
@@ -202,6 +257,7 @@ describe('DmConversationItem Component', () => {
       props: {
         conversation: conversationWithoutMessage,
       },
+      global: { plugins: [i18n] },
     });
 
     // The time element should not be rendered
@@ -217,6 +273,7 @@ describe('DmConversationItem Component', () => {
         conversation: mockConversation,
         isSelected: false,
       },
+      global: { plugins: [i18n] },
     });
 
     await flushPromises();
@@ -229,6 +286,7 @@ describe('DmConversationItem Component', () => {
       props: {
         conversation: mockConversation,
       },
+      global: { plugins: [i18n] },
     });
 
     const avatar = wrapper.find('img');
@@ -240,6 +298,7 @@ describe('DmConversationItem Component', () => {
       props: {
         conversation: mockConversation,
       },
+      global: { plugins: [i18n] },
     });
 
     const displayNameSpan = wrapper.find(
@@ -253,6 +312,7 @@ describe('DmConversationItem Component', () => {
       props: {
         conversation: mockConversation,
       },
+      global: { plugins: [i18n] },
     });
 
     const usernameSpan = wrapper.find(

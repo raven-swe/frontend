@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-const { modelValue } = defineProps<{ modelValue: string }>();
+const { modelValue, disabled = false } = defineProps<{ modelValue: string; disabled?: boolean }>();
 const emit = defineEmits<{ (e: 'update:modelValue', v: string): void; (e: 'enter'): void }>();
 
 const textareaRef = ref<HTMLTextAreaElement | null>(null);
@@ -38,8 +38,9 @@ function onKeydown(e: KeyboardEvent) {
     ref="textareaRef"
     :value="modelValue"
     :placeholder="$t ? $t('dm.placeholder-start-message') : 'Start a new message'"
+    :disabled="disabled"
     rows="1"
-    class="placeholder:text-muted-foreground/80 flex-1 resize-none bg-transparent text-[15px] leading-relaxed outline-none"
+    class="placeholder:text-muted-foreground/80 flex-1 resize-none bg-transparent text-[15px] leading-relaxed outline-none disabled:cursor-not-allowed disabled:opacity-50"
     @input="onInput"
     @keydown="onKeydown"
   />

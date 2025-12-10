@@ -74,13 +74,11 @@ watch(
           transform: `translateY(${virtualRow.start}px)`,
         }"
       >
-        <!-- Loading indicator for next page -->
         <template v-if="virtualRow.index > conversations.length - 1">
           <div class="flex items-center justify-center p-4">
             <UiSpinner v-if="hasNextPage" size="1.25rem" />
           </div>
         </template>
-        <!-- Conversation item -->
         <template v-else-if="conversations[virtualRow.index]">
           <DmConversationItem
             :conversation="conversations[virtualRow.index]!"

@@ -4,28 +4,32 @@ import MessageSendButton from './input/MessageSendButton.vue';
 import MessageTextField from './input/MessageTextField.vue';
 import MessageToolbar from './input/MessageToolbar.vue';
 import { showToaster } from '@/utils/showToaster';
+import { uploadMediaService } from '@/services/tweet/uploadMediaService';
 import type { useDmSocketIO } from '@/composables/useDmSocketIO';
+import type { MediaItem } from '~~/shared/types/shared';
 
 const message = ref('');
-const imageFile = ref<File | null>(null);
+const media = ref<MediaItem | null>(null);
 const fileInputRef = ref<HTMLInputElement | null>(null);
+const isUploading = ref(false);
 const imageMeta = ref<{ width: number; height: number } | null>(null);
-const previewUrl = computed(() => (imageFile.value ? URL.createObjectURL(imageFile.value) : ''));
+const imageFile = computed(() => media.value?.file ?? null);
+const previewUrl = computed(() => media.value?.url ?? '');
 
 const route = useRoute();
 const conversationId = computed(() => route.params.conversationId as string);
 
 const ws = inject<ReturnType<typeof useDmSocketIO>>('dmSocket');
+const { uploadImage } = uploadMediaService();
 
-const canSend = computed(() => message.value.trim().length > 0 || !!imageFile.value);
+const canSend = computed(
+  () => (message.value.trim().length > 0 || !!media.value) && !isUploading.value,
+);
 
-function handleSend() {
+async function handleSend() {
   const text = message.value.trim();
 
-  if (!text) {
-    if (imageFile.value) {
-      showToaster('error', 'Image upload is not yet supported via WebSocket');
-    }
+  if (!text && !media.value) {
     return;
   }
 
@@ -44,18 +48,39 @@ function handleSend() {
     return;
   }
 
-  // Send message via Socket.IO
-  ws.sendMessage(conversationId.value, text);
+  isUploading.value = true;
 
-  message.value = '';
-  if (imageFile.value) URL.revokeObjectURL(previewUrl.value);
-  imageFile.value = null;
-  imageMeta.value = null;
-  if (fileInputRef.value) fileInputRef.value.value = '';
+  try {
+    let mediaId: string | undefined;
+
+    if (media.value && media.value.type === 'image') {
+      try {
+        mediaId = await uploadImage(media.value.file, 'messages');
+      } catch {
+        showToaster('error', 'Failed to upload image');
+        return;
+      }
+    }
+
+    ws.sendMessage(conversationId.value, text || '', mediaId);
+
+    message.value = '';
+    if (media.value) {
+      URL.revokeObjectURL(media.value.url);
+      media.value = null;
+    }
+    imageMeta.value = null;
+    if (fileInputRef.value) fileInputRef.value.value = '';
+  } catch {
+    showToaster('error', 'Failed to send message');
+  } finally {
+    isUploading.value = false;
+  }
 }
 
 function onAddImage() {
-  if (imageFile.value) return;
+  // Only allow one image in DMs
+  if (media.value) return;
   fileInputRef.value?.click();
 }
 
@@ -63,22 +88,31 @@ function onImageChange(e: Event) {
   const input = e.target as HTMLInputElement;
   const file = input.files?.[0];
   if (!file) return;
-  imageFile.value = file;
+
+  if (media.value) return;
+
+  const url = URL.createObjectURL(file);
+  const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  const type = file.type.startsWith('video') ? 'video' : 'image';
+
+  media.value = { id, file, url, type };
+
   const tmp = new Image();
   tmp.onload = () => {
     imageMeta.value = { width: tmp.naturalWidth, height: tmp.naturalHeight };
   };
-  tmp.src = URL.createObjectURL(file);
+  tmp.src = url;
 }
 
 function removeImage() {
-  if (imageFile.value) URL.revokeObjectURL(previewUrl.value);
-  imageFile.value = null;
-  imageMeta.value = null;
-  if (fileInputRef.value) fileInputRef.value.value = '';
+  if (media.value) {
+    URL.revokeObjectURL(media.value.url);
+    media.value = null;
+    imageMeta.value = null;
+    if (fileInputRef.value) fileInputRef.value.value = '';
+  }
 }
 
-// Dynamic sizing logic
 const MAX_W = 240;
 const MAX_H = 180;
 const previewBoxStyle = computed(() => {
@@ -105,11 +139,15 @@ const previewBoxStyle = computed(() => {
       />
 
       <div role="group" class="flex items-center gap-3">
-        <template v-if="!imageFile">
+        <template v-if="!media && !isUploading">
           <MessageToolbar @add-image="onAddImage" />
         </template>
-        <MessageTextField v-model="message" @enter="handleSend" />
-        <MessageSendButton :disabled="!canSend" @send="handleSend" />
+        <MessageTextField v-model="message" :disabled="isUploading" @enter="handleSend" />
+        <MessageSendButton :disabled="!canSend || isUploading" @send="handleSend" />
+      </div>
+
+      <div v-if="isUploading" class="text-muted-foreground mt-2 text-sm">
+        {{ $t('dm.message-input.uploading') }}
       </div>
 
       <input
