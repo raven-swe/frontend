@@ -9,10 +9,12 @@ const props = withDefaults(
     user: CompactUser;
     primaryAction?: 'mute' | 'follow' | 'block';
     showDropdown?: boolean;
+    compact?: boolean;
   }>(),
   {
     primaryAction: 'follow',
     showDropdown: false,
+    compact: false,
   },
 );
 
@@ -57,7 +59,14 @@ const isCurrentUser = computed(() => {
             @unfollow="$emit('unfollow', user.username)"
             @unblock="$emit('unblock', user.username)"
           >
-            <p class="text-md font-semibold break-all">{{ user.displayName }}</p>
+            <p
+              class="text-md font-semibold break-all"
+              :class="{
+                'line-clamp-1 text-ellipsis': compact,
+              }"
+            >
+              {{ user.displayName }}
+            </p>
           </UserHoverCard>
           <p class="text-muted-foreground text-sm" data-cy="user-row-username">
             <UserHoverCard
@@ -69,14 +78,14 @@ const isCurrentUser = computed(() => {
               {{ '@' + user.username + ' ' }}
             </UserHoverCard>
             <span
-              v-if="user.relationship.follower"
+              v-if="user.relationship.follower && !isCurrentUser && !compact"
               class="bg-muted rounded-sm p-0.5 px-0.75 text-xs font-semibold"
             >
               {{ $t('ui.follows-you') }}
             </span>
           </p>
         </div>
-        <div v-if="!isCurrentUser" class="flex items-center gap-1">
+        <div v-if="!isCurrentUser" class="flex items-center gap-1 ps-2">
           <BlockToggleButton
             v-if="primaryAction === 'block' || isBlocked"
             :relationship="relationship"
@@ -117,7 +126,7 @@ const isCurrentUser = computed(() => {
           </UserActionDropdown>
         </div>
       </div>
-      <p class="text-md line-clamp-3 break-all">
+      <p v-if="!compact" class="text-md line-clamp-3 break-all">
         <UiContentEntitiesRenderer :content="user.bio ?? ''" :entities="user.bioEntities" />
       </p>
     </div>
