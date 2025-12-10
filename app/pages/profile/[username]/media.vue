@@ -61,6 +61,9 @@ onServerPrefetch(async () => {
           :has-next-page="hasNextPage"
           :is-fetching-next-page="isFetchingNextPage"
           :fetch-next-page="fetchNextPage"
+          :get-key="
+            (item, index, key) => `${item.map((tweet) => `${tweet.id}-${key || index}`).join('-')}`
+          "
         >
           <template #item="{ item }">
             <div class="grid grid-cols-3 gap-1 overflow-hidden pt-1">

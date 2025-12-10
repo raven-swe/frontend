@@ -141,7 +141,7 @@ function handleAiSummary() {
               >
                 <Icon name="vscode-icons:file-type-gemini" size="1.2rem" />
               </UiButton>
-              <TweetDropdown :tweet="props.tweet">
+              <TweetDropdown :tweet="props.tweet" :username="originalUsername">
                 <UiButton
                   variant="ghost-default"
                   size="icon-xs"
