@@ -35,7 +35,7 @@ function increment() {
           {{ $t('testing.follow') }}
         </Button>
         <Button
-          variant="outline-destructive"
+          variant="outline-destructive-hover"
           size="xs"
           class="w-25"
           @mouseenter="isHovered = true"

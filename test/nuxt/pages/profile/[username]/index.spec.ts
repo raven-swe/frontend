@@ -35,7 +35,7 @@ const mockUser: User = {
   },
 };
 
-describe('ProfilePage', () => {
+describe('user tweets page', () => {
   let queryClient: QueryClient;
 
   beforeEach(() => {
@@ -50,7 +50,7 @@ describe('ProfilePage', () => {
     registerEndpoint(`/api/users/${mockUser.username}/tweets`, () => ({
       data: [],
     }));
-    const { default: ProfilePage } = await import('~/pages/profile/[username]/[[tab]].vue');
+    const { default: ProfilePage } = await import('~/pages/profile/[username]/index.vue');
     const wrapper = await mountSuspended(ProfilePage, {
       route: {
         params: { username: mockUser.username, tab: '' },
@@ -119,7 +119,7 @@ describe('ProfilePage', () => {
       data: mockTweets,
     }));
 
-    const { default: ProfilePage } = await import('~/pages/profile/[username]/[[tab]].vue');
+    const { default: ProfilePage } = await import('~/pages/profile/[username]/index.vue');
 
     const wrapper = await mountSuspended(ProfilePage, {
       route: {

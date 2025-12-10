@@ -1,123 +1,147 @@
 <script lang="ts" setup>
-import type { DmMessage } from '#shared/types/dm';
 import DmMessagesList from './DmMessagesList.vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useDmMessages } from '@/composables/useDmMessages';
 
-const me = {
-  username: 'hussein',
-  displayName: 'Hussein',
-  avatarUrl: 'https://i.pravatar.cc/150?img=2',
-};
+import { showToaster } from '@/utils/showToaster';
+import Spinner from '~/components/ui/Spinner.vue';
+import type { DmMessage } from '~~/shared/types/dm';
 
-const other = {
-  username: '@btngana',
-  displayName: 'Ahmed Amr',
-  avatarUrl: 'https://i.pravatar.cc/150?img=3',
-};
+const route = useRoute();
+const router = useRouter();
+const conversationId = computed(() => route.params.conversationId as string | null);
 
-const now = () => new Date().toISOString();
+const userStore = useUserStore();
+const currentUsername = computed(() => userStore.user.username);
 
-const messages: DmMessage[] = [
-  {
-    id: 'msg_1',
-    sender: { ...me },
-    content: 'Hey! How are you?',
-    entities: { mentions: [], hashtags: [] },
-    mediaUrl: null,
-    createdAt: now(),
-    isMine: true,
+const {
+  conversations,
+  loading: conversationsLoading,
+  error: conversationsError,
+} = useDmConversations();
+
+const conversation = computed<DmConversation | null>(() => {
+  if (!conversationId.value) return null;
+  return conversations.value?.find((c) => c.id === conversationId.value) || null;
+});
+
+const {
+  messages: initialMessages,
+  loading: messagesLoading,
+  error: messagesError,
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage,
+} = useDmMessages(() => conversationId.value);
+
+const ws = useDmSocketIO();
+provide('dmSocket', ws);
+const liveMessages = ref<DmMessage[]>([]);
+
+const lastSeenMessageId = ref<string | null>(null);
+
+const messages = computed(() => {
+  const initial = initialMessages.value || [];
+  // Add live messages at the END (bottom) so they appear as newest
+  const combined = [...initial, ...liveMessages.value];
+
+  return combined;
+});
+
+watch(
+  conversationId,
+  (newId) => {
+    if (newId) {
+      // Connect socket if not already connected
+      if (!ws.isConnected.value) {
+        ws.connect();
+      }
+
+      // Reset live messages and seen state when switching conversations
+      liveMessages.value = [];
+      lastSeenMessageId.value = null;
+    }
   },
-  {
-    id: 'msg_2',
-    sender: { ...other },
-    content: 'I’m good! Working on the project.',
-    entities: { mentions: [], hashtags: [] },
-    mediaUrl: null,
-    createdAt: now(),
-    isMine: false,
+  { immediate: true },
+);
+
+// Mark messages as seen when messages load and we're connected
+// This needs to wait for messages to actually load
+watch(
+  [() => messages.value, () => ws.isConnected.value, conversationId],
+  ([msgs, connected, convId]) => {
+    if (connected && convId && msgs.length > 0) {
+      const lastMessage = msgs[msgs.length - 1];
+      if (lastMessage?.id && !lastMessage.isMine) {
+        ws.markSeen(convId, lastMessage.id);
+      }
+    }
   },
-  {
-    id: 'msg_3',
-    sender: { ...me },
-    content: `Great! Let’s push the latest changes. ${other.username}`,
-    entities: {
-      mentions: [{ username: other.username.replace(/^@/, ''), startPosition: 39 }],
-      hashtags: [],
-    },
-    mediaUrl: null,
-    createdAt: now(),
-    isMine: true,
+  { immediate: true },
+);
+
+// Handle incoming Socket messages
+onMounted(() => {
+  ws.onMessage((message) => {
+    if (conversationId.value && message) {
+      // Push new messages to the end (bottom of chat)
+      liveMessages.value.push(message);
+    }
+  });
+
+  ws.onSeenUpdate((data) => {
+    if (data.conversationId === conversationId.value && data.username === currentUsername.value) {
+      lastSeenMessageId.value = data.lastSeenMessageId;
+    }
+  });
+
+  ws.onError((error) => {
+    showToaster('error', `Socket error: ${error}`);
+  });
+});
+
+watch(messagesError, (val) => val && showToaster('error', 'Failed to load messages'));
+watch(conversationsError, (val) => val && showToaster('error', 'Failed to load conversation'));
+watch(
+  [
+    () => messagesLoading.value,
+    () => conversationsLoading.value,
+    () => initialMessages.value,
+    () => conversation.value,
+    conversationId,
+  ],
+  ([msgsLoading, convsLoading, msgs, conv, convId]) => {
+    if (msgsLoading || convsLoading) return;
+    if (convId && !conv && msgs && msgs.length === 0) {
+      router.replace('/messages');
+    }
   },
-  {
-    id: 'msg_4',
-    sender: { ...me },
-    content: 'Check this out #update',
-    entities: { mentions: [], hashtags: [{ hashtag: 'update', startPosition: 15 }] },
-    mediaUrl: 'https://picsum.photos/seed/dm/300/200',
-    createdAt: now(),
-    isMine: true,
-  },
-  {
-    id: 'msg_1',
-    sender: { ...me },
-    content: 'Hey! How are you?',
-    entities: { mentions: [], hashtags: [] },
-    mediaUrl: null,
-    createdAt: now(),
-    isMine: true,
-  },
-  {
-    id: 'msg_2',
-    sender: { ...other },
-    content: 'I’m good! Working on the project.',
-    entities: { mentions: [], hashtags: [] },
-    mediaUrl: null,
-    createdAt: now(),
-    isMine: false,
-  },
-  {
-    id: 'msg_1',
-    sender: { ...me },
-    content: 'Hey! How are you?',
-    entities: { mentions: [], hashtags: [] },
-    mediaUrl: null,
-    createdAt: now(),
-    isMine: true,
-  },
-  {
-    id: 'msg_2',
-    sender: { ...other },
-    content: 'I’m good! Working on the project.',
-    entities: { mentions: [], hashtags: [] },
-    mediaUrl: null,
-    createdAt: now(),
-    isMine: false,
-  },
-  {
-    id: 'msg_1',
-    sender: { ...me },
-    content: 'Hey! How are you?',
-    entities: { mentions: [], hashtags: [] },
-    mediaUrl: null,
-    createdAt: now(),
-    isMine: true,
-  },
-  {
-    id: 'msg_2',
-    sender: { ...other },
-    content: 'I’m good! Working on the project.',
-    entities: { mentions: [], hashtags: [] },
-    mediaUrl: null,
-    createdAt: now(),
-    isMine: false,
-  },
-];
+  { immediate: true },
+);
 </script>
 <template>
   <div class="flex h-full flex-col overflow-hidden">
-    <DmConversationHeader :username="me.username" :avatar-url="me.avatarUrl" />
-    <div class="flex-1 overflow-y-auto p-4">
-      <DmConversationInfo />
-      <DmMessagesList :messages="messages" />
+    <DmConversationHeader
+      :username="conversation?.participant.username || conversationId"
+      :avatar-url="conversation?.participant.avatarUrl || ''"
+    />
+    <div class="flex flex-1 flex-col overflow-hidden">
+      <DmConversationInfo :conversation="conversation || null" class="px-4 pt-4" />
+      <div
+        v-if="conversationsLoading || messagesLoading"
+        class="flex flex-1 items-center justify-center p-4"
+      >
+        <Spinner size="1.5rem" />
+      </div>
+      <DmMessagesList
+        v-else
+        class="flex-1 px-4 pb-4"
+        :messages="messages || []"
+        :has-next-page="hasNextPage || false"
+        :is-fetching-next-page="isFetchingNextPage || false"
+        :on-load-more="fetchNextPage"
+        :last-seen-message-id="lastSeenMessageId"
+      />
     </div>
     <DmConversationDmMessageInput />
   </div>

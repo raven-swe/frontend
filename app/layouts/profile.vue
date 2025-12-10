@@ -3,14 +3,14 @@ import ProfileDetails from '~/components/profile/ProfileDetails.vue';
 import ProfileDetailsSkeleton from '~/components/profile/skeletons/ProfileDetailsSkeleton.vue';
 import Tabs from '@/components/ui/Tabs.vue';
 import Tab from '@/components/ui/Tab.vue';
-import { apiFetch } from '~/api';
 import { useQuery, useQueryClient } from '@tanstack/vue-query';
 import type { FetchError } from 'ofetch';
+import { profileTabsService } from '~/services/profile/profileTabsService';
 
-const route = useRouter().currentRoute.value;
+const route = useRouter();
 
 const username = computed(() => {
-  const val = route.params.username;
+  const val = route.currentRoute.value.params.username;
   return typeof val === 'string' ? val.toLowerCase() : null;
 });
 const profilePath = computed(() => `/profile/${username.value}`);
@@ -25,9 +25,7 @@ const {
   suspense,
 } = useQuery<User, FetchError<FetchError<ApiErrorResponse>>>({
   queryKey,
-  queryFn: async () => {
-    return (await apiFetch(`/api/users/${username.value}/profile`)).data;
-  },
+  queryFn: async ({ signal }) => profileTabsService.getProfile(username.value!, signal),
   staleTime: 1000 * 60 * 5, // 5min cache
   retry: false, // Don't retry on 404
   structuralSharing: false, // Disable structural sharing to ensure reactivity
@@ -44,7 +42,7 @@ const isUserNotFound = computed(() => {
 });
 const queryClient = useQueryClient();
 watch(
-  () => route.fullPath,
+  () => route.currentRoute.value.fullPath,
   () => {
     if (!user.value) return;
 

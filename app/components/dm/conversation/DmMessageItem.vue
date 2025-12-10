@@ -2,7 +2,11 @@
 import type { DmMessage } from '#shared/types/dm';
 import { renderSegments, formatTime } from '../../../utils/dm';
 
-const props = defineProps<{ message: DmMessage }>();
+const props = defineProps<{
+  message: DmMessage;
+  isSeen?: boolean;
+}>();
+
 const textColor = props.message.isMine ? 'text-white' : 'text-foreground';
 </script>
 <template>
@@ -23,7 +27,7 @@ const textColor = props.message.isMine ? 'text-white' : 'text-foreground';
       </template>
       <template v-if="message.content">
         <div
-          class="w-fit rounded-3xl px-4 py-2 text-sm leading-relaxed break-words"
+          class="rounded-3xl px-4 py-2 text-sm leading-relaxed break-all whitespace-pre-wrap"
           :class="message.isMine ? 'bg-primary text-white' : 'bg-accent text-foreground'"
         >
           <template v-for="(segment, idx) in renderSegments(message)" :key="idx">
@@ -42,9 +46,10 @@ const textColor = props.message.isMine ? 'text-white' : 'text-foreground';
           </template>
         </div>
       </template>
-      <span class="text-muted-foreground text-[11px]" :class="message.isMine ? 'self-end' : ''">{{
-        formatTime(message.createdAt)
-      }}</span>
+      <span class="text-muted-foreground text-[11px]" :class="message.isMine ? 'self-end' : ''">
+        {{ formatTime(message.createdAt) }}
+        <span v-if="isSeen && message.isMine" class="text-primary ms-1">· {{ $t('dm.seen') }}</span>
+      </span>
     </div>
   </div>
 </template>

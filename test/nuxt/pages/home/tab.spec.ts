@@ -1,8 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mountSuspended } from '@nuxt/test-utils/runtime';
+import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime';
 import { ref } from 'vue';
 import type { Tweet } from '~~/shared/types/tweets';
 import TabPage from '~/pages/home/[tab].vue';
+import en from '~~/i18n/locales/en.json';
+import { createI18n } from 'vue-i18n';
+
+// Set up i18n
+const i18n = createI18n({
+  locale: 'en',
+  messages: {
+    en,
+  },
+});
 
 const mockTweet: Tweet = {
   id: 'tw-1',
@@ -72,6 +82,13 @@ vi.mock('@tanstack/vue-query', async () => {
       return mockInfiniteQueryResult;
     }),
   };
+});
+
+mockNuxtImport('useI18n', () => {
+  return () => ({
+    locale: { value: 'en' },
+    t: (key: string) => key,
+  });
 });
 
 describe('Home [tab].vue', () => {
@@ -147,6 +164,7 @@ describe('Home [tab].vue', () => {
         stubs: {
           TweetComposer: true,
         },
+        plugins: [i18n],
       },
     });
 

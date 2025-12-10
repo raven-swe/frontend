@@ -37,8 +37,11 @@ export const useRegisterStore = defineStore('register', () => {
       if (isApiValidationError(error)) {
         const errors = error.data?.data?.error.errors;
         return errors;
+      } else if (isApiError(error)) {
+        const apiError = error.data?.data;
+        showToaster('error', apiError?.message || 'Failed to submit registration info');
       } else {
-        console.error('Failed to verify OTP');
+        showToaster('error', 'Failed to submit registration info');
       }
     }
   };
@@ -51,8 +54,11 @@ export const useRegisterStore = defineStore('register', () => {
       if (isApiValidationError(error)) {
         const errors = error.data?.data?.error.errors;
         return errors;
+      } else if (isApiError(error)) {
+        const apiError = error.data?.data;
+        showToaster('error', apiError?.message || 'Failed to verify OTP');
       } else {
-        console.error('Failed to verify OTP');
+        showToaster('error', 'Failed to verify OTP');
       }
     }
   };
@@ -86,8 +92,11 @@ export const useRegisterStore = defineStore('register', () => {
       if (isApiValidationError(error)) {
         const errors = error.data?.data?.error.errors;
         return errors;
+      } else if (isApiError(error)) {
+        const apiError = error.data?.data;
+        showToaster('error', apiError?.message || 'Failed to complete registration');
       } else {
-        console.error('Failed to verify OTP');
+        showToaster('error', 'Failed to complete registration');
       }
     }
   };

@@ -48,10 +48,10 @@ describe('Button Component', () => {
     expect(classes).toContain('text-foreground');
   });
 
-  it('applies correct classes for variant: outline-destructive', async () => {
+  it('applies correct classes for variant: outline-destructive-hover', async () => {
     const wrapper = await mountSuspended(Button, {
-      props: { variant: 'outline-destructive' },
-      slots: { default: () => 'outline-destructive' },
+      props: { variant: 'outline-destructive-hover' },
+      slots: { default: () => 'outline-destructive-hover' },
     });
     const classes = wrapper.classes();
     expect(classes).toContain('border-input');

@@ -1,199 +1,187 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
 import Avatar from '~/components/ui/Avatar.vue';
-import type { Tweet } from '~~/shared/types/tweets';
 import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
+import ContentEntitiesRenderer from '../ui/ContentEntitiesRenderer.vue';
+import { useUserStore } from '~/stores/user';
+import QuotedTweetCard from './QuotedTweetCard.vue';
+import AiSummary from './AiSummary.vue';
 interface Props {
-  tweet: Tweet;
+  tweet: TweetWithParents;
 }
 const props = defineProps<Props>();
+const userStore = useUserStore();
+const originalUsername = ref<string>(userStore.user?.username || '');
 
-type Segment = { type: 'text' | 'mention' | 'hashtag'; text: string; href?: string };
-const tweet = ref(props.tweet);
-
+const tweetClone = ref(structuredClone(toRaw(props.tweet)));
+const aiSummaryRef = ref<InstanceType<typeof AiSummary> | null>(null);
 // Update local tweet state when like/unlike succeeds
 const onLikeSuccess = () => {
-  if (!tweet.value.isLiked) {
-    tweet.value.isLiked = true;
-    tweet.value.likeCount = (tweet.value.likeCount ?? 0) + 1;
+  if (!tweetClone.value.isLiked) {
+    tweetClone.value.isLiked = true;
+    tweetClone.value.likeCount = (tweetClone.value.likeCount ?? 0) + 1;
   }
 };
 
 const onUnlikeSuccess = () => {
-  if (tweet.value.isLiked) {
-    tweet.value.isLiked = false;
-    const next = (tweet.value.likeCount ?? 0) - 1;
-    tweet.value.likeCount = next < 0 ? 0 : next;
+  if (tweetClone.value.isLiked) {
+    tweetClone.value.isLiked = false;
+    const next = (tweetClone.value.likeCount ?? 0) - 1;
+    tweetClone.value.likeCount = next < 0 ? 0 : next;
   }
 };
 
 const onRetweetSuccess = () => {
-  if (!tweet.value.isRetweeted) {
-    tweet.value.isRetweeted = true;
-    tweet.value.retweetCount += 1;
+  if (!tweetClone.value.isRetweeted) {
+    tweetClone.value.isRetweeted = true;
+    tweetClone.value.retweetCount += 1;
   }
 };
 
 const onUndoRetweetSuccess = () => {
-  if (tweet.value.isRetweeted) {
-    tweet.value.isRetweeted = false;
-    const next = (tweet.value.retweetCount ?? 0) - 1;
-    tweet.value.retweetCount = next < 0 ? 0 : next;
+  if (tweetClone.value.isRetweeted) {
+    tweetClone.value.isRetweeted = false;
+    const next = (tweetClone.value.retweetCount ?? 0) - 1;
+    tweetClone.value.retweetCount = next < 0 ? 0 : next;
   }
 };
 
-const contentSegments = computed<Segment[]>(() => {
-  const segments: Segment[] = [];
-  const content = tweet.value.content || '';
-  const { entities } = tweet.value;
-  if (!entities || (!entities.mentions?.length && !entities.hashtags?.length)) {
-    return [{ type: 'text', text: content }];
-  }
+const { mutate: followUser } = useFollowMutation();
+const { mutate: blockUser } = useBlockMutation();
 
-  type Range = {
-    start: number;
-    end: number;
-    type: 'mention' | 'hashtag';
-    text: string;
-    href: string;
-  };
-  const ranges: Range[] = [];
-
-  for (const m of entities.mentions || []) {
-    const start = m.startPosition;
-    const text = `@${m.username} `;
-    ranges.push({
-      start,
-      end: start + text.length,
-      type: 'mention',
-      text,
-      href: `/@${m.username}`,
-    });
-  }
-  for (const h of entities.hashtags || []) {
-    const start = h.startPosition;
-    const text = `#${h.hashtag} `;
-    ranges.push({
-      start,
-      end: start + text.length,
-      type: 'hashtag',
-      text,
-      href: `/hashtag/${h.hashtag}`,
-    });
-  }
-
-  ranges.sort((a, b) => a.start - b.start);
-
-  let cursor = 0;
-  for (const r of ranges) {
-    if (r.start > cursor) {
-      segments.push({ type: 'text', text: content.slice(cursor, r.start) });
-    }
-    segments.push({ type: r.type, text: r.text, href: r.href });
-    cursor = r.end;
-  }
-  if (cursor < content.length) {
-    segments.push({ type: 'text', text: content.slice(cursor) });
-  }
-  return segments;
-});
+function handleAiSummary() {
+  aiSummaryRef.value?.handleAiSummary?.();
+}
 </script>
 
 <template>
-  <article class="border-b-border w-full max-w-[700px] gap-3 border-b-1 p-4">
-    <div class="flex w-full items-center justify-between">
-      <div class="flex">
-        <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
-          <Avatar
-            :img="tweet.author.avatarUrl || '/default_profile.png'"
-            size="sm"
-            variant="primary"
-          />
-        </NuxtLink>
-
-        <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
-          <div class="ms-2 flex flex-col">
-            <span class="cursor-pointer font-semibold hover:underline">{{
-              tweet.author.displayName
-            }}</span>
-            <span class="text-muted-foreground" v-text="'@' + tweet.author.username" />
+  <NuxtLink
+    v-if="props.tweet.repostedBy"
+    :to="`/profile/${props.tweet.repostedBy.username}`"
+    class="text-muted-foreground ms-2 mt-13 flex items-center gap-1 px-6"
+  >
+    <Icon name="tabler:repeat" size="1.2rem" />
+    <span
+      v-if="props.tweet.repostedBy.username === originalUsername"
+      class="text-muted-foreground text-sm"
+    >
+      {{ $t('tweet.retweeted-by-you') }}
+    </span>
+    <span v-else class="text-muted-foreground text-sm">{{
+      $t('tweet.retweeted-by', { username: props.tweet.repostedBy.displayName })
+    }}</span>
+  </NuxtLink>
+  <article class="w-full max-w-[700px] gap-3 border-b px-4 pb-2">
+    <div class="flex w-full flex-col gap-1">
+      <div class="flex flex-row gap-2">
+        <div class="relative flex flex-col items-center gap-1">
+          <div
+            class="h-2 w-0.5 shrink-0"
+            :class="{
+              'bg-thread-foreground': tweetClone.rootTweet,
+            }"
+          ></div>
+          <UserHoverCard
+            :username="props.tweet.author.username"
+            @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
+            @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
+            @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
+            @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
+          >
+            <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
+              <Avatar
+                :img="tweetClone.author.avatarUrl || '/default_profile.png'"
+                size="sm"
+                variant="primary"
+                class="shrink-0"
+              />
+            </NuxtLink>
+          </UserHoverCard>
+        </div>
+        <div class="flex w-full items-start justify-between">
+          <div class="flex h-full flex-col justify-end">
+            <UserHoverCard
+              :username="props.tweet.author.username"
+              @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
+              @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
+              @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
+              @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
+            >
+              <NuxtLink
+                :to="`/profile/${props.tweet.author.username}`"
+                class="cursor-pointer leading-tight font-semibold hover:underline"
+                @click.stop
+              >
+                {{ tweetClone.author.displayName }}
+              </NuxtLink>
+            </UserHoverCard>
+            <UserHoverCard
+              :username="props.tweet.author.username"
+              @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
+              @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
+              @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
+              @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
+            >
+              <NuxtLink
+                :to="`/profile/${props.tweet.author.username}`"
+                class="text-muted-foreground leading-tight"
+                @click.stop
+              >
+                {{ '@' + tweetClone.author.username }}
+              </NuxtLink>
+            </UserHoverCard>
           </div>
-        </NuxtLink>
-      </div>
-      <div class="flex">
-        <Icon
-          class="text-foreground/50 hover:text-primary cursor-pointer"
-          name="ic:more-horiz"
-          size="1.4rem"
-        />
+          <div class="relative">
+            <div class="absolute end-0 top-1/2 flex translate-x-2.5 flex-row items-center">
+              <UiButton
+                variant="ghost-default"
+                size="icon-sm"
+                class="text-muted-foreground"
+                @click.stop="handleAiSummary"
+              >
+                <Icon name="vscode-icons:file-type-gemini" size="1.2rem" />
+              </UiButton>
+              <TweetDropdown :tweet="props.tweet">
+                <UiButton
+                  variant="ghost-default"
+                  size="icon-xs"
+                  class="text-muted-foreground"
+                  @click.stop
+                >
+                  <Icon name="lucide:more-horizontal" />
+                </UiButton>
+              </TweetDropdown>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="border-b-border mt-3 border-b-1 pb-3">
-      <p class="mt-1 leading-relaxed break-words whitespace-pre-wrap">
-        <template v-for="(seg, i) in contentSegments" :key="i">
-          <span v-if="seg.type === 'text'" class="inline">
-            {{ seg.text }}
-          </span>
-          <NuxtLink v-else :to="seg.href" class="text-primary inline font-medium hover:underline">
-            {{ seg.text }}
-          </NuxtLink>
-        </template>
+    <div class="border-b-border border-b-1">
+      <p class="pt-2 text-lg leading-relaxed break-words whitespace-pre-wrap">
+        <ContentEntitiesRenderer :content="tweetClone.content" :entities="tweetClone.entities" />
       </p>
-      <TweetMedia :media="tweet.media" />
+      <TweetMedia :media="tweetClone.media" />
 
-      <div class="mt-2">
+      <!-- Quoted Tweet -->
+      <QuotedTweetCard v-if="tweetClone.quotedTweet" :tweet="tweetClone.quotedTweet" />
+
+      <AiSummary ref="aiSummaryRef" :tweet-id="props.tweet.id" />
+      <div class="py-2">
         <time
-          :title="formatDate(tweet.createdAt)"
-          :datetime="tweet.createdAt"
-          class="text-muted-foreground hover:cursor-pointer hover:underline"
-          >{{ formatDate(tweet.createdAt) }}</time
+          :title="formatDate(tweetClone.createdAt)"
+          :datetime="tweetClone.createdAt"
+          class="text-muted-foreground text-md"
+          >{{ formatDate(tweetClone.createdAt) }}</time
         >
       </div>
     </div>
+
     <TweetActionButtons
-      :tweet="tweet"
+      :tweet="tweetClone"
       @like-success="onLikeSuccess"
       @unlike-success="onUnlikeSuccess"
       @retweet-success="onRetweetSuccess"
       @undo-retweet-success="onUndoRetweetSuccess"
     />
-
-    <div v-if="false" class="min-w-0 flex-1">
-      <div class="flex flex-wrap items-center gap-x-1 text-sm">
-        <span class="text-muted-foreground" v-text="'@' + tweet.author.username" />
-        <span class="text-muted-foreground">·</span>
-        <time
-          :title="formatDate(tweet.createdAt)"
-          :datetime="tweet.createdAt"
-          class="text-muted-foreground hover:cursor-pointer hover:underline"
-          >{{ relativeTime(tweet.createdAt) }}</time
-        >
-      </div>
-
-      <!-- Content -->
-      <p class="mt-1 leading-relaxed break-words whitespace-pre-wrap">
-        <template v-for="(seg, i) in contentSegments" :key="i">
-          <span v-if="seg.type === 'text'" class="inline">
-            {{ seg.text }}
-          </span>
-          <NuxtLink v-else :to="seg.href" class="text-primary inline font-medium hover:underline">
-            {{ seg.text }}
-          </NuxtLink>
-        </template>
-      </p>
-
-      <!-- Media (single image basic layout) -->
-      <TweetMedia :media="tweet.media" />
-
-      <!-- Actions -->
-      <TweetActionButtons
-        :tweet="tweet"
-        @like-success="onLikeSuccess"
-        @unlike-success="onUnlikeSuccess"
-        @retweet-success="onRetweetSuccess"
-        @undo-retweet-success="onUndoRetweetSuccess"
-      />
-    </div>
   </article>
 </template>

@@ -5,9 +5,7 @@ import { useForm } from 'vee-validate';
 import FieldInput from '~/components/ui/form/FieldInput.vue';
 import Button from '~/components/ui/Button.vue';
 import { apiFetch } from '~/api';
-definePageMeta({
-  layout: false,
-});
+definePageMeta({ layout: 'settings' });
 const router = useRouter();
 
 const schema = yup.object({

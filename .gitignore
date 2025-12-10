@@ -38,3 +38,6 @@ logs
 cypress/screenshots
 cypress/videos
 .vite-dev-cache
+
+docs
+cypress/results

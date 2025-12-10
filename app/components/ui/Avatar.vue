@@ -10,6 +10,7 @@ const avatarRoot = cva('relative flex shrink-0 overflow-hidden rounded-full', {
       secondary: 'cursor-default',
     },
     size: {
+      xs: 'size-6',
       sm: 'size-10',
       md: 'size-16',
       lg: 'size-24',
@@ -36,7 +37,7 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-  <AvatarRoot :class="avatarRoot({ variant, size })">
+  <AvatarRoot data-slot="avatar" :class="avatarRoot({ variant, size })">
     <AvatarImg :src="img" alt="User Avatar" />
   </AvatarRoot>
 </template>

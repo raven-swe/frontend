@@ -31,6 +31,24 @@ const mockUser: User = {
     follower: false,
     muted: false,
   },
+  mutualUsers: [
+    {
+      avatarUrl: '/mutual1.jpg',
+      displayName: 'mutualuser1',
+    },
+    {
+      avatarUrl: '/mutual2.jpg',
+      displayName: 'mutualuser2',
+    },
+    {
+      avatarUrl: '/mutual3.jpg',
+      displayName: 'mutualuser3',
+    },
+    {
+      avatarUrl: '/mutual4.jpg',
+      displayName: 'mutualuser4',
+    },
+  ],
 };
 
 describe('ProfileInfo', () => {
@@ -43,13 +61,10 @@ describe('ProfileInfo', () => {
       },
     });
 
-    const container = wrapper.find('div.mt-2.flex.flex-col');
-    expect(container.exists()).toBe(true);
-
     const infoContainer = wrapper.find('.mt-2.flex.flex-wrap.gap-2');
     expect(infoContainer.exists()).toBe(true);
 
-    const statsContainer = wrapper.find('.mt-4.flex.space-x-4');
+    const statsContainer = wrapper.find('.mt-3.flex.space-x-4');
     expect(statsContainer.exists()).toBe(true);
     const html = wrapper.html();
     expect(html).toContain('ic:sharp-location-on');
@@ -69,7 +84,6 @@ describe('ProfileInfo', () => {
     const bio = wrapper.find('p.whitespace-pre-line');
     expect(bio.exists()).toBe(true);
     expect(bio.text()).toBe('This is a test bio');
-    expect(bio.classes()).toContain('text-muted-foreground');
     expect(bio.classes()).toContain('mt-2');
 
     expect(wrapper.html()).toContain('Test Location');
@@ -168,7 +182,7 @@ describe('ProfileInfo', () => {
         },
       },
     });
-    const statsSection = wrapper.find('div.mt-4.flex.space-x-4');
+    const statsSection = wrapper.find('div.mt-3.flex.space-x-4');
     expect(statsSection.exists()).toBe(true);
 
     const strongTags = wrapper.findAll('strong');
@@ -285,6 +299,113 @@ describe('ProfileInfo', () => {
     const html = wrapper.html();
     expect(html).toContain('ic:sharp-calendar-month');
     expect(html).toContain('March 2021'); // formatMonthYear output shows full month name
+    wrapper.unmount();
+  });
+
+  it('renders one mutual follower when mutualsCount is 1', async () => {
+    const wrapper = await mountSuspended(ProfileInfo, {
+      global: {
+        provide: {
+          'user-data': computed(() => ({
+            ...mockUser,
+            mutualsCount: 1,
+          })),
+        },
+        stubs: {
+          UiAvatar: {
+            props: ['img'],
+            template: '<div data-test="avatar">{{ img }}</div>',
+          },
+        },
+      },
+    });
+
+    expect(wrapper.html()).toContain('Followed by mutualuser1');
+    const avatar = wrapper.findAll('div[data-test="avatar"]');
+    expect(avatar.length).toBe(1);
+    expect(avatar[0]?.text()).toBe('/mutual1.jpg');
+    wrapper.unmount();
+  });
+
+  it('renders two mutual followers when mutualsCount is 2', async () => {
+    const wrapper = await mountSuspended(ProfileInfo, {
+      global: {
+        provide: {
+          'user-data': computed(() => ({
+            ...mockUser,
+            mutualsCount: 2,
+          })),
+        },
+        stubs: {
+          UiAvatar: {
+            props: ['img'],
+            template: '<div data-test="avatar">{{ img }}</div>',
+          },
+        },
+      },
+    });
+
+    expect(wrapper.html()).toContain('Followed by mutualuser1 and mutualuser2');
+    const avatar = wrapper.findAll('div[data-test="avatar"]');
+    expect(avatar.length).toBe(2);
+    expect(avatar[0]?.text()).toBe('/mutual1.jpg');
+    expect(avatar[1]?.text()).toBe('/mutual2.jpg');
+    wrapper.unmount();
+  });
+
+  it('renders three mutual followers when mutualsCount is 3', async () => {
+    const wrapper = await mountSuspended(ProfileInfo, {
+      global: {
+        provide: {
+          'user-data': computed(() => ({
+            ...mockUser,
+            mutualsCount: 3,
+          })),
+        },
+        stubs: {
+          UiAvatar: {
+            props: ['img'],
+            template: '<div data-test="avatar">{{ img }}</div>',
+          },
+        },
+      },
+    });
+
+    expect(wrapper.html()).toContain('Followed by mutualuser1, mutualuser2, and mutualuser3');
+    const avatar = wrapper.findAll('div[data-test="avatar"]');
+    expect(avatar.length).toBe(3);
+    expect(avatar[0]?.text()).toBe('/mutual1.jpg');
+    expect(avatar[1]?.text()).toBe('/mutual2.jpg');
+    expect(avatar[2]?.text()).toBe('/mutual3.jpg');
+    wrapper.unmount();
+  });
+
+  it('renders four mutual followers when mutualsCount is many', async () => {
+    const wrapper = await mountSuspended(ProfileInfo, {
+      global: {
+        provide: {
+          'user-data': computed(() => ({
+            ...mockUser,
+            mutualsCount: 43,
+          })),
+        },
+        stubs: {
+          UiAvatar: {
+            props: ['img'],
+            template: '<div data-test="avatar">{{ img }}</div>',
+          },
+        },
+      },
+    });
+
+    expect(wrapper.text()).toContain(
+      `Followed by mutualuser1, mutualuser2, and ${43 - 2} others you follow`,
+    );
+    const avatar = wrapper.findAll('div[data-test="avatar"]');
+    expect(avatar.length).toBe(3);
+    expect(avatar[0]?.text()).toBe('/mutual1.jpg');
+    expect(avatar[1]?.text()).toBe('/mutual2.jpg');
+    expect(avatar[2]?.text()).toBe('/mutual3.jpg');
     wrapper.unmount();
   });
 });

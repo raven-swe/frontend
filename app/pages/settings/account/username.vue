@@ -9,9 +9,7 @@ import { useDebounceFn } from '@vueuse/core';
 import { useUserStore } from '~/stores/user';
 import { apiFetch } from '~/api';
 
-definePageMeta({
-  layout: false,
-});
+definePageMeta({ layout: 'settings' });
 
 const router = useRouter();
 const userStore = useUserStore();

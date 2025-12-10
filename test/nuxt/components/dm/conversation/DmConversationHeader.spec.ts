@@ -44,13 +44,13 @@ describe('DmConversationHeader Component', () => {
     expect(username.classes()).toContain('font-bold');
   });
 
-  it('renders the report icon', async () => {
+  it('renders the back arrow icon for mobile navigation', async () => {
     const wrapper = await mountSuspended(DmConversationHeader, {
       props: mockProps,
     });
 
     const html = wrapper.html();
-    expect(html).toContain('ic:round-report-gmailerrorred');
+    expect(html).toContain('ic:round-arrow-back');
   });
 
   it('has sticky positioning', async () => {
@@ -78,7 +78,7 @@ describe('DmConversationHeader Component', () => {
       props: mockProps,
     });
 
-    const innerContainer = wrapper.find('.flex.items-center.gap-3');
+    const innerContainer = wrapper.find('.flex.items-center.gap-6');
     expect(innerContainer.exists()).toBe(true);
   });
 });
