@@ -103,6 +103,7 @@ const { mutate: followUser } = useFollowMutation();
     <SideBarRightPreviewCard
       v-if="showWhatIsHappening"
       :title="$t('rightsidebar.whats-happening.title')"
+      data-test="whats-happening-card"
     >
       <div
         v-if="trendingIsLoading"
