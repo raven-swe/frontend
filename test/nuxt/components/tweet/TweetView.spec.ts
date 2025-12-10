@@ -93,7 +93,7 @@ describe('TweetView.vue', () => {
     expect(mention.exists()).toBe(true);
     expect(mention.text()).toContain('@alice');
 
-    const hashtag = wrapper.find('a[href="/hashtag/Testing"]');
+    const hashtag = wrapper.find('a[href="/search/top?q=%23Testing"]');
     expect(hashtag.exists()).toBe(true);
     expect(hashtag.text()).toContain('#Testing');
   });

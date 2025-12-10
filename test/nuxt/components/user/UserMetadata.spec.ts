@@ -178,7 +178,7 @@ describe('UserMetadata', () => {
     expect(mentionLink.text()).toBe('@friend');
 
     // Find hashtag link
-    const hashtagLink = wrapper.find('a[href="/hashtag/VueJS"]');
+    const hashtagLink = wrapper.find('a[href="/search/top?q=%23VueJS"]');
     expect(hashtagLink.exists()).toBe(true);
     expect(hashtagLink.text()).toBe('#VueJS');
 

@@ -115,7 +115,7 @@ describe('TweetQuoteCard.vue', () => {
     expect(mention.exists()).toBe(true);
     expect(mention.text()).toContain('@user');
 
-    const hashtag = wrapper.find('a[href="/hashtag/Tag"]');
+    const hashtag = wrapper.find('a[href="/search/top?q=%23Tag"]');
     expect(hashtag.exists()).toBe(true);
     expect(hashtag.text()).toContain('#Tag');
   });
@@ -192,7 +192,7 @@ describe('TweetQuoteCard.vue', () => {
     } as unknown as Tweet['entities'];
     tweet.entities = entities;
     const wrapper = mount(TweetQuoteCard, { props: { tweet }, global: globalConfig });
-    const hashtag = wrapper.find('a[href="/hashtag/Tag"]');
+    const hashtag = wrapper.find('a[href="/search/top?q=%23Tag"]');
     expect(hashtag.exists()).toBe(true);
     expect(wrapper.text()).toContain('Hello');
     expect(wrapper.text()).toContain('there');

@@ -53,6 +53,14 @@
       "title": "من تتابع",
       "follow": "متابعة"
     },
+    "search-filters": {
+      "title": "تصفية البحث",
+      "people": {
+        "title": "الأشخاص",
+        "any-one": "من أي شخص",
+        "you-follow": "الأشخاص الذين تتابعهم"
+      }
+    },
     "show-more": "عرض المزيد"
   },
   "homepage": {
@@ -148,6 +156,49 @@
       "noMoreTweets": "لا توجد تغريدات أخرى"
     }
   },
+  "explore": {
+    "for-you": {
+      "tab": "لك",
+      "posts-for-you": "المنشورات لك"
+    },
+    "trending": {
+      "tab": "رائج"
+    },
+    "news": {
+      "tab": "أخبار"
+    },
+    "sports": {
+      "tab": "رياضة"
+    },
+    "entertainment": {
+      "tab": "ترفيه"
+    },
+    "no-trending-hashtags": "لا توجد علامات تصنيف رائجة",
+    "hashtag": "{rank} . رائج في {category}"
+  },
+  "search": {
+    "top": {
+      "tab": "الأعلى",
+      "view-all": "عرض الكل"
+    },
+    "latest": {
+      "tab": "الأحدث"
+    },
+    "people": {
+      "tab": "الأشخاص"
+    },
+    "media": {
+      "tab": "الوسائط"
+    },
+    "no-trending-hashtags": "لا توجد علامات تصنيف رائجة",
+    "no-results": "لا توجد نتائج لـ \"{query}\"",
+    "try-searching": "حاول البحث عن شيء آخر.",
+    "settings": {
+      "title": "إعدادات البحث",
+      "remove-block": "إزالة الحسابات المحظورة والمكتومة",
+      "remove-block-desc": "استخدم هذا لإزالة نتائج البحث من الحسابات التي قمت بحظرها أو كتمها."
+    }
+  },
   "playground": {
     "dialog": {
       "title": "إنشاء حسابك",
@@ -219,7 +270,8 @@
       "unlike": "إلغاء الإعجاب"
     },
     "retweeted-by-you": "لقد أعدتَ النشر",
-    "show-more-parents": "عرض المزيد من التغريدات الأصلية"
+    "show-more-parents": "عرض المزيد من التغريدات الأصلية",
+    "replying-to": "الرد علي"
   },
   "notifications": {
     "title": "الإشعارات",
@@ -242,6 +294,7 @@
     "skip-for-now": "تخطي الآن",
     "save": "حفظ",
     "cancel": "إلغاء",
+    "clear": "مسح",
     "discard": "تجاهل",
     "post": "نشر",
     "reply": "رد",
@@ -260,7 +313,15 @@
         "placeholder": "ابحث"
       },
       "search-list": {
-        "placeholder": "حاول البحث عن أشخاص أو قوائم أو كلمات رئيسية"
+        "placeholder": "حاول البحث عن أشخاص أو قوائم أو كلمات رئيسية",
+        "recent": "الأخيرة",
+        "clear-all": "مسح الكل",
+        "search-for": "ابحث عن \"{query}\"",
+        "go-to": "اذهب إلى {'@'}{query}"
+      },
+      "clear-dialog": {
+        "title": "مسح كل عمليات البحث الأخيرة؟",
+        "description": "لا يمكن التراجع عن هذا الإجراء وستتم إزالة جميع عمليات البحث الأخيرة الخاصة بك."
       }
     },
     "logout": {

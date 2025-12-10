@@ -20,6 +20,7 @@ const placeholderText = computed(
   <div
     class="shadow-accent bg-background mt-0 overflow-y-auto rounded-lg border border-1 shadow-lg"
     :style="{ maxHeight: props.maxHeight }"
+    @mousedown.prevent
   >
     <div v-if="$slots.default">
       <slot />
