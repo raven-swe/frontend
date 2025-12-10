@@ -4,7 +4,6 @@ import Avatar from '~/components/ui/Avatar.vue';
 import type { Tweet } from '~~/shared/types/tweets';
 import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
-import { useUserStore } from '~/stores/user';
 import QuotedTweetCard from './QuotedTweetCard.vue';
 import AiSummary from './AiSummary.vue';
 import { useUserStore } from '~/stores/user';
@@ -15,9 +14,6 @@ interface Props {
 }
 const props = defineProps<Props>();
 const router = useRouter();
-const userStore = useUserStore();
-const originalUsername = ref<string>(userStore.user?.username || '');
-
 const userStore = useUserStore();
 const originalUsername = ref<string>(userStore.user?.username || '');
 
