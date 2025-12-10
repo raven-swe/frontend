@@ -242,74 +242,80 @@ function handleReplied(tweet: Tweet) {
             </UiButton>
           </div>
 
-          <div v-else-if="tweetData" class="divide-border flex min-h-screen w-full divide-x">
-            <div class="flex min-h-screen flex-1 items-center justify-center align-middle">
-              <Carousel>
-                <CarouselContent class="h-full w-full">
-                  <CarouselItem v-for="(m, i) in tweetData.media" :key="i">
-                    <MediaItemCompact :media="m" />
-                  </CarouselItem>
-                </CarouselContent>
-                <CarouselPrevious />
-                <CarouselNext />
-              </Carousel>
-            </div>
-
-            <div class="ms-auto min-h-screen w-80 shrink-0 overflow-y-auto">
-              <div v-if="tweetData">
-                <TweetView :tweet="tweetData" :media="false" />
+          <div v-else>
+            <div v-if="tweetData" class="divide-border flex min-h-screen w-full divide-x">
+              <div class="flex min-h-screen w-[80%] items-center justify-center pt-9 align-middle">
+                <Carousel class="h-full w-full">
+                  <CarouselContent>
+                    <CarouselItem
+                      v-for="(m, i) in tweetData.media"
+                      :key="i"
+                      class="flex h-full w-full items-center justify-center"
+                    >
+                      <MediaItemCompact :media="m" />
+                    </CarouselItem>
+                  </CarouselContent>
+                  <CarouselPrevious />
+                  <CarouselNext />
+                </Carousel>
               </div>
 
-              <TweetComposer
-                :reply-to-tweet-id="tweetData?.id"
-                type="reply"
-                @posted="handleReplied"
-              />
+              <div class="ms-auto min-h-screen w-[20%] overflow-y-auto">
+                <div v-if="tweetData">
+                  <TweetView :tweet="tweetData" :media="false" />
+                </div>
 
-              <div ref="parentRef" class="border-border mx-auto max-w-[700px] border-y">
-                <ClientOnly>
-                  <div v-if="tweets">
-                    <div
-                      :style="{
-                        height: `${totalSize}px`,
-                        width: '100%',
-                        position: 'relative',
-                      }"
-                    >
+                <TweetComposer
+                  :reply-to-tweet-id="tweetData?.id"
+                  type="reply"
+                  @posted="handleReplied"
+                />
+
+                <div ref="parentRef" class="border-border mx-auto max-w-[700px] border-y">
+                  <ClientOnly>
+                    <div v-if="tweets">
                       <div
                         :style="{
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
+                          height: `${totalSize}px`,
                           width: '100%',
-                          transform: `translateY(${
-                            virtualRows[0]
-                              ? virtualRows[0].start - rowVirtualizer.options.scrollMargin
-                              : 0
-                          }px)`,
+                          position: 'relative',
                         }"
                       >
                         <div
-                          v-for="virtualRow in virtualRows"
-                          :key="tweets[virtualRow.index]?.id || String(virtualRow.key)"
-                          :ref="measureElement"
-                          :data-index="virtualRow.index"
+                          :style="{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            transform: `translateY(${
+                              virtualRows[0]
+                                ? virtualRows[0].start - rowVirtualizer.options.scrollMargin
+                                : 0
+                            }px)`,
+                          }"
                         >
-                          <TweetDefaultCard
-                            v-if="tweets[virtualRow.index]"
-                            :tweet="tweets[virtualRow.index]!"
-                          />
+                          <div
+                            v-for="virtualRow in virtualRows"
+                            :key="tweets[virtualRow.index]?.id || String(virtualRow.key)"
+                            :ref="measureElement"
+                            :data-index="virtualRow.index"
+                          >
+                            <TweetDefaultCard
+                              v-if="tweets[virtualRow.index]"
+                              :tweet="tweets[virtualRow.index]!"
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </ClientOnly>
+                  </ClientOnly>
 
-                <div
-                  v-if="(hasNextPage && isFetchingNextPage) || isRepliesLoading"
-                  class="text-primary mt-20 flex shrink-0 items-center justify-center py-4"
-                >
-                  <UiSpinner />
+                  <div
+                    v-if="(hasNextPage && isFetchingNextPage) || isRepliesLoading"
+                    class="text-primary mt-20 flex shrink-0 items-center justify-center py-4"
+                  >
+                    <UiSpinner />
+                  </div>
                 </div>
               </div>
             </div>
