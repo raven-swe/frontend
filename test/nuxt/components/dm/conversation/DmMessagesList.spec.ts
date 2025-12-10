@@ -1,180 +1,536 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { mountSuspended } from '@nuxt/test-utils/runtime';
+import { flushPromises } from '@vue/test-utils';
 import DmMessagesList from '@/components/dm/conversation/DmMessagesList.vue';
-import type { DmMessage } from '#shared/types/dm';
+import type { DmMessage } from '@/../shared/types/dm';
 
-const createMockMessages = (): DmMessage[] => [
-  {
-    id: 'msg_1',
-    sender: {
-      username: 'user1',
-      displayName: 'User One',
-      avatarUrl: 'https://i.pravatar.cc/150?img=1',
+// Mock @tanstack/vue-virtual
+vi.mock('@tanstack/vue-virtual', () => ({
+  useVirtualizer: vi.fn(() => ({
+    value: {
+      getVirtualItems: () => [
+        { index: 0, key: '0', start: 0 },
+        { index: 1, key: '1', start: 120 },
+        { index: 2, key: '2', start: 240 },
+      ],
+      getTotalSize: () => 360,
+      scrollToIndex: vi.fn(),
     },
-    content: 'First message',
-    entities: { mentions: [], hashtags: [] },
-    mediaUrl: null,
-    createdAt: new Date().toISOString(),
-    isMine: true,
+  })),
+}));
+
+// Mock DmMessageItem component
+vi.mock('@/components/dm/conversation/DmMessageItem.vue', () => ({
+  default: {
+    name: 'DmMessageItem',
+    props: ['message'],
+    template:
+      '<div data-test="message-item" :data-message-id="message.id" :data-is-mine="message.isMine">{{ message.content }}</div>',
   },
-  {
-    id: 'msg_2',
-    sender: {
-      username: 'user2',
-      displayName: 'User Two',
-      avatarUrl: 'https://i.pravatar.cc/150?img=2',
-    },
-    content: 'Second message',
-    entities: { mentions: [], hashtags: [] },
-    mediaUrl: null,
-    createdAt: new Date().toISOString(),
-    isMine: false,
+}));
+
+// Mock UiSpinner component
+vi.mock('@/components/ui/spinner/Spinner.vue', () => ({
+  default: {
+    name: 'UiSpinner',
+    props: ['size'],
+    template: '<div data-test="spinner">Loading...</div>',
   },
-  {
-    id: 'msg_3',
-    sender: {
-      username: 'user1',
-      displayName: 'User One',
-      avatarUrl: 'https://i.pravatar.cc/150?img=1',
-    },
-    content: 'Third message',
-    entities: { mentions: [], hashtags: [] },
-    mediaUrl: null,
-    createdAt: new Date().toISOString(),
-    isMine: true,
+}));
+
+const createMockMessage = (overrides: Partial<DmMessage> = {}): DmMessage => ({
+  id: '1',
+  content: 'Test message',
+  entities: {
+    mentions: [],
+    hashtags: [],
   },
+  mediaUrl: null,
+  createdAt: new Date().toISOString(),
+  isMine: false,
+  ...overrides,
+});
+
+const mockMessages: DmMessage[] = [
+  createMockMessage({ id: '1', content: 'Hello there!', isMine: false }),
+  createMockMessage({ id: '2', content: 'Hi! How are you?', isMine: true }),
+  createMockMessage({ id: '3', content: 'I am doing great, thanks!', isMine: false }),
 ];
 
 describe('DmMessagesList Component', () => {
-  it('renders the messages list container', async () => {
-    const messages = createMockMessages();
-    const wrapper = await mountSuspended(DmMessagesList, {
-      props: { messages },
-    });
-
-    const container = wrapper.find('div.flex.flex-col');
-    expect(container.exists()).toBe(true);
-    expect(container.classes()).toContain('gap-2');
-    expect(container.classes()).toContain('p-3');
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.useFakeTimers();
   });
 
-  it('renders all messages', async () => {
-    const messages = createMockMessages();
+  it('renders successfully', async () => {
     const wrapper = await mountSuspended(DmMessagesList, {
-      props: { messages },
-    });
-
-    expect(wrapper.text()).toContain('First message');
-    expect(wrapper.text()).toContain('Second message');
-    expect(wrapper.text()).toContain('Third message');
-  });
-
-  it('renders correct number of message items', async () => {
-    const messages = createMockMessages();
-    const wrapper = await mountSuspended(DmMessagesList, {
-      props: { messages },
-    });
-
-    // Count message bubbles
-    const messageBubbles = wrapper.findAll('.rounded-3xl');
-    expect(messageBubbles.length).toBe(messages.length);
-  });
-
-  it('renders empty list when no messages provided', async () => {
-    const wrapper = await mountSuspended(DmMessagesList, {
-      props: { messages: [] },
-    });
-
-    const container = wrapper.find('div.flex.flex-col');
-    expect(container.exists()).toBe(true);
-
-    const messageBubbles = wrapper.findAll('.rounded-3xl');
-    expect(messageBubbles.length).toBe(0);
-  });
-
-  it('preserves message order', async () => {
-    const messages = createMockMessages();
-    const wrapper = await mountSuspended(DmMessagesList, {
-      props: { messages },
-    });
-
-    const text = wrapper.text();
-    const firstIndex = text.indexOf('First message');
-    const secondIndex = text.indexOf('Second message');
-    const thirdIndex = text.indexOf('Third message');
-
-    expect(firstIndex).toBeLessThan(secondIndex);
-    expect(secondIndex).toBeLessThan(thirdIndex);
-  });
-
-  it('renders messages with proper spacing', async () => {
-    const messages = createMockMessages();
-    const wrapper = await mountSuspended(DmMessagesList, {
-      props: { messages },
-    });
-
-    const container = wrapper.find('div.flex.flex-col');
-    expect(container.classes()).toContain('gap-2');
-  });
-
-  it('renders each message with unique key', async () => {
-    const messages = createMockMessages();
-    const wrapper = await mountSuspended(DmMessagesList, {
-      props: { messages },
-    });
-
-    // All messages should be rendered (checked by content)
-    expect(wrapper.text()).toContain('First message');
-    expect(wrapper.text()).toContain('Second message');
-    expect(wrapper.text()).toContain('Third message');
-  });
-
-  it('handles single message', async () => {
-    const allMessages = createMockMessages();
-    const firstMessage = allMessages[0];
-    if (!firstMessage) throw new Error('No message found');
-    const messages = [firstMessage];
-    const wrapper = await mountSuspended(DmMessagesList, {
-      props: { messages },
-    });
-
-    expect(wrapper.text()).toContain('First message');
-    const messageBubbles = wrapper.findAll('.rounded-3xl');
-    expect(messageBubbles.length).toBe(1);
-  });
-
-  it('renders messages with different alignments based on isMine', async () => {
-    const messages = createMockMessages();
-    const wrapper = await mountSuspended(DmMessagesList, {
-      props: { messages },
-    });
-
-    const html = wrapper.html();
-    // Should have both justify-end (isMine: true) and justify-start (isMine: false)
-    expect(html).toContain('justify-end');
-    expect(html).toContain('justify-start');
-  });
-
-  it('passes message data correctly to child components', async () => {
-    const messages = [
-      {
-        id: 'msg_special',
-        sender: {
-          username: 'special_user',
-          displayName: 'Special User',
-          avatarUrl: 'https://i.pravatar.cc/150?img=5',
-        },
-        content: 'Special message content',
-        entities: { mentions: [], hashtags: [] },
-        mediaUrl: null,
-        createdAt: new Date().toISOString(),
-        isMine: true,
+      props: {
+        messages: mockMessages,
       },
-    ];
-    const wrapper = await mountSuspended(DmMessagesList, {
-      props: { messages },
     });
 
-    expect(wrapper.text()).toContain('Special message content');
+    expect(wrapper.html()).toBeTruthy();
+  });
+
+  it('renders message items for each message', async () => {
+    const wrapper = await mountSuspended(DmMessagesList, {
+      props: {
+        messages: mockMessages,
+      },
+    });
+
+    await flushPromises();
+    const items = wrapper.findAll('[data-test="message-item"]');
+    expect(items.length).toBe(mockMessages.length);
+  });
+
+  it('displays message content', async () => {
+    const wrapper = await mountSuspended(DmMessagesList, {
+      props: {
+        messages: mockMessages,
+      },
+    });
+
+    await flushPromises();
+    const html = wrapper.html();
+    expect(html).toContain('Hello there!');
+    expect(html).toContain('Hi! How are you?');
+    expect(html).toContain('I am doing great, thanks!');
+  });
+
+  it('renders empty list when no messages', async () => {
+    // Mock useVirtualizer to return empty items for empty list
+    const { useVirtualizer } = await import('@tanstack/vue-virtual');
+    vi.mocked(useVirtualizer).mockReturnValue({
+      value: {
+        getVirtualItems: () => [],
+        getTotalSize: () => 0,
+        scrollToIndex: vi.fn(),
+      },
+    } as unknown as ReturnType<typeof useVirtualizer>);
+
+    const wrapper = await mountSuspended(DmMessagesList, {
+      props: {
+        messages: [],
+      },
+    });
+
+    await flushPromises();
+    const items = wrapper.findAll('[data-test="message-item"]');
+    expect(items.length).toBe(0);
+  });
+
+  it('has scrollable container with correct styling', async () => {
+    const wrapper = await mountSuspended(DmMessagesList, {
+      props: {
+        messages: mockMessages,
+      },
+    });
+
+    const container = wrapper.find('div');
+    expect(container.classes()).toContain('overflow-y-auto');
+  });
+
+  it('shows spinner when fetching next page', async () => {
+    const wrapper = await mountSuspended(DmMessagesList, {
+      props: {
+        messages: mockMessages,
+        hasNextPage: true,
+        isFetchingNextPage: true,
+      },
+    });
+
+    await flushPromises();
+    // The spinner is rendered inside a div with v-if condition
+    // Check for the spinner's container or the loading text
+    const spinnerContainer = wrapper.find('.flex.items-center.justify-center.p-4');
+    expect(spinnerContainer.exists()).toBe(true);
+  });
+
+  it('does not show spinner when not fetching', async () => {
+    const wrapper = await mountSuspended(DmMessagesList, {
+      props: {
+        messages: mockMessages,
+        hasNextPage: true,
+        isFetchingNextPage: false,
+      },
+    });
+
+    await flushPromises();
+    const spinner = wrapper.find('[data-test="spinner"]');
+    expect(spinner.exists()).toBe(false);
+  });
+
+  it('does not show spinner when hasNextPage is false', async () => {
+    const wrapper = await mountSuspended(DmMessagesList, {
+      props: {
+        messages: mockMessages,
+        hasNextPage: false,
+        isFetchingNextPage: false,
+      },
+    });
+
+    await flushPromises();
+    const spinner = wrapper.find('[data-test="spinner"]');
+    expect(spinner.exists()).toBe(false);
+  });
+
+  it('exposes parentRef and scrollToBottom via defineExpose', async () => {
+    const wrapper = await mountSuspended(DmMessagesList, {
+      props: {
+        messages: mockMessages,
+      },
+    });
+
+    // Check that exposed properties exist
+    expect(wrapper.vm.parentRef).toBeDefined();
+    expect(wrapper.vm.scrollToBottom).toBeDefined();
+    expect(typeof wrapper.vm.scrollToBottom).toBe('function');
+  });
+
+  it('renders with hasNextPage true', async () => {
+    const wrapper = await mountSuspended(DmMessagesList, {
+      props: {
+        messages: mockMessages,
+        hasNextPage: true,
+        isFetchingNextPage: false,
+      },
+    });
+
+    expect(wrapper.html()).toBeTruthy();
+  });
+
+  it('handles messages with media', async () => {
+    const messagesWithMedia: DmMessage[] = [
+      createMockMessage({
+        id: '1',
+        content: 'Check this out!',
+        mediaUrl: 'https://example.com/image.jpg',
+        isMine: true,
+      }),
+    ];
+
+    // Reset mock for this test
+    const { useVirtualizer } = await import('@tanstack/vue-virtual');
+    vi.mocked(useVirtualizer).mockReturnValue({
+      value: {
+        getVirtualItems: () => [{ index: 0, key: '0', start: 0 }],
+        getTotalSize: () => 120,
+        scrollToIndex: vi.fn(),
+      },
+    } as unknown as ReturnType<typeof useVirtualizer>);
+
+    const wrapper = await mountSuspended(DmMessagesList, {
+      props: {
+        messages: messagesWithMedia,
+      },
+    });
+
+    await flushPromises();
+    const items = wrapper.findAll('[data-test="message-item"]');
+    expect(items.length).toBe(1);
+  });
+
+  it('handles own messages vs other messages', async () => {
+    // Reset mock for this test
+    const { useVirtualizer } = await import('@tanstack/vue-virtual');
+    vi.mocked(useVirtualizer).mockReturnValue({
+      value: {
+        getVirtualItems: () => [
+          { index: 0, key: '0', start: 0 },
+          { index: 1, key: '1', start: 120 },
+        ],
+        getTotalSize: () => 240,
+        scrollToIndex: vi.fn(),
+      },
+    } as unknown as ReturnType<typeof useVirtualizer>);
+
+    const mixedMessages: DmMessage[] = [
+      createMockMessage({ id: '1', content: 'From other', isMine: false }),
+      createMockMessage({ id: '2', content: 'From me', isMine: true }),
+    ];
+
+    const wrapper = await mountSuspended(DmMessagesList, {
+      props: {
+        messages: mixedMessages,
+      },
+    });
+
+    await flushPromises();
+    const items = wrapper.findAll('[data-test="message-item"]');
+    expect(items.length).toBe(2);
+    expect(items[0]!.attributes('data-is-mine')).toBe('false');
+    expect(items[1]!.attributes('data-is-mine')).toBe('true');
+  });
+
+  it('calls onLoadMore when provided and scrolling to top', async () => {
+    const onLoadMore = vi.fn();
+
+    // Mock virtualizer to simulate first item visible at index 0
+    const { useVirtualizer } = await import('@tanstack/vue-virtual');
+    vi.mocked(useVirtualizer).mockReturnValue({
+      value: {
+        getVirtualItems: () => [
+          { index: 0, key: '0', start: 0 },
+          { index: 1, key: '1', start: 120 },
+        ],
+        getTotalSize: () => 240,
+        scrollToIndex: vi.fn(),
+      },
+    } as unknown as ReturnType<typeof useVirtualizer>);
+
+    await mountSuspended(DmMessagesList, {
+      props: {
+        messages: mockMessages,
+        hasNextPage: true,
+        isFetchingNextPage: false,
+        onLoadMore,
+      },
+    });
+
+    await flushPromises();
+
+    // onLoadMore should be called when first item is visible and hasNextPage is true
+    expect(onLoadMore).toHaveBeenCalled();
+  });
+
+  it('does not call onLoadMore when isFetchingNextPage is true', async () => {
+    const onLoadMore = vi.fn();
+
+    await mountSuspended(DmMessagesList, {
+      props: {
+        messages: mockMessages,
+        hasNextPage: true,
+        isFetchingNextPage: true,
+        onLoadMore,
+      },
+    });
+
+    await flushPromises();
+
+    // onLoadMore should not be called when already fetching
+    expect(onLoadMore).not.toHaveBeenCalled();
+  });
+
+  it('does not call onLoadMore when hasNextPage is false', async () => {
+    const onLoadMore = vi.fn();
+
+    await mountSuspended(DmMessagesList, {
+      props: {
+        messages: mockMessages,
+        hasNextPage: false,
+        isFetchingNextPage: false,
+        onLoadMore,
+      },
+    });
+
+    await flushPromises();
+
+    // onLoadMore should not be called when there's no next page
+    expect(onLoadMore).not.toHaveBeenCalled();
+  });
+
+  it('renders messages with entities (mentions and hashtags)', async () => {
+    // Reset mock for this test
+    const { useVirtualizer } = await import('@tanstack/vue-virtual');
+    vi.mocked(useVirtualizer).mockReturnValue({
+      value: {
+        getVirtualItems: () => [{ index: 0, key: '0', start: 0 }],
+        getTotalSize: () => 120,
+        scrollToIndex: vi.fn(),
+      },
+    } as unknown as ReturnType<typeof useVirtualizer>);
+
+    const messageWithEntities: DmMessage[] = [
+      createMockMessage({
+        id: '1',
+        content: 'Hey @john check out #trending',
+        entities: {
+          mentions: [{ username: 'john', startPosition: 4 }],
+          hashtags: [{ hashtag: 'trending', startPosition: 20 }],
+        },
+        isMine: false,
+      }),
+    ];
+
+    const wrapper = await mountSuspended(DmMessagesList, {
+      props: {
+        messages: messageWithEntities,
+      },
+    });
+
+    await flushPromises();
+    const items = wrapper.findAll('[data-test="message-item"]');
+    expect(items.length).toBe(1);
+  });
+
+  it('calculates correct container height based on messages', async () => {
+    // Reset mock to default for this test
+    const { useVirtualizer } = await import('@tanstack/vue-virtual');
+    vi.mocked(useVirtualizer).mockReturnValue({
+      value: {
+        getVirtualItems: () => [
+          { index: 0, key: '0', start: 0 },
+          { index: 1, key: '1', start: 120 },
+          { index: 2, key: '2', start: 240 },
+        ],
+        getTotalSize: () => 360,
+        scrollToIndex: vi.fn(),
+      },
+    } as unknown as ReturnType<typeof useVirtualizer>);
+
+    const wrapper = await mountSuspended(DmMessagesList, {
+      props: {
+        messages: mockMessages,
+      },
+    });
+
+    await flushPromises();
+
+    // Check that the inner container exists
+    const innerContainer = wrapper.find('div > div:not([data-test])');
+    expect(innerContainer.exists()).toBe(true);
+  });
+
+  it('scrollToBottom function can be called', async () => {
+    const mockScrollToIndex = vi.fn();
+    const { useVirtualizer } = await import('@tanstack/vue-virtual');
+    vi.mocked(useVirtualizer).mockReturnValue({
+      value: {
+        getVirtualItems: () => [
+          { index: 0, key: '0', start: 0 },
+          { index: 1, key: '1', start: 120 },
+        ],
+        getTotalSize: () => 240,
+        scrollToIndex: mockScrollToIndex,
+      },
+    } as unknown as ReturnType<typeof useVirtualizer>);
+
+    const wrapper = await mountSuspended(DmMessagesList, {
+      props: {
+        messages: mockMessages,
+      },
+    });
+
+    await flushPromises();
+    vi.runAllTimers();
+
+    // Call the exposed scrollToBottom function
+    wrapper.vm.scrollToBottom();
+    expect(mockScrollToIndex).toHaveBeenCalled();
+  });
+
+  it('handles message length changes (new messages)', async () => {
+    const mockScrollToIndex = vi.fn();
+    const { useVirtualizer } = await import('@tanstack/vue-virtual');
+    vi.mocked(useVirtualizer).mockReturnValue({
+      value: {
+        getVirtualItems: () => [{ index: 0, key: '0', start: 0 }],
+        getTotalSize: () => 120,
+        scrollToIndex: mockScrollToIndex,
+      },
+    } as unknown as ReturnType<typeof useVirtualizer>);
+
+    const wrapper = await mountSuspended(DmMessagesList, {
+      props: {
+        messages: [mockMessages[0]!],
+      },
+    });
+
+    await flushPromises();
+    vi.runAllTimers();
+
+    // Update with more messages
+    await wrapper.setProps({
+      messages: mockMessages,
+    });
+    await flushPromises();
+    vi.runAllTimers();
+
+    expect(wrapper.html()).toBeTruthy();
+  });
+
+  it('handles conversation switch (messages cleared)', async () => {
+    const { useVirtualizer } = await import('@tanstack/vue-virtual');
+    vi.mocked(useVirtualizer).mockReturnValue({
+      value: {
+        getVirtualItems: () => [],
+        getTotalSize: () => 0,
+        scrollToIndex: vi.fn(),
+      },
+    } as unknown as ReturnType<typeof useVirtualizer>);
+
+    const wrapper = await mountSuspended(DmMessagesList, {
+      props: {
+        messages: mockMessages,
+      },
+    });
+
+    await flushPromises();
+    vi.runAllTimers();
+
+    // Clear messages (conversation switch)
+    await wrapper.setProps({
+      messages: [],
+    });
+    await flushPromises();
+    vi.runAllTimers();
+
+    expect(wrapper.html()).toBeTruthy();
+  });
+
+  it('handles totalSize changes', async () => {
+    let totalSize = 120;
+    const { useVirtualizer } = await import('@tanstack/vue-virtual');
+    vi.mocked(useVirtualizer).mockReturnValue({
+      value: {
+        getVirtualItems: () => [{ index: 0, key: '0', start: 0 }],
+        getTotalSize: () => totalSize,
+        scrollToIndex: vi.fn(),
+      },
+    } as unknown as ReturnType<typeof useVirtualizer>);
+
+    const wrapper = await mountSuspended(DmMessagesList, {
+      props: {
+        messages: [mockMessages[0]!],
+      },
+    });
+
+    await flushPromises();
+    vi.runAllTimers();
+
+    // Simulate totalSize change
+    totalSize = 240;
+    await wrapper.setProps({
+      messages: mockMessages.slice(0, 2),
+    });
+    await flushPromises();
+    vi.runAllTimers();
+
+    expect(wrapper.html()).toBeTruthy();
+  });
+
+  it('handles empty virtual rows', async () => {
+    const { useVirtualizer } = await import('@tanstack/vue-virtual');
+    vi.mocked(useVirtualizer).mockReturnValue({
+      value: {
+        getVirtualItems: () => [],
+        getTotalSize: () => 0,
+        scrollToIndex: vi.fn(),
+      },
+    } as unknown as ReturnType<typeof useVirtualizer>);
+
+    const wrapper = await mountSuspended(DmMessagesList, {
+      props: {
+        messages: [],
+        hasNextPage: true,
+        isFetchingNextPage: false,
+        onLoadMore: vi.fn(),
+      },
+    });
+
+    await flushPromises();
+    expect(wrapper.html()).toBeTruthy();
   });
 });

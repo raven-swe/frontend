@@ -1,4 +1,14 @@
 {
+  "ai-summary": {
+    "retry": "Retry",
+    "summary": "AI Summary",
+    "generate-summary": "Generate Summary",
+    "loading-summary": "Generating summary...",
+    "something-went-wrong": "Something went wrong while generating the summary.",
+    "no-summary": "No summary available.",
+    "summary-label": "Summary",
+    "close": "Close AI summary"
+  },
   "testing": {
     "user": {
       "name": "John Doe",
@@ -43,6 +53,14 @@
     "who-to-follow": {
       "title": "Who to follow",
       "follow": "Follow"
+    },
+    "search-filters": {
+      "title": "Search Filters",
+      "people": {
+        "title": "People",
+        "any-one": "From any one",
+        "you-follow": "people you follow"
+      }
     },
     "show-more": "Show more"
   },
@@ -117,7 +135,18 @@
           "description": "When someone you know follows them, they'll be listed here."
         }
       }
-    }
+    },
+    "media": {
+      "no-media": {
+        "title": "{'@'}{username} hasn't posted media",
+        "description": "Once they do, those posts will show up here."
+      },
+      "current-user-no-media": {
+        "title": "Lights, camera … attachments!",
+        "description": "When you post photos or videos, they will show up here."
+      }
+    },
+    "mutual": "Followed by {user1} | Followed by {user1} and {user2} | Followed by {user1}, {user2}, and {user3} | Followed by {user1}, {user2}, and {count} others"
   },
   "home": {
     "tabs": {
@@ -127,6 +156,49 @@
     "messages": {
       "loadingMore": "Loading more tweets...",
       "noMoreTweets": "No more tweets"
+    }
+  },
+  "explore": {
+    "for-you": {
+      "tab": "For You",
+      "posts-for-you": "Posts for you"
+    },
+    "trending": {
+      "tab": "Trending"
+    },
+    "news": {
+      "tab": "News"
+    },
+    "sports": {
+      "tab": "Sports"
+    },
+    "entertainment": {
+      "tab": "Entertainment"
+    },
+    "no-trending-hashtags": "No trending hashtags found",
+    "hashtag": "{rank} . Trending in {category}"
+  },
+  "search": {
+    "top": {
+      "tab": "Top",
+      "view-all": "View all"
+    },
+    "latest": {
+      "tab": "Latest"
+    },
+    "people": {
+      "tab": "People"
+    },
+    "media": {
+      "tab": "Media"
+    },
+    "no-trending-hashtags": "No trending hashtags found",
+    "no-results": "No results for \"{query}\"",
+    "try-searching": "Try searching for something else.",
+    "settings": {
+      "title": "Search Settings",
+      "remove-block": "Remove blocked and muted accounts",
+      "remove-block-desc": "Use this to eliminate search results from accounts you’ve blocked or muted."
     }
   },
   "playground": {
@@ -142,7 +214,8 @@
     "joined": "Joined",
     "following": "Following",
     "followers": "Followers",
-    "user-muted": "You have muted posts from this account."
+    "user-muted": "You have muted posts from this account.",
+    "mutual": "Followed by {user1} | Followed by {user1} and {user2} | Followed by {user1}, {user2}, and {user3} | Followed by {user1}, {user2}, and {others} others you follow"
   },
   "root": {
     "hero": {
@@ -197,6 +270,51 @@
       "reply": "Reply",
       "like": "Like",
       "unlike": "Unlike"
+    },
+    "retweeted-by-you": "You Reposted",
+    "retweeted-by": "{username} Reposted",
+    "show-more-parents": "Show more tweets",
+    "deleted-quote": "This post is unavailable.",
+    "deleted-parent": "This Post was deleted by the Post author.",
+    "engagement": {
+      "label": "View post engagement",
+      "title": "Post engagements",
+      "likes": {
+        "title": "Likes",
+        "empty": {
+          "title": "No likes yet",
+          "description": "When someone taps the heart to Like this post, it'll show up here."
+        }
+      },
+      "reposts": {
+        "title": "Reposts",
+        "empty": {
+          "title": "No Reposts yet",
+          "description": "Share someone else's post on your timeline by reposting it. When you do, it'll show up here."
+        }
+      },
+      "quotes": {
+        "title": "Quotes",
+        "empty": {
+          "title": "No Quotes yet",
+          "description": "You will find a list of everyone who quoted this post here."
+        }
+      }
+    },
+    "replying-to": "Replying to"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "tabs": {
+      "all": "All",
+      "mentions": "Mentions"
+    },
+    "no-notifications": "No notifications yet",
+    "message": {
+      "follow": "started following you",
+      "like": " liked your post",
+      "reply": "replied to your post",
+      "repost": "reposted your post"
     }
   },
   "ui": {
@@ -206,6 +324,7 @@
     "skip-for-now": "Skip for now",
     "save": "Save",
     "cancel": "Cancel",
+    "clear": "Clear",
     "discard": "Discard",
     "post": "Post",
     "reply": "Reply",
@@ -224,8 +343,22 @@
         "placeholder": "Search"
       },
       "search-list": {
-        "placeholder": "Try searching for people, lists, or keywords"
+        "placeholder": "Try searching for people, lists, or keywords",
+        "recent": "Recent",
+        "clear-all": "Clear all",
+        "search-for": "Search For \"{query}\"",
+        "go-to": "Go to {'@'}{query}"
+      },
+      "clear-dialog": {
+        "title": "Clear all recent searches?",
+        "description": "This can’t be undone and you’ll remove all your recent searches."
       }
+    },
+    "logout": {
+      "label": "Log out {'@'}{username}",
+      "title": "Log out of Raven?",
+      "description": "You can always log back in at any time.",
+      "confirm": "Log out"
     }
   },
   "errors": {
@@ -476,10 +609,19 @@
     "header-title": "Messages",
     "placeholder-start-message": "Start a new message",
     "attachedImage": "Attached image",
+    "seen": "Seen",
     "empty": {
       "select": "Select a message",
       "description": "Choose from your existing conversations, start a new one, or just keep swimming.",
       "new": "New message"
+    },
+    "dialog": {
+      "new-message": "New message",
+      "search-people": "Search people",
+      "next": "Next",
+      "you-follow": "Following",
+      "follow-each-other": "You follow each other",
+      "cant-message": "can't be messaged"
     }
   },
   "toaster": {

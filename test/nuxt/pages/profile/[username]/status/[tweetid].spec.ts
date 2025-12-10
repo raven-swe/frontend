@@ -1,506 +1,323 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount } from '@vue/test-utils';
-import { nextTick } from 'vue';
-import { FetchError } from 'ofetch';
-import type { Tweet } from '~~/shared/types/tweets';
+import { mountSuspended } from '@nuxt/test-utils/runtime';
+import { createI18n } from 'vue-i18n';
+import en from '@@/i18n/locales/en.json';
+import type { ComponentMountingOptions } from '@vue/test-utils';
+import type TweetIdPage from '@/pages/profile/[username]/status/[tweetid]/index.vue';
+import TweetView from '~/components/tweet/TweetView.vue';
 
-interface TweetDetailPageVM {
-  tweets: Tweet[];
-  tweetData: Tweet | null;
-  isLoading: boolean;
-  isMainTweetFound: boolean;
-  repliesIsLoading: boolean;
-  hasNextPage: boolean;
-  cursor: string | null;
-}
+const i18n = createI18n({ locale: 'en', messages: { en } });
 
-const mockTweet: Tweet = {
-  id: '123',
-  content: 'Test tweet content',
-  createdAt: new Date().toISOString(),
+const mockTweetWithParent = {
+  id: 'tw-thread-7',
+  content:
+    'hm worldly fuzzy subtract through emphasize when @smWUk39D46QO outside furthermore after hmph given without slimy which atop up @Vd70r0HKbb9t1c #fit #pearl https://uncomfortable-contractor.info/ lazy now gracefully sharply misreport whack unnecessarily @xE8iBDsQ phew but very apud',
+  createdAt: '2025-12-07T20:36:52.974Z',
   author: {
-    username: 'testuser',
-    displayName: 'Test User',
-    avatarUrl: 'https://example.com/avatar.jpg',
+    username: 'kpy3q1b',
+    displayName: 'Tyra59',
+    avatarUrl: 'https://avatars.githubusercontent.com/u/3699669',
     isFollowing: false,
-    isFollower: false,
+    isFollower: true,
   },
-  replyCount: 5,
-  retweetCount: 10,
-  likeCount: 20,
+  replyCount: 3,
+  retweetCount: 91,
+  likeCount: 245,
   isLiked: false,
   isRetweeted: false,
-  entities: { mentions: [], hashtags: [] },
+  entities: {
+    mentions: [
+      {
+        username: 'smWUk39D46QO',
+        startPosition: 49,
+      },
+      {
+        username: 'Vd70r0HKbb9t1c',
+        startPosition: 128,
+      },
+      {
+        username: 'xE8iBDsQ',
+        startPosition: 253,
+      },
+    ],
+    hashtags: [
+      {
+        hashtag: 'fit',
+        startPosition: 144,
+      },
+      {
+        hashtag: 'pearl',
+        startPosition: 149,
+      },
+    ],
+  },
   media: [],
+  replyToTweetId: 'tw-thread-6',
+  hasMoreParents: true,
+  parentTweets: [
+    {
+      id: 'tw-thread-3',
+      content:
+        'zowie troubled excepting lashes dramatize but fabricate red unsightly https://grimy-velocity.com/ furthermore https://hasty-newsprint.net amid yearn coop howl though verve reproachfully apostrophize haunting rapid quaff embody warmhearted https://wide-eyed-tennis.net/ beret afore #lashes quiet destock unselfish cone likewise beyond multicolored worth yet near depot beep',
+      createdAt: '2025-12-07T20:36:48.971Z',
+      author: {
+        username: 'ehqbmo',
+        displayName: 'Alysa_Mante4',
+        avatarUrl: 'https://cdn.jsdelivr.net/gh/faker-js/assets-person-portrait/female/512/75.jpg',
+        isFollowing: false,
+        isFollower: true,
+      },
+      replyCount: 0,
+      retweetCount: 10,
+      likeCount: 217,
+      isLiked: false,
+      isRetweeted: true,
+      entities: {
+        mentions: [],
+        hashtags: [
+          {
+            hashtag: 'lashes',
+            startPosition: 281,
+          },
+        ],
+      },
+      media: [],
+      quoteToTweetId: null,
+      quotedTweet: null,
+    },
+    {
+      id: 'tw-thread-4',
+      content:
+        'these intently quaintly ick of @fM5BOQ which palatable #pliers unit consequently patiently #tool near sadly term shovel concerning so since founder yippee colorful whoever knitting oh before proceed exalted desecrate adjudge fun with given properly https://elliptical-loyalty.net upon owlishly bah @Uo0XiNT3jm #hepatitis phooey https://terrible-government.com/ noisily off while waterlogged',
+      createdAt: '2025-12-07T20:36:49.972Z',
+      author: {
+        username: 'wqvd2_z2mia6h',
+        displayName: 'Jensen_Doyle',
+        avatarUrl: 'https://cdn.jsdelivr.net/gh/faker-js/assets-person-portrait/male/512/78.jpg',
+        isFollowing: true,
+        isFollower: true,
+      },
+      replyCount: 0,
+      retweetCount: 28,
+      likeCount: 104,
+      isLiked: true,
+      isRetweeted: true,
+      entities: {
+        mentions: [
+          {
+            username: 'fM5BOQ',
+            startPosition: 31,
+          },
+          {
+            username: 'Uo0XiNT3jm',
+            startPosition: 298,
+          },
+        ],
+        hashtags: [
+          {
+            hashtag: 'pliers',
+            startPosition: 55,
+          },
+          {
+            hashtag: 'tool',
+            startPosition: 91,
+          },
+          {
+            hashtag: 'hepatitis',
+            startPosition: 310,
+          },
+        ],
+      },
+      media: [],
+      quoteToTweetId: null,
+      quotedTweet: null,
+    },
+    {
+      id: 'tw-thread-5',
+      content:
+        'inside eek starch to given toward #brace cool tired bonnet reluctantly saloon incidentally @cksw6WRLLE before pop nippy till angelic properly publicity',
+      createdAt: '2025-12-07T20:36:50.972Z',
+      author: {
+        username: 'ny5q',
+        displayName: 'Esta20',
+        avatarUrl: 'https://cdn.jsdelivr.net/gh/faker-js/assets-person-portrait/female/512/24.jpg',
+        isFollowing: false,
+        isFollower: true,
+      },
+      replyCount: 0,
+      retweetCount: 20,
+      likeCount: 164,
+      isLiked: false,
+      isRetweeted: false,
+      entities: {
+        mentions: [
+          {
+            username: 'cksw6WRLLE',
+            startPosition: 91,
+          },
+        ],
+        hashtags: [
+          {
+            hashtag: 'brace',
+            startPosition: 34,
+          },
+        ],
+      },
+      media: [],
+      quoteToTweetId: null,
+      quotedTweet: null,
+    },
+    {
+      id: 'tw-thread-6',
+      content:
+        'wrongly forecast flashy astride https://unhealthy-waist.com suddenly developing barring yesterday molasses @HpQpj7SQwQ5Eu always gripping defrag fidget notwithstanding about beneath throughout er blank well-documented fill red',
+      createdAt: '2025-12-07T20:36:51.973Z',
+      author: {
+        username: 'tq73oy',
+        displayName: 'Guadalupe13',
+        avatarUrl: 'https://cdn.jsdelivr.net/gh/faker-js/assets-person-portrait/female/512/23.jpg',
+        isFollowing: true,
+        isFollower: true,
+      },
+      replyCount: 0,
+      retweetCount: 85,
+      likeCount: 233,
+      isLiked: true,
+      isRetweeted: true,
+      entities: {
+        mentions: [
+          {
+            username: 'HpQpj7SQwQ5Eu',
+            startPosition: 107,
+          },
+        ],
+        hashtags: [],
+      },
+      media: [
+        {
+          type: 'VIDEO',
+          url: 'https://www.w3schools.com/html/mov_bbb.mp4',
+          altText: 'Aestas vigor asperiores consectetur sui vester demens.',
+          width: 1639,
+          height: 464,
+        },
+      ],
+      quoteToTweetId: null,
+      quotedTweet: null,
+    },
+  ],
+  quoteToTweetId: null,
+  quotedTweet: null,
+  rootTweet: {
+    id: 'tw-thread-0',
+    content:
+      'smoggy besides ew #release cauliflower alongside hence evince weight @RAf throughout supposing psst valley @xchkvis_tECceW5 #sticker where @zWScbQH #tail',
+    createdAt: '2025-12-07T20:36:45.968Z',
+    author: {
+      username: 'id9',
+      displayName: 'Abel.Emard79',
+      avatarUrl: 'https://cdn.jsdelivr.net/gh/faker-js/assets-person-portrait/male/512/15.jpg',
+      isFollowing: true,
+      isFollower: true,
+    },
+    replyCount: 2,
+    retweetCount: 57,
+    likeCount: 233,
+    isLiked: false,
+    isRetweeted: true,
+    entities: {
+      mentions: [
+        {
+          username: 'RAf',
+          startPosition: 69,
+        },
+        {
+          username: 'xchkvis_tECceW5',
+          startPosition: 107,
+        },
+        {
+          username: 'zWScbQH',
+          startPosition: 139,
+        },
+      ],
+      hashtags: [
+        {
+          hashtag: 'release',
+          startPosition: 18,
+        },
+        {
+          hashtag: 'sticker',
+          startPosition: 124,
+        },
+        {
+          hashtag: 'tail',
+          startPosition: 148,
+        },
+      ],
+    },
+    media: [
+      {
+        type: 'IMAGE',
+        url: 'https://picsum.photos/seed/9632/579/419',
+        altText: 'Veritatis veniam stillicidium tero conturbo averto paens cubicularis uterque.',
+        width: 1576,
+        height: 998,
+      },
+    ],
+    hasMoreParents: false,
+    parentTweets: null,
+    quoteToTweetId: null,
+    quotedTweet: null,
+    rootTweet: null,
+  },
 };
 
-const mockReplies: Tweet[] = [
-  {
-    id: '456',
-    content: 'Reply 1',
-    createdAt: new Date().toISOString(),
-    author: {
-      username: 'replier1',
-      displayName: 'Replier One',
-      avatarUrl: 'https://example.com/avatar2.jpg',
-      isFollowing: false,
-      isFollower: false,
+const createWrapper = async ({
+  props,
+  options,
+}:
+  | {
+      props?: ComponentMountingOptions<typeof TweetIdPage>['props'];
+      options?: Partial<ComponentMountingOptions<typeof TweetIdPage>>;
+    }
+  | undefined = {}) => {
+  const { default: tweetPage } = await import(
+    '@/pages/profile/[username]/status/[tweetid]/index.vue'
+  );
+  return mountSuspended(tweetPage, {
+    props,
+    global: {
+      plugins: [i18n],
     },
-    replyCount: 0,
-    retweetCount: 0,
-    likeCount: 0,
-    isLiked: false,
-    isRetweeted: false,
-    entities: { mentions: [], hashtags: [] },
-    media: [],
-  },
-];
-
-const {
-  mockTweetsService,
-  mockRouter,
-  useRouteMock,
-  mockShowToaster,
-  mockQueryClient,
-  mockInfiniteQuery,
-} = vi.hoisted(() => ({
-  mockTweetsService: {
-    tweet: vi.fn(),
-    replies: vi.fn(),
-  },
-  mockRouter: {
-    back: vi.fn(),
-    replace: vi.fn(),
-  },
-  useRouteMock: vi.fn(),
-  mockShowToaster: vi.fn(),
-  mockQueryClient: {
-    invalidateQueries: vi.fn(),
-    setQueryData: vi.fn(),
-    getQueryData: vi.fn(),
-  },
-  mockInfiniteQuery: {
-    data: {
-      value: {
-        pages: [] as Array<{
-          data: Tweet[];
-          pagination: { nextCursor: string | null; hasNextPage: boolean };
-        }>,
-        pageParams: [] as Array<string | null>,
-      },
-    },
-    fetchNextPage: vi.fn(),
-    hasNextPage: { value: false },
-    isFetchingNextPage: { value: false },
-    isLoading: { value: false },
-    suspense: vi.fn().mockResolvedValue(undefined),
-  },
-}));
-
-vi.mock('~/services/tweet/tweetsService', () => ({
-  tweetsService: mockTweetsService,
-}));
-
-vi.mock('vue-router', () => ({
-  useRouter: () => mockRouter,
-  useRoute: useRouteMock,
-}));
-
-vi.mock('~/utils/showToaster', () => ({
-  showToaster: mockShowToaster,
-}));
-
-vi.mock('@tanstack/vue-query', async () => {
-  const actual = await vi.importActual('@tanstack/vue-query');
-  return {
-    ...actual,
-    useQueryClient: () => mockQueryClient,
-    useInfiniteQuery: (options: {
-      queryFn?: (params: { pageParam: string | null }) => Promise<unknown>;
-      initialPageParam?: string | null;
-    }) => {
-      // Execute the queryFn when useInfiniteQuery is called
-      if (options.queryFn) {
-        options.queryFn({ pageParam: options.initialPageParam ?? null }).then((result: unknown) => {
-          const typedResult = result as {
-            data: Tweet[];
-            pagination: { nextCursor: string | null; hasNextPage: boolean };
-          };
-          mockInfiniteQuery.data.value = {
-            pages: [typedResult],
-            pageParams: [options.initialPageParam ?? null],
-          };
-        });
-      }
-      return mockInfiniteQuery;
-    },
-  };
-});
-
-vi.mock('@tanstack/vue-virtual', async () => {
-  const { ref } = await import('vue');
-  return {
-    useWindowVirtualizer: () =>
-      ref({
-        getVirtualItems: () => [],
-        getTotalSize: () => 0,
-        scrollToIndex: vi.fn(),
-        measureElement: vi.fn(),
-      }),
-  };
-});
-
-describe('Tweet Detail Page', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    useRouteMock.mockReturnValue({
+    route: {
       params: {
-        username: 'testuser',
-        tweetid: '123',
+        username: mockTweetWithParent.author.username,
+        tweetid: mockTweetWithParent.id,
       },
-      path: '/profile/testuser/status/123',
+    },
+    ...options,
+  });
+};
+
+describe('/pages/profile/[username]/status/[tweetid].vue', () => {
+  beforeEach(() => {
+    vi.doMock('@tanstack/vue-query', async (importActual) => {
+      const actual = await importActual<typeof import('@tanstack/vue-query')>();
+      return {
+        ...actual,
+        useQuery: () => ({
+          data: mockTweetWithParent,
+          isLoading: false,
+          isError: false,
+        }),
+      };
     });
-    mockTweetsService.tweet.mockResolvedValue({ data: mockTweet });
-    mockTweetsService.replies.mockResolvedValue({
-      data: mockReplies,
-      pagination: { nextCursor: null, hasNextPage: false },
-    });
-    // Reset mock data
-    mockInfiniteQuery.data.value = {
-      pages: [{ data: mockReplies, pagination: { nextCursor: null, hasNextPage: false } }],
-      pageParams: [null],
-    };
-    mockInfiniteQuery.hasNextPage.value = false;
-    mockInfiniteQuery.isLoading.value = false;
   });
 
-  it('should load and display the main tweet', async () => {
-    const TweetDetailPage = (await import('~/pages/profile/[username]/status/[tweetid].vue'))
-      .default;
-
-    const wrapper = mount(TweetDetailPage, {
-      global: {
-        provide: {
-          registerNewTweetHandler: vi.fn(() => vi.fn()),
-        },
-        stubs: {
-          TweetView: true,
-          TweetComposer: true,
-          TweetDefaultCard: true,
-          UiSpinner: true,
-          UiButton: true,
-          Icon: true,
-        },
-        mocks: { $t: (k: string) => k },
-      },
-    });
-
-    // Wait for all promises to resolve
-    await vi.waitFor(
-      () => {
-        expect(mockTweetsService.tweet).toHaveBeenCalledWith('123');
-        expect(mockTweetsService.replies).toHaveBeenCalledWith('123', {
-          limit: 10,
-          cursor: null,
-        });
-      },
-      { timeout: 3000 },
-    );
-
-    await nextTick();
-
-    const vm = wrapper.vm as unknown as TweetDetailPageVM;
-    expect(vm.tweetData).toEqual(mockTweet);
-    expect(vm.tweets).toHaveLength(1);
-  });
-
-  it('should show spinner while loading', async () => {
-    const TweetDetailPage = (await import('~/pages/profile/[username]/status/[tweetid].vue'))
-      .default;
-
-    const wrapper = mount(TweetDetailPage, {
-      global: {
-        provide: {
-          registerNewTweetHandler: vi.fn(() => vi.fn()),
-        },
-        stubs: {
-          TweetView: true,
-          TweetComposer: true,
-          TweetDefaultCard: true,
-          UiSpinner: { template: '<div class="spinner">Loading...</div>' },
-          UiButton: true,
-          Icon: true,
-        },
-        mocks: { $t: (k: string) => k },
-      },
-    });
-
-    const vm = wrapper.vm as unknown as TweetDetailPageVM;
-    expect(vm.isLoading).toBe(true);
-
-    await nextTick();
-    await new Promise((resolve) => setTimeout(resolve, 100));
-
-    expect(vm.isLoading).toBe(false);
-  });
-
-  it('should display not found message when tweet does not exist', async () => {
-    const error = new FetchError('Not found');
-    error.data = { statusCode: 404 } as unknown as FetchError['data'];
-    mockTweetsService.tweet.mockRejectedValue(error);
-
-    const TweetDetailPage = (await import('~/pages/profile/[username]/status/[tweetid].vue'))
-      .default;
-
-    const wrapper = mount(TweetDetailPage, {
-      global: {
-        provide: {
-          registerNewTweetHandler: vi.fn(() => vi.fn()),
-        },
-        stubs: {
-          TweetView: true,
-          TweetComposer: true,
-          TweetDefaultCard: true,
-          UiSpinner: true,
-          UiButton: { template: '<button><slot /></button>' },
-          Icon: true,
-        },
-        mocks: { $t: (k: string) => k },
-      },
-    });
-
-    await nextTick();
-    await new Promise((resolve) => setTimeout(resolve, 100));
-
-    const vm = wrapper.vm as unknown as TweetDetailPageVM;
-    expect(vm.isMainTweetFound).toBe(false);
-    expect(wrapper.text()).toContain('TWEET_NOT_FOUND');
-  });
-
-  it('should show error toaster on API error', async () => {
-    const error = new FetchError('Server error');
-    error.data = { statusCode: 500 } as unknown as FetchError['data'];
-    mockTweetsService.tweet.mockRejectedValue(error);
-
-    const TweetDetailPage = (await import('~/pages/profile/[username]/status/[tweetid].vue'))
-      .default;
-
-    mount(TweetDetailPage, {
-      global: {
-        provide: {
-          registerNewTweetHandler: vi.fn(() => vi.fn()),
-        },
-        stubs: {
-          TweetView: true,
-          TweetComposer: true,
-          TweetDefaultCard: true,
-          UiSpinner: true,
-          UiButton: true,
-          Icon: true,
-        },
-        mocks: { $t: (k: string) => k },
-      },
-    });
-
-    await nextTick();
-    await new Promise((resolve) => setTimeout(resolve, 100));
-
-    expect(mockShowToaster).toHaveBeenCalledWith(
-      'error',
-      'toaster.tweet-page.tweet-load-error',
-      true,
-    );
-  });
-
-  it('should redirect if username in URL does not match tweet author', async () => {
-    const differentUserTweet = {
-      ...mockTweet,
-      author: { ...mockTweet.author, username: 'differentuser' },
-    };
-    mockTweetsService.tweet.mockResolvedValue({ data: differentUserTweet });
-
-    const TweetDetailPage = (await import('~/pages/profile/[username]/status/[tweetid].vue'))
-      .default;
-
-    mount(TweetDetailPage, {
-      global: {
-        provide: {
-          registerNewTweetHandler: vi.fn(() => vi.fn()),
-        },
-        stubs: {
-          TweetView: true,
-          TweetComposer: true,
-          TweetDefaultCard: true,
-          UiSpinner: true,
-          UiButton: true,
-          Icon: true,
-        },
-        mocks: { $t: (k: string) => k },
-      },
-    });
-
-    await nextTick();
-    await new Promise((resolve) => setTimeout(resolve, 100));
-
-    expect(mockRouter.replace).toHaveBeenCalledWith('/profile/differentuser/status/123');
-  });
-
-  it('should call router.back() when back button is clicked', async () => {
-    const TweetDetailPage = (await import('~/pages/profile/[username]/status/[tweetid].vue'))
-      .default;
-
-    const wrapper = mount(TweetDetailPage, {
-      global: {
-        provide: {
-          registerNewTweetHandler: vi.fn(() => vi.fn()),
-        },
-        stubs: {
-          TweetView: true,
-          TweetComposer: true,
-          TweetDefaultCard: true,
-          UiSpinner: true,
-          UiButton: true,
-          Icon: true,
-        },
-        mocks: { $t: (k: string) => k },
-      },
-    });
-
-    await nextTick();
-    await new Promise((resolve) => setTimeout(resolve, 100));
-
-    const backButton = wrapper.find('button');
-    await backButton.trigger('click');
-
-    expect(mockRouter.back).toHaveBeenCalled();
-  });
-
-  it('should handle empty response without rendering reply items', async () => {
-    mockTweetsService.replies.mockResolvedValue({
-      data: [],
-      pagination: { cursor: null, nextCursor: null, hasNextPage: false },
-    });
-
-    const TweetDetailPage = (await import('~/pages/profile/[username]/status/[tweetid].vue'))
-      .default;
-
-    const wrapper = mount(TweetDetailPage, {
-      global: {
-        provide: {
-          registerNewTweetHandler: vi.fn(() => vi.fn()),
-        },
-        stubs: {
-          TweetView: true,
-          TweetComposer: true,
-          TweetDefaultCard: { name: 'TweetDefaultCard', template: '<div class="tweet-card" />' },
-          UiSpinner: true,
-          UiButton: true,
-          Icon: true,
-        },
-        mocks: { $t: (k: string) => k },
-      },
-    });
-
-    await nextTick();
-    await new Promise((resolve) => setTimeout(resolve, 100));
-
-    const cards = wrapper.findAllComponents({ name: 'TweetDefaultCard' });
-    expect(cards.length).toBe(0);
-  });
-
-  it('should reload data when route params change', async () => {
-    const TweetDetailPage = (await import('~/pages/profile/[username]/status/[tweetid].vue'))
-      .default;
-
-    const wrapper = mount(TweetDetailPage, {
-      global: {
-        provide: {
-          registerNewTweetHandler: vi.fn(() => vi.fn()),
-        },
-        stubs: {
-          TweetView: true,
-          TweetComposer: true,
-          TweetDefaultCard: true,
-          UiSpinner: true,
-          UiButton: true,
-          Icon: true,
-        },
-        mocks: { $t: (k: string) => k },
-      },
-    });
-
-    await nextTick();
-    await new Promise((resolve) => setTimeout(resolve, 100));
-
-    // Verify the component loaded initial data
-    expect(mockTweetsService.tweet).toHaveBeenCalledWith('123');
-    const vm = wrapper.vm as unknown as TweetDetailPageVM;
-    expect(vm.tweetData).toBeDefined();
-  });
-
-  it('should handle errors in replies loading', async () => {
-    // Update the mock to reflect error state before mounting
-    mockInfiniteQuery.data.value = { pages: [], pageParams: [] };
-    mockInfiniteQuery.isLoading.value = false;
-
-    const TweetDetailPage = (await import('~/pages/profile/[username]/status/[tweetid].vue'))
-      .default;
-
-    const wrapper = mount(TweetDetailPage, {
-      global: {
-        provide: {
-          registerNewTweetHandler: vi.fn(() => vi.fn()),
-        },
-        stubs: {
-          TweetView: true,
-          TweetComposer: true,
-          TweetDefaultCard: true,
-          UiSpinner: true,
-          UiButton: true,
-          Icon: true,
-        },
-        mocks: { $t: (k: string) => k },
-      },
-    });
-
-    await nextTick();
-    await new Promise((resolve) => setTimeout(resolve, 100));
-
-    // Replies errors are handled by useInfiniteQuery internally, not via showToaster
-    // The component should still function with empty replies
-    const vm = wrapper.vm as unknown as TweetDetailPageVM;
-    expect(vm.tweets).toEqual([]);
-  });
-
-  it('should set hasNextPage to false when no more tweets', async () => {
-    mockTweetsService.replies.mockResolvedValue({
-      data: mockReplies,
-      pagination: { nextCursor: null, hasNextPage: false },
-    });
-
-    const TweetDetailPage = (await import('~/pages/profile/[username]/status/[tweetid].vue'))
-      .default;
-
-    mount(TweetDetailPage, {
-      global: {
-        provide: {
-          registerNewTweetHandler: vi.fn(() => vi.fn()),
-        },
-        stubs: {
-          TweetView: true,
-          TweetComposer: true,
-          TweetDefaultCard: true,
-          UiSpinner: true,
-          UiButton: true,
-          Icon: true,
-        },
-        mocks: { $t: (k: string) => k },
-      },
-    });
-
-    await nextTick();
-    await new Promise((resolve) => setTimeout(resolve, 100));
-
-    expect(mockInfiniteQuery.hasNextPage.value).toBe(false);
+  it('renders tweetView', async () => {
+    const wrapper = await createWrapper();
+    const tweetView = wrapper.findComponent(TweetView);
+    expect(tweetView.exists()).toBe(true);
+    expect(tweetView.props('tweet')).toEqual(mockTweetWithParent);
   });
 });

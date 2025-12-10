@@ -1,0 +1,212 @@
+import type { DmSseEventMap } from '~~/shared/types/dm';
+import { EventSourcePolyfill } from 'event-source-polyfill';
+import type { Notification } from '~~/shared/types/notifications';
+import { useQueryClient } from '@tanstack/vue-query';
+import { updateConversationLastMessage } from '~/composables/useDmConversations';
+
+interface UseDmSseOptions {
+  autoReconnect?: boolean;
+  maxReconnectAttempts?: number;
+  baseReconnectDelay?: number;
+}
+
+export function useDmSse(options: UseDmSseOptions = {}) {
+  const { autoReconnect = true, maxReconnectAttempts = 5, baseReconnectDelay = 1000 } = options;
+
+  const SSEendpoint = `/api/stream?topics=dm,notifications`;
+  const unseenCount = ref<number>(0);
+  const lastNewMessageinfo = ref<DmSseEventMap['dm.new_message'] | null>(null);
+  const lastNotification = ref<Notification | null>(null);
+  const unseenNotificationsCount = ref<number>(0);
+  const isConnected = ref<boolean>(false);
+  const error = ref<Event | null>(null);
+  const reconnectAttempts = ref<number>(0);
+  const queryClient = useQueryClient();
+  const route = useRoute();
+  const userStore = useUserStore();
+  const selectedConversationId = computed(() => (route.params.conversationId as string) || null);
+  // Track last processed message to avoid duplicates
+  const lastProcessedMessageId = ref<string | null>(null);
+
+  let es: EventSource | null = null;
+  let reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
+  let shouldReconnect = true;
+
+  const clearReconnectTimeout = () => {
+    if (reconnectTimeout) {
+      clearTimeout(reconnectTimeout);
+      reconnectTimeout = null;
+    }
+  };
+
+  const scheduleReconnect = () => {
+    if (!shouldReconnect || !autoReconnect) return;
+    if (reconnectAttempts.value >= maxReconnectAttempts) {
+      return;
+    }
+
+    clearReconnectTimeout();
+
+    const delay = baseReconnectDelay * Math.pow(2, reconnectAttempts.value);
+
+    reconnectTimeout = setTimeout(() => {
+      reconnectAttempts.value++;
+      connect();
+    }, delay);
+  };
+
+  const connect = () => {
+    // Don't create duplicate connections
+    if (es && es.readyState !== EventSource.CLOSED) {
+      return;
+    }
+
+    if (!SSEendpoint) {
+      return;
+    }
+
+    // Clean up any existing connection
+    disconnect();
+
+    try {
+      es = new EventSourcePolyfill(SSEendpoint, {
+        withCredentials: true,
+        heartbeatTimeout: 120_000, // expect some data within this time
+      }) as unknown as EventSource;
+
+      es.onopen = () => {
+        isConnected.value = true;
+        reconnectAttempts.value = 0;
+        error.value = null;
+      };
+
+      es.onerror = (evt) => {
+        error.value = evt;
+        isConnected.value = false;
+        if (es) {
+          es.close();
+          es = null;
+        }
+
+        scheduleReconnect();
+      };
+
+      es.addEventListener('dm.unseen_conversations_count', (evt: MessageEvent) => {
+        try {
+          const data = JSON.parse(evt.data) as DmSseEventMap['dm.unseen_conversations_count'];
+          unseenCount.value = data.count;
+          // console.log('Received unseen_conversations_count event:', data);
+        } catch {
+          createError('Failed to parse unseen_conversations_count event data');
+        }
+      });
+
+      es.addEventListener('dm.new_message', (evt: MessageEvent) => {
+        try {
+          const data = JSON.parse(evt.data) as DmSseEventMap['dm.new_message'];
+          lastNewMessageinfo.value = data;
+
+          // Avoid processing duplicate messages
+          if (data.messageId === lastProcessedMessageId.value) return;
+          lastProcessedMessageId.value = data.messageId;
+
+          // If user is currently in this conversation and is not the sender mark as seen
+          // Otherwise mark as unseen
+          const isCurrentConversation = selectedConversationId.value === data.conversationId;
+          const isNotSender = data.sender.username !== userStore.user.username;
+          const shouldMarkAsSeen = isCurrentConversation && isNotSender;
+          updateConversationLastMessage(queryClient, data.conversationId, {
+            content: data.bodySnippet,
+            senderUsername: data.sender.username,
+            sentAt: data.createdAt,
+            seen: shouldMarkAsSeen,
+          });
+        } catch {
+          createError('Failed to parse new_message event data');
+        }
+      });
+
+      es.addEventListener('notifications.count_update', (evt: MessageEvent) => {
+        try {
+          const data = JSON.parse(evt.data) as { count: number };
+          unseenNotificationsCount.value = data.count;
+          // console.log('Received notifications.count_update event:', unseenNotificationsCount.value);
+        } catch {
+          createError('Failed to parse notifications.count_update event data');
+        }
+      });
+
+      es.addEventListener('notifications.new', (evt: MessageEvent) => {
+        try {
+          const notif = JSON.parse(evt.data) as Notification;
+          lastNotification.value = notif;
+          queryClient.setQueryData(['notifications-main'], (oldData: unknown) => {
+            if (!oldData || typeof oldData !== 'object') return oldData;
+
+            const od = oldData as {
+              pages?: Array<{ data?: unknown[] }>;
+              [k: string]: unknown;
+            };
+
+            const first = od.pages?.[0];
+            if (!first) return oldData;
+
+            const firstTyped = first as { data?: Notification[] };
+
+            return {
+              ...od,
+              pages: [
+                {
+                  ...firstTyped,
+                  data: [notif, ...(firstTyped.data ?? [])],
+                },
+                ...(od.pages?.slice(1) ?? []),
+              ],
+            };
+          });
+          // console.log('Received notifications.new event:', notif);
+        } catch {
+          createError('Failed to parse notifications.new event data');
+        }
+      });
+    } catch {
+      scheduleReconnect();
+    }
+  };
+
+  const disconnect = () => {
+    shouldReconnect = false;
+    clearReconnectTimeout();
+
+    if (es) {
+      es.close();
+      es = null;
+      isConnected.value = false;
+    }
+  };
+
+  const reconnect = () => {
+    shouldReconnect = true;
+    reconnectAttempts.value = 0;
+    connect();
+  };
+
+  onBeforeUnmount(() => {
+    disconnect();
+  });
+
+  return {
+    // state
+    unseenCount,
+    lastNewMessageinfo,
+    lastNotification,
+    unseenNotificationsCount,
+    isConnected,
+    error,
+    reconnectAttempts,
+    // controls
+    connect,
+    disconnect,
+    reconnect,
+  };
+}

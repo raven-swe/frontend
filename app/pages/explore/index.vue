@@ -1,8 +1,9 @@
-<script lang="ts" setup></script>
+<script setup lang="ts">
+import { navigateTo } from '#app';
+
+navigateTo('/explore/for-you', { redirectCode: 301 });
+</script>
 
 <template>
-  <div>
-    <h1 class="p-4 text-2xl font-bold">{{ $t('leftsidebar.nav.explore') }}</h1>
-    <!-- Explore content will go here -->
-  </div>
+  <div></div>
 </template>

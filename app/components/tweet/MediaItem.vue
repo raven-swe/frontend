@@ -34,6 +34,7 @@ const isImage = computed(() => props.media.type === 'IMAGE' || isGif.value);
       v-else-if="isVideo"
       class="flex h-full max-h-full w-full items-center justify-center overflow-hidden"
       :class="shouldRound ? (props.compact ? 'rounded-lg' : 'rounded-xl') : ''"
+      @click.stop
     >
       <VideoPlayer
         :src="props.media.url"

@@ -10,24 +10,26 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-  <VideoPlayer
-    class="video-js vjs-default-skin h-full w-full overflow-hidden rounded-xl"
-    :options="{
-      controls: true,
-      autoplay: false,
-      preload: 'metadata',
-      responsive: true,
-      fluid: true,
-      poster: props.poster,
-      controlBar: { autoHide: false },
-      sources: [
-        {
-          src: props.src,
-          type: 'video/mp4',
-        },
-      ],
-    }"
-  />
+  <ClientOnly>
+    <VideoPlayer
+      class="video-js vjs-default-skin h-full w-full overflow-hidden rounded-xl"
+      :options="{
+        controls: true,
+        autoplay: false,
+        preload: 'metadata',
+        responsive: true,
+        fluid: true,
+        poster: props.poster,
+        controlBar: { autoHide: false },
+        sources: [
+          {
+            src: props.src,
+            type: 'video/mp4',
+          },
+        ],
+      }"
+    />
+  </ClientOnly>
 </template>
 
 <style scoped>

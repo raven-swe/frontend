@@ -1,8 +1,131 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import { Like, Follow, Repost, Reply, QuoteMention } from '~/components/notifications';
+import { useNotificationsList } from '~/composables/useNotificationsList';
+import type { Notification } from '~~/shared/types/notifications';
+
+definePageMeta({
+  layout: 'notifications',
+});
+
+const lastNotification = inject<Ref<Notification | null>>('lastNotification')!;
+const unseenNotificationsCount = inject<Ref<number>>('unseenNotificationsCount')!;
+
+function componentForType(type: string) {
+  switch (type) {
+    case 'FOLLOW':
+      return Follow;
+    case 'LIKE':
+      return Like;
+    case 'RETWEET':
+      return Repost;
+    case 'REPLY':
+      return Reply;
+    case 'QUOTE':
+      return QuoteMention;
+    case 'MENTION':
+      return QuoteMention;
+    default:
+      return Follow;
+  }
+}
+
+const {
+  notifications,
+  virtualRows,
+  totalSize,
+  measureElement,
+  hasNextPage,
+  isFetchingNextPage,
+  isLoading,
+  markAllSeen,
+  getPrimaryActor,
+} = useNotificationsList({
+  queryKey: ['notifications-main'],
+  filter: null,
+  lastNotification,
+  relatedQueryKeys: [['notifications-mentions']],
+  unseenRef: unseenNotificationsCount,
+});
+
+const { mutate: followUser } = useFollowMutation();
+
+onMounted(() => {
+  const hasUnseen = notifications.value.some((n) => !n.isSeen);
+  if (hasUnseen) {
+    setTimeout(() => {}, 500);
+    markAllSeen();
+    unseenNotificationsCount.value = 0;
+  }
+});
+</script>
 
 <template>
-  <div>
-    <h1 class="p-4 text-2xl font-bold">{{ $t('leftsidebar.nav.notifications') }}</h1>
-    <!-- Notifications content will go here -->
+  <div class="mx-auto max-w-[700px]">
+    <ClientOnly>
+      <div v-if="notifications">
+        <div
+          :style="{
+            height: `${totalSize}px`,
+            width: '100%',
+            position: 'relative',
+          }"
+        >
+          <div
+            :style="{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              transform: `translateY(${virtualRows[0] ? virtualRows[0].start - 0 : 0}px)`,
+            }"
+          >
+            <div
+              v-for="virtualRow in virtualRows"
+              :key="notifications[virtualRow.index]?.id || String(virtualRow.key)"
+              :ref="measureElement"
+              :data-index="virtualRow.index"
+            >
+              <component
+                :is="componentForType(notifications[virtualRow.index]!.type)"
+                v-if="notifications[virtualRow.index]"
+                :timestamp="notifications[virtualRow.index]!.latestEventAt ?? ''"
+                :actor="getPrimaryActor(notifications[virtualRow.index]!.actorSummary)"
+                :is-seen="notifications[virtualRow.index]!.isSeen"
+                :tweet="notifications[virtualRow.index]!.tweetSummary?.primaryTweet"
+                @follow="
+                  followUser({
+                    username: getPrimaryActor(notifications[virtualRow.index]!.actorSummary)
+                      .username,
+                    action: 'follow',
+                  })
+                "
+                @unfollow="
+                  followUser({
+                    username: getPrimaryActor(notifications[virtualRow.index]!.actorSummary)
+                      .username,
+                    action: 'unfollow',
+                  })
+                "
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        v-if="(hasNextPage && isFetchingNextPage) || isLoading"
+        class="text-primary mt-20 flex shrink-0 items-center justify-center py-4"
+      >
+        <UiSpinner />
+      </div>
+    </ClientOnly>
+
+    <div
+      v-if="notifications.length === 0 && !isFetchingNextPage && !isLoading"
+      data-testid="empty-state"
+      class="text-muted-foreground mt-20 text-center"
+    >
+      <h1 class="text-xl font-semibold">{{ $t('notifications.no-notifications') }}</h1>
+    </div>
   </div>
 </template>
