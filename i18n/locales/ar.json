@@ -269,7 +269,8 @@
       "like": "إعجاب",
       "unlike": "إلغاء الإعجاب"
     },
-    "show-more-parents": "عرض المزيد من التغريدات الأصلية"
+    "show-more-parents": "عرض المزيد من التغريدات الأصلية",
+    "replying-to": "الرد علي"
   },
   "notifications": {
     "title": "الإشعارات",

@@ -156,6 +156,37 @@ const { mutate: blockUser } = useBlockMutation();
         </div>
       </div>
 
+      <div
+        v-if="tweet.replyToTweet"
+        class="text-muted-foreground mb-1 flex items-center gap-1 text-sm"
+      >
+        <p>
+          {{ $t('tweet.replying-to') }}
+        </p>
+        <UserHoverCard
+          v-if="props.tweet.replyToTweet"
+          :username="props.tweet.replyToTweet.author.username"
+          @follow="
+            followUser({ username: props.tweet.replyToTweet.author.username, action: 'follow' })
+          "
+          @block="
+            blockUser({ username: props.tweet.replyToTweet.author.username, action: 'block' })
+          "
+          @unblock="
+            blockUser({ username: props.tweet.replyToTweet.author.username, action: 'unblock' })
+          "
+          @unfollow="
+            followUser({ username: props.tweet.replyToTweet.author.username, action: 'unfollow' })
+          "
+        >
+          <NuxtLink :to="`/profile/${props.tweet.replyToTweet.author.username}`" @click.stop>
+            <span class="text-primary cursor-pointer hover:underline">{{
+              '@' + props.tweet.replyToTweet.author.username
+            }}</span>
+          </NuxtLink>
+        </UserHoverCard>
+      </div>
+
       <!-- Content -->
       <p class="leading-relaxed break-words whitespace-pre-wrap">
         <UiContentEntitiesRenderer :content="tweet.content" :entities="tweet.entities" />

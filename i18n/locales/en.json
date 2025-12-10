@@ -298,7 +298,8 @@
           "description": "You will find a list of everyone who quoted this post here."
         }
       }
-    }
+    },
+    "replying-to": "Replying to"
   },
   "notifications": {
     "title": "Notifications",
