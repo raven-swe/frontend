@@ -18,6 +18,7 @@ interface Props {
   hasMedia?: boolean;
   canAddMedia?: boolean;
   buttonText?: string;
+  composerType: string;
 }
 
 interface Emits {
@@ -100,7 +101,10 @@ const handleFileSelect = (event: Event) => {
 </script>
 
 <template>
-  <div class="toolbar border-border ms-[60px] flex items-center justify-between pt-1.5">
+  <div
+    class="toolbar border-border me-4 flex items-center justify-between pt-1.5"
+    :class="props.composerType === 'quote' ? 'ms-0' : 'ms-[60px]'"
+  >
     <div class="flex gap-2">
       <UiButton
         variant="tweet-icon-blue"

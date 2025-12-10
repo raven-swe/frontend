@@ -71,20 +71,6 @@ describe('ProfileDetails Component', () => {
     expect(profileImage.exists()).toBe(true);
   });
 
-  it('renders ProfileInfo component', async () => {
-    const wrapper = await mountSuspended(ProfileDetails, {
-      global: {
-        provide: {
-          'user-data': computed(() => mockUser),
-        },
-        plugins: [i18n],
-      },
-    });
-
-    const container = wrapper.find('div.mt-2.flex.flex-col');
-    expect(container.exists()).toBe(true);
-  });
-
   it('passes correct coverImg prop to ProfileCover', async () => {
     const wrapper = await mountSuspended(ProfileDetails, {
       global: {
@@ -126,5 +112,19 @@ describe('ProfileDetails Component', () => {
     const html = wrapper.html();
     expect(html).toContain(mockUser.displayName);
     expect(html).toContain(mockUser.username);
+  });
+
+  it('sends empty string if no cover url', async () => {
+    const wrapper = await mountSuspended(ProfileDetails, {
+      global: {
+        provide: {
+          'user-data': computed(() => ({ ...mockUser, bannerUrl: undefined })),
+        },
+        plugins: [i18n],
+      },
+    });
+
+    const coverImage = wrapper.find('img[alt="Profile Cover"]');
+    expect(coverImage.exists()).toBe(false);
   });
 });

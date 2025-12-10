@@ -1,19 +1,12 @@
-type TweetAuthor = {
+import type { ContentEntities } from './entity';
+
+export type TweetAuthor = {
   username: string;
   displayName: string;
   avatarUrl: string;
   isFollowing: boolean;
   isFollower?: boolean;
   isBlocked?: boolean;
-};
-
-type TweetMention = {
-  username: string;
-  startPosition: number;
-};
-type TweetHashtag = {
-  hashtag: string;
-  startPosition: number;
 };
 
 export type TweetMedia = {
@@ -25,9 +18,8 @@ export type TweetMedia = {
   height: number;
 };
 
-type TweetEntity = {
-  mentions: TweetMention[];
-  hashtags: TweetHashtag[];
+export type DeletedTweet = {
+  isDeleted: true;
 };
 
 export type Tweet = {
@@ -40,11 +32,22 @@ export type Tweet = {
   likeCount: number;
   isLiked: boolean;
   isRetweeted: boolean;
-  entities: TweetEntity;
+  entities?: ContentEntities | null;
   media: TweetMedia[];
   replyToTweetId?: string | null;
-  quoteToTweetId?: string;
-  quotedTweet?: Tweet;
+  repostedBy?: {
+    displayName: string;
+    username: string;
+  };
+  quoteToTweetId?: string | null;
+  quotedTweet?: Tweet | DeletedTweet | null;
+  replyToTweet?: Tweet | null; // search only
+};
+
+export type TweetWithParents = Tweet & {
+  rootTweet?: Tweet | DeletedTweet | null;
+  parentTweets?: (Tweet | DeletedTweet)[] | null;
+  hasMoreParents?: boolean;
 };
 
 export type CreateTweetRequest = {

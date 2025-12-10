@@ -1,35 +1,44 @@
-export type User = {
-  username: string;
+import type { ContentEntities } from './entity';
+
+export type UserRelationship = {
+  blocking?: boolean;
+  blockedBy?: boolean;
+  muted?: boolean;
+  following?: boolean;
+  follower?: boolean;
+};
+
+export type MutualUser = {
   displayName: string;
-  bio: string | null;
-  bioEntities: {
-    mentions: {
-      username: string;
-      startPosition: number;
-    }[];
-    hashtags: {
-      hashtag: string;
-      startPosition: number;
-    }[];
-  };
   avatarUrl: string;
+};
+
+export type CompactUser = MutualUser & {
+  username: string;
+  bio: string | null;
+  bioEntities: ContentEntities | null;
+  relationship: UserRelationship;
+};
+
+export type User = CompactUser & {
   bannerUrl: string;
   location: string;
   websiteUrl: string;
   birthDate: string;
   joinedAt: string; // ISO date string
-  relationship: {
-    blocking: boolean;
-    blockedBy: boolean;
-    muted: boolean;
-    following: boolean;
-    follower: boolean;
-  };
-  email: string;
-  phone: string;
   followingCount: number;
   followersCount: number;
   mutualsCount?: number;
-  mutualNames?: string[];
-  languageCode: string;
+  mutualUsers?: MutualUser[];
+  email?: string;
+  phone?: string;
+  languageCode?: string;
+};
+
+export type SearchedUser = {
+  username: string;
+  displayName: string;
+  avatarUrl: string;
+  isFollowing: boolean;
+  isFollower: boolean;
 };

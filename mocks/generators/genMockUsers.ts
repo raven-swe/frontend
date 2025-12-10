@@ -3,19 +3,71 @@ import type { User } from '#shared/types/user';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import type { ContentEntities } from '#shared/types/entity';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export function generateMockUser(): User {
+type BioEntities = User['bioEntities'];
+
+export function generateUsername(): string {
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_';
+  const length = faker.number.int({ min: 3, max: 15 });
+
+  let username = '';
+  for (let i = 0; i < length; i++) {
+    username += chars.charAt(faker.number.int({ min: 0, max: chars.length - 1 }));
+  }
+  return username;
+}
+
+export function generateBioWithEntities(): { bio: string; bioEntities: BioEntities } {
+  const bioTokens: string[] = [];
+  const mentions: ContentEntities['mentions'] = [];
+  const hashtags: ContentEntities['hashtags'] = [];
+
+  const wordCount = faker.number.int({ min: 10, max: 25 });
+  let currentPosition = 0;
+
+  for (let i = 0; i < wordCount; i++) {
+    const rnd = Math.random();
+
+    let token = '';
+    if (rnd < 0.7) {
+      token = faker.word.words(); // 70% regular word
+    } else if (rnd < 0.8) {
+      const username = generateUsername();
+      token = `@${username}`;
+      mentions.push({ username, startPosition: currentPosition });
+    } else if (rnd < 0.9) {
+      const tag = faker.word.noun(); // 10% hashtag
+      token = `#${tag}`;
+      hashtags.push({ hashtag: tag, startPosition: currentPosition });
+    } else {
+      // 10% random link
+      const url = faker.internet.url();
+      token = url;
+    }
+
+    bioTokens.push(token);
+    currentPosition += token.length + 1;
+  }
+
+  const bio = bioTokens.join(' ');
+
   return {
-    username: faker.internet.username(),
+    bio,
+    bioEntities: { mentions, hashtags },
+  };
+}
+
+export function generateMockUser(username?: string): User {
+  const { bio, bioEntities } = generateBioWithEntities();
+  return {
+    username: username || generateUsername(),
     displayName: faker.internet.displayName(),
-    bio: faker.lorem.sentence(),
-    bioEntities: {
-      mentions: [],
-      hashtags: [],
-    },
+    bio,
+    bioEntities,
     avatarUrl: faker.image.avatar(),
     bannerUrl: faker.image.urlPicsumPhotos({ width: 128 }),
     location: faker.location.city(),
@@ -43,6 +95,7 @@ export function generateMockUser(): User {
 
 const totalMockUsers = 100;
 export const mockUsers: User[] = Array.from({ length: totalMockUsers }, generateMockUser);
+mockUsers.push(generateMockUser('raven_user'));
 const outputDir = path.join(__dirname, '../data');
 if (!fs.existsSync(outputDir)) {
   fs.mkdirSync(outputDir, { recursive: true });

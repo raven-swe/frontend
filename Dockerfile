@@ -9,8 +9,10 @@ FROM base AS build
 ENV NODE_ENV=development
 
 ARG NUXT_PUBLIC_RECAPTCHA_SITE_KEY
+ARG NUXT_PUBLIC_DM_WS_URL
 
 ENV NUXT_PUBLIC_RECAPTCHA_SITE_KEY=$NUXT_PUBLIC_RECAPTCHA_SITE_KEY
+ENV NUXT_PUBLIC_DM_WS_URL=$NUXT_PUBLIC_DM_WS_URL
 
 # Install dependencies
 COPY package.json pnpm-lock.yaml ./
@@ -20,6 +22,12 @@ RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
 # Copy the rest of the application code
 COPY . .
 RUN pnpm mock:gen
+
+# change back to production for build
+ENV NODE_ENV=production
+
+# Increase memory limit for Node.js during build
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 
 # Build Nuxt (SSR)
 RUN pnpm build
