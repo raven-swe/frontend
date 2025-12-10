@@ -54,6 +54,14 @@
       "title": "Who to follow",
       "follow": "Follow"
     },
+    "search-filters": {
+      "title": "Search Filters",
+      "people": {
+        "title": "People",
+        "any-one": "From any one",
+        "you-follow": "people you follow"
+      }
+    },
     "show-more": "Show more"
   },
   "homepage": {
@@ -148,6 +156,49 @@
     "messages": {
       "loadingMore": "Loading more tweets...",
       "noMoreTweets": "No more tweets"
+    }
+  },
+  "explore": {
+    "for-you": {
+      "tab": "For You",
+      "posts-for-you": "Posts for you"
+    },
+    "trending": {
+      "tab": "Trending"
+    },
+    "news": {
+      "tab": "News"
+    },
+    "sports": {
+      "tab": "Sports"
+    },
+    "entertainment": {
+      "tab": "Entertainment"
+    },
+    "no-trending-hashtags": "No trending hashtags found",
+    "hashtag": "{rank} . Trending in {category}"
+  },
+  "search": {
+    "top": {
+      "tab": "Top",
+      "view-all": "View all"
+    },
+    "latest": {
+      "tab": "Latest"
+    },
+    "people": {
+      "tab": "People"
+    },
+    "media": {
+      "tab": "Media"
+    },
+    "no-trending-hashtags": "No trending hashtags found",
+    "no-results": "No results for \"{query}\"",
+    "try-searching": "Try searching for something else.",
+    "settings": {
+      "title": "Search Settings",
+      "remove-block": "Remove blocked and muted accounts",
+      "remove-block-desc": "Use this to eliminate search results from accounts you’ve blocked or muted."
     }
   },
   "playground": {
@@ -247,7 +298,8 @@
           "description": "You will find a list of everyone who quoted this post here."
         }
       }
-    }
+    },
+    "replying-to": "Replying to"
   },
   "notifications": {
     "title": "Notifications",
@@ -270,6 +322,7 @@
     "skip-for-now": "Skip for now",
     "save": "Save",
     "cancel": "Cancel",
+    "clear": "Clear",
     "discard": "Discard",
     "post": "Post",
     "reply": "Reply",
@@ -288,7 +341,15 @@
         "placeholder": "Search"
       },
       "search-list": {
-        "placeholder": "Try searching for people, lists, or keywords"
+        "placeholder": "Try searching for people, lists, or keywords",
+        "recent": "Recent",
+        "clear-all": "Clear all",
+        "search-for": "Search For \"{query}\"",
+        "go-to": "Go to {'@'}{query}"
+      },
+      "clear-dialog": {
+        "title": "Clear all recent searches?",
+        "description": "This can’t be undone and you’ll remove all your recent searches."
       }
     },
     "logout": {

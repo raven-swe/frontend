@@ -37,6 +37,7 @@ export type Tweet = {
   replyToTweetId?: string | null;
   quoteToTweetId?: string | null;
   quotedTweet?: Tweet | DeletedTweet | null;
+  replyToTweet?: Tweet | null; // search only
 };
 
 export type TweetWithParents = Tweet & {

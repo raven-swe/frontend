@@ -148,11 +148,14 @@ watchEffect(() => {
         <UiSpinner />
       </div>
     </ClientOnly>
-    <div v-if="!isLoading && users.length === 0" class="mx-auto my-10 max-w-90 px-8 text-start">
+    <div
+      v-if="!isLoading && users.length === 0"
+      class="mx-auto my-10 max-w-90 px-8 text-start break-words"
+    >
       <h2 class="text-[2rem] leading-tight font-black">
         {{ emptyTitle }}
       </h2>
-      <p class="text-muted-foreground leading-tight">
+      <p class="text-muted-foreground mt-1 leading-tight">
         {{ emptyDescription }}
       </p>
     </div>
