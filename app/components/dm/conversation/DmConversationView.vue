@@ -1,15 +1,18 @@
 <script lang="ts" setup>
 import DmMessagesList from './DmMessagesList.vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useDmMessages } from '@/composables/useDmMessages';
 
-import { useDmSocketIO } from '@/composables/useDmSocketIO';
 import { showToaster } from '@/utils/showToaster';
 import Spinner from '~/components/ui/Spinner.vue';
 import type { DmMessage } from '~~/shared/types/dm';
 
 const route = useRoute();
+const router = useRouter();
 const conversationId = computed(() => route.params.conversationId as string | null);
+
+const userStore = useUserStore();
+const currentUsername = computed(() => userStore.user.username);
 
 const {
   conversations,
@@ -26,33 +29,24 @@ const {
   messages: initialMessages,
   loading: messagesLoading,
   error: messagesError,
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage,
 } = useDmMessages(() => conversationId.value);
 
 const ws = useDmSocketIO();
 provide('dmSocket', ws);
 const liveMessages = ref<DmMessage[]>([]);
 
+const lastSeenMessageId = ref<string | null>(null);
+
 const messages = computed(() => {
   const initial = initialMessages.value || [];
-  return [...liveMessages.value, ...initial];
+  // Add live messages at the END (bottom) so they appear as newest
+  const combined = [...initial, ...liveMessages.value];
+
+  return combined;
 });
-
-const messagesContainer = ref<HTMLElement | null>(null);
-
-function autoScroll() {
-  const el = messagesContainer.value;
-  if (!el) return;
-
-  const threshold = 200;
-
-  const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
-
-  if (isNearBottom) {
-    requestAnimationFrame(() => {
-      el.scrollTop = el.scrollHeight;
-    });
-  }
-}
 
 watch(
   conversationId,
@@ -63,62 +57,41 @@ watch(
         ws.connect();
       }
 
-      // Reset live messages when switching conversations
+      // Reset live messages and seen state when switching conversations
       liveMessages.value = [];
-
-      // Wait for socket to be connected before switching
-      const checkConnection = () => {
-        if (ws.isConnected.value) {
-          const lastMessage = messages.value[messages.value.length - 1];
-          if (lastMessage?.id) {
-            ws.markSeen(newId, lastMessage.id);
-          }
-        } else {
-          // retry until connected
-          setTimeout(checkConnection, 200);
-        }
-      };
-
-      checkConnection();
-      // Force scroll to bottom when switching conversations
-      nextTick(() => {
-        const el = messagesContainer.value;
-        if (el) {
-          requestAnimationFrame(() => {
-            el.scrollTop = el.scrollHeight;
-          });
-        }
-      });
+      lastSeenMessageId.value = null;
     }
   },
   { immediate: true },
 );
 
-// Scroll to bottom when messages load or change
-watch(messages, () => {
-  nextTick(() => autoScroll());
-});
-
-// Force scroll to bottom when messages finish loading initially
-watch(messagesLoading, (isLoading, wasLoading) => {
-  if (wasLoading && !isLoading) {
-    // Messages just finished loading
-    nextTick(() => {
-      const el = messagesContainer.value;
-      if (el) {
-        requestAnimationFrame(() => {
-          el.scrollTop = el.scrollHeight;
-        });
+// Mark messages as seen when messages load and we're connected
+// This needs to wait for messages to actually load
+watch(
+  [() => messages.value, () => ws.isConnected.value, conversationId],
+  ([msgs, connected, convId]) => {
+    if (connected && convId && msgs.length > 0) {
+      const lastMessage = msgs[msgs.length - 1];
+      if (lastMessage?.id && !lastMessage.isMine) {
+        ws.markSeen(convId, lastMessage.id);
       }
-    });
-  }
-});
+    }
+  },
+  { immediate: true },
+);
 
 // Handle incoming Socket messages
 onMounted(() => {
   ws.onMessage((message) => {
     if (conversationId.value && message) {
-      liveMessages.value.unshift(message);
+      // Push new messages to the end (bottom of chat)
+      liveMessages.value.push(message);
+    }
+  });
+
+  ws.onSeenUpdate((data) => {
+    if (data.conversationId === conversationId.value && data.username === currentUsername.value) {
+      lastSeenMessageId.value = data.lastSeenMessageId;
     }
   });
 
@@ -129,6 +102,22 @@ onMounted(() => {
 
 watch(messagesError, (val) => val && showToaster('error', 'Failed to load messages'));
 watch(conversationsError, (val) => val && showToaster('error', 'Failed to load conversation'));
+watch(
+  [
+    () => messagesLoading.value,
+    () => conversationsLoading.value,
+    () => initialMessages.value,
+    () => conversation.value,
+    conversationId,
+  ],
+  ([msgsLoading, convsLoading, msgs, conv, convId]) => {
+    if (msgsLoading || convsLoading) return;
+    if (convId && !conv && msgs && msgs.length === 0) {
+      router.replace('/messages');
+    }
+  },
+  { immediate: true },
+);
 </script>
 <template>
   <div class="flex h-full flex-col overflow-hidden">
@@ -136,15 +125,23 @@ watch(conversationsError, (val) => val && showToaster('error', 'Failed to load c
       :username="conversation?.participant.username || conversationId"
       :avatar-url="conversation?.participant.avatarUrl || ''"
     />
-    <div ref="messagesContainer" class="flex-1 overflow-y-auto p-4">
-      <DmConversationInfo :conversation="conversation || null" />
+    <div class="flex flex-1 flex-col overflow-hidden">
+      <DmConversationInfo :conversation="conversation || null" class="px-4 pt-4" />
       <div
         v-if="conversationsLoading || messagesLoading"
-        class="flex items-center justify-center p-4"
+        class="flex flex-1 items-center justify-center p-4"
       >
         <Spinner size="1.5rem" />
       </div>
-      <DmMessagesList v-else :messages="messages || []" />
+      <DmMessagesList
+        v-else
+        class="flex-1 px-4 pb-4"
+        :messages="messages || []"
+        :has-next-page="hasNextPage || false"
+        :is-fetching-next-page="isFetchingNextPage || false"
+        :on-load-more="fetchNextPage"
+        :last-seen-message-id="lastSeenMessageId"
+      />
     </div>
     <DmConversationDmMessageInput />
   </div>

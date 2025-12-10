@@ -3,13 +3,14 @@ import type { User } from '#shared/types/user';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import type { ContentEntities } from '#shared/types/entity';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-type BioEntity = User['bioEntities'];
+type BioEntities = User['bioEntities'];
 
-function generateUsername(): string {
+export function generateUsername(): string {
   const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_';
   const length = faker.number.int({ min: 3, max: 15 });
 
@@ -20,10 +21,10 @@ function generateUsername(): string {
   return username;
 }
 
-function generateBioWithEntities(): { bio: string; bioEntities: BioEntity } {
+export function generateBioWithEntities(): { bio: string; bioEntities: BioEntities } {
   const bioTokens: string[] = [];
-  const mentions: BioEntity['mentions'] = [];
-  const hashtags: BioEntity['hashtags'] = [];
+  const mentions: ContentEntities['mentions'] = [];
+  const hashtags: ContentEntities['hashtags'] = [];
 
   const wordCount = faker.number.int({ min: 10, max: 25 });
   let currentPosition = 0;
@@ -60,10 +61,10 @@ function generateBioWithEntities(): { bio: string; bioEntities: BioEntity } {
   };
 }
 
-export function generateMockUser(): User {
+export function generateMockUser(username?: string): User {
   const { bio, bioEntities } = generateBioWithEntities();
   return {
-    username: generateUsername(),
+    username: username || generateUsername(),
     displayName: faker.internet.displayName(),
     bio,
     bioEntities,
@@ -94,6 +95,7 @@ export function generateMockUser(): User {
 
 const totalMockUsers = 100;
 export const mockUsers: User[] = Array.from({ length: totalMockUsers }, generateMockUser);
+mockUsers.push(generateMockUser('raven_user'));
 const outputDir = path.join(__dirname, '../data');
 if (!fs.existsSync(outputDir)) {
   fs.mkdirSync(outputDir, { recursive: true });

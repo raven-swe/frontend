@@ -47,6 +47,7 @@ const aspectStyle = computed(() => {
       v-else-if="isVideo"
       class="h-full w-full overflow-hidden"
       :class="props.compact ? 'rounded-lg' : 'rounded-xl'"
+      @click.stop
     >
       <VideoPlayer :src="props.media.url" :poster="props.media.altText" />
     </div>

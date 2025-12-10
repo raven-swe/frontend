@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/vue-query';
-import type { SearchedUser } from '~~/shared/types/user';
+
 import type { ApiSuccessResponse } from '~~/shared/types/api';
 import type { MaybeRefOrGetter } from 'vue';
 import { apiFetch } from '~/api';
@@ -11,21 +11,18 @@ export function useSearchUsers(searchQuery: MaybeRefOrGetter<string>) {
     queryKey: ['search-users', queryRef],
     queryFn: async () => {
       const query = queryRef.value;
-      if (!query.trim()) return [] as SearchedUser[];
+      if (!query.trim()) return [] as CompactUser[];
 
       try {
-        const resp = await apiFetch<ApiSuccessResponse<{ users: SearchedUser[] }>>(
-          '/api/search/users',
-          {
-            method: 'GET',
-            query: { query },
-          },
-        );
+        const resp = await apiFetch<ApiSuccessResponse<CompactUser[]>>('/api/search/users', {
+          method: 'GET',
+          query: { query },
+        });
 
-        const users = resp?.data?.users ?? [];
+        const users = resp?.data ?? [];
         return Array.isArray(users) ? users : [];
       } catch {
-        return [] as SearchedUser[];
+        return [] as CompactUser[];
       }
     },
     enabled: computed(() => queryRef.value.trim().length > 0),

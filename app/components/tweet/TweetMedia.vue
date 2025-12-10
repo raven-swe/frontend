@@ -15,7 +15,7 @@ const getLink = () => (props.tweetId ? `/media/${props.tweetId}` : undefined);
 </script>
 
 <template>
-  <div :class="[compact ? 'w-full max-w-[300px]' : 'w-full', 'pt-2']">
+  <div v-if="media.length > 0" :class="[compact ? 'w-full max-w-[300px]' : 'w-full', 'pt-2']">
     <!-- 1 media -->
     <div v-if="media.length === 1" class="grid overflow-hidden rounded-xl">
       <NuxtLink

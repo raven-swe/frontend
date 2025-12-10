@@ -23,14 +23,19 @@ export const relativeTime = (iso: string, locale = 'en-US') => {
 
 export function formatDate(isoString: string, locale = 'en-US'): string {
   const date = new Date(isoString);
-  return date.toLocaleString(locale, {
-    weekday: 'short',
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
+
+  const time = date.toLocaleTimeString(locale, {
+    hour: 'numeric',
     minute: '2-digit',
   });
+
+  const fullDate = date.toLocaleDateString(locale, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+
+  return `${time} · ${fullDate}`;
 }
 
 export function birthDateFormat(isoString: string, locale = 'en-US'): string {

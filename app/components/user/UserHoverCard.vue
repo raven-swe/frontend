@@ -12,7 +12,7 @@ defineEmits<{
 
 <template>
   <UiHoverCard>
-    <UiHoverCardTrigger>
+    <UiHoverCardTrigger as-child>
       <slot />
     </UiHoverCardTrigger>
     <UiHoverCardContent>

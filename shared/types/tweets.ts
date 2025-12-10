@@ -1,6 +1,6 @@
 import type { ContentEntities } from './entity';
 
-type TweetAuthor = {
+export type TweetAuthor = {
   username: string;
   displayName: string;
   avatarUrl: string;
@@ -18,6 +18,10 @@ export type TweetMedia = {
   height: number;
 };
 
+export type DeletedTweet = {
+  isDeleted: true;
+};
+
 export type Tweet = {
   id: string;
   content: string;
@@ -28,11 +32,22 @@ export type Tweet = {
   likeCount: number;
   isLiked: boolean;
   isRetweeted: boolean;
-  entities: ContentEntities;
+  entities?: ContentEntities | null;
   media: TweetMedia[];
   replyToTweetId?: string | null;
-  quoteToTweetId?: string;
-  quotedTweet?: Tweet;
+  repostedBy?: {
+    displayName: string;
+    username: string;
+  };
+  quoteToTweetId?: string | null;
+  quotedTweet?: Tweet | DeletedTweet | null;
+  replyToTweet?: Tweet | null; // search only
+};
+
+export type TweetWithParents = Tweet & {
+  rootTweet?: Tweet | DeletedTweet | null;
+  parentTweets?: (Tweet | DeletedTweet)[] | null;
+  hasMoreParents?: boolean;
 };
 
 export type CreateTweetRequest = {

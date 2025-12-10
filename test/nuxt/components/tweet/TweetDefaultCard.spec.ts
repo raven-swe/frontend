@@ -7,12 +7,25 @@ import TweetMedia from '@/components/tweet/TweetMedia.vue';
 import TweetActionButtons from '@/components/tweet/TweetActionButtons.vue';
 import type { Tweet } from '~~/shared/types/tweets';
 import { mockNuxtImport } from '@nuxt/test-utils/runtime';
+import en from '~~/i18n/locales/en.json';
+import { createI18n } from 'vue-i18n';
 
-// Mock i18n
-const i18nMock = {
+// Set up i18n
+const i18n = createI18n({
   locale: 'en',
-  t: (key: string) => key,
-};
+  messages: {
+    en,
+  },
+});
+
+vi.mock('~/composables/useProfileMutation', () => ({
+  useFollowMutation: () => ({
+    mutate: vi.fn(),
+  }),
+  useBlockMutation: () => ({
+    mutate: vi.fn(),
+  }),
+}));
 
 const routerMock = vi.hoisted(() => {
   return {
@@ -22,6 +35,12 @@ const routerMock = vi.hoisted(() => {
 
 mockNuxtImport('useRouter', () => {
   return () => routerMock;
+});
+mockNuxtImport('useI18n', () => {
+  return () => ({
+    locale: { value: 'en' },
+    t: (key: string) => key,
+  });
 });
 
 // Stub components for faster tests
@@ -40,9 +59,7 @@ const stubs = {
 
 const globalConfig = {
   stubs,
-  mocks: {
-    $i18n: i18nMock,
-  },
+  plugins: [i18n],
 };
 
 function makeTweet(overrides: Partial<Tweet> = {}): Tweet {
@@ -149,7 +166,7 @@ describe('TweetDefaultCard.vue', () => {
     expect(mention.text()).toContain('@john_doe');
 
     // Hashtag link
-    const hashtag = wrapper.find('a[href="/hashtag/Nuxt3"]');
+    const hashtag = wrapper.find('a[href="/search/top?q=%23Nuxt3"]');
     expect(hashtag.exists()).toBe(true);
     expect(hashtag.text()).toContain('#Nuxt3');
 
@@ -201,7 +218,7 @@ describe('TweetDefaultCard.vue', () => {
 
     // Find links within the tweet content area (excluding author username link)
     const mentionLink = wrapper.find('a[href="/profile/john_doe"]');
-    const hashtagLink = wrapper.find('a[href="/hashtag/Nuxt3"]');
+    const hashtagLink = wrapper.find('a[href="/search/top?q=%23Nuxt3"]');
 
     expect(mentionLink.exists()).toBe(true);
     expect(mentionLink.text()).toContain('@john_doe');
@@ -442,7 +459,10 @@ describe('TweetDefaultCard.vue', () => {
       global: globalConfig,
     });
 
-    await wrapper.trigger('click');
+    // Click the article element to ensure the handler runs
+    const article = wrapper.find('article');
+    expect(article.exists()).toBe(true);
+    await article.trigger('click');
 
     expect(routerMock.push).toHaveBeenCalledWith(
       `/profile/${tweet.author.username}/status/${tweet.id}`,

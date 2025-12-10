@@ -2,6 +2,7 @@
 import { useSearchUsers } from '@/composables/useSearchUsers';
 import { useStartConversation } from '@/composables/useStartConversation';
 import type { DmConversation } from '~~/shared/types/dm';
+import type { CompactUser } from '~~/shared/types/user';
 
 // Local state
 const search = ref('');
@@ -13,16 +14,31 @@ const { users, loading } = useSearchUsers(search);
 const router = useRouter();
 const { startConversation, isStarting } = useStartConversation();
 
+watch(users, (newUsers) => {
+  console.warn('Users updated:', toRaw(newUsers));
+});
+
 const canProceed = computed(() => !!selectedUsername.value);
 
 function toggleSelect(username: string) {
   selectedUsername.value = selectedUsername.value === username ? null : username;
 }
 
-function followStatus(u: { isFollowing: boolean; isFollower: boolean }) {
-  if (u.isFollowing && u.isFollower) return $t('dm.dialog.follow-each-other');
-  if (u.isFollowing) return $t('dm.dialog.you-follow');
+function followStatus(u: CompactUser) {
+  const isFollowing = u.relationship?.following ?? false;
+  const isFollower = u.relationship?.follower ?? false;
+  if (isFollowing && isFollower) return $t('dm.dialog.follow-each-other');
+  if (isFollowing) return $t('dm.dialog.you-follow');
   return '';
+}
+
+function isBlocked(u: CompactUser) {
+  return u.relationship?.blocking || u.relationship?.blockedBy;
+}
+
+function handleUserClick(u: CompactUser) {
+  if (isBlocked(u)) return;
+  toggleSelect(u.username);
 }
 
 async function onNewConversation() {
@@ -43,14 +59,17 @@ async function onNewConversation() {
     <UiDialogContent class="w-full max-w-xl overflow-hidden p-0">
       <UiDialogHeader class="border-muted/30 border-b px-4 py-3">
         <div class="flex items-center justify-between">
-          <DialogTitle class="text-lg font-semibold">
+          <UiDialogTitle class="text-lg font-semibold">
             {{ $t('dm.dialog.new-message') }}
-          </DialogTitle>
+          </UiDialogTitle>
 
           <UiButton :disabled="!canProceed || isStarting" @click="onNewConversation">
             {{ $t('dm.dialog.next') }}
           </UiButton>
         </div>
+        <UiDialogDescription class="sr-only">
+          {{ $t('dm.dialog.search-people') }}
+        </UiDialogDescription>
         <!-- Search input -->
         <div class="px-4 pt-3 pb-2">
           <label class="sr-only" :for="'dm-search'">{{ $t('dm.dialog.search-people') }}</label>
@@ -80,20 +99,25 @@ async function onNewConversation() {
           <div
             v-for="u in users || []"
             :key="u.username"
-            class="hover:bg-muted/20 flex cursor-pointer items-center gap-3 px-4 py-3"
+            class="flex items-center gap-3 px-4 py-3"
             :class="{
               'border-primary border-e-4': selectedUsername === u.username,
+              'hover:bg-muted/20 cursor-pointer': !isBlocked(u),
+              'cursor-not-allowed opacity-50': isBlocked(u),
             }"
-            @click="toggleSelect(u.username)"
+            @click="handleUserClick(u)"
           >
             <UiAvatar size="sm" :img="u.avatarUrl" />
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-2">
-                <Icon name="ic:sharp-person" size="18" class="text-muted-foreground" />
                 <p class="truncate font-medium">{{ u.displayName }}</p>
                 <p class="text-muted-foreground truncate before:content-['@']">{{ u.username }}</p>
               </div>
-              <p v-if="followStatus(u)" class="text-muted-foreground mt-0.5 text-sm">
+              <p v-if="isBlocked(u)" class="text-destructive mt-0.5 flex text-sm">
+                {{ $t('dm.dialog.cant-message') }}
+              </p>
+              <p v-else-if="followStatus(u)" class="text-muted-foreground mt-0.5 flex text-sm">
+                <Icon name="ic:sharp-person" size="18" class="text-muted-foreground" />
                 {{ followStatus(u) }}
               </p>
             </div>

@@ -1,14 +1,19 @@
 <script lang="ts" setup>
 import type { DmConversation } from '~/../shared/types/dm';
-import { useDmHighlight } from '@/composables/useDmHighlight';
 
 const props = defineProps<{
   conversation: DmConversation;
   isSelected?: boolean;
 }>();
 
-const { isHighlighted } = useDmHighlight();
-const highlighted = computed(() => isHighlighted(props.conversation.id));
+const userStore = useUserStore();
+
+const highlighted = computed(() => {
+  const lastMessage = props.conversation.lastMessage;
+  if (!lastMessage) return false;
+  const isNotSender = lastMessage.senderUsername !== userStore.user.username;
+  return !lastMessage.seen && !props.isSelected && isNotSender;
+});
 </script>
 <template>
   <div

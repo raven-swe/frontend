@@ -1,78 +1,111 @@
-import { useQuery } from '@tanstack/vue-query';
-import type { DmConversation, DmSseEventMap } from '~~/shared/types/dm';
+import { useInfiniteQuery, type useQueryClient } from '@tanstack/vue-query';
+import type { DmConversation } from '~~/shared/types/dm';
 import type { ApiSuccessResponse } from '~~/shared/types/api';
 import { apiFetch } from '~/api';
-import { useDmHighlight } from './useDmHighlight';
+
+type ConversationsCache = {
+  pages: ApiSuccessResponse<DmConversation[]>[];
+  pageParams: (string | undefined)[];
+};
+
+// Helper to update a conversation in the cache
+function updateConversationInCache(
+  queryClient: ReturnType<typeof useQueryClient>,
+  conversationId: string,
+  updater: (conversation: DmConversation) => DmConversation,
+) {
+  queryClient.setQueryData<ConversationsCache>(['dm-conversations'], (oldData) => {
+    if (!oldData) return oldData;
+
+    return {
+      ...oldData,
+      pages: oldData.pages.map((page) => ({
+        ...page,
+        data: page.data.map((conv) => (conv.id === conversationId ? updater(conv) : conv)),
+      })),
+    };
+  });
+}
+
+// Update lastMessage when new SSE message arrives
+export function updateConversationLastMessage(
+  queryClient: ReturnType<typeof useQueryClient>,
+  conversationId: string,
+  lastMessage: {
+    content: string;
+    senderUsername: string;
+    sentAt: string;
+    seen: boolean;
+  },
+) {
+  updateConversationInCache(queryClient, conversationId, (conv) => ({
+    ...conv,
+    lastMessage,
+  }));
+}
+
+// Mark conversation as seen
+export function markConversationSeenInCache(
+  queryClient: ReturnType<typeof useQueryClient>,
+  conversationId: string,
+) {
+  updateConversationInCache(queryClient, conversationId, (conv) => ({
+    ...conv,
+    lastMessage: conv.lastMessage ? { ...conv.lastMessage, seen: true } : null,
+  }));
+}
 
 export function useDmConversations() {
-  const { data, isPending, error, refetch } = useQuery({
-    queryKey: ['dm-conversations'],
-    queryFn: async () => {
-      const resp = await apiFetch<ApiSuccessResponse<DmConversation[]>>('/api/conversations', {
-        method: 'GET',
-      });
-      return resp.data;
-    },
+  const { data, isPending, error, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ['dm-conversations'],
+      queryFn: async ({ pageParam }) => {
+        const resp = await apiFetch<ApiSuccessResponse<DmConversation[]>>('/api/conversations', {
+          method: 'GET',
+          query: {
+            cursor: pageParam,
+            limit: 20,
+          },
+        });
+
+        return resp;
+      },
+      initialPageParam: undefined as string | undefined,
+      getNextPageParam: (lastPage) => {
+        if (lastPage.pagination?.hasNextPage && lastPage.pagination?.nextCursor) {
+          return lastPage.pagination.nextCursor;
+        }
+        return undefined;
+      },
+    });
+
+  // Flatten all pages into a single array
+  const allConversations = computed(() => {
+    return data.value ? data.value.pages.flatMap((page) => page.data) : [];
   });
 
-  const { highlightedIds } = useDmHighlight();
-
-  // Track conversations that have been moved to top
-  const movedToTopIds = useState<Set<string>>('dm-moved-to-top-ids', () => new Set());
-
-  const lastNewMessageinfo = inject<Ref<DmSseEventMap['dm.new_message'] | null>>(
-    'lastNewMessageinfo',
-    ref(null),
-  );
-
-  const lastProcessedMessageId = ref<string | null>(null);
-
-  watch(
-    () => lastNewMessageinfo.value,
-    (newMessage) => {
-      if (!newMessage || !data.value) return;
-
-      if (newMessage.messageId === lastProcessedMessageId.value) return;
-      lastProcessedMessageId.value = newMessage.messageId;
-
-      const conversation = data.value.find((c) => c.id === newMessage.conversationId);
-      if (conversation) {
-        conversation.lastMessage = {
-          content: newMessage.bodySnippet,
-          senderUsername: newMessage.sender.username,
-          sentAt: newMessage.createdAt,
-        };
-      }
-    },
-    { immediate: false },
-  );
-
-  watch(
-    highlightedIds,
-    (newIds) => {
-      newIds.forEach((id) => {
-        movedToTopIds.value.add(id);
-      });
-    },
-    { deep: true },
-  );
-
+  // Sort conversations by most recent message
   const sortedConversations = computed(() => {
-    if (!data.value) return [];
+    if (!allConversations.value.length) return [];
 
-    const list = [...data.value];
+    const list = [...allConversations.value];
 
     list.sort((a, b) => {
-      const aIsTop = movedToTopIds.value.has(a.id);
-      const bIsTop = movedToTopIds.value.has(b.id);
-
-      if (aIsTop && !bIsTop) return -1;
-      if (!aIsTop && bIsTop) return 1;
-      return 0;
+      const aTime = a.lastMessage?.sentAt ? new Date(a.lastMessage.sentAt).getTime() : 0;
+      const bTime = b.lastMessage?.sentAt ? new Date(b.lastMessage.sentAt).getTime() : 0;
+      return bTime - aTime;
     });
 
     return list;
   });
 
-  return { conversations: sortedConversations, loading: isPending, error, refresh: refetch };
+  return {
+    conversations: sortedConversations,
+    loading: isPending,
+    error,
+    refresh: refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  };
 }

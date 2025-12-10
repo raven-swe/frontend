@@ -3,13 +3,12 @@ import { mountSuspended } from '@nuxt/test-utils/runtime';
 import PreviewCard from '@/components/SideBar/Right/PreviewCard/index.vue';
 
 describe('SideBar Right PreviewCard Component', () => {
-  it('renders with default title', async () => {
+  it("doesn't render title element with no title prop", async () => {
     const wrapper = await mountSuspended(PreviewCard);
 
-    // Check if title is rendered
+    // Check if title is NOT rendered when no prop provided
     const title = wrapper.find('h1');
-    expect(title.exists()).toBe(true);
-    expect(title.text()).toBe('Title');
+    expect(title.exists()).toBe(false);
   });
 
   it('renders with custom title', async () => {
@@ -22,6 +21,29 @@ describe('SideBar Right PreviewCard Component', () => {
 
     const title = wrapper.find('h1');
     expect(title.text()).toBe(customTitle);
+  });
+
+  it('renders title when provided as empty string', async () => {
+    const wrapper = await mountSuspended(PreviewCard, {
+      props: {
+        title: '',
+      },
+    });
+
+    // Empty string is falsy, so title should not render
+    const title = wrapper.find('h1');
+    expect(title.exists()).toBe(false);
+  });
+
+  it('renders title when provided as undefined', async () => {
+    const wrapper = await mountSuspended(PreviewCard, {
+      props: {
+        title: undefined,
+      },
+    });
+
+    const title = wrapper.find('h1');
+    expect(title.exists()).toBe(false);
   });
 
   it('has proper styling classes', async () => {
@@ -43,10 +65,23 @@ describe('SideBar Right PreviewCard Component', () => {
     expect(slotContent.text()).toBe('Test Content');
   });
 
-  it('has show more link', async () => {
-    const wrapper = await mountSuspended(PreviewCard);
+  it('renders both title and slot content together', async () => {
+    const customTitle = 'Test Title';
+    const wrapper = await mountSuspended(PreviewCard, {
+      props: {
+        title: customTitle,
+      },
+      slots: {
+        default: '<div class="slot-content">Slot Content</div>',
+      },
+    });
 
-    const showMore = wrapper.find('.cursor-pointer.text-primary');
-    expect(showMore.exists()).toBe(true);
+    const title = wrapper.find('h1');
+    expect(title.exists()).toBe(true);
+    expect(title.text()).toBe(customTitle);
+
+    const slotContent = wrapper.find('.slot-content');
+    expect(slotContent.exists()).toBe(true);
+    expect(slotContent.text()).toBe('Slot Content');
   });
 });

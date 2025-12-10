@@ -16,10 +16,17 @@ const displayUrl = computed(() => {
   }
   return '';
 });
+
+const mutualPluralIndex = computed(() => (userProfile?.value.mutualsCount ?? 1) - 1);
+
+const modifiedMutualUsers = computed(() => {
+  if (!userProfile?.value.mutualUsers) return [];
+  return userProfile.value.mutualUsers.slice(0, Math.min(userProfile.value.mutualsCount ?? 0, 3));
+});
 </script>
 
 <template>
-  <div class="mt-2 flex flex-col" data-cy="profile-info">
+  <div class="my-2 flex flex-col" data-cy="profile-info">
     <div class="px-4">
       <h2
         class="text-foreground line-clamp-2 pb-0 text-2xl font-bold break-words"
@@ -35,12 +42,7 @@ const displayUrl = computed(() => {
       >
         <UiContentEntitiesRenderer
           :content="userProfile?.bio ?? ''"
-          :entities="
-            userProfile?.bioEntities ?? {
-              mentions: [],
-              hashtags: [],
-            }
-          "
+          :entities="userProfile?.bioEntities"
         />
       </p>
 
@@ -75,7 +77,8 @@ const displayUrl = computed(() => {
         </p>
       </div>
 
-      <div class="mt-4 flex space-x-4">
+      <!-- Following and Followers -->
+      <div class="mt-3 flex space-x-4">
         <NuxtLink
           :to="`/profile/${userProfile?.username}/following`"
           class="hover:underline"
@@ -99,6 +102,41 @@ const displayUrl = computed(() => {
           <span class="text-muted-foreground ms-1"> {{ $t('profile-info.followers') }} </span>
         </NuxtLink>
       </div>
+
+      <!-- Mutual Followers -->
+      <div v-if="userProfile?.mutualsCount !== 0" class="mt-3">
+        <NuxtLink
+          :to="`/profile/${userProfile?.username}/followers-you-follow`"
+          class="decoration-muted-foreground flex w-fit items-center gap-2 hover:underline"
+        >
+          <div
+            class="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-1"
+          >
+            <UiAvatar
+              v-for="(mutual, i) in modifiedMutualUsers"
+              :key="i"
+              :img="mutual.avatarUrl"
+              size="xs"
+              :style="{
+                zIndex: modifiedMutualUsers.length - i,
+              }"
+            />
+          </div>
+          <p class="text-muted-foreground text-sm">
+            {{
+              $t('profile-info.mutual', mutualPluralIndex, {
+                named: {
+                  others: Math.max(mutualPluralIndex - 1, 0),
+                  user1: userProfile?.mutualUsers?.[0]?.displayName,
+                  user2: userProfile?.mutualUsers?.[1]?.displayName,
+                  user3: userProfile?.mutualUsers?.[2]?.displayName,
+                },
+              })
+            }}
+          </p>
+        </NuxtLink>
+      </div>
+
       <div v-if="isMuted" class="mt-4">
         <p class="text-muted-foreground text-sm">
           {{ $t('profile-info.user-muted') }}
