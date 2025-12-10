@@ -7,7 +7,7 @@ const mockError = ref<Error | null>(null);
 const mockData = ref<unknown>(null);
 const mockMutateAsync = vi.fn();
 const mockReset = vi.fn();
-const mockAddPendingConversation = vi.fn();
+const mockSetQueryData = vi.fn();
 
 // Mock dependencies
 vi.mock('@tanstack/vue-query', () => ({
@@ -23,10 +23,9 @@ vi.mock('@tanstack/vue-query', () => ({
       reset: mockReset,
     };
   }),
-}));
-
-vi.mock('@/composables/useDmConversations', () => ({
-  addPendingConversation: mockAddPendingConversation,
+  useQueryClient: vi.fn(() => ({
+    setQueryData: mockSetQueryData,
+  })),
 }));
 
 vi.mock('@/api', () => ({
@@ -124,7 +123,7 @@ describe('useStartConversation', () => {
     }
   });
 
-  it('onSuccess adds new conversation to pending list', async () => {
+  it('onSuccess adds new conversation to cache', async () => {
     await import('@/composables/useStartConversation');
 
     const onSuccess = (globalThis as Record<string, unknown>).__testOnSuccess as (newConversation: {
@@ -135,7 +134,7 @@ describe('useStartConversation', () => {
       const newConversation = { id: 'new-conv' };
       onSuccess(newConversation);
 
-      expect(mockAddPendingConversation).toHaveBeenCalledWith(newConversation);
+      expect(mockSetQueryData).toHaveBeenCalledWith(['dm-conversations'], expect.any(Function));
     }
   });
 });

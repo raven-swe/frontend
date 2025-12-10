@@ -32,7 +32,7 @@ const isCurrentUser = computed(() => {
 
 <template>
   <div
-    class="border-border hover:bg-foreground/5 flex cursor-pointer gap-2 py-3 ps-4 pe-2 transition-colors duration-100"
+    class="border-border hover:bg-foreground/5 flex cursor-pointer gap-2 overflow-hidden py-3 ps-4 pe-2 transition-colors duration-100"
     :class="{ 'pe-3': !props.showDropdown }"
     data-cy="user-row"
     @click="router.push(`/profile/${user.username}`)"
@@ -57,9 +57,8 @@ const isCurrentUser = computed(() => {
             @unfollow="$emit('unfollow', user.username)"
             @unblock="$emit('unblock', user.username)"
           >
-            <p class="text-md font-semibold">{{ user.displayName }}</p>
+            <p class="text-md font-semibold break-all">{{ user.displayName }}</p>
           </UserHoverCard>
-
           <p class="text-muted-foreground text-sm" data-cy="user-row-username">
             <UserHoverCard
               :username="user.username"

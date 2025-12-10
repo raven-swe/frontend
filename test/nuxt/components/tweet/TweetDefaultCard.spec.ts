@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
+import { VueQueryPlugin } from '@tanstack/vue-query';
 import TweetDefaultCard from '@/components/tweet/TweetDefaultCard.vue';
 import Avatar from '@/components/ui/Avatar.vue';
 import TweetMedia from '@/components/tweet/TweetMedia.vue';
@@ -59,7 +60,7 @@ const stubs = {
 
 const globalConfig = {
   stubs,
-  plugins: [i18n],
+  plugins: [i18n, VueQueryPlugin],
 };
 
 function makeTweet(overrides: Partial<Tweet> = {}): Tweet {
@@ -166,7 +167,7 @@ describe('TweetDefaultCard.vue', () => {
     expect(mention.text()).toContain('@john_doe');
 
     // Hashtag link
-    const hashtag = wrapper.find('a[href="/hashtag/Nuxt3"]');
+    const hashtag = wrapper.find('a[href="/search/top?q=%23Nuxt3"]');
     expect(hashtag.exists()).toBe(true);
     expect(hashtag.text()).toContain('#Nuxt3');
 
@@ -218,7 +219,7 @@ describe('TweetDefaultCard.vue', () => {
 
     // Find links within the tweet content area (excluding author username link)
     const mentionLink = wrapper.find('a[href="/profile/john_doe"]');
-    const hashtagLink = wrapper.find('a[href="/hashtag/Nuxt3"]');
+    const hashtagLink = wrapper.find('a[href="/search/top?q=%23Nuxt3"]');
 
     expect(mentionLink.exists()).toBe(true);
     expect(mentionLink.text()).toContain('@john_doe');
@@ -459,7 +460,10 @@ describe('TweetDefaultCard.vue', () => {
       global: globalConfig,
     });
 
-    await wrapper.trigger('click');
+    // Click the article element to ensure the handler runs
+    const article = wrapper.find('article');
+    expect(article.exists()).toBe(true);
+    await article.trigger('click');
 
     expect(routerMock.push).toHaveBeenCalledWith(
       `/profile/${tweet.author.username}/status/${tweet.id}`,

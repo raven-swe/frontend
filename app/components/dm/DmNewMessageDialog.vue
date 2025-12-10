@@ -59,14 +59,17 @@ async function onNewConversation() {
     <UiDialogContent class="w-full max-w-xl overflow-hidden p-0">
       <UiDialogHeader class="border-muted/30 border-b px-4 py-3">
         <div class="flex items-center justify-between">
-          <DialogTitle class="text-lg font-semibold">
+          <UiDialogTitle class="text-lg font-semibold">
             {{ $t('dm.dialog.new-message') }}
-          </DialogTitle>
+          </UiDialogTitle>
 
           <UiButton :disabled="!canProceed || isStarting" @click="onNewConversation">
             {{ $t('dm.dialog.next') }}
           </UiButton>
         </div>
+        <UiDialogDescription class="sr-only">
+          {{ $t('dm.dialog.search-people') }}
+        </UiDialogDescription>
         <!-- Search input -->
         <div class="px-4 pt-3 pb-2">
           <label class="sr-only" :for="'dm-search'">{{ $t('dm.dialog.search-people') }}</label>

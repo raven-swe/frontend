@@ -21,7 +21,7 @@ const parsedBioTokens = computed(() => parseContentEntities(props.content, props
     </NuxtLink>
     <NuxtLink
       v-else-if="token.type === 'hashtag'"
-      :to="`/hashtag/${token.value}`"
+      :to="`/search/top?q=${encodeURIComponent('#' + token.value)}`"
       class="text-primary hover:underline"
       @click.stop
     >

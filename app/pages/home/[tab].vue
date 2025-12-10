@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import TweetDefaultCard from '~/components/tweet/TweetDefaultCard.vue';
 import { homeService } from '~/services/home/homeService';
-import { useInfiniteQuery, useQueryClient } from '@tanstack/vue-query';
+import { useInfiniteQuery, useQueryClient, type InfiniteData } from '@tanstack/vue-query';
 import { useWindowVirtualizer } from '@tanstack/vue-virtual';
 
 function isTab(value: unknown): value is HomeTab {
@@ -50,7 +50,6 @@ const rowVirtualizerOptions = computed(() => {
     estimateSize: () => 120,
     overscan: 3,
     scrollMargin: parentOffsetRef.value,
-    getItemKey: (index: number) => tweets.value[index]?.id || index,
   };
 });
 
@@ -85,23 +84,23 @@ const queryClient = useQueryClient();
 function handlePost(tweet: Tweet) {
   // Optimistically add the new tweet to the top of the list
   if (!tab.value) return;
-  queryClient.setQueryData<{
-    pages: Array<{ data: Tweet[]; pagination?: CursorPagination }>;
-    pageParams: Array<string | null>;
-  }>([tab.value], (oldData) => {
-    if (!oldData) return oldData;
-    const newData = {
-      ...oldData,
-      pages: [
-        {
-          data: [tweet, ...(oldData.pages[0]?.data || [])],
-          pagination: oldData.pages[0]?.pagination,
-        },
-        ...oldData.pages.slice(1),
-      ],
-    };
-    return newData;
-  });
+  queryClient.setQueryData<InfiniteData<{ data: Tweet[]; pagination?: CursorPagination }>>(
+    [tab.value],
+    (oldData) => {
+      if (!oldData) return oldData;
+      const newData = {
+        ...oldData,
+        pages: [
+          {
+            data: [tweet, ...(oldData.pages[0]?.data || [])],
+            pagination: oldData.pages[0]?.pagination,
+          },
+          ...oldData.pages.slice(1),
+        ],
+      };
+      return newData;
+    },
+  );
 }
 
 watch(
@@ -173,9 +172,9 @@ watch(
     <div
       v-if="tweets.length === 0 && !isFetchingNextPage && !isLoading"
       data-testid="empty-state"
-      class="text-muted-foreground mt-20 text-center"
+      class="mx-auto my-10 max-w-90 px-8 text-start break-words"
     >
-      <h1 class="text-xl font-semibold">{{ $t('testing.tweets.tweet-not-found') }}</h1>
+      <p class="text-[2rem] leading-tight font-black">{{ $t('errors.TWEET_NOT_FOUND') }}</p>
     </div>
   </div>
 </template>
