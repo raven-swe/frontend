@@ -12,7 +12,7 @@ const props = defineProps<Props>();
 <template>
   <ClientOnly>
     <VideoPlayer
-      class="video-js vjs-default-skin h-full w-full overflow-hidden rounded-xl"
+      class="video-js vjs-default-skin h-full w-full overflow-hidden"
       :options="{
         controls: true,
         autoplay: false,
