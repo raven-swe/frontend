@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime';
+import { VueQueryPlugin } from '@tanstack/vue-query';
 import TweetView from '@/components/tweet/TweetView.vue';
 import Avatar from '@/components/ui/Avatar.vue';
 import TweetMedia from '@/components/tweet/TweetMedia.vue';
@@ -69,7 +70,7 @@ describe('TweetView.vue', () => {
     const tweet = makeTweet();
     const wrapper = await mountSuspended(TweetView, {
       props: { tweet },
-      global: { stubs: { NuxtImg: true, Icon: true }, plugins: [i18n] },
+      global: { stubs: { NuxtImg: true, Icon: true }, plugins: [i18n, VueQueryPlugin] },
     });
 
     const avatar = wrapper.findComponent(Avatar);
@@ -86,7 +87,7 @@ describe('TweetView.vue', () => {
     const tweet = makeTweet();
     const wrapper = await mountSuspended(TweetView, {
       props: { tweet },
-      global: { stubs: { NuxtImg: true, Icon: true }, plugins: [i18n] },
+      global: { stubs: { NuxtImg: true, Icon: true }, plugins: [i18n, VueQueryPlugin] },
     });
 
     const mention = wrapper.find('a[href="/profile/alice"]');
@@ -101,8 +102,8 @@ describe('TweetView.vue', () => {
   it('renders media and action buttons with correct props when media=true', async () => {
     const tweet = makeTweet();
     const wrapper = await mountSuspended(TweetView, {
-      props: { tweet, media: true },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      props: { tweet },
+      global: { stubs: { NuxtImg: true, Icon: true }, plugins: [i18n, VueQueryPlugin] },
     });
 
     const media = wrapper.findComponent(TweetMedia);
