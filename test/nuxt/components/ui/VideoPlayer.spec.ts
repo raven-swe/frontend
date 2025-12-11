@@ -11,6 +11,12 @@ vi.mock('@videojs-player/vue', () => ({
   },
 }));
 
+// Stub ClientOnly to render its default slot
+const ClientOnlyStub = {
+  name: 'ClientOnly',
+  template: '<slot />',
+};
+
 describe('VideoPlayer.vue', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -21,6 +27,9 @@ describe('VideoPlayer.vue', () => {
       props: {
         src: '/test-video.mp4',
       },
+      global: {
+        stubs: { ClientOnly: ClientOnlyStub },
+      },
     });
 
     expect(wrapper.find('.video-js-mock').exists()).toBe(true);
@@ -30,6 +39,9 @@ describe('VideoPlayer.vue', () => {
     const wrapper = mount(VideoPlayer, {
       props: {
         src: '/my-video.mp4',
+      },
+      global: {
+        stubs: { ClientOnly: ClientOnlyStub },
       },
     });
 
@@ -43,6 +55,9 @@ describe('VideoPlayer.vue', () => {
         src: '/test-video.mp4',
         poster: '/poster-image.jpg',
       },
+      global: {
+        stubs: { ClientOnly: ClientOnlyStub },
+      },
     });
 
     const options = JSON.parse(wrapper.find('.video-js-mock').attributes('data-options') || '{}');
@@ -53,6 +68,9 @@ describe('VideoPlayer.vue', () => {
     const wrapper = mount(VideoPlayer, {
       props: {
         src: '/test-video.mp4',
+      },
+      global: {
+        stubs: { ClientOnly: ClientOnlyStub },
       },
     });
 
@@ -66,6 +84,9 @@ describe('VideoPlayer.vue', () => {
         src: '/test-video.mp4',
         fluid: false,
       },
+      global: {
+        stubs: { ClientOnly: ClientOnlyStub },
+      },
     });
 
     const options = JSON.parse(wrapper.find('.video-js-mock').attributes('data-options') || '{}');
@@ -76,6 +97,9 @@ describe('VideoPlayer.vue', () => {
     const wrapper = mount(VideoPlayer, {
       props: {
         src: '/test-video.mp4',
+      },
+      global: {
+        stubs: { ClientOnly: ClientOnlyStub },
       },
     });
 
@@ -88,6 +112,9 @@ describe('VideoPlayer.vue', () => {
       props: {
         src: '/test-video.mp4',
       },
+      global: {
+        stubs: { ClientOnly: ClientOnlyStub },
+      },
     });
 
     const options = JSON.parse(wrapper.find('.video-js-mock').attributes('data-options') || '{}');
@@ -98,6 +125,9 @@ describe('VideoPlayer.vue', () => {
     const wrapper = mount(VideoPlayer, {
       props: {
         src: '/test-video.mp4',
+      },
+      global: {
+        stubs: { ClientOnly: ClientOnlyStub },
       },
     });
 
@@ -110,6 +140,9 @@ describe('VideoPlayer.vue', () => {
       props: {
         src: '/test-video.mp4',
       },
+      global: {
+        stubs: { ClientOnly: ClientOnlyStub },
+      },
     });
 
     const options = JSON.parse(wrapper.find('.video-js-mock').attributes('data-options') || '{}');
@@ -120,6 +153,9 @@ describe('VideoPlayer.vue', () => {
     const wrapper = mount(VideoPlayer, {
       props: {
         src: '/test-video.mp4',
+      },
+      global: {
+        stubs: { ClientOnly: ClientOnlyStub },
       },
     });
 
@@ -132,6 +168,9 @@ describe('VideoPlayer.vue', () => {
       props: {
         src: '/test-video.mp4',
       },
+      global: {
+        stubs: { ClientOnly: ClientOnlyStub },
+      },
     });
 
     // The component passes these classes to the VideoPlayer
@@ -143,6 +182,9 @@ describe('VideoPlayer.vue', () => {
     const wrapper = mount(VideoPlayer, {
       props: {
         src: '/test-video.mp4',
+      },
+      global: {
+        stubs: { ClientOnly: ClientOnlyStub },
       },
     });
 
@@ -160,6 +202,9 @@ describe('VideoPlayer.vue', () => {
     testSources.forEach((src) => {
       const wrapper = mount(VideoPlayer, {
         props: { src },
+        global: {
+          stubs: { ClientOnly: ClientOnlyStub },
+        },
       });
 
       const options = JSON.parse(wrapper.find('.video-js-mock').attributes('data-options') || '{}');
