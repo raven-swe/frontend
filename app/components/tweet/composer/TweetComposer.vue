@@ -8,6 +8,7 @@ import type { MediaItem } from '~~/shared/types/shared';
 import type { Tweet } from '~~/shared/types/tweets';
 import Avatar from '~/components/ui/Avatar.vue';
 import { useTweetComposer } from '~/composables/useTweetComposer';
+import { useQueryClient } from '@tanstack/vue-query';
 
 interface Props {
   replyToTweetId?: string | null;
@@ -43,13 +44,14 @@ const {
 const emit = defineEmits<{
   (e: 'posted', tweet: Tweet): void;
 }>();
+const queryClient = useQueryClient();
 
 const handlePostWrapper = async () => {
   const newTweet = await handlePost();
   if (!newTweet) return;
 
+  queryClient.setQueryData<Tweet>(['tweet', newTweet.id], newTweet);
   emit('posted', newTweet);
-
   // Cleanup
   media.value.forEach((item) => URL.revokeObjectURL(item.url));
   tweetContent.value = '';

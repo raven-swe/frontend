@@ -38,6 +38,7 @@ export type Tweet = {
   repostedBy?: {
     displayName: string;
     username: string;
+    id?: string;
   };
   quoteToTweetId?: string | null;
   quotedTweet?: Tweet | DeletedTweet | null;

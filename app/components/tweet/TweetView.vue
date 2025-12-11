@@ -13,38 +13,7 @@ const props = defineProps<Props>();
 const userStore = useUserStore();
 const originalUsername = ref<string>(userStore.user?.username || '');
 
-const tweetClone = ref(structuredClone(toRaw(props.tweet)));
 const aiSummaryRef = ref<InstanceType<typeof AiSummary> | null>(null);
-// Update local tweet state when like/unlike succeeds
-const onLikeSuccess = () => {
-  if (!tweetClone.value.isLiked) {
-    tweetClone.value.isLiked = true;
-    tweetClone.value.likeCount = (tweetClone.value.likeCount ?? 0) + 1;
-  }
-};
-
-const onUnlikeSuccess = () => {
-  if (tweetClone.value.isLiked) {
-    tweetClone.value.isLiked = false;
-    const next = (tweetClone.value.likeCount ?? 0) - 1;
-    tweetClone.value.likeCount = next < 0 ? 0 : next;
-  }
-};
-
-const onRetweetSuccess = () => {
-  if (!tweetClone.value.isRetweeted) {
-    tweetClone.value.isRetweeted = true;
-    tweetClone.value.retweetCount += 1;
-  }
-};
-
-const onUndoRetweetSuccess = () => {
-  if (tweetClone.value.isRetweeted) {
-    tweetClone.value.isRetweeted = false;
-    const next = (tweetClone.value.retweetCount ?? 0) - 1;
-    tweetClone.value.retweetCount = next < 0 ? 0 : next;
-  }
-};
 
 const { mutate: followUser } = useFollowMutation();
 const { mutate: blockUser } = useBlockMutation();
@@ -78,7 +47,7 @@ function handleAiSummary() {
           <div
             class="h-2 w-0.5 shrink-0"
             :class="{
-              'bg-thread-foreground': tweetClone.rootTweet,
+              'bg-thread-foreground': tweet.rootTweet,
             }"
           ></div>
           <UserHoverCard
@@ -90,7 +59,7 @@ function handleAiSummary() {
           >
             <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
               <Avatar
-                :img="tweetClone.author.avatarUrl || '/default_profile.png'"
+                :img="tweet.author.avatarUrl || '/default_profile.png'"
                 size="sm"
                 variant="primary"
                 class="shrink-0"
@@ -112,7 +81,7 @@ function handleAiSummary() {
                 class="cursor-pointer leading-tight font-semibold hover:underline"
                 @click.stop
               >
-                {{ tweetClone.author.displayName }}
+                {{ tweet.author.displayName }}
               </NuxtLink>
             </UserHoverCard>
             <UserHoverCard
@@ -127,7 +96,7 @@ function handleAiSummary() {
                 class="text-muted-foreground leading-tight"
                 @click.stop
               >
-                {{ '@' + tweetClone.author.username }}
+                {{ '@' + tweet.author.username }}
               </NuxtLink>
             </UserHoverCard>
           </div>
@@ -158,30 +127,24 @@ function handleAiSummary() {
     </div>
     <div class="border-b-border border-b-1">
       <p class="pt-2 text-lg leading-relaxed break-words whitespace-pre-wrap">
-        <ContentEntitiesRenderer :content="tweetClone.content" :entities="tweetClone.entities" />
+        <ContentEntitiesRenderer :content="tweet.content" :entities="tweet.entities" />
       </p>
-      <TweetMedia :media="tweetClone.media" />
+      <TweetMedia :media="tweet.media" />
 
       <!-- Quoted Tweet -->
-      <QuotedTweetCard v-if="tweetClone.quotedTweet" :tweet="tweetClone.quotedTweet" />
+      <QuotedTweetCard v-if="tweet.quotedTweet" :tweet="tweet.quotedTweet" />
 
       <AiSummary ref="aiSummaryRef" :tweet-id="props.tweet.id" />
       <div class="py-2">
         <time
-          :title="formatDate(tweetClone.createdAt)"
-          :datetime="tweetClone.createdAt"
+          :title="formatDate(tweet.createdAt)"
+          :datetime="tweet.createdAt"
           class="text-muted-foreground text-md"
-          >{{ formatDate(tweetClone.createdAt) }}</time
+          >{{ formatDate(tweet.createdAt) }}</time
         >
       </div>
     </div>
 
-    <TweetActionButtons
-      :tweet="tweetClone"
-      @like-success="onLikeSuccess"
-      @unlike-success="onUnlikeSuccess"
-      @retweet-success="onRetweetSuccess"
-      @undo-retweet-success="onUndoRetweetSuccess"
-    />
+    <TweetActionButtons :tweet="tweet" />
   </article>
 </template>

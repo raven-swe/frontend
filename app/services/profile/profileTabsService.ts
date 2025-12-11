@@ -6,6 +6,10 @@ export const profileTabsService = {
     return (await apiFetch(`/api/users/${username}/profile`, { method: 'GET', signal })).data;
   },
 
+  getReposterById: async (userId: string) => {
+    return (await apiFetch(`/api/users/id/${userId}`, { method: 'GET' })).data;
+  },
+
   getProfileTweetsPaginated: async (
     username: string,
     tab: 'replies' | 'tweets' | 'likes' | 'media',

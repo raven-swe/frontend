@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import TweetDefaultCard from '~/components/tweet/TweetDefaultCard.vue';
 import { homeService } from '~/services/home/homeService';
-import { useInfiniteQuery, useQueryClient, type InfiniteData } from '@tanstack/vue-query';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/vue-query';
 import { useWindowVirtualizer } from '@tanstack/vue-virtual';
 
 function isTab(value: unknown): value is HomeTab {
@@ -18,6 +18,7 @@ definePageMeta({
 const route = useRoute();
 const tab = computed(() => route.params.tab as HomeTab);
 
+const queryClient = useQueryClient();
 const {
   data: response,
   fetchNextPage,
@@ -26,10 +27,27 @@ const {
   isLoading,
   suspense,
 } = useInfiniteQuery({
-  queryKey: [tab.value],
+  queryKey: computed(() => ['tweets', tab.value]),
   initialPageParam: null as string | null,
-  queryFn: async ({ pageParam = null }) =>
-    await homeService.getHomeTab({ limit: 10, cursor: pageParam }, tab.value),
+  queryFn: async ({ pageParam = null }) => {
+    const res = await homeService.getHomeTab({ limit: 10, cursor: pageParam }, tab.value);
+    res.data.forEach((tweet) => {
+      queryClient.setQueryData(['tweet', tweet.id], tweet);
+      if (tweet.repostedBy) {
+        queryClient.setQueryData(['tweet-reposter', tweet.repostedBy.username], tweet.repostedBy);
+      }
+    });
+    const ids = res.data.map((tweet) => ({
+      id: tweet.id,
+      // this is highliy experimental
+      // I will use username instead of id as currenly the backend does not provide reposter id in the tweet object
+      reposterId: tweet.repostedBy?.username ?? null,
+    }));
+    return {
+      ...res,
+      data: ids,
+    };
+  },
   getNextPageParam: (lastPage) =>
     lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined,
   structuralSharing: false,
@@ -50,6 +68,16 @@ const rowVirtualizerOptions = computed(() => {
     estimateSize: () => 120,
     overscan: 3,
     scrollMargin: parentOffsetRef.value,
+    getItemKey: (index: number) => {
+      const tweet = tweets.value[index];
+      if (tweet) {
+        let key = `${tweet.id}`;
+        if (tweet.reposterId) key += `-repost-${tweet.reposterId}`;
+        key += `-index-${index}`;
+        return key;
+      }
+      return `loading-${index}`;
+    },
   };
 });
 
@@ -78,56 +106,17 @@ watchEffect(() => {
 onServerPrefetch(async () => {
   await suspense();
 });
-
-const queryClient = useQueryClient();
-
-function handlePost(tweet: Tweet) {
-  // Optimistically add the new tweet to the top of the list
-  if (!tab.value) return;
-  queryClient.setQueryData<InfiniteData<{ data: Tweet[]; pagination?: CursorPagination }>>(
-    [tab.value],
-    (oldData) => {
-      if (!oldData) return oldData;
-      const newData = {
-        ...oldData,
-        pages: [
-          {
-            data: [tweet, ...(oldData.pages[0]?.data || [])],
-            pagination: oldData.pages[0]?.pagination,
-          },
-          ...oldData.pages.slice(1),
-        ],
-      };
-      return newData;
-    },
-  );
-}
-
-watch(
-  () => tweets.value.length,
-  () => {
-    setTimeout(() => {
-      if (parentRef.value) {
-        parentOffsetRef.value = parentRef.value.offsetTop;
-      }
-    }, 100);
-  },
-  { flush: 'post' },
-);
-
-watch(
-  () => tab.value,
-  () => {
-    // Invalidate and refetch tweets when tab changes
-    queryClient.invalidateQueries({ queryKey: [tab.value] });
-  },
-);
 </script>
 
 <template>
   <div class="border-border mx-auto max-w-[700px]">
-    <TweetComposer class="mt-15 border-b-1" @posted="handlePost" />
-    <ClientOnly>
+    <ClientOnly fallback="span">
+      <template #fallback>
+        <div class="text-primary mt-20 flex shrink-0 items-center justify-center py-4">
+          <UiSpinner />
+        </div>
+      </template>
+
       <div v-if="tweets" ref="parentRef">
         <div
           :style="{
@@ -149,13 +138,15 @@ watch(
           >
             <div
               v-for="virtualRow in virtualRows"
-              :key="tweets[virtualRow.index]?.id || String(virtualRow.key)"
+              :key="String(virtualRow.key)"
               :ref="measureElement"
               :data-index="virtualRow.index"
+              :data-testid="String(virtualRow.key)"
             >
               <TweetDefaultCard
                 v-if="tweets[virtualRow.index]"
-                :tweet="tweets[virtualRow.index]!"
+                :tweet-id="tweets[virtualRow.index]?.id!"
+                :reposter-id="tweets[virtualRow.index]?.reposterId"
               />
             </div>
           </div>
@@ -168,13 +159,13 @@ watch(
       >
         <UiSpinner />
       </div>
+      <div
+        v-if="tweets.length === 0 && !isFetchingNextPage && !isLoading"
+        data-testid="empty-state"
+        class="mx-auto my-10 max-w-90 px-8 text-start break-words"
+      >
+        <p class="text-[2rem] leading-tight font-black">{{ $t('errors.TWEET_NOT_FOUND') }}</p>
+      </div>
     </ClientOnly>
-    <div
-      v-if="tweets.length === 0 && !isFetchingNextPage && !isLoading"
-      data-testid="empty-state"
-      class="mx-auto my-10 max-w-90 px-8 text-start break-words"
-    >
-      <p class="text-[2rem] leading-tight font-black">{{ $t('errors.TWEET_NOT_FOUND') }}</p>
-    </div>
   </div>
 </template>

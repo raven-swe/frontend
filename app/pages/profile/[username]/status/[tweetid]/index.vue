@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import TweetView from '~/components/tweet/TweetView.vue';
-import type { Tweet, TweetWithParents } from '~~/shared/types/tweets';
-import type { ApiErrorResponse, ApiSuccessResponse } from '~~/shared/types/api';
+import type { TweetWithParents } from '~~/shared/types/tweets';
+import type { ApiErrorResponse } from '~~/shared/types/api';
 import { tweetsService } from '~/services/tweet/tweetsService';
 import { isApiError, isApiValidationError } from '~/utils/errorUtils';
-import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/vue-query';
+import { useInfiniteQuery, useQuery, useQueryClient, type InfiniteData } from '@tanstack/vue-query';
 import { isTweetDeleted } from '~/utils/tweetDeleted';
 import DeletedTweetPlaceholder from '~/components/tweet/DeletedTweetPlaceholder.vue';
 
@@ -19,8 +19,21 @@ const {
   isPending,
   error,
 } = useQuery<TweetWithParents, ApiErrorResponse>({
-  queryKey: ['tweet', tweetid],
-  queryFn: async () => (await tweetsService.tweet(tweetid.value)).data,
+  queryKey: ['tweet-extended', tweetid],
+  queryFn: async () => {
+    const res = await tweetsService.tweet(tweetid.value);
+    const tweetData = res.data;
+    if (tweetData.rootTweet && !isTweetDeleted(tweetData.rootTweet)) {
+      queryClient.setQueryData(['tweet', tweetData.rootTweet.id], tweetData.rootTweet);
+    }
+    if (tweetData.parentTweets) {
+      tweetData.parentTweets.forEach((parentTweet) => {
+        if (!isTweetDeleted(parentTweet))
+          queryClient.setQueryData(['tweet', parentTweet.id], parentTweet);
+      });
+    }
+    return tweetData;
+  },
   refetchOnWindowFocus: false,
   refetchOnMount: false,
   retry: false,
@@ -66,10 +79,24 @@ const {
   isFetchingNextPage,
   isPending: isRepliesLoading,
 } = useInfiniteQuery({
-  queryKey: ['tweet-replies', tweetid],
+  queryKey: computed(() => ['tweet-replies', tweetid.value]),
   initialPageParam: null as string | null,
-  queryFn: async ({ pageParam = null }) =>
-    await tweetsService.replies(tweetid.value, { limit: 10, cursor: pageParam }),
+  queryFn: async ({ pageParam = null }) => {
+    const res = await tweetsService.replies(tweetid.value, { limit: 10, cursor: pageParam });
+    res.data.forEach((tweet) => {
+      queryClient.setQueryData(['tweet', tweet.id], tweet);
+    });
+    const ids = res.data.map((tweet) => ({
+      id: tweet.id,
+      // this is highliy experimental
+      // I will use username instead of id as currenly the backend does not provide reposter id in the tweet object
+      reposterId: tweet.repostedBy?.username ?? null,
+    }));
+    return {
+      ...res,
+      data: ids,
+    };
+  },
   getNextPageParam: (lastPage) =>
     lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined,
   enabled: computed(() => !!tweetData.value),
@@ -77,35 +104,35 @@ const {
 
 const replies = computed(() => repliesResponse.value?.pages.flatMap((page) => page.data) || []);
 
-function handleReplied(tweet: Tweet) {
-  if (tweet.replyToTweetId !== tweetid.value) return;
-
-  queryClient.setQueryData<{
-    pages: Array<ApiSuccessResponse<Tweet[]>>;
-    pageParams: Array<string | null>;
-  }>(['tweet-replies', tweetid], (old) => {
-    if (!old) return old;
-
-    const first = old.pages[0];
-    if (!first) return old;
-
-    return {
-      ...old,
-      pages: [
-        {
-          ...first,
-          data: [tweet, ...first.data],
-        },
-        ...old.pages.slice(1),
-      ],
-    };
-  });
-}
 onMounted(async () => {
   await nextTick(() => {
     scrollMainTweetIntoView();
   });
 });
+
+const handleNewReply = (newReply: Tweet) => {
+  queryClient.setQueryData<
+    InfiniteData<ApiSuccessResponse<{ id: string; reposterId: string | null }[]>>
+  >(['tweet-replies', tweetid.value], (old) => {
+    if (!old) return old;
+
+    const [firstPage, ...restPages] = old.pages;
+    if (!firstPage) return old;
+
+    const newItem = { id: newReply.id, reposterId: null };
+
+    const updatedFirstPage: ApiSuccessResponse<{ id: string; reposterId: string | null }[]> = {
+      ...firstPage,
+      data: [newItem, ...firstPage.data],
+    };
+
+    return {
+      ...old,
+      pages: [updatedFirstPage, ...restPages],
+      pageParams: [...old.pageParams],
+    };
+  });
+};
 
 onServerPrefetch(async () => {
   await suspense();
@@ -150,7 +177,7 @@ onServerPrefetch(async () => {
       <TweetDefaultCard
         v-if="tweetData.rootTweet && !isTweetDeleted(tweetData.rootTweet)"
         is-root
-        :tweet="tweetData.rootTweet"
+        :tweet-id="tweetData.rootTweet.id"
       />
       <div v-else-if="tweetData.rootTweet" class="bg-background relative h-14">
         <div class="px-4 pb-2">
@@ -174,7 +201,7 @@ onServerPrefetch(async () => {
         </p>
       </NuxtLink>
       <template v-for="(tweet, i) in tweetData.parentTweets ?? []" :key="i">
-        <TweetDefaultCard v-if="!isTweetDeleted(tweet)" :tweet="tweet" is-parent />
+        <TweetDefaultCard v-if="!isTweetDeleted(tweet)" :tweet-id="tweet.id" is-parent />
         <div v-else class="px-4 py-2">
           <DeletedTweetPlaceholder>
             {{ $t('tweet.deleted-parent') }}
@@ -187,7 +214,7 @@ onServerPrefetch(async () => {
       <TweetView :tweet="tweetData" />
 
       <div class="border-b">
-        <TweetComposer :reply-to-tweet-id="tweetData?.id" type="reply" @posted="handleReplied" />
+        <TweetComposer :reply-to-tweet-id="tweetid" type="reply" @posted="handleNewReply" />
       </div>
 
       <ClientOnly placeholder-tag="div">
@@ -200,7 +227,7 @@ onServerPrefetch(async () => {
           :get-key="(tweet, idx, key) => tweet.id ?? key"
         >
           <template #item="{ item: tweet }">
-            <TweetDefaultCard v-if="tweet" :tweet="tweet" />
+            <TweetDefaultCard v-if="tweet" :tweet-id="tweet.id" />
           </template>
         </CommonVirtualInfiniteScroller>
         <div

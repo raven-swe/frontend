@@ -1,12 +1,7 @@
 <script setup lang="ts">
 import type { Tweet } from '~~/shared/types/tweets';
 import Button from '~/components/ui/Button.vue';
-import {
-  likeTweet,
-  retweetTweet,
-  unLikeTweet,
-  undoRetweetTweet,
-} from '~/services/tweet/actionButtonsService';
+
 import QuoteTweetDialog from './composer/QuoteTweetDialog.vue';
 import { showToaster } from '~/utils/showToaster';
 import { buildTweetLink } from '~/utils/tweetLink';
@@ -16,78 +11,24 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-
-const emit = defineEmits<{
-  (e: 'like-success' | 'unlike-success' | 'retweet-success' | 'undo-retweet-success'): void;
-}>();
-
-const pendingLike = ref(false);
 const showQuoteDialog = ref(false);
+const { mutate: likeTweet } = useTweetLikeMutation();
+const { mutate: retweet } = useTweetRetweetMutation();
 
-const handleLike = async () => {
-  if (pendingLike.value) return;
-  pendingLike.value = true;
-  emit('like-success');
-  try {
-    const res = await likeTweet(props.tweet.id);
-    if (!res?.success) emit('unlike-success');
-  } catch (err) {
-    emit('unlike-success');
-    console.error('like failed', err);
-  } finally {
-    pendingLike.value = false;
-  }
+const handleLike = () => {
+  likeTweet({ tweetId: props.tweet.id, action: 'like' });
 };
 
-const handleUnlike = async () => {
-  if (pendingLike.value) return;
-  pendingLike.value = true;
-  emit('unlike-success');
-  try {
-    const res = await unLikeTweet(props.tweet.id);
-    if (!res?.success) emit('like-success');
-  } catch (err) {
-    emit('like-success');
-    console.error('unlike failed', err);
-  } finally {
-    pendingLike.value = false;
-  }
+const handleUnlike = () => {
+  likeTweet({ tweetId: props.tweet.id, action: 'unlike' });
 };
 
-const pendingRetweet = ref(false);
-
-const handleRetweet = async () => {
-  if (pendingRetweet.value) return;
-  pendingRetweet.value = true;
-  emit('retweet-success');
-  try {
-    const res = await retweetTweet(props.tweet.id);
-    if (!res?.success) {
-      emit('undo-retweet-success');
-    }
-  } catch (err) {
-    emit('undo-retweet-success');
-    console.error('retweet failed', err);
-  } finally {
-    pendingRetweet.value = false;
-  }
+const handleRetweet = () => {
+  retweet({ tweetId: props.tweet.id, action: 'retweet' });
 };
 
-const handleUndoRetweet = async () => {
-  if (pendingRetweet.value) return;
-  pendingRetweet.value = true;
-  emit('undo-retweet-success');
-  try {
-    const res = await undoRetweetTweet(props.tweet.id);
-    if (!res?.success) {
-      emit('retweet-success');
-    }
-  } catch (err) {
-    emit('retweet-success');
-    console.error('undo retweet failed', err);
-  } finally {
-    pendingRetweet.value = false;
-  }
+const handleUndoRetweet = () => {
+  retweet({ tweetId: props.tweet.id, action: 'undo-retweet' });
 };
 
 const handleShare = async () => {
@@ -177,10 +118,6 @@ const handleShare = async () => {
     </Button>
 
     <!-- Place dialog outside dropdown structure -->
-    <QuoteTweetDialog
-      v-model:open="showQuoteDialog"
-      :quote-to-tweet="props.tweet"
-      @quote-success="emit('retweet-success')"
-    />
+    <QuoteTweetDialog v-model:open="showQuoteDialog" :quote-to-tweet="props.tweet" />
   </div>
 </template>
