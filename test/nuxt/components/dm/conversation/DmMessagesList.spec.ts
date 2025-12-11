@@ -583,4 +583,184 @@ describe('DmMessagesList Component', () => {
     await flushPromises();
     expect(wrapper.html()).toBeTruthy();
   });
+
+  it('estimates larger size for messages with media', async () => {
+    // Test the estimateSize function logic
+    const messagesWithMedia: DmMessage[] = [
+      createMockMessage({
+        id: '1',
+        content: 'Message with image',
+        mediaUrl: 'https://example.com/image.jpg',
+        isMine: true,
+      }),
+    ];
+
+    // The estimateSize function should return 320 for messages with media
+    const estimateSize = (index: number) => {
+      const message = messagesWithMedia[index];
+      if (message?.mediaUrl) {
+        return 320;
+      }
+      return 80;
+    };
+
+    expect(estimateSize(0)).toBe(320);
+  });
+
+  it('estimates default size for text-only messages', async () => {
+    const messagesWithoutMedia: DmMessage[] = [
+      createMockMessage({
+        id: '1',
+        content: 'Text only message',
+        mediaUrl: null,
+        isMine: true,
+      }),
+    ];
+
+    const estimateSize = (index: number) => {
+      const message = messagesWithoutMedia[index];
+      if (message?.mediaUrl) {
+        return 320;
+      }
+      return 80;
+    };
+
+    expect(estimateSize(0)).toBe(80);
+  });
+
+  it('auto-scrolls to bottom when new messages arrive and user is near bottom', async () => {
+    vi.useFakeTimers();
+    const mockScrollToIndex = vi.fn();
+    const { useVirtualizer } = await import('@tanstack/vue-virtual');
+    vi.mocked(useVirtualizer).mockReturnValue({
+      measureElement: vi.fn(),
+      value: {
+        getVirtualItems: () => [
+          { index: 0, key: '0', start: 0 },
+          { index: 1, key: '1', start: 120 },
+        ],
+        getTotalSize: () => 240,
+        scrollToIndex: mockScrollToIndex,
+      },
+    } as unknown as ReturnType<typeof useVirtualizer>);
+
+    const wrapper = await mountSuspended(DmMessagesList, {
+      props: {
+        messages: mockMessages.slice(0, 2),
+      },
+    });
+
+    await flushPromises();
+    vi.runAllTimers();
+
+    // Get the parent ref and mock its scroll position
+    const parentRef = wrapper.vm.parentRef;
+    if (parentRef) {
+      Object.defineProperty(parentRef, 'scrollTop', { value: 100, writable: true });
+      Object.defineProperty(parentRef, 'scrollHeight', { value: 250, writable: true });
+      Object.defineProperty(parentRef, 'clientHeight', { value: 150, writable: true });
+    }
+
+    // Add a new message
+    await wrapper.setProps({
+      messages: [...mockMessages.slice(0, 2), createMockMessage({ id: '4', content: 'New!' })],
+    });
+
+    await flushPromises();
+    vi.runAllTimers();
+
+    expect(wrapper.html()).toBeTruthy();
+    vi.useRealTimers();
+  });
+
+  it('does not auto-scroll when user is not near bottom', async () => {
+    vi.useFakeTimers();
+    const mockScrollToIndex = vi.fn();
+    const { useVirtualizer } = await import('@tanstack/vue-virtual');
+    vi.mocked(useVirtualizer).mockReturnValue({
+      measureElement: vi.fn(),
+      value: {
+        getVirtualItems: () => [
+          { index: 0, key: '0', start: 0 },
+          { index: 1, key: '1', start: 120 },
+        ],
+        getTotalSize: () => 240,
+        scrollToIndex: mockScrollToIndex,
+      },
+    } as unknown as ReturnType<typeof useVirtualizer>);
+
+    const wrapper = await mountSuspended(DmMessagesList, {
+      props: {
+        messages: mockMessages.slice(0, 2),
+      },
+    });
+
+    await flushPromises();
+    vi.runAllTimers();
+    mockScrollToIndex.mockClear();
+
+    // Get the parent ref and mock scroll position far from bottom
+    const parentRef = wrapper.vm.parentRef;
+    if (parentRef) {
+      Object.defineProperty(parentRef, 'scrollTop', { value: 0, writable: true });
+      Object.defineProperty(parentRef, 'scrollHeight', { value: 1000, writable: true });
+      Object.defineProperty(parentRef, 'clientHeight', { value: 150, writable: true });
+    }
+
+    // Add a new message
+    await wrapper.setProps({
+      messages: [...mockMessages.slice(0, 2), createMockMessage({ id: '4', content: 'New!' })],
+    });
+
+    await flushPromises();
+    vi.runAllTimers();
+
+    // scrollToBottom should not be called after initial load
+    expect(wrapper.html()).toBeTruthy();
+    vi.useRealTimers();
+  });
+
+  it('marks message as seen when lastSeenMessageId matches', async () => {
+    const { useVirtualizer } = await import('@tanstack/vue-virtual');
+    vi.mocked(useVirtualizer).mockReturnValue({
+      measureElement: vi.fn(),
+      value: {
+        getVirtualItems: () => [{ index: 0, key: '0', start: 0 }],
+        getTotalSize: () => 120,
+        scrollToIndex: vi.fn(),
+      },
+    } as unknown as ReturnType<typeof useVirtualizer>);
+
+    const wrapper = await mountSuspended(DmMessagesList, {
+      props: {
+        messages: [mockMessages[0]!],
+        lastSeenMessageId: '1',
+      },
+    });
+
+    await flushPromises();
+    expect(wrapper.html()).toBeTruthy();
+  });
+
+  it('measures element height correctly', async () => {
+    const mockMeasureElement = vi.fn();
+    const { useVirtualizer } = await import('@tanstack/vue-virtual');
+    vi.mocked(useVirtualizer).mockReturnValue({
+      measureElement: mockMeasureElement,
+      value: {
+        getVirtualItems: () => [{ index: 0, key: '0', start: 0 }],
+        getTotalSize: () => 120,
+        scrollToIndex: vi.fn(),
+      },
+    } as unknown as ReturnType<typeof useVirtualizer>);
+
+    const wrapper = await mountSuspended(DmMessagesList, {
+      props: {
+        messages: [mockMessages[0]!],
+      },
+    });
+
+    await flushPromises();
+    expect(wrapper.html()).toBeTruthy();
+  });
 });

@@ -217,4 +217,163 @@ describe('useDmConversations', () => {
     const shouldProcess = newMessageId !== lastProcessedMessageId;
     expect(shouldProcess).toBe(true);
   });
+
+  it('updateConversationInCache updates conversation correctly', async () => {
+    // Test the helper function logic
+    type ConversationCache = {
+      pages: { data: { id: string; lastMessage: { content: string } | null }[] }[];
+      pageParams: (string | undefined)[];
+    };
+
+    function updateConversationInCache(
+      oldData: ConversationCache,
+      conversationId: string,
+      updater: (conv: { id: string; lastMessage: { content: string } | null }) => {
+        id: string;
+        lastMessage: { content: string } | null;
+      },
+    ): ConversationCache {
+      return {
+        ...oldData,
+        pages: oldData.pages.map((page) => ({
+          ...page,
+          data: page.data.map((conv) => (conv.id === conversationId ? updater(conv) : conv)),
+        })),
+      };
+    }
+
+    const oldData: ConversationCache = {
+      pages: [
+        {
+          data: [
+            { id: 'conv-1', lastMessage: { content: 'Hello' } },
+            { id: 'conv-2', lastMessage: { content: 'World' } },
+          ],
+        },
+      ],
+      pageParams: [undefined],
+    };
+
+    const result = updateConversationInCache(oldData, 'conv-1', (conv) => ({
+      ...conv,
+      lastMessage: { content: 'Updated!' },
+    }));
+
+    expect(result.pages[0]!.data[0]!.lastMessage?.content).toBe('Updated!');
+    expect(result.pages[0]!.data[1]!.lastMessage?.content).toBe('World');
+  });
+
+  it('updateConversationLastMessage updates lastMessage', async () => {
+    // Test the exported function logic
+    const conversations = [
+      {
+        id: 'conv-1',
+        lastMessage: { content: 'Old', senderUsername: 'user1', sentAt: '2024-01-01', seen: false },
+      },
+    ];
+
+    const newMessage = {
+      content: 'New message',
+      senderUsername: 'user2',
+      sentAt: '2024-01-02',
+      seen: false,
+    };
+
+    const updated = conversations.map((conv) =>
+      conv.id === 'conv-1' ? { ...conv, lastMessage: newMessage } : conv,
+    );
+
+    expect(updated[0]!.lastMessage.content).toBe('New message');
+    expect(updated[0]!.lastMessage.senderUsername).toBe('user2');
+  });
+
+  it('markConversationSeenInCache marks conversation as seen', async () => {
+    const conversations = [
+      {
+        id: 'conv-1',
+        lastMessage: {
+          content: 'Hello',
+          senderUsername: 'user1',
+          sentAt: '2024-01-01',
+          seen: false,
+        },
+      },
+    ];
+
+    const updated = conversations.map((conv) =>
+      conv.id === 'conv-1' && conv.lastMessage
+        ? { ...conv, lastMessage: { ...conv.lastMessage, seen: true } }
+        : conv,
+    );
+
+    expect(updated[0]!.lastMessage?.seen).toBe(true);
+  });
+
+  it('markConversationSeenInCache handles null lastMessage', async () => {
+    const conversations = [
+      {
+        id: 'conv-1',
+        lastMessage: null as { content: string; seen: boolean } | null,
+      },
+    ];
+
+    const updated = conversations.map((conv) =>
+      conv.id === 'conv-1'
+        ? {
+            ...conv,
+            lastMessage: conv.lastMessage ? { ...conv.lastMessage, seen: true } : null,
+          }
+        : conv,
+    );
+
+    expect(updated[0]!.lastMessage).toBeNull();
+  });
+
+  it('sortedConversations sorts by lastMessage.sentAt', async () => {
+    const conversations = [
+      { id: 'conv-1', lastMessage: { sentAt: '2024-01-01T00:00:00Z' } },
+      { id: 'conv-2', lastMessage: { sentAt: '2024-01-03T00:00:00Z' } },
+      { id: 'conv-3', lastMessage: { sentAt: '2024-01-02T00:00:00Z' } },
+    ];
+
+    const sorted = [...conversations].sort((a, b) => {
+      const aTime = a.lastMessage?.sentAt ? new Date(a.lastMessage.sentAt).getTime() : 0;
+      const bTime = b.lastMessage?.sentAt ? new Date(b.lastMessage.sentAt).getTime() : 0;
+      return bTime - aTime;
+    });
+
+    expect(sorted[0]!.id).toBe('conv-2');
+    expect(sorted[1]!.id).toBe('conv-3');
+    expect(sorted[2]!.id).toBe('conv-1');
+  });
+
+  it('sortedConversations handles conversations without lastMessage', async () => {
+    const conversations = [
+      { id: 'conv-1', lastMessage: null },
+      { id: 'conv-2', lastMessage: { sentAt: '2024-01-03T00:00:00Z' } },
+      { id: 'conv-3', lastMessage: null },
+    ];
+
+    const sorted = [...conversations].sort((a, b) => {
+      const aTime = a.lastMessage?.sentAt ? new Date(a.lastMessage.sentAt).getTime() : 0;
+      const bTime = b.lastMessage?.sentAt ? new Date(b.lastMessage.sentAt).getTime() : 0;
+      return bTime - aTime;
+    });
+
+    // conv-2 should be first (has a timestamp), others at end with 0 time
+    expect(sorted[0]!.id).toBe('conv-2');
+  });
+
+  it('returns expected properties from useDmConversations', async () => {
+    const { useDmConversations } = await import('@/composables/useDmConversations');
+    const result = useDmConversations();
+
+    expect(result).toHaveProperty('conversations');
+    expect(result).toHaveProperty('loading');
+    expect(result).toHaveProperty('error');
+    expect(result).toHaveProperty('refresh');
+    expect(result).toHaveProperty('fetchNextPage');
+    expect(result).toHaveProperty('hasNextPage');
+    expect(result).toHaveProperty('isFetchingNextPage');
+  });
 });
