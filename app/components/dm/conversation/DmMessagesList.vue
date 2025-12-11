@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, watchEffect, watch, ref, onMounted, nextTick } from 'vue';
 
-import type { DmMessage } from '#shared/types/dm';
+import type { DmMessage, DmConversation } from '#shared/types/dm';
 import DmMessageItem from './DmMessageItem.vue';
 import { useVirtualizer } from '@tanstack/vue-virtual';
 
@@ -11,9 +11,9 @@ const props = defineProps<{
   isFetchingNextPage?: boolean;
   onLoadMore?: () => void;
   lastSeenMessageId?: string | null;
+  conversation?: DmConversation | null;
 }>();
 
-// console.log('DmMessagesList props.messages:', props.messages.length);
 const parentRef = ref<HTMLElement | null>(null);
 const scrollToBottom = () => {
   if (rowVirtualizer.value && props.messages.length > 0) {
@@ -132,7 +132,8 @@ defineExpose({ parentRef, scrollToBottom });
 </script>
 <template>
   <div ref="parentRef" class="h-full gap-2 overflow-y-auto">
-    <!-- Loader at top for loading older messages -->
+    <DmConversationInfo v-if="conversation" :conversation="conversation" class="pt-4" />
+
     <div v-if="hasNextPage && isFetchingNextPage" class="flex items-center justify-center p-4">
       <UiSpinner size="1.5rem" />
     </div>

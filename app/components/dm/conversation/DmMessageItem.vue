@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { DmMessage } from '#shared/types/dm';
-import { renderSegments, formatTime } from '../../../utils/dm';
+import { renderSegments } from '../../../utils/dm';
 
 const props = defineProps<{
   message: DmMessage;
@@ -47,7 +47,7 @@ const textColor = props.message.isMine ? 'text-white' : 'text-foreground';
         </div>
       </template>
       <span class="text-muted-foreground text-[11px]" :class="message.isMine ? 'self-end' : ''">
-        {{ formatTime(message.createdAt) }}
+        {{ formatDate(message.createdAt) }}
         <span v-if="isSeen && message.isMine" class="text-primary ms-1">· {{ $t('dm.seen') }}</span>
       </span>
     </div>

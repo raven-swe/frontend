@@ -126,7 +126,6 @@ watch(
       :avatar-url="conversation?.participant.avatarUrl || ''"
     />
     <div class="flex flex-1 flex-col overflow-hidden">
-      <DmConversationInfo :conversation="conversation || null" class="px-4 pt-4" />
       <div
         v-if="conversationsLoading || messagesLoading"
         class="flex flex-1 items-center justify-center p-4"
@@ -141,6 +140,7 @@ watch(
         :is-fetching-next-page="isFetchingNextPage || false"
         :on-load-more="fetchNextPage"
         :last-seen-message-id="lastSeenMessageId"
+        :conversation="conversation || null"
       />
     </div>
     <DmConversationDmMessageInput />

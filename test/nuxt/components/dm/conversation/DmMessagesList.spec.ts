@@ -2,7 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { mountSuspended } from '@nuxt/test-utils/runtime';
 import { flushPromises } from '@vue/test-utils';
 import DmMessagesList from '@/components/dm/conversation/DmMessagesList.vue';
-import type { DmMessage } from '@/../shared/types/dm';
+import type { DmMessage, DmConversation } from '@/../shared/types/dm';
 
 // Mock @tanstack/vue-virtual
 vi.mock('@tanstack/vue-virtual', () => ({
@@ -58,6 +58,22 @@ const mockMessages: DmMessage[] = [
   createMockMessage({ id: '3', content: 'I am doing great, thanks!', isMine: false }),
 ];
 
+const mockConversation: DmConversation = {
+  id: 'conv-1',
+  participant: {
+    username: 'johndoe',
+    displayName: 'John Doe',
+    avatarUrl: 'https://example.com/avatar.jpg',
+  },
+  lastMessage: {
+    content: 'Hello there!',
+    senderUsername: 'johndoe',
+    sentAt: new Date().toISOString(),
+    seen: false,
+  },
+  isMuted: false,
+};
+
 describe('DmMessagesList Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -101,6 +117,20 @@ describe('DmMessagesList Component', () => {
     expect(html).toContain('I am doing great, thanks!');
   });
 
+  it('renders DmConversationInfo component', async () => {
+    const wrapper = await mountSuspended(DmMessagesList, {
+      props: {
+        messages: mockMessages,
+        conversation: mockConversation,
+      },
+    });
+    await flushPromises();
+
+    // Check for DmConversationInfo by finding the component or its expected content
+    const html = wrapper.html();
+    expect(html).toContain('johndoe');
+    expect(html).toContain('John Doe');
+  });
   it('renders empty list when no messages', async () => {
     // Mock useVirtualizer to return empty items for empty list
     const { useVirtualizer } = await import('@tanstack/vue-virtual');

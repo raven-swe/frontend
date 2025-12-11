@@ -175,14 +175,6 @@ describe('DmConversationView Component', () => {
     expect(header.exists()).toBe(true);
   });
 
-  it('renders DmConversationInfo component', async () => {
-    const wrapper = await mountSuspended(DmConversationView);
-    await flushPromises();
-
-    const info = wrapper.find('[data-test="conversation-info"]');
-    expect(info.exists()).toBe(true);
-  });
-
   it('renders DmMessagesList when not loading', async () => {
     mockMessagesLoading.value = false;
     mockConversationsLoading.value = false;
