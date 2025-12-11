@@ -32,12 +32,14 @@ watch(
   >
     <div class="text-foreground relative flex h-8 w-8 items-center justify-center">
       <Icon :name="`ic:${iconType}${tab.icon}`" size="28" />
-      <span
-        v-if="tab.badgeCount && tab.badgeCount > 0"
-        class="bg-primary text-primary-foreground absolute -top-3 -me-1 inline-flex h-6 min-w-[22px] items-center justify-center rounded-full px-1.5 text-[11px] leading-none font-semibold"
-      >
-        {{ tab.badgeCount > 99 ? '99+' : tab.badgeCount }}
-      </span>
+      <ClientOnly>
+        <span
+          v-if="tab.badgeCount && tab.badgeCount > 0"
+          class="bg-primary text-foreground absolute -end-1 -top-1 inline-flex min-w-5 items-center justify-center rounded-full border-1 p-0.75 text-xs leading-none"
+        >
+          {{ tab.badgeCount > 99 ? '99+' : tab.badgeCount }}
+        </span>
+      </ClientOnly>
     </div>
 
     <div class="ms-4 hidden text-xl xl:block" :class="textStyle">
