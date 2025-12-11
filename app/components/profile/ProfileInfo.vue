@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import type { User } from '~~/shared/types/user';
 import { formatMonthYear } from '~/utils/date';
 import { cleanUrl } from '~/utils/cleanUrl';
+import { useIsCurrentUser } from '~/composables/useIsCurrentUser';
 
 const userProfile = inject<ComputedRef<User>>('user-data');
 
@@ -16,6 +16,8 @@ const displayUrl = computed(() => {
   }
   return '';
 });
+
+const isCurrentUser = useIsCurrentUser();
 
 const mutualPluralIndex = computed(() => (userProfile?.value.mutualsCount ?? 1) - 1);
 
@@ -104,7 +106,7 @@ const modifiedMutualUsers = computed(() => {
       </div>
 
       <!-- Mutual Followers -->
-      <div v-if="userProfile?.mutualsCount !== 0" class="mt-3">
+      <div v-if="userProfile?.mutualsCount !== 0 && !isCurrentUser" class="mt-3">
         <NuxtLink
           :to="`/profile/${userProfile?.username}/followers-you-follow`"
           class="decoration-muted-foreground flex w-fit items-center gap-2 hover:underline"
