@@ -55,7 +55,9 @@ const unblockUser = () => {
         />
       </header>
       <NuxtLink :to="`/profile/${user.username}`">
-        <p class="text-sm font-bold hover:underline">{{ user.displayName }}</p>
+        <p class="line-clamp-1 truncate text-sm font-bold hover:underline">
+          {{ user.displayName }}
+        </p>
         <p class="text-muted-foreground cursor-pointer text-sm">
           {{ '@' + user.username }}
           <span
