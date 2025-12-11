@@ -57,3 +57,8 @@ export type CreateTweetRequest = {
   replyToTweetId?: string | null;
   quoteToTweetId?: string | null;
 };
+
+export type TweetListItem = {
+  id: string;
+  reposterId?: string | null;
+};

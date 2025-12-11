@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import TweetDefaultCard from '~/components/tweet/TweetDefaultCard.vue';
-import { homeService } from '~/services/home/homeService';
-import { useInfiniteQuery, useQueryClient } from '@tanstack/vue-query';
-import { useWindowVirtualizer } from '@tanstack/vue-virtual';
+import VirtualInfiniteScroller from '~/components/common/VirtualInfiniteScroller.vue';
+import { useTimelineTweets } from '~/composables/tweet/useTweetLists';
+import { getItemKey } from '~/constants/query-keys';
 
 function isTab(value: unknown): value is HomeTab {
   return typeof value === 'string' && validHomeTabs.includes(value as HomeTab);
@@ -18,7 +17,6 @@ definePageMeta({
 const route = useRoute();
 const tab = computed(() => route.params.tab as HomeTab);
 
-const queryClient = useQueryClient();
 const {
   data: response,
   fetchNextPage,
@@ -26,82 +24,9 @@ const {
   isFetchingNextPage,
   isLoading,
   suspense,
-} = useInfiniteQuery({
-  queryKey: computed(() => ['tweets', tab.value]),
-  initialPageParam: null as string | null,
-  queryFn: async ({ pageParam = null }) => {
-    const res = await homeService.getHomeTab({ limit: 10, cursor: pageParam }, tab.value);
-    res.data.forEach((tweet) => {
-      queryClient.setQueryData(['tweet', tweet.id], tweet);
-      if (tweet.repostedBy) {
-        queryClient.setQueryData(['tweet-reposter', tweet.repostedBy.username], tweet.repostedBy);
-      }
-    });
-    const ids = res.data.map((tweet) => ({
-      id: tweet.id,
-      // this is highliy experimental
-      // I will use username instead of id as currenly the backend does not provide reposter id in the tweet object
-      reposterId: tweet.repostedBy?.username ?? null,
-    }));
-    return {
-      ...res,
-      data: ids,
-    };
-  },
-  getNextPageParam: (lastPage) =>
-    lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined,
-  structuralSharing: false,
-});
+} = useTimelineTweets(computed(() => tab.value));
 
 const tweets = computed(() => response.value?.pages.flatMap((page) => page.data) || []);
-
-//  Virtualization setup
-const parentRef = ref<HTMLElement | null>(null);
-const parentOffsetRef = ref(0);
-onMounted(() => {
-  parentOffsetRef.value = parentRef.value?.offsetTop ?? 0;
-});
-
-const rowVirtualizerOptions = computed(() => {
-  return {
-    count: hasNextPage ? tweets.value.length + 1 : tweets.value.length,
-    estimateSize: () => 120,
-    overscan: 3,
-    scrollMargin: parentOffsetRef.value,
-    getItemKey: (index: number) => {
-      const tweet = tweets.value[index];
-      if (tweet) {
-        let key = `${tweet.id}`;
-        if (tweet.reposterId) key += `-repost-${tweet.reposterId}`;
-        key += `-index-${index}`;
-        return key;
-      }
-      return `loading-${index}`;
-    },
-  };
-});
-
-const rowVirtualizer = useWindowVirtualizer(rowVirtualizerOptions);
-const virtualRows = computed(() => rowVirtualizer.value.getVirtualItems());
-const totalSize = computed(() => rowVirtualizer.value.getTotalSize());
-
-const measureElement = (el: Element | ComponentPublicInstance | null) => {
-  if (!el) return;
-  const element = 'nodeType' in el ? (el as HTMLElement) : (el as ComponentPublicInstance).$el;
-  rowVirtualizer.value.measureElement(element);
-};
-
-watchEffect(() => {
-  const [lastItem] = [...virtualRows.value].reverse();
-
-  if (!lastItem) {
-    return;
-  }
-
-  if (lastItem.index >= tweets.value.length - 3 && hasNextPage.value && !isFetchingNextPage.value) {
-    fetchNextPage();
-  }
-});
 
 onServerPrefetch(async () => {
   await suspense();
@@ -117,41 +42,17 @@ onServerPrefetch(async () => {
         </div>
       </template>
 
-      <div v-if="tweets" ref="parentRef">
-        <div
-          :style="{
-            height: `${totalSize}px`,
-            width: '100%',
-            position: 'relative',
-          }"
-        >
-          <div
-            :style="{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              transform: `translateY(${
-                virtualRows[0] ? virtualRows[0].start - rowVirtualizer.options.scrollMargin : 0
-              }px)`,
-            }"
-          >
-            <div
-              v-for="virtualRow in virtualRows"
-              :key="String(virtualRow.key)"
-              :ref="measureElement"
-              :data-index="virtualRow.index"
-              :data-testid="String(virtualRow.key)"
-            >
-              <TweetDefaultCard
-                v-if="tweets[virtualRow.index]"
-                :tweet-id="tweets[virtualRow.index]?.id!"
-                :reposter-id="tweets[virtualRow.index]?.reposterId"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
+      <VirtualInfiniteScroller
+        :items="tweets"
+        :get-key="getItemKey"
+        :has-next-page="hasNextPage"
+        :is-fetching-next-page="isFetchingNextPage"
+        :fetch-next-page="fetchNextPage"
+      >
+        <template #item="{ item }">
+          <TweetDefaultCard v-if="item" :tweet-id="item.id" :reposter-id="item.reposterId" />
+        </template>
+      </VirtualInfiniteScroller>
 
       <div
         v-if="(hasNextPage && isFetchingNextPage) || isLoading"

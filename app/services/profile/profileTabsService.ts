@@ -15,6 +15,7 @@ export const profileTabsService = {
     tab: 'replies' | 'tweets' | 'likes' | 'media',
     cursor: string | null,
     limit?: number,
+    signal?: AbortSignal,
   ) => {
     return await apiFetch(`/api/users/${username}/${tab}`, {
       method: 'GET',
@@ -22,6 +23,7 @@ export const profileTabsService = {
         cursor,
         limit: (limit ?? DEFAULT_PAGE_SIZE).toString(),
       },
+      signal,
     });
   },
 

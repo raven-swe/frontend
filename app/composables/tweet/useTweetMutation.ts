@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/vue-query';
 import type { FetchError } from 'ofetch';
+import { tweetKeys } from '~/constants/query-keys';
 import {
   likeTweet,
   unLikeTweet,
@@ -43,27 +44,28 @@ export function useTweetMutation<ActionType extends Actions, Q = void>({
     mutationKey: ['tweet-interaction'],
     mutationFn,
     onMutate: async ({ tweetId, action }, { client }) => {
-      const previousTweet = client.getQueryData<Tweet>(['tweet', tweetId]);
-      const previousTweetExtended = client.getQueryData<TweetWithParents>([
-        'tweet-extended',
-        tweetId,
-      ]);
-      if (previousTweetExtended) {
-        client.setQueryData<TweetWithParents>(['tweet-extended', tweetId], (old) => {
-          if (!old) return old;
-          const tweetCopy = JSON.parse(JSON.stringify(toRaw(old)));
-          const newTweet = optimisticUpdateFn(tweetCopy, action);
-          return newTweet;
-        });
-      }
+      const previousTweet = client.getQueryData<Tweet>(tweetKeys.entity(tweetId));
       if (previousTweet) {
-        client.setQueryData<Tweet>(['tweet', tweetId], (old) => {
+        client.setQueryData<Tweet>(tweetKeys.entity(tweetId), (old) => {
           if (!old) return old;
           const tweetCopy = JSON.parse(JSON.stringify(toRaw(old)));
           const newTweet = optimisticUpdateFn(tweetCopy, action);
           return newTweet;
         });
       }
+
+      const previousTweetExtended = client.getQueryData<TweetWithParents>(
+        tweetKeys.detail(tweetId),
+      );
+      if (previousTweetExtended) {
+        client.setQueryData<TweetWithParents>(tweetKeys.detail(tweetId), (old) => {
+          if (!old) return old;
+          const tweetCopy = JSON.parse(JSON.stringify(toRaw(old)));
+          const newTweet = optimisticUpdateFn(tweetCopy, action);
+          return newTweet;
+        });
+      }
+
       return {
         previousTweet,
         previousTweetExtended,
@@ -76,11 +78,11 @@ export function useTweetMutation<ActionType extends Actions, Q = void>({
         return;
       }
       if (context?.previousTweet) {
-        client.setQueryData<Tweet>(['tweet', tweetId], context.previousTweet);
+        client.setQueryData<Tweet>(tweetKeys.entity(tweetId), context.previousTweet);
       }
       if (context?.previousTweetExtended) {
         client.setQueryData<TweetWithParents>(
-          ['tweet-extended', tweetId],
+          tweetKeys.detail(tweetId),
           context.previousTweetExtended,
         );
       }
@@ -90,8 +92,8 @@ export function useTweetMutation<ActionType extends Actions, Q = void>({
     },
 
     onSettled: (_data, _err, { tweetId }, _mutationResult, { client }) => {
-      client.invalidateQueries({ queryKey: ['tweet', tweetId] });
-      client.invalidateQueries({ queryKey: ['tweet-extended', tweetId] });
+      client.invalidateQueries({ queryKey: tweetKeys.entity(tweetId) });
+      client.invalidateQueries({ queryKey: tweetKeys.detail(tweetId) });
     },
   });
 }

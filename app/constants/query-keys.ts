@@ -3,12 +3,24 @@ export const tweetKeys = {
 
   entity: (id: string) => ['tweet', id] as const, // canonical Tweet
 
+  detail: (id: string) => ['tweet', 'detail', id] as const, // ['tweets','detail',id]
+
+  reposter: (tweetId: string) => ['tweet', 'reposter', tweetId] as const, // tweet reposter
+
   timeline: (tab: string) => [...tweetKeys.all, 'timeline', tab] as const, // ['tweets','timeline',tab]
+
+  search: (query: string, tab: string, filter: string) =>
+    [...tweetKeys.all, 'search', query, tab, filter] as const, // ['tweets','search',query,tab,filter]
 
   replyList: (tweetId: string) => [...tweetKeys.all, 'replies', tweetId] as const, // ['tweets','replies',tweetId]
 
-  profileTab: (username: string, tab: 'tweets' | 'replies' | 'likes') =>
+  profileTab: (username: string, tab: 'tweets' | 'replies' | 'likes' | 'media') =>
     [...tweetKeys.all, 'profile', username, tab] as const, // ['tweets','profile',username,tab]
+};
 
-  detail: (id: string) => [...tweetKeys.all, 'detail', id] as const, // ['tweets','detail',id]
+export const getItemKey = (item: TweetListItem, index: number) => {
+  let keyStr = `${item.id}`;
+  if (item.reposterId) keyStr += `-repost-${item.reposterId}`;
+  keyStr += `-index-${index}`;
+  return keyStr;
 };

@@ -6,9 +6,7 @@ import TweetActionButtons from './TweetActionButtons.vue';
 import QuotedTweetCard from './QuotedTweetCard.vue';
 import AiSummary from './AiSummary.vue';
 import { useUserStore } from '~/stores/user';
-import { useQuery } from '@tanstack/vue-query';
-import { tweetsService } from '~/services/tweet/tweetsService';
-import { profileTabsService } from '~/services/profile/profileTabsService';
+import { useTweet, useTweetReposter } from '~/composables/tweet/useTweet';
 interface Props {
   tweetId: string;
   reposterId?: string | null;
@@ -20,27 +18,9 @@ const router = useRouter();
 const userStore = useUserStore();
 const originalUsername = ref<string>(userStore.user?.username || '');
 
-const { data: tweet } = useQuery({
-  queryKey: computed(() => ['tweet', props.tweetId]),
-  queryFn: async () => {
-    const res = await tweetsService.tweet(props.tweetId);
-    const tweetData = res.data;
-    delete tweetData.parentTweets;
-    delete tweetData.hasMoreParents;
-    delete tweetData.rootTweet;
-    return tweetData;
-  },
-});
+const { data: tweet } = useTweet(props.tweetId);
 
-const { data: reposter } = useQuery({
-  queryKey: computed(() => ['tweet-reposter', props.reposterId]),
-  queryFn: async () => {
-    if (!props.reposterId) return null;
-    const res = await profileTabsService.getReposterById(props.reposterId);
-    return res;
-  },
-  enabled: computed(() => Boolean(props.reposterId)),
-});
+const { data: reposter } = useTweetReposter(props.reposterId);
 
 // Format createdAt to a short relative time like "6h", "3d", "2m"
 const aiSummaryRef = ref<InstanceType<typeof AiSummary> | null>(null);

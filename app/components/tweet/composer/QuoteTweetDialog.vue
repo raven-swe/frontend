@@ -10,11 +10,11 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:open': [value: boolean];
-  'quote-success': [];
+  'quote-success': [data: Tweet];
 }>();
 
-const onQuoteSuccess = () => {
-  emit('quote-success');
+const onQuoteSuccess = (data: Tweet) => {
+  emit('quote-success', data);
   emit('update:open', false);
 };
 

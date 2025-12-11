@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { useInfiniteQuery } from '@tanstack/vue-query';
 import VirtualInfiniteScroller from '~/components/common/VirtualInfiniteScroller.vue';
-import Thumbnail from '~/components/ui/Thumbnail.vue';
-import { profileTabsService } from '~/services/profile/profileTabsService';
+import { useProfileTweets } from '~/composables/tweet/useTweetLists';
+import { getItemKey } from '~/constants/query-keys';
 
 definePageMeta({
   layout: 'profile',
@@ -23,19 +22,10 @@ const {
   isFetchingNextPage,
   isLoading,
   suspense,
-} = useInfiniteQuery({
-  queryKey: ['profile', user?.value.username, 'tweets-media'],
-  initialPageParam: null as string | null,
-  queryFn: async ({ pageParam = null }) =>
-    await profileTabsService.getProfileTweetsPaginated(
-      user?.value.username || '',
-      'media',
-      pageParam,
-    ),
-
-  getNextPageParam: (lastPage) =>
-    lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined,
-});
+} = useProfileTweets(
+  'media',
+  computed(() => user?.value.username || ''),
+);
 
 const tweets = computed(() => {
   const flat = response.value?.pages.flatMap((page) => page.data) || [];
@@ -62,20 +52,16 @@ onServerPrefetch(async () => {
           :is-fetching-next-page="isFetchingNextPage"
           :fetch-next-page="fetchNextPage"
           :get-key="
-            (item, index, key) => `${item.map((tweet) => `${tweet.id}-${key || index}`).join('-')}`
+            (item, index, key) => `${item.map((tweet) => getItemKey(tweet, index)).join('-')}`
           "
         >
           <template #item="{ item }">
             <div class="grid grid-cols-3 gap-1 overflow-hidden pt-1">
-              <!-- Always delegate media rendering to Thumbnail -->
-              <NuxtLink
-                v-for="tweet in item"
-                :key="tweet.id"
-                :to="`/profile/${tweet.author.username}/status/${tweet.id}`"
-                class="block size-full"
-              >
-                <Thumbnail :media="tweet.media?.[0]" :multiple="tweet.media?.length > 1" />
-              </NuxtLink>
+              <TweetMediaThumbnail
+                v-for="(tweet, index) in item"
+                :key="index"
+                :tweet-id="tweet.id"
+              />
             </div>
           </template>
         </VirtualInfiniteScroller>

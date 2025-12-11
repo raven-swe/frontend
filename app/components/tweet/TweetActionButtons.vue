@@ -5,6 +5,13 @@ import Button from '~/components/ui/Button.vue';
 import QuoteTweetDialog from './composer/QuoteTweetDialog.vue';
 import { showToaster } from '~/utils/showToaster';
 import { buildTweetLink } from '~/utils/tweetLink';
+import {
+  useTweetLikeMutation,
+  useTweetRetweetMutation,
+} from '~/composables/tweet/useTweetMutation';
+import { prependTweetToInfiniteLists } from '~/composables/tweet/updateTweetList';
+import { tweetKeys } from '~/constants/query-keys';
+import { useQueryClient } from '@tanstack/vue-query';
 
 interface Props {
   tweet: Tweet;
@@ -29,6 +36,16 @@ const handleRetweet = () => {
 
 const handleUndoRetweet = () => {
   retweet({ tweetId: props.tweet.id, action: 'undo-retweet' });
+};
+
+const queryClient = useQueryClient();
+
+const handleQuote = (data: Tweet) => {
+  prependTweetToInfiniteLists(
+    queryClient,
+    [tweetKeys.profileTab(data.author.username, 'tweets')],
+    data,
+  );
 };
 
 const handleShare = async () => {
@@ -118,6 +135,10 @@ const handleShare = async () => {
     </Button>
 
     <!-- Place dialog outside dropdown structure -->
-    <QuoteTweetDialog v-model:open="showQuoteDialog" :quote-to-tweet="props.tweet" />
+    <QuoteTweetDialog
+      v-model:open="showQuoteDialog"
+      :quote-to-tweet="props.tweet"
+      @quote-success="handleQuote"
+    />
   </div>
 </template>

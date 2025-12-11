@@ -1,6 +1,22 @@
 <script lang="ts" setup>
 import Tabs from '@/components/ui/Tabs.vue';
 import Tab from '@/components/ui/Tab.vue';
+import { prependTweetToInfiniteLists } from '~/composables/tweet/updateTweetList';
+import { tweetKeys } from '~/constants/query-keys';
+import { useQueryClient } from '@tanstack/vue-query';
+
+const queryClient = useQueryClient();
+
+function handlePosted(tweet: Tweet) {
+  const queryKeys = [
+    tweetKeys.timeline('for-you'),
+    tweetKeys.timeline('following'),
+    tweetKeys.profileTab(tweet.author.username, 'tweets'),
+    tweetKeys.profileTab(tweet.author.username, 'replies'),
+    tweetKeys.profileTab(tweet.author.username, 'media'),
+  ];
+  prependTweetToInfiniteLists(queryClient, queryKeys, tweet);
+}
 </script>
 
 <template>
@@ -17,6 +33,7 @@ import Tab from '@/components/ui/Tab.vue';
         :is-active="$route.path === '/home/following'"
       />
     </Tabs>
+    <TweetComposer class="border-b" @posted="handlePosted" />
     <slot />
   </NuxtLayout>
 </template>

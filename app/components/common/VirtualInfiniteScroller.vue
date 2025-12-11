@@ -12,7 +12,7 @@ interface Props<T> {
   getKey?: (
     item: T,
     index: number,
-    key?: VirtualItem['key'],
+    key: VirtualItem['key'],
   ) => string | number | VirtualItem['key'];
 }
 

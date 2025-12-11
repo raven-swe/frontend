@@ -1,44 +1,31 @@
 <script setup lang="ts">
 import TweetView from '~/components/tweet/TweetView.vue';
-import type { TweetWithParents } from '~~/shared/types/tweets';
-import type { ApiErrorResponse } from '~~/shared/types/api';
-import { tweetsService } from '~/services/tweet/tweetsService';
 import { isApiError, isApiValidationError } from '~/utils/errorUtils';
-import { useInfiniteQuery, useQuery, useQueryClient, type InfiniteData } from '@tanstack/vue-query';
 import { isTweetDeleted } from '~/utils/tweetDeleted';
 import DeletedTweetPlaceholder from '~/components/tweet/DeletedTweetPlaceholder.vue';
+import { useTweetReplies } from '~/composables/tweet/useTweetLists';
+import { useTweetWithParents } from '~/composables/tweet/useTweet';
+import { useQueryClient } from '@tanstack/vue-query';
+import { tweetKeys } from '~/constants/query-keys';
+import { prependTweetToInfiniteLists } from '~/composables/tweet/updateTweetList';
 
 const router = useRouter();
 const queryClient = useQueryClient();
 const username = computed(() => router.currentRoute.value.params.username as string);
 const tweetid = computed(() => router.currentRoute.value.params.tweetid as string);
 
+const { data: tweetData, suspense, isPending, error } = useTweetWithParents(tweetid);
+
 const {
-  data: tweetData,
-  suspense,
-  isPending,
-  error,
-} = useQuery<TweetWithParents, ApiErrorResponse>({
-  queryKey: ['tweet-extended', tweetid],
-  queryFn: async () => {
-    const res = await tweetsService.tweet(tweetid.value);
-    const tweetData = res.data;
-    if (tweetData.rootTweet && !isTweetDeleted(tweetData.rootTweet)) {
-      queryClient.setQueryData(['tweet', tweetData.rootTweet.id], tweetData.rootTweet);
-    }
-    if (tweetData.parentTweets) {
-      tweetData.parentTweets.forEach((parentTweet) => {
-        if (!isTweetDeleted(parentTweet))
-          queryClient.setQueryData(['tweet', parentTweet.id], parentTweet);
-      });
-    }
-    return tweetData;
-  },
-  refetchOnWindowFocus: false,
-  refetchOnMount: false,
-  retry: false,
-  structuralSharing: false,
-});
+  data: repliesResponse,
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage,
+  isPending: isRepliesLoading,
+} = useTweetReplies(
+  tweetid,
+  computed(() => !!tweetData.value),
+);
 
 const oldestParent = computed(() => tweetData.value?.parentTweets?.at(0) || null);
 
@@ -72,36 +59,6 @@ watch(
   { immediate: true },
 );
 
-const {
-  data: repliesResponse,
-  fetchNextPage,
-  hasNextPage,
-  isFetchingNextPage,
-  isPending: isRepliesLoading,
-} = useInfiniteQuery({
-  queryKey: computed(() => ['tweet-replies', tweetid.value]),
-  initialPageParam: null as string | null,
-  queryFn: async ({ pageParam = null }) => {
-    const res = await tweetsService.replies(tweetid.value, { limit: 10, cursor: pageParam });
-    res.data.forEach((tweet) => {
-      queryClient.setQueryData(['tweet', tweet.id], tweet);
-    });
-    const ids = res.data.map((tweet) => ({
-      id: tweet.id,
-      // this is highliy experimental
-      // I will use username instead of id as currenly the backend does not provide reposter id in the tweet object
-      reposterId: tweet.repostedBy?.username ?? null,
-    }));
-    return {
-      ...res,
-      data: ids,
-    };
-  },
-  getNextPageParam: (lastPage) =>
-    lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined,
-  enabled: computed(() => !!tweetData.value),
-});
-
 const replies = computed(() => repliesResponse.value?.pages.flatMap((page) => page.data) || []);
 
 onMounted(async () => {
@@ -111,27 +68,11 @@ onMounted(async () => {
 });
 
 const handleNewReply = (newReply: Tweet) => {
-  queryClient.setQueryData<
-    InfiniteData<ApiSuccessResponse<{ id: string; reposterId: string | null }[]>>
-  >(['tweet-replies', tweetid.value], (old) => {
-    if (!old) return old;
-
-    const [firstPage, ...restPages] = old.pages;
-    if (!firstPage) return old;
-
-    const newItem = { id: newReply.id, reposterId: null };
-
-    const updatedFirstPage: ApiSuccessResponse<{ id: string; reposterId: string | null }[]> = {
-      ...firstPage,
-      data: [newItem, ...firstPage.data],
-    };
-
-    return {
-      ...old,
-      pages: [updatedFirstPage, ...restPages],
-      pageParams: [...old.pageParams],
-    };
-  });
+  const queryKeys = [
+    tweetKeys.profileTab(newReply.author.username, 'replies'),
+    tweetKeys.replyList(tweetid.value),
+  ];
+  prependTweetToInfiniteLists(queryClient, queryKeys, newReply);
 };
 
 onServerPrefetch(async () => {
