@@ -56,6 +56,7 @@ const [_username, usernameAttrs] = defineField('username');
 
 const checkUsernameAvailability = useDebounceFn(async (username: string) => {
   // Guard: skip network call if unchanged or invalid
+  username = username.toLocaleLowerCase();
   if (!username || errors.value.username) return;
   if (username === originalUsername.value) return;
 
@@ -88,6 +89,7 @@ const checkUsernameAvailability = useDebounceFn(async (username: string) => {
   }
 }, 300);
 const dynamicUsernameSuggestions = useDebounceFn(async (username: string) => {
+  username = username.toLocaleLowerCase();
   // Guard: skip suggestions fetch if unchanged or invalid
   if (!username || errors.value.username) return;
   if (username === originalUsername.value) return;
