@@ -4,7 +4,7 @@ import { useRoute } from 'vue-router';
 import TweetDefaultCard from '~/components/tweet/TweetDefaultCard.vue';
 import { homeService } from '~/services/home/homeService';
 import { useInfiniteQuery, useQueryClient, type InfiniteData } from '@tanstack/vue-query';
-import { useWindowVirtualizer } from '@tanstack/vue-virtual';
+import VirtualInfiniteScroller from '~/components/common/VirtualInfiniteScroller.vue';
 
 function isTab(value: unknown): value is HomeTab {
   return typeof value === 'string' && validHomeTabs.includes(value as HomeTab);
@@ -42,37 +42,6 @@ const parentRef = ref<HTMLElement | null>(null);
 const parentOffsetRef = ref(0);
 onMounted(() => {
   parentOffsetRef.value = parentRef.value?.offsetTop ?? 0;
-});
-
-const rowVirtualizerOptions = computed(() => {
-  return {
-    count: hasNextPage ? tweets.value.length + 1 : tweets.value.length,
-    estimateSize: () => 120,
-    overscan: 3,
-    scrollMargin: parentOffsetRef.value,
-  };
-});
-
-const rowVirtualizer = useWindowVirtualizer(rowVirtualizerOptions);
-const virtualRows = computed(() => rowVirtualizer.value.getVirtualItems());
-const totalSize = computed(() => rowVirtualizer.value.getTotalSize());
-
-const measureElement = (el: Element | ComponentPublicInstance | null) => {
-  if (!el) return;
-  const element = 'nodeType' in el ? (el as HTMLElement) : (el as ComponentPublicInstance).$el;
-  rowVirtualizer.value.measureElement(element);
-};
-
-watchEffect(() => {
-  const [lastItem] = [...virtualRows.value].reverse();
-
-  if (!lastItem) {
-    return;
-  }
-
-  if (lastItem.index >= tweets.value.length - 3 && hasNextPage.value && !isFetchingNextPage.value) {
-    fetchNextPage();
-  }
 });
 
 onServerPrefetch(async () => {
@@ -128,40 +97,17 @@ watch(
   <div class="border-border mx-auto max-w-[700px]">
     <TweetComposer class="mt-15 border-b-1" @posted="handlePost" />
     <ClientOnly>
-      <div v-if="tweets" ref="parentRef">
-        <div
-          :style="{
-            height: `${totalSize}px`,
-            width: '100%',
-            position: 'relative',
-          }"
-        >
-          <div
-            :style="{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              transform: `translateY(${
-                virtualRows[0] ? virtualRows[0].start - rowVirtualizer.options.scrollMargin : 0
-              }px)`,
-            }"
-          >
-            <div
-              v-for="virtualRow in virtualRows"
-              :key="tweets[virtualRow.index]?.id || String(virtualRow.key)"
-              :ref="measureElement"
-              :data-index="virtualRow.index"
-            >
-              <TweetDefaultCard
-                v-if="tweets[virtualRow.index]"
-                :tweet="tweets[virtualRow.index]!"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
+      <VirtualInfiniteScroller
+        :items="tweets"
+        :has-next-page="hasNextPage"
+        :is-fetching-next-page="isFetchingNextPage"
+        :fetch-next-page="fetchNextPage"
+        :get-key="(item, index, key) => `${item?.id}-${item?.repostedBy?.username}-${key}`"
+      >
+        <template #item="{ item }">
+          <TweetDefaultCard v-if="item" :tweet="item" />
+        </template>
+      </VirtualInfiniteScroller>
       <div
         v-if="(hasNextPage && isFetchingNextPage) || isLoading"
         class="text-primary mt-20 flex shrink-0 items-center justify-center py-4"
@@ -174,7 +120,12 @@ watch(
       data-testid="empty-state"
       class="mx-auto my-10 max-w-90 px-8 text-start break-words"
     >
-      <p class="text-[2rem] leading-tight font-black">{{ $t('errors.TWEET_NOT_FOUND') }}</p>
+      <h2 class="text-[2rem] leading-tight font-black">
+        {{ $t('home.messages.empty.title') }}
+      </h2>
+      <p class="text-muted-foreground mt-1 leading-tight">
+        {{ $t('home.messages.empty.description') }}
+      </p>
     </div>
   </div>
 </template>
