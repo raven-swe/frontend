@@ -52,7 +52,8 @@ onServerPrefetch(async () => {
           :is-fetching-next-page="isFetchingNextPage"
           :fetch-next-page="fetchNextPage"
           :get-key="
-            (item, index, key) => `${item.map((tweet) => getItemKey(tweet, index)).join('-')}`
+            (item, index, key) =>
+              `${item?.map((tweet) => getItemKey(tweet, index)).join('-') ?? key}`
           "
         >
           <template #item="{ item }">

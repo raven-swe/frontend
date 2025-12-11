@@ -10,7 +10,7 @@ interface Props<T> {
   isFetchingNextPage: boolean;
   fetchNextPage: () => void;
   getKey?: (
-    item: T,
+    item: T | undefined,
     index: number,
     key: VirtualItem['key'],
   ) => string | number | VirtualItem['key'];
@@ -20,7 +20,7 @@ const props = withDefaults(defineProps<Props<T>>(), {
   estimateSize: 120,
   overscan: 2,
   scrollMargin: 0,
-  getKey: (item: T, index: number, key?: VirtualItem['key']) => key ?? index,
+  getKey: (item: T | undefined, index: number, key?: VirtualItem['key']) => key ?? index,
 });
 
 // Refs for container offset
@@ -87,7 +87,7 @@ watchEffect(() => {
         <div
           v-for="virtualRow in virtualRows"
           :key="
-            String(props.getKey(props.items[virtualRow.index]!, virtualRow.index, virtualRow.key))
+            String(props.getKey(props.items[virtualRow.index], virtualRow.index, virtualRow.key))
           "
           :ref="measureElement"
           :data-index="virtualRow.index"

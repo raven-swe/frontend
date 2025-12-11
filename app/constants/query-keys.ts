@@ -18,7 +18,8 @@ export const tweetKeys = {
     [...tweetKeys.all, 'profile', username, tab] as const, // ['tweets','profile',username,tab]
 };
 
-export const getItemKey = (item: TweetListItem, index: number) => {
+export const getItemKey = (item: TweetListItem | undefined, index: number) => {
+  if (!item) return `loading-${index}`;
   let keyStr = `${item.id}`;
   if (item.reposterId) keyStr += `-repost-${item.reposterId}`;
   keyStr += `-index-${index}`;

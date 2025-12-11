@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, type InfiniteData, type QueryKey } from '@tanstack/vue-query';
 import type { FetchError } from 'ofetch';
 import { tweetKeys } from '~/constants/query-keys';
 import {
@@ -6,6 +6,7 @@ import {
   unLikeTweet,
   retweetTweet,
   undoRetweetTweet,
+  deleteTweet,
 } from '~/services/tweet/actionButtonsService';
 
 type Actions = 'like' | 'unlike' | 'retweet' | 'undo-retweet';
@@ -138,6 +139,85 @@ export function useTweetRetweetMutation() {
         tweet.isRetweeted = false;
       }
       return tweet;
+    },
+  });
+}
+
+export function useTweetDeleteMutation() {
+  const { t } = useI18n();
+
+  return useMutation<
+    undefined,
+    FetchError<FetchError<ApiErrorResponse>>,
+    { tweetId: string },
+    {
+      previousLists?: [QueryKey, InfiniteData<ApiSuccessResponse<TweetListItem[]>> | undefined][];
+      previousEntity?: Tweet;
+      previousDetail?: TweetWithParents;
+    }
+  >({
+    mutationKey: ['tweet-interaction', 'delete'],
+    mutationFn: async ({ tweetId }) => {
+      await deleteTweet(tweetId);
+    },
+    onMutate: async ({ tweetId }, { client }) => {
+      // cancel any outgoing fetches for tweets lists
+      await client.cancelQueries({ queryKey: tweetKeys.all, exact: false });
+
+      const previousLists = client.getQueriesData<
+        InfiniteData<ApiSuccessResponse<TweetListItem[]>>
+      >({
+        queryKey: tweetKeys.all,
+        exact: false,
+      });
+
+      // optimistically remove the tweet from all lists
+      client.setQueriesData<InfiniteData<ApiSuccessResponse<TweetListItem[]>>>(
+        {
+          queryKey: tweetKeys.all,
+          exact: false,
+        },
+        (oldData) => {
+          if (!oldData) return oldData;
+          const updatedPages = oldData.pages.map((page) => {
+            const filteredData = page.data.filter((tweet) => tweet.id !== tweetId);
+            return { ...page, data: filteredData };
+          });
+          return { ...oldData, pages: updatedPages };
+        },
+      );
+
+      const previousEntity = client.getQueryData<Tweet>(tweetKeys.entity(tweetId));
+      const previousDetail = client.getQueryData<TweetWithParents>(tweetKeys.detail(tweetId));
+
+      // remove canonical entries
+      client.removeQueries({ queryKey: tweetKeys.entity(tweetId), exact: true });
+      client.removeQueries({ queryKey: tweetKeys.detail(tweetId), exact: true });
+
+      return { previousLists, previousEntity, previousDetail };
+    },
+    onError: (err, { tweetId }, ctx, { client }) => {
+      console.error('Error during tweet delete:', err);
+
+      // restore lists
+      ctx?.previousLists?.forEach(([queryKey, data]) => {
+        client.setQueryData(queryKey, data);
+      });
+
+      if (ctx?.previousEntity) {
+        client.setQueryData(tweetKeys.entity(tweetId), ctx.previousEntity);
+      }
+      if (ctx?.previousDetail) {
+        client.setQueryData(tweetKeys.detail(tweetId), ctx.previousDetail);
+      }
+
+      const code = err?.data?.data?.error?.code;
+      const message = t(`errors.tweet.${code}`) || t('errors.UNKNOWN_ERROR');
+      showToaster('error', message);
+    },
+    onSettled: (_data, _err, { tweetId }, _ctx, { client }) => {
+      client.invalidateQueries({ queryKey: tweetKeys.entity(tweetId) });
+      client.invalidateQueries({ queryKey: tweetKeys.detail(tweetId) });
     },
   });
 }

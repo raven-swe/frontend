@@ -28,11 +28,11 @@ export function useTimelineTweets(tab: MaybeRefOrGetter<'following' | 'for-you'>
     queryKey: computed(() => tweetKeys.timeline(toValue(tab))),
     initialPageParam: null as string | null,
     queryFn: async ({ pageParam = null, signal }) => {
-      const res = await homeService.getHomeTab(
-        { limit: 10, cursor: pageParam },
-        toValue(tab),
+      const res = await homeService.getHomeTab({
+        tab: toValue(tab),
+        cursor: pageParam,
         signal,
-      );
+      });
 
       // Update the tweet cache
       updateCacheWithTweets(res.data, queryClient);
