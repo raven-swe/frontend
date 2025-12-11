@@ -612,6 +612,7 @@
     "seen": "Seen",
     "no-messages-yet": "No messages yet",
     "sent-photo": "Sent a photo",
+    "cant-message": "can't be messaged",
     "empty": {
       "select": "Select a message",
       "description": "Choose from your existing conversations, start a new one, or just keep swimming.",

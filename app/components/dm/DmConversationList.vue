@@ -83,8 +83,15 @@ watch(
           <DmConversationItem
             :conversation="conversations[virtualRow.index]!"
             :is-selected="selectedId === conversations[virtualRow.index]!.id"
-            class="hover:bg-foreground/5 cursor-pointer"
-            @click="emit('select', conversations[virtualRow.index]!.id)"
+            :class="[
+              conversations[virtualRow.index]!.isBlocking
+                ? 'cursor-not-allowed opacity-50'
+                : 'hover:bg-foreground/5 cursor-pointer',
+            ]"
+            @click="
+              !conversations[virtualRow.index]?.isBlocking &&
+              emit('select', conversations[virtualRow.index]!.id)
+            "
           />
         </template>
       </div>

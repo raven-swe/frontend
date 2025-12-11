@@ -581,6 +581,7 @@
     "attachedImage": "صورة مرفقة",
     "seen": "تمت المشاهدة",
     "no-messages-yet": "لا توجد رسائل بعد",
+    "cant-message": "لا يمكن إرسال رسالة",
     "sent-photo": "تم إرسال صورة",
     "empty": {
       "select": "اختر رسالة",

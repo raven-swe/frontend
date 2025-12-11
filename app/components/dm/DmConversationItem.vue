@@ -17,6 +17,7 @@ const highlighted = computed(() => {
 });
 
 const lastMessageText = computed(() => {
+  if (props.conversation?.isBlocking) return t('dm.cant-message');
   const lastMessage = props.conversation.lastMessage;
   if (!lastMessage) return t('dm.no-messages-yet');
   if (!lastMessage.content) return t('dm.sent-photo');
