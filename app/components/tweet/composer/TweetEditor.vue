@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { showToaster } from '@/utils/showToaster';
+import { useDebounceFn } from '@vueuse/core';
+import { searchService } from '~/services/search/searchService';
+import type { CompactUser } from '~~/shared/types/user';
 import {
   MAX_IMAGE_SIZE_BYTES,
   MAX_IMAGE_SIZE_MB,
@@ -29,6 +32,10 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<Emits>();
 
 const textareaRef = ref<HTMLTextAreaElement | null>(null);
+const mentionResults = ref<CompactUser[] | null>(null);
+const mention = ref<string>('');
+const highlightedIndex = ref<number>(0);
+const isFocused = ref<boolean>(false);
 
 const characterCount = computed(() => props.modelValue.length);
 const isOverLimit = computed(() => characterCount.value > props.maxLength);
@@ -79,8 +86,135 @@ const adjustHeight = () => {
 const handleInput = (event: Event) => {
   adjustHeight();
   const target = event.target as HTMLTextAreaElement;
-  emit('update:modelValue', target.value);
+  const newValue = target.value;
+  const cursorPosition = target.selectionStart || 0;
+
+  emit('update:modelValue', newValue);
+
+  const textBeforeCursor = newValue.slice(0, cursorPosition);
+  const textAfterCursor = newValue.slice(cursorPosition);
+
+  // Primary case: we're actively typing or cursor is inside a potential mention ending with @word
+  const activeMentionMatch = textBeforeCursor.match(/@(\w*)$/);
+  const textAfter = textAfterCursor.match(/^(\w*)/)?.[1] ?? '';
+
+  if (activeMentionMatch) {
+    mention.value = activeMentionMatch[1] + textAfter;
+    debouncedMentions(mention.value);
+    return;
+  }
+
+  // Fallback case: cursor is inside an existing completed mention like "Hello @grok how are you" with cursor on "rok"
+  const leftPart = textBeforeCursor.match(/@(\w+)$/);
+  const rightPart = textAfterCursor.match(/^(\w*)/)?.[1] ?? '';
+
+  if (leftPart && rightPart.length > 0) {
+    mention.value = leftPart[1] + rightPart;
+    debouncedMentions(mention.value);
+    return;
+  }
+
+  // Not in a mention anymore
+  if (mention.value) {
+    mention.value = '';
+    mentionResults.value = null;
+  }
 };
+
+watch(mentionResults, (newResults) => {
+  if (newResults && newResults.length > 0) {
+    highlightedIndex.value = 0;
+  } else {
+    highlightedIndex.value = -1;
+  }
+});
+
+watch(highlightedIndex, () => {
+  if (mentionResults.value && mentionResults.value.length > 0) {
+    nextTick(() => {
+      const listItems = document.querySelectorAll('.mention-items');
+      const activeItem = listItems[highlightedIndex.value] as HTMLElement;
+      if (activeItem) {
+        activeItem.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'nearest',
+        });
+      }
+    });
+  }
+});
+
+const handleKeydown = (e: KeyboardEvent) => {
+  if (!mentionResults.value || mentionResults.value.length === 0) return;
+
+  const key = e.key;
+
+  if (key === 'ArrowDown') {
+    e.preventDefault();
+    highlightedIndex.value = (highlightedIndex.value + 1) % mentionResults.value.length;
+  } else if (key === 'ArrowUp') {
+    e.preventDefault();
+    highlightedIndex.value =
+      (highlightedIndex.value - 1 + mentionResults.value.length) % mentionResults.value.length;
+  } else if (key === 'Enter') {
+    if (highlightedIndex.value >= 0) {
+      e.preventDefault();
+      selectUser(mentionResults.value[highlightedIndex.value]);
+    }
+  }
+};
+
+const selectUser = (user: CompactUser) => {
+  if (!textareaRef.value) return;
+
+  const textarea = textareaRef.value;
+  const currentText = props.modelValue;
+  const cursorPos = textarea.selectionStart || 0;
+
+  const textBeforeCursor = currentText.slice(0, cursorPos);
+  const textAfterCursor = currentText.slice(cursorPos);
+
+  // Detect the current mention being edited (left and right parts around cursor)
+  const leftMatch = textBeforeCursor.match(/@(\w*)$/); // part before cursor after @
+  const rightMatch = textAfterCursor.match(/^(\w*)/); // part after cursor
+
+  let startIndex: number;
+  let endIndex: number;
+
+  if (leftMatch) {
+    // There is text after @ before the cursor → we are inside or at end of a mention
+    startIndex = textBeforeCursor.lastIndexOf('@');
+    const usernameSoFar = leftMatch[1] + (rightMatch?.[1] ?? '');
+    endIndex = startIndex + 1 + usernameSoFar.length; // +1 for the @
+  } else {
+    // Fallback — should not happen if dropdown is open
+    startIndex = cursorPos;
+    endIndex = cursorPos;
+  }
+
+  // Replace the entire current mention with the selected one + space
+  const newText =
+    currentText.slice(0, startIndex) + '@' + user.username + ' ' + currentText.slice(endIndex);
+
+  emit('update:modelValue', newText);
+
+  closeMentionDropdown();
+
+  // Place cursor after the inserted username and space
+  nextTick(() => {
+    textarea.focus();
+    const newCursorPos = startIndex + user.username.length + 2; // +1 for @, +1 for space
+    textarea.setSelectionRange(newCursorPos, newCursorPos);
+  });
+};
+
+const closeMentionDropdown = () => {
+  mentionResults.value = null;
+  mention.value = '';
+  highlightedIndex.value = -1;
+};
+
 const allowedTypes = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_VIDEO_TYPES];
 const handlePaste = (e: ClipboardEvent) => {
   const items = e.clipboardData?.items;
@@ -150,6 +284,20 @@ defineExpose({
   isOverLimit: () => isOverLimit.value,
   characterCount: () => characterCount.value,
 });
+
+const debouncedMentions = useDebounceFn(async (mention) => {
+  if (!mention.trim()) {
+    mentionResults.value = null;
+    return;
+  }
+  try {
+    const results = await searchService.getMentionSuggestions(mention);
+    mentionResults.value = results.data;
+  } catch (error) {
+    console.error('Mention search error:', error);
+    mentionResults.value = null;
+  }
+}, 300);
 </script>
 
 <template>
@@ -163,6 +311,9 @@ defineExpose({
         class="caret-foreground absolute inset-0 z-10 w-full resize-none border-none bg-transparent text-lg leading-7 text-transparent outline-none"
         rows="1"
         @input="handleInput"
+        @keydown="handleKeydown"
+        @focus="isFocused = true"
+        @blur="isFocused = false"
       />
 
       <!-- Visible content with styling -->
@@ -181,5 +332,42 @@ defineExpose({
       </div>
     </div>
     <slot name="reposted-tweet" />
+    <div
+      v-if="mentionResults && mentionResults.length > 0 && isFocused"
+      class="absolute start-15 z-50 mt-2 w-90"
+    >
+      <UiSearchList :max-height="'50vh'">
+        <div
+          v-for="(user, index) in mentionResults"
+          :key="user.username"
+          :class="[
+            'mention-items flex cursor-pointer items-center gap-3 p-3 transition-colors',
+            highlightedIndex === index ? 'bg-accent' : '',
+          ]"
+          @click="selectUser(user)"
+        >
+          <UiAvatar :img="user.avatarUrl" size="sm" />
+          <div class="flex-1 overflow-hidden">
+            <p class="text-foreground truncate text-sm font-bold">{{ user.displayName }}</p>
+            <p class="text-muted-foreground truncate text-sm">{{ $t('@') }}{{ user.username }}</p>
+            <p
+              v-if="user.relationship.follower || user.relationship.following"
+              class="text-muted-foreground truncate text-sm"
+            >
+              <Icon name="material-symbols:person" />
+              {{
+                user.relationship.follower && user.relationship.following
+                  ? $t('ui.you-follow-each-other')
+                  : user.relationship.follower
+                    ? $t('ui.follow-you')
+                    : user.relationship.following
+                      ? $t('ui.following')
+                      : ''
+              }}
+            </p>
+          </div>
+        </div>
+      </UiSearchList>
+    </div>
   </div>
 </template>
