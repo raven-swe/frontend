@@ -29,6 +29,20 @@ describe('FollowerFollowing Layout', () => {
       },
       global: {
         plugins: [i18n],
+        stubs: {
+          // Prevent rendering the full default layout tree
+          NuxtLayout: {
+            template: '<div><slot /></div>',
+          },
+          // Render a real button and forward component click
+          UiButton: {
+            emits: ['click'],
+            template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>',
+          },
+          UiTabs: true,
+          UiTab: true,
+          Icon: true,
+        },
       },
     });
 
@@ -54,6 +68,16 @@ describe('FollowerFollowing Layout', () => {
       },
       global: {
         plugins: [i18n],
+        stubs: {
+          NuxtLayout: { template: '<div><slot /></div>' },
+          UiButton: {
+            emits: ['click'],
+            template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>',
+          },
+          UiTabs: true,
+          UiTab: true,
+          Icon: true,
+        },
       },
     });
     const spy = vi.spyOn(wrapper.vm.$router, 'back').mockImplementation(() => {});

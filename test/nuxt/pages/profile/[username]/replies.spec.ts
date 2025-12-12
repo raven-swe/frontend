@@ -5,6 +5,24 @@ import type { User } from '#shared/types/user';
 import { computed } from 'vue';
 import type { Tweet } from '#shared/types/tweets';
 import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query';
+import { createI18n } from 'vue-i18n';
+import messages from '@@/i18n/locales/en.json';
+
+// Mock the profileTabsService.getProfile used by the profile layout
+const profileTabsServiceMock = vi.hoisted(() => ({
+  getProfile: vi.fn(),
+}));
+
+vi.mock('~/services/profile/profileTabsService', async (orig) => {
+  const actual = await orig();
+  return {
+    ...actual,
+    profileTabsService: {
+      ...actual.profileTabsService,
+      getProfile: profileTabsServiceMock.getProfile,
+    },
+  };
+});
 
 const mockUser: User = {
   joinedAt: '2020-07-15T12:34:56Z',
@@ -44,6 +62,7 @@ describe('replies page', () => {
     vi.resetAllMocks();
     queryClient = new QueryClient();
     queryClient.clear();
+    profileTabsServiceMock.getProfile.mockResolvedValue(mockUser);
   });
 
   it('renders empty state when no tweets are available', async () => {
@@ -51,6 +70,7 @@ describe('replies page', () => {
       data: [],
     }));
     const { default: ProfilePage } = await import('~/pages/profile/[username]/replies.vue');
+    const i18n = createI18n({ locale: 'en', messages: { en: messages } });
     const wrapper = await mountSuspended(ProfilePage, {
       route: {
         params: { username: mockUser.username },
@@ -61,8 +81,13 @@ describe('replies page', () => {
         },
         stubs: {
           TweetDefaultCard: true,
+          NuxtLayout: { template: '<div><slot /></div>' },
+          Tabs: true,
+          Tab: true,
+          UiSpinner: true,
+          ClientOnly: { template: '<slot />' },
         },
-        plugins: [[VueQueryPlugin, { queryClient }]],
+        plugins: [[VueQueryPlugin, { queryClient }], i18n],
       },
     });
 
@@ -121,6 +146,7 @@ describe('replies page', () => {
 
     const { default: ProfilePage } = await import('~/pages/profile/[username]/replies.vue');
 
+    const i18n = createI18n({ locale: 'en', messages: { en: messages } });
     const wrapper = await mountSuspended(ProfilePage, {
       route: {
         params: { username: mockUser.username },
@@ -129,8 +155,15 @@ describe('replies page', () => {
         provide: {
           'user-data': computed(() => mockUser),
         },
-        stubs: { TweetDefaultCard: true },
-        plugins: [[VueQueryPlugin, { queryClient }]],
+        stubs: {
+          TweetDefaultCard: true,
+          NuxtLayout: { template: '<div><slot /></div>' },
+          Tabs: true,
+          Tab: true,
+          UiSpinner: true,
+          ClientOnly: { template: '<slot />' },
+        },
+        plugins: [[VueQueryPlugin, { queryClient }], i18n],
       },
     });
 
