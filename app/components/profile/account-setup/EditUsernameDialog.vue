@@ -52,7 +52,16 @@ const usernameSchema = usernameSchemaBase.test(
   },
 );
 
-const { values, defineField, handleSubmit, isSubmitting, isFieldValid, setFieldValue } = useForm({
+const {
+  values,
+  defineField,
+  handleSubmit,
+  isSubmitting,
+  isFieldValid,
+  setFieldValue,
+  meta,
+  resetForm,
+} = useForm({
   validationSchema: yup.object({
     username: usernameSchema.required(),
   }),
@@ -98,6 +107,21 @@ const actionButton = computed(() => {
     variant: (isUsernameSet ? 'primary' : 'outline') as ButtonVariants['variant'],
   };
 });
+
+watch(
+  () => userStore.user?.username,
+  (username) => {
+    if (!username) return;
+
+    // Avoid overwriting if the user already typed
+    if (meta.value.dirty) return;
+
+    resetForm({
+      values: { username },
+    });
+  },
+  { immediate: true },
+);
 </script>
 
 <template>

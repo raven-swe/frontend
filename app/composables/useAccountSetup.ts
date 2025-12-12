@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/vue-query';
 import { updateProfileService } from '~/services/profile/updateProfileService';
 import { settingsService } from '~/services/settingsService';
 
@@ -44,9 +45,11 @@ export default function useAccountSetup() {
     }
   }
 
+  const queryClient = useQueryClient();
   async function handleUsernameSubmit(username: string) {
     try {
       await settingsService.updateUsername(username);
+      queryClient.invalidateQueries({ queryKey: ['layout-data'] });
       goToNextStep();
     } catch (error) {
       if (isApiValidationError(error)) {

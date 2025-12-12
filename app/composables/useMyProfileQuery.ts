@@ -8,14 +8,12 @@ export default function useMyProfileQuery() {
     queryKey: ['layout-data'],
     queryFn: async () => {
       const response = await meService.fetchProfile();
-
       if (response.success) userStore.setUser(response.data);
-
       return response;
     },
     refetchOnMount: false,
     refetchOnWindowFocus: false,
-    staleTime: 1000 * 60 * 10,
+    staleTime: 1000 * 60 * 10, // 10 minutes
   });
 
   onServerPrefetch(async () => {
