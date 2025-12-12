@@ -25,6 +25,16 @@ const conversation = computed<DmConversation | null>(() => {
   return conversations.value?.find((c) => c.id === conversationId.value) || null;
 });
 
+watch(
+  () => conversation.value?.isBlocking,
+  (isBlocking) => {
+    if (isBlocking) {
+      router.replace('/messages');
+    }
+  },
+  { immediate: true },
+);
+
 const {
   messages: initialMessages,
   loading: messagesLoading,
