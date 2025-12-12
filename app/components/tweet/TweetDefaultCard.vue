@@ -151,10 +151,10 @@ const { mutate: blockUser } = useBlockMutation();
             class="absolute end-0 top-1/2 flex translate-x-2.5 -translate-y-1/2 flex-row items-center"
           >
             <UiButton
+              v-if="!(!tweet.content || tweet.content.trim().length === 0)"
               variant="ghost-default"
               size="icon-sm"
               class="text-muted-foreground"
-              :disabled="!tweet.content || tweet.content.trim().length === 0"
               @click.stop="handleAiSummary"
             >
               <Icon name="vscode-icons:file-type-gemini" size="1.2rem" />
