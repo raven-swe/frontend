@@ -38,7 +38,7 @@ const { orientation, canScrollNext, scrollNext } = useCarousel();
     @click="scrollNext"
   >
     <slot>
-      <Icon :name="$t('ui.carousel.next.icon')" class="size-5" size="1.25rem" />
+      <Icon :name="$t('ui.carousel.next.icon')" class="size-5" size="1.55rem" />
       <span class="sr-only">{{ $t('ui.carousel.next.label') }}</span>
     </slot>
   </UiButton>

@@ -38,7 +38,7 @@ const { orientation, canScrollPrev, scrollPrev } = useCarousel();
     @click="scrollPrev"
   >
     <slot>
-      <Icon :name="$t('ui.carousel.previous.icon')" class="size-5" size="1.25rem" />
+      <Icon :name="$t('ui.carousel.previous.icon')" class="size-5" size="1.55rem" />
       <span class="sr-only">{{ $t('ui.carousel.previous.label') }}</span>
     </slot>
   </UiButton>
