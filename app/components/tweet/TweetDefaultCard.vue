@@ -154,6 +154,7 @@ const { mutate: blockUser } = useBlockMutation();
               variant="ghost-default"
               size="icon-sm"
               class="text-muted-foreground"
+              :disabled="!tweet.content || tweet.content.trim().length === 0"
               @click.stop="handleAiSummary"
             >
               <Icon name="vscode-icons:file-type-gemini" size="1.2rem" />

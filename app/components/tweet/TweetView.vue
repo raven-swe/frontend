@@ -137,6 +137,7 @@ function handleAiSummary() {
                 variant="ghost-default"
                 size="icon-sm"
                 class="text-muted-foreground"
+                :disabled="!tweetClone.content || tweetClone.content.trim().length === 0"
                 @click.stop="handleAiSummary"
               >
                 <Icon name="vscode-icons:file-type-gemini" size="1.2rem" />
