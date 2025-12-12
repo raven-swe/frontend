@@ -118,12 +118,13 @@ const actionButton = computed(() => {
           {{ $t('profile.account-setup.username.description') }}
         </UiDialogDescription>
       </UiDialogHeader>
-      <form class="flex flex-1 flex-col" @submit.prevent="onSubmit">
+      <form class="flex flex-1 flex-col" data-cy="edit-username-form" @submit.prevent="onSubmit">
         <FieldInput
           :placeholder="$t('profile.account-setup.username.username-label')"
           class="mx-auto w-full max-w-100"
           v-bind="usernameAttrs"
           name="username"
+          data-cy="username-input"
         />
         <div class="py-8">
           <div class="mx-auto w-full max-w-100">
@@ -131,13 +132,19 @@ const actionButton = computed(() => {
             <div v-if="isLoading">
               <UiSpinner class="text-primary" />
             </div>
-            <div v-if="suggestions" data-test="suggestions-container" class="flex flex-col gap-2">
+            <div
+              v-if="suggestions"
+              data-test="suggestions-container"
+              class="flex flex-col gap-2"
+              data-cy="username-suggestions-list"
+            >
               <button
                 v-for="(suggestion, index) in suggestions"
                 :key="suggestion"
                 type="button"
                 class="text-primary cursor-pointer text-start hover:underline"
                 :data-test="`suggestion-button-${index}`"
+                data-cy="username-suggestion-button"
                 @click="setFieldValue('username', suggestion)"
               >
                 {{ suggestion }}
@@ -151,6 +158,7 @@ const actionButton = computed(() => {
             class="w-full max-w-100"
             size="xl"
             data-test="submit-button"
+            data-cy="username-next-button"
             :disabled="
               (isSubmitting || !isFieldValid('username')) && values.username.trim().length > 0
             "

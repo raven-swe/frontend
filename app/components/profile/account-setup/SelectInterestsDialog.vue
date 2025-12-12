@@ -86,8 +86,15 @@ const translatedInterest = (interest: Interest) => {
           {{ $t('profile.account-setup.interests.description') }}
         </UiDialogDescription>
       </UiDialogHeader>
-      <form class="flex h-full flex-1 flex-col overflow-y-hidden px-0" @submit.prevent="onSubmit">
-        <div class="grid grid-cols-2 justify-center gap-4 overflow-y-auto px-4 py-2 sm:grid-cols-3">
+      <form
+        class="flex h-full flex-1 flex-col overflow-y-hidden px-0"
+        data-cy="select-interests-form"
+        @submit.prevent="onSubmit"
+      >
+        <div
+          class="grid grid-cols-2 justify-center gap-4 overflow-y-auto px-4 py-2 sm:grid-cols-3"
+          data-cy="interests-list"
+        >
           <InterestItem
             v-for="interest in interestsData?.data.interests || []"
             :key="interest.code"
@@ -99,14 +106,22 @@ const translatedInterest = (interest: Interest) => {
         <UiDialogFooter
           class="mt-auto flex flex-row items-center justify-between border-t-1 px-8 pt-4"
         >
-          <p v-if="fields.length <= 0" class="text-muted-foreground shrink-0 text-sm">
+          <p
+            v-if="fields.length <= 0"
+            class="text-muted-foreground shrink-0 text-sm"
+            data-cy="no-interests-selected"
+          >
             {{
               $t('profile.account-setup.interests.selected-count', {
                 count: fields.length,
               })
             }}
           </p>
-          <p v-else class="text-foreground shrink-0 text-sm font-medium">
+          <p
+            v-else
+            class="text-foreground shrink-0 text-sm font-medium"
+            data-cy="interests-selected"
+          >
             {{
               $t('profile.account-setup.interests.selected-done', {
                 count: fields.length,
@@ -119,6 +134,7 @@ const translatedInterest = (interest: Interest) => {
             size="xl"
             :disabled="fields.length === 0 || !isFieldValid('interests')"
             type="submit"
+            data-cy="onboarding-next-button"
           >
             {{ $t('ui.next') }}
           </UiButton>
