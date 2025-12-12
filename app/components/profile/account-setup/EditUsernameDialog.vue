@@ -31,7 +31,7 @@ const usernameSchema = usernameSchemaBase.test(
   async (username, ctx) => {
     if (!username) return false;
 
-    const current = userStore.user.username?.toLowerCase();
+    const current = userStore.user?.username?.toLowerCase();
     const normalized = username.toLowerCase();
     if (normalized === current) return true;
 
@@ -57,7 +57,7 @@ const { values, defineField, handleSubmit, isSubmitting, isFieldValid, setFieldV
     username: usernameSchema.required(),
   }),
   initialValues: {
-    username: userStore.user.username?.toString() || '',
+    username: userStore.user?.username?.toString() || '',
   },
 });
 
