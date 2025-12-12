@@ -42,6 +42,7 @@ const {
   fetchNextPage,
   hasNextPage,
   isFetchingNextPage,
+  refresh: refreshMessages,
 } = useDmMessages(() => conversationId.value);
 
 const ws = useDmSocketIO();
@@ -110,6 +111,11 @@ onMounted(() => {
   });
 });
 
+const handleMessageDeleted = (messageId: string) => {
+  liveMessages.value = liveMessages.value.filter((m) => m.id !== messageId);
+  refreshMessages();
+};
+
 watch(messagesError, (val) => val && showToaster('error', 'Failed to load messages'));
 watch(conversationsError, (val) => val && showToaster('error', 'Failed to load conversation'));
 watch(
@@ -151,6 +157,7 @@ watch(
         :on-load-more="fetchNextPage"
         :last-seen-message-id="lastSeenMessageId"
         :conversation="conversation || null"
+        @message-deleted="handleMessageDeleted"
       />
     </div>
     <DmConversationDmMessageInput />

@@ -1,16 +1,34 @@
 <script lang="ts" setup>
 import type { DmMessage } from '#shared/types/dm';
 import { renderSegments } from '../../../utils/dm';
+import DmMessageDropDown from './DmMessageDropDown.vue';
 
 const props = defineProps<{
   message: DmMessage;
   isSeen?: boolean;
+  conversationId: string;
+}>();
+
+const emit = defineEmits<{
+  (e: 'deleted', messageId: string): void;
 }>();
 
 const textColor = props.message.isMine ? 'text-white' : 'text-foreground';
+
+const handleDeleted = () => {
+  emit('deleted', props.message.id);
+};
 </script>
 <template>
-  <div class="py-1" :class="message.isMine ? 'flex justify-end' : 'flex justify-start'">
+  <div class="group py-1" :class="message.isMine ? 'flex justify-end' : 'flex justify-start'">
+    <div v-if="message.isMine">
+      <DmMessageDropDown
+        :conversation-id="conversationId"
+        :message-id="message.id"
+        @deleted="handleDeleted"
+      />
+    </div>
+
     <div
       class="flex max-w-[68%] flex-col gap-1"
       :class="message.isMine ? 'items-end' : 'items-start'"

@@ -628,7 +628,8 @@
     },
     "message-input": {
       "uploading": "Uploading image..."
-    }
+    },
+    "delete": "Delete"
   },
   "toaster": {
     "login": {

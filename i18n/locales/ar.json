@@ -598,7 +598,8 @@
     },
     "message-input": {
       "uploading": "جارٍ رفع الصورة..."
-    }
+    },
+    "delete": "حذف"
   },
   "toaster": {
     "login": {

@@ -14,6 +14,10 @@ const props = defineProps<{
   conversation?: DmConversation | null;
 }>();
 
+defineEmits<{
+  (e: 'message-deleted', messageId: string): void;
+}>();
+
 const parentRef = ref<HTMLElement | null>(null);
 const scrollToBottom = () => {
   if (rowVirtualizer.value && props.messages.length > 0) {
@@ -162,6 +166,8 @@ defineExpose({ parentRef, scrollToBottom });
           <DmMessageItem
             :message="messages[virtualRow.index]!"
             :is-seen="messages[virtualRow.index]!.id === props.lastSeenMessageId"
+            :conversation-id="conversation?.id || ''"
+            @deleted="(messageId) => $emit('message-deleted', messageId)"
           />
         </template>
       </div>
