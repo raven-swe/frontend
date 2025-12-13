@@ -204,6 +204,7 @@ function selectGif(gif: GifResult) {
     tenorId: gif.id,
     url: gif.media_formats.gif.url,
   });
+  emit('close');
 }
 </script>
 

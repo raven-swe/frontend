@@ -55,12 +55,15 @@ export const useTweetComposer = (
           const item = media.value[i];
 
           if (item?.type === 'image') {
+            if (!item.file) continue;
             const mediaId = await uploadImage(item.file, 'tweets');
             mediaIds.push(mediaId);
           } else if (item?.type === 'video') {
+            if (!item.file) continue;
             const mediaId = await uploadVideo(item.file, 'tweets');
             mediaIds.push(mediaId);
           }
+          // upload gif
 
           uploadProgress.value = Math.round(((i + 1) / media.value.length) * 100);
         }
@@ -103,11 +106,26 @@ export const useTweetComposer = (
     });
   };
 
+  const handleAddGif = (payload: { tenorId: string; url: string }) => {
+    if (media.value.length >= MAX_MEDIA) return;
+
+    const id = `gif-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+    media.value.push({
+      id,
+      url: payload.url,
+      type: 'gif',
+      tenorId: payload.tenorId,
+    });
+  };
+
   const handleRemoveMedia = (id: string) => {
     const index = media.value.findIndex((m) => m.id === id);
 
     if (index !== -1 && index < media.value.length && media.value[index]) {
-      URL.revokeObjectURL(media.value[index].url);
+      if (media.value[index].file) {
+        URL.revokeObjectURL(media.value[index].url);
+      }
       media.value.splice(index, 1);
     }
   };
@@ -126,6 +144,7 @@ export const useTweetComposer = (
     // actions
     handlePost,
     handleAddMedia,
+    handleAddGif,
     handleRemoveMedia,
   };
 };

@@ -25,7 +25,7 @@ interface Emits {
   (e: 'post'): void;
   (e: 'add-media', files: File[]): void;
   (e: 'insert-emoji', emoji: string): void;
-  (e: 'add-gif', payload: { tenorId: string; url: string }): void;
+  (e: 'insert-gif', payload: { tenorId: string; url: string }): void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -70,7 +70,7 @@ const handleGifClick = () => {
 
 const handleGifSelect = (payload: { tenorId: string; url: string }) => {
   isGifPickerOpen.value = false;
-  emit('add-gif', payload);
+  emit('insert-gif', payload);
 };
 
 const handleGifPickerClose = () => {
@@ -148,6 +148,7 @@ const handleEmojiSelect = (emoji: EmojiSelectEvent) => {
         :title="$t('tweet.composer.gif')"
         class="text-brand-blue"
         size="icon-md"
+        :disabled="!canAddMedia"
         @click="handleGifClick"
       >
         <Icon name="heroicons:gif-solid" size="20" />

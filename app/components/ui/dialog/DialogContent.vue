@@ -41,7 +41,7 @@ const contentPadding = computed(() => props.contentPadding ?? 'px-6 pb-6');
       @escape-key-down="(e) => e.preventDefault()"
       @interact-outside="(e) => e.preventDefault()"
     >
-      <div class="relative flex h-auto flex-shrink-0 flex-row items-center justify-start gap-2 p-2">
+      <div class="relative flex h-auto shrink-0 flex-row items-center justify-start gap-2 p-2">
         <DialogClose v-if="!hideCloseButton" data-slot="dialog-close" as-child>
           <Button variant="ghost-default" size="icon-xs" class="absolute inset-2">
             <Icon name="lucide:x" class="size-5" />

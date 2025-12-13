@@ -38,6 +38,7 @@ const {
   handlePost,
   handleAddMedia,
   handleRemoveMedia,
+  handleAddGif,
 } = useTweetComposer(tweetContent, media, replyToRef, quoteToRef);
 
 const emit = defineEmits<{
@@ -111,6 +112,7 @@ const handleInsertEmoji = (emoji: string) => {
         @post="handlePostWrapper"
         @add-media="handleAddMedia"
         @insert-emoji="handleInsertEmoji"
+        @insert-gif="handleAddGif"
       />
     </div>
   </div>
