@@ -1,5 +1,6 @@
-import { useInfiniteQuery, useQueryClient } from '@tanstack/vue-query';
+import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { tweetKeys } from '~/constants/query-keys';
+import { exploreService } from '~/services/explore/exploreService';
 import { homeService } from '~/services/home/homeService';
 import { profileTabsService } from '~/services/profile/profileTabsService';
 import { searchService } from '~/services/search/searchService';
@@ -153,6 +154,32 @@ export function useTweetSearch(
     },
     getNextPageParam: (lastPage) =>
       lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined,
+    structuralSharing: false,
+  });
+}
+
+export function useCategorizedTweet() {
+  const queryClient = useQueryClient();
+  return useQuery({
+    queryKey: tweetKeys.exploreCategorized(),
+    queryFn: async () => {
+      const res = await exploreService.getCategorizedTweets();
+
+      // Update the tweet cache
+      const tweets = res.data.categories.flatMap((category) => category.tweets);
+
+      updateCacheWithTweets(tweets, queryClient);
+      const result = res.data.categories.map((category) => ({
+        category: category.category,
+        tweets: mapTweetsToIds(category.tweets),
+      }));
+      return {
+        ...res,
+        data: {
+          categories: result,
+        },
+      };
+    },
     structuralSharing: false,
   });
 }

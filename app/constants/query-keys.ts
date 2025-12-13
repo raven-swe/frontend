@@ -8,6 +8,7 @@ export const tweetKeys = {
   reposter: (tweetId: string) => ['tweet', 'reposter', tweetId] as const, // tweet reposter
 
   timeline: (tab: string) => [...tweetKeys.all, 'timeline', tab] as const, // ['tweets','timeline',tab]
+  exploreCategorized: () => [...tweetKeys.all, 'explore', 'categorized'] as const, // ['tweets','explore','for-you']
 
   search: (query: string, tab: string, filter: string, excludeMuteBlock: string) =>
     [...tweetKeys.all, 'search', query, tab, filter, excludeMuteBlock] as const, // ['tweets','search',query,tab,filter,people]
