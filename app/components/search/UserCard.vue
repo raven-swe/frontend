@@ -21,7 +21,7 @@ const props = defineProps<{
           props.user.relationship.follower && props.user.relationship.following
             ? $t('ui.you-follow-each-other')
             : props.user.relationship.follower
-              ? $t('ui.follow-you')
+              ? $t('ui.follows-you')
               : props.user.relationship.following
                 ? $t('ui.following')
                 : ''
