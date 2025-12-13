@@ -60,6 +60,8 @@ const mockSocketMarkSeen = vi.fn();
 const mockSocketOnMessage = vi.fn();
 const mockSocketOnError = vi.fn();
 const mockSocketOnSeenUpdate = vi.fn();
+const mockSocketOnReactionReceived = vi.fn();
+const mockSocketSendReaction = vi.fn();
 const mockSocketIsConnected = ref(true);
 
 vi.mock('@/composables/useDmSocketIO', () => ({
@@ -69,6 +71,8 @@ vi.mock('@/composables/useDmSocketIO', () => ({
     onMessage: mockSocketOnMessage,
     onError: mockSocketOnError,
     onSeenUpdate: mockSocketOnSeenUpdate,
+    onReactionReceived: mockSocketOnReactionReceived,
+    sendReaction: mockSocketSendReaction,
     isConnected: mockSocketIsConnected,
   }),
 }));

@@ -16,14 +16,17 @@ const props = defineProps<{
 
 defineEmits<{
   (e: 'message-deleted', messageId: string): void;
+  (e: 'reaction', messageId: string, reaction: string): void;
 }>();
 
 const parentRef = ref<HTMLElement | null>(null);
 const scrollToBottom = () => {
-  if (rowVirtualizer.value && props.messages.length > 0) {
-    rowVirtualizer.value.scrollToIndex(props.messages.length - 1, {
-      align: 'end',
-      behavior: 'auto',
+  if (parentRef.value) {
+    // Use native scroll for more reliable behavior
+    nextTick(() => {
+      if (parentRef.value) {
+        parentRef.value.scrollTop = parentRef.value.scrollHeight;
+      }
     });
   }
 };
@@ -168,6 +171,7 @@ defineExpose({ parentRef, scrollToBottom });
             :is-seen="messages[virtualRow.index]!.id === props.lastSeenMessageId"
             :conversation-id="conversation?.id || ''"
             @deleted="(messageId) => $emit('message-deleted', messageId)"
+            @reaction="(messageId, reaction) => $emit('reaction', messageId, reaction)"
           />
         </template>
       </div>

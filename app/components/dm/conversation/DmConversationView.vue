@@ -5,7 +5,7 @@ import { useDmMessages } from '@/composables/useDmMessages';
 
 import { showToaster } from '@/utils/showToaster';
 import Spinner from '~/components/ui/Spinner.vue';
-import type { DmMessage } from '~~/shared/types/dm';
+import type { DmMessage, DmReactionUser } from '~~/shared/types/dm';
 
 const route = useRoute();
 const router = useRouter();
@@ -50,13 +50,24 @@ provide('dmSocket', ws);
 const liveMessages = ref<DmMessage[]>([]);
 
 const lastSeenMessageId = ref<string | null>(null);
+const messagesListRef = ref<InstanceType<typeof DmMessagesList> | null>(null);
+
+// Provide scroll function to DmMessageInput
+const scrollToBottom = () => {
+  nextTick(() => {
+    messagesListRef.value?.scrollToBottom();
+    setTimeout(() => {
+      messagesListRef.value?.scrollToBottom();
+    }, 100);
+  });
+};
+provide('scrollToBottom', scrollToBottom);
 
 const messages = computed(() => {
   const initial = initialMessages.value || [];
-  // Add live messages at the END (bottom) so they appear as newest
-  const combined = [...initial, ...liveMessages.value];
-
-  return combined;
+  const initialIds = new Set(initial.map((m) => m.id));
+  const uniqueLiveMessages = liveMessages.value.filter((m) => !initialIds.has(m.id));
+  return [...initial, ...uniqueLiveMessages];
 });
 
 watch(
@@ -83,7 +94,7 @@ watch(
   ([msgs, connected, convId]) => {
     if (connected && convId && msgs.length > 0) {
       const lastMessage = msgs[msgs.length - 1];
-      if (lastMessage?.id && !lastMessage.isMine) {
+      if (lastMessage?.id) {
         ws.markSeen(convId, lastMessage.id);
       }
     }
@@ -106,6 +117,12 @@ onMounted(() => {
     }
   });
 
+  ws.onReactionReceived((data) => {
+    if (data.conversationId === conversationId.value) {
+      updateMessageReaction(data.messageId, data.reactions);
+    }
+  });
+
   ws.onError((error) => {
     showToaster('error', `Socket error: ${error}`);
   });
@@ -113,6 +130,31 @@ onMounted(() => {
 
 const handleMessageDeleted = (messageId: string) => {
   liveMessages.value = liveMessages.value.filter((m) => m.id !== messageId);
+  refreshMessages();
+};
+
+const handleReaction = (messageId: string, reaction: string) => {
+  if (!conversationId.value) return;
+  ws.sendReaction(conversationId.value, messageId, reaction);
+};
+
+// Update message reactions in cache when reaction received
+const updateMessageReaction = (
+  messageId: string,
+  reactions: { sender: DmReactionUser; receiver: DmReactionUser },
+) => {
+  // Update in live messages
+  const liveIdx = liveMessages.value.findIndex((m) => m.id === messageId);
+  if (liveIdx !== -1) {
+    const existingMessage = liveMessages.value[liveIdx];
+    if (existingMessage) {
+      liveMessages.value[liveIdx] = {
+        ...existingMessage,
+        reactions: reactions as DmMessage['reactions'],
+      };
+    }
+  }
+  // Refresh to update initial messages from server
   refreshMessages();
 };
 
@@ -150,6 +192,7 @@ watch(
       </div>
       <DmMessagesList
         v-else
+        ref="messagesListRef"
         class="flex-1 px-4 pb-4"
         :messages="messages || []"
         :has-next-page="hasNextPage || false"
@@ -158,6 +201,7 @@ watch(
         :last-seen-message-id="lastSeenMessageId"
         :conversation="conversation || null"
         @message-deleted="handleMessageDeleted"
+        @reaction="handleReaction"
       />
     </div>
     <DmConversationDmTypingIndicator :conversation-id="conversationId" />

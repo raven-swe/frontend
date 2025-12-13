@@ -21,8 +21,12 @@ vi.mock('@tanstack/vue-query', () => ({
 
 describe('useDmConversations', () => {
   const mockSetQueryData = vi.fn();
+  const mockGetQueryData = vi.fn();
+  const mockInvalidateQueries = vi.fn();
   const mockQueryClient = {
     setQueryData: mockSetQueryData,
+    getQueryData: mockGetQueryData,
+    invalidateQueries: mockInvalidateQueries,
   };
 
   beforeEach(() => {
@@ -40,7 +44,7 @@ describe('useDmConversations', () => {
   });
 
   describe('updateConversationLastMessage', () => {
-    it('updates the conversation last message in cache', () => {
+    it('updates the conversation last message in cache when conversation exists', () => {
       const conversationId = 'conv-1';
       const lastMessage = {
         content: 'New message',
@@ -49,26 +53,24 @@ describe('useDmConversations', () => {
         seen: false,
       };
 
-      // Mock setQueryData implementation to execute the updater
-      mockSetQueryData.mockImplementation((key, updater) => {
-        const oldData = {
-          pages: [
-            {
-              success: true,
-              data: [
-                { id: 'conv-1', lastMessage: null },
-                { id: 'conv-2', lastMessage: null },
-              ],
-            },
-          ],
-          pageParams: [],
-        };
-        // updater might expect oldData to be defining the recursive structure, but here we just pass our mock data
-        return updater(oldData);
-      });
+      // Mock getQueryData to return existing cache with the conversation
+      const existingCache = {
+        pages: [
+          {
+            success: true,
+            data: [
+              { id: 'conv-1', lastMessage: null },
+              { id: 'conv-2', lastMessage: null },
+            ],
+          },
+        ],
+        pageParams: [],
+      };
+      mockGetQueryData.mockReturnValue(existingCache);
 
       updateConversationLastMessage(mockQueryClient as any, conversationId, lastMessage);
 
+      expect(mockGetQueryData).toHaveBeenCalledWith(['dm-conversations']);
       expect(mockSetQueryData).toHaveBeenCalledWith(['dm-conversations'], expect.any(Function));
 
       // Verify implementation correctness
@@ -94,12 +96,43 @@ describe('useDmConversations', () => {
       expect(otherConv.lastMessage).toBeNull();
     });
 
-    it('handles missing oldData', () => {
-      mockSetQueryData.mockImplementation((key, updater) => updater(undefined));
-      updateConversationLastMessage(mockQueryClient as any, 'conv-1', {} as any);
+    it('invalidates query when conversation does not exist in cache', () => {
+      // Mock getQueryData to return cache without the conversation
+      const existingCache = {
+        pages: [
+          {
+            success: true,
+            data: [{ id: 'conv-2', lastMessage: null }],
+          },
+        ],
+        pageParams: [],
+      };
+      mockGetQueryData.mockReturnValue(existingCache);
 
-      const updater = mockSetQueryData.mock?.calls?.[0]?.[1];
-      expect(updater(undefined)).toBeUndefined();
+      updateConversationLastMessage(mockQueryClient as any, 'conv-1', {
+        content: 'New message',
+        senderUsername: 'user1',
+        sentAt: '2024-01-01T10:00:00Z',
+        seen: false,
+      });
+
+      expect(mockGetQueryData).toHaveBeenCalledWith(['dm-conversations']);
+      expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['dm-conversations'] });
+      expect(mockSetQueryData).not.toHaveBeenCalled();
+    });
+
+    it('invalidates query when cache is empty', () => {
+      mockGetQueryData.mockReturnValue(undefined);
+
+      updateConversationLastMessage(mockQueryClient as any, 'conv-1', {
+        content: 'New message',
+        senderUsername: 'user1',
+        sentAt: '2024-01-01T10:00:00Z',
+        seen: false,
+      });
+
+      expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['dm-conversations'] });
+      expect(mockSetQueryData).not.toHaveBeenCalled();
     });
   });
 

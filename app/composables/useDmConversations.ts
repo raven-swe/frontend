@@ -38,6 +38,17 @@ export function updateConversationLastMessage(
     seen: boolean;
   },
 ) {
+  const cache = queryClient.getQueryData<ConversationsCache>(['dm-conversations']);
+
+  const conversationExists = cache?.pages.some((page) =>
+    page.data.some((conv) => conv.id === conversationId),
+  );
+
+  if (!conversationExists) {
+    queryClient.invalidateQueries({ queryKey: ['dm-conversations'] });
+    return;
+  }
+
   updateConversationInCache(queryClient, conversationId, (conv) => ({
     ...conv,
     lastMessage,

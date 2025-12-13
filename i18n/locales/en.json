@@ -630,7 +630,11 @@
       "uploading": "Uploading image..."
     },
     "delete": "Delete",
-    "typing": "{username} is typing..."
+    "typing": "{username} is typing...",
+    "reaction": {
+      "add": "Add reaction",
+      "remove": "Remove reaction"
+    }
   },
   "toaster": {
     "login": {

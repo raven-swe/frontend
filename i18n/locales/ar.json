@@ -600,7 +600,11 @@
       "uploading": "جارٍ رفع الصورة..."
     },
     "delete": "حذف",
-    "typing": "{username} يكتب..."
+    "typing": "{username} يكتب...",
+    "reaction": {
+      "add": "إضافة تفاعل",
+      "remove": "إزالة التفاعل"
+    }
   },
   "toaster": {
     "login": {

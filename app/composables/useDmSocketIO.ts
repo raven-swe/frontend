@@ -155,6 +155,7 @@ export function useDmSocketIO() {
   function markSeen(conversationId: string, lastSeenMessageId: string) {
     socket.value?.emit('mark_seen', { conversationId, lastSeenMessageId });
     // Update the cache to mark conversation as seen
+    // console.log('Marking conversation as seen in cache for conversationId:', conversationId);
     markConversationSeenInCache(queryClient, conversationId);
   }
 

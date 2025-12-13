@@ -37,6 +37,22 @@ export interface DmMessageSender {
   avatarUrl: string;
 }
 
+export interface DmMessageReactions {
+  sender: {
+    username: string;
+    displayName: string;
+    avatarUrl: string;
+    reaction: string;
+    reactedAt: string;
+  };
+  receiver: {
+    username: string;
+    displayName: string;
+    avatarUrl: string;
+    reaction: string;
+    reactedAt: string;
+  };
+}
 export interface DmMessage {
   id: string;
   content: string;
@@ -48,6 +64,7 @@ export interface DmMessage {
   altText?: string | null;
   createdAt: string;
   isMine: boolean;
+  reactions?: DmMessageReactions | null;
 }
 
 // WebSocket Types

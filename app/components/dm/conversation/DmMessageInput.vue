@@ -20,6 +20,7 @@ const route = useRoute();
 const conversationId = computed(() => route.params.conversationId as string);
 
 const ws = inject<ReturnType<typeof useDmSocketIO>>('dmSocket');
+const scrollToBottom = inject<() => void>('scrollToBottom');
 const { uploadImage } = uploadMediaService();
 
 const canSend = computed(
@@ -71,6 +72,9 @@ async function handleSend() {
     }
     imageMeta.value = null;
     if (fileInputRef.value) fileInputRef.value.value = '';
+
+    // Scroll to bottom after sending
+    scrollToBottom?.();
   } catch {
     showToaster('error', 'Failed to send message');
   } finally {
