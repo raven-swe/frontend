@@ -98,6 +98,13 @@ const onSkip = async () => {
   goToNextStep();
 };
 
+const handleNextClick = (event: Event) => {
+  if (values.username.trim().length === 0) {
+    event.preventDefault();
+    onSkip();
+  }
+};
+
 const [_, usernameAttrs] = defineField('username');
 
 const actionButton = computed(() => {
@@ -186,7 +193,7 @@ watch(
             :disabled="
               (isSubmitting || !isFieldValid('username')) && values.username.trim().length > 0
             "
-            @click="() => (values.username.trim().length > 0 ? onSubmit() : onSkip())"
+            @click="handleNextClick"
           >
             {{ actionButton.text }}
           </UiButton>

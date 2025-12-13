@@ -88,29 +88,28 @@ describe('Onboarding Flow', { testIsolation: false }, function () {
         });
     });
 
-    it('should proceed to home after setting username', function () {
+    it('should proceed to interests form after setting username', function () {
       cy.get('button[data-cy="username-next-button"]').contains('Next').click();
       cy.get('form[data-cy="select-interests-form"]', { timeout: 10000 }).should('exist');
-      cy.get('div[data-cy="follow-suggestion-list"]').should('exist');
     });
   });
 
   describe('Select interests Form', function () {
     it('should display interests selection form', function () {
       cy.get('form[data-cy="select-interests-form"]').should('be.visible');
-      cy.get('button[data-cy="interest-button"]', { timeout: 10000 }).should('have.length.gte', 1);
+      cy.get('button[data-cy="interest-item"]', { timeout: 10000 }).should('have.length.gte', 1);
     });
     it('should show no interests selected at first', function () {
       cy.get('p[data-cy="no-interests-selected"]').should('be.visible');
     });
     it('should allow selecting interests and enable next button', function () {
-      cy.get('button[data-cy="interest-button"]').first().click();
+      cy.get('button[data-cy="interest-item"]').first().click();
       cy.get('p[data-cy="no-interests-selected"]').should('not.exist');
       cy.get('p[data-cy="interests-selected"]').should('be.visible');
-      cy.get('button[data-cy="interests-next-button"]').contains('Next').should('not.be.disabled');
+      cy.get('button[data-cy="onboarding-next-button"]').contains('Next').should('not.be.disabled');
     });
     it('should complete onboarding and redirect to home', function () {
-      cy.get('button[data-cy="interests-next-button"]').contains('Next').click();
+      cy.get('button[data-cy="onboarding-next-button"]').contains('Next').click();
       cy.get('div[data-cy="follow-suggestion-list"]').should('exist');
     });
   });
