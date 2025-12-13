@@ -144,6 +144,7 @@ function handleAiSummary() {
             </UiButton>
             <TweetDropdown :tweet="props.tweet" :username="originalUsername">
               <UiButton
+                v-if="!(!tweetClone.content || tweetClone.content.trim().length === 0)"
                 variant="ghost-default"
                 size="icon-xs"
                 class="text-muted-foreground"

@@ -3,15 +3,13 @@ import { mountSuspended } from '@nuxt/test-utils/runtime';
 import FollowerFollowingLayout from '~/layouts/follower-following.vue';
 import { createI18n } from 'vue-i18n';
 import messages from '@@/i18n/locales/en.json';
+import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query';
 
 const i18n = createI18n({ locale: 'en', messages: { en: messages } });
 
 // Mock the profileTabsService
 const profileTabsServiceMock = vi.hoisted(() => ({
-  getProfile: vi.fn().mockResolvedValue({
-    username: 'testuser',
-    displayName: 'Test User',
-  }),
+  getProfile: vi.fn(),
 }));
 
 vi.mock('~/services/profile/profileTabsService', () => ({
@@ -20,6 +18,12 @@ vi.mock('~/services/profile/profileTabsService', () => ({
 
 describe('FollowerFollowing Layout', () => {
   it('renders follower tab content', async () => {
+    const queryClient = new QueryClient();
+    profileTabsServiceMock.getProfile.mockResolvedValue({
+      username: 'testuser',
+      displayName: 'Test User',
+      mutualsCount: 0,
+    });
     const wrapper = await mountSuspended(FollowerFollowingLayout, {
       slots: {
         default: '<div class="follower-content">Follower Content</div>',
@@ -28,7 +32,7 @@ describe('FollowerFollowing Layout', () => {
         path: '/profile/testuser/followers',
       },
       global: {
-        plugins: [i18n],
+        plugins: [i18n, [VueQueryPlugin, { queryClient }]],
       },
     });
 
@@ -42,6 +46,12 @@ describe('FollowerFollowing Layout', () => {
   });
 
   it('renders back button and works correctly', async () => {
+    const queryClient = new QueryClient();
+    profileTabsServiceMock.getProfile.mockResolvedValue({
+      username: 'testuser',
+      displayName: 'Test User',
+      mutualsCount: 0,
+    });
     const wrapper = await mountSuspended(FollowerFollowingLayout, {
       slots: {
         default: '<div class="following-content">Following Content</div>',
@@ -53,7 +63,7 @@ describe('FollowerFollowing Layout', () => {
         },
       },
       global: {
-        plugins: [i18n],
+        plugins: [i18n, [VueQueryPlugin, { queryClient }]],
       },
     });
     const spy = vi.spyOn(wrapper.vm.$router, 'back').mockImplementation(() => {});
