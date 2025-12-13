@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed, onUnmounted } from 'vue';
+import { useInfiniteQuery } from '@tanstack/vue-query';
 
 const config = useRuntimeConfig();
 const API_KEY = config.public.tenorApiKey;
 
 const searchQuery = ref('');
 const isFocused = ref(false);
+
+defineEmits<{
+  (e: 'close'): void;
+}>();
 
 interface Category {
   name: string;
@@ -68,38 +73,108 @@ const categories: Category[] = [
   },
 ];
 
-const selectedCategory = ref<string | null>(null);
-const gifs = ref<GifResult[]>([]);
-const loading = ref(false);
-const error = ref<string | null>(null);
+const selectedCategory = ref<Category | null>(null);
+const currentQuery = ref('');
+const scrollContainerRef = ref<HTMLElement | null>(null);
 
-async function fetchCategoryGifs(query: string) {
-  loading.value = true;
-  error.value = null;
+async function fetchGifs(query: string, pos?: string | null): Promise<TenorResponse> {
+  const params: Record<string, string | number> = {
+    key: API_KEY,
+    q: query,
+    limit: 21,
+    media_filter: 'gif',
+  };
 
-  try {
-    const res = await $fetch<TenorResponse>('https://tenor.googleapis.com/v2/search', {
-      method: 'GET',
-      params: {
-        key: API_KEY,
-        q: query,
-        limit: 21,
-        media_filter: 'gif',
-      },
-    });
-
-    gifs.value = res.results || [];
-  } catch (err: unknown) {
-    error.value = err instanceof Error ? err.message : 'An unknown error occurred';
+  if (pos) {
+    params.pos = pos;
   }
 
-  loading.value = false;
+  const res = await $fetch<TenorResponse>('https://tenor.googleapis.com/v2/search', {
+    method: 'GET',
+    params,
+  });
+
+  return res;
 }
 
+// Infinite query setup
+const {
+  data: response,
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage,
+  isLoading,
+} = useInfiniteQuery({
+  queryKey: computed(() => ['gifs', currentQuery.value]),
+  initialPageParam: null as string | null,
+  queryFn: async ({ pageParam = null }) => {
+    if (!currentQuery.value) {
+      return { results: [], next: '' };
+    }
+    return await fetchGifs(currentQuery.value, pageParam);
+  },
+  getNextPageParam: (lastPage) => {
+    return lastPage.next && lastPage.next !== '' ? lastPage.next : undefined;
+  },
+  enabled: computed(() => !!currentQuery.value),
+  refetchOnWindowFocus: false,
+  refetchOnMount: false,
+  refetchOnReconnect: false,
+});
+
+const allGifs = computed(() => {
+  if (!response.value?.pages) return [];
+  return response.value.pages.flatMap((page) => page.results || []);
+});
+
 function openCategory(cat: Category) {
-  selectedCategory.value = cat.name;
-  fetchCategoryGifs(cat.query);
+  selectedCategory.value = cat;
+  currentQuery.value = cat.query;
 }
+
+function closeCategory() {
+  selectedCategory.value = null;
+  currentQuery.value = '';
+}
+
+// Infinite scrolling
+let scrollHandler: ((e: Event) => void) | null = null;
+let isFetching = false;
+
+watch(scrollContainerRef, (container) => {
+  if (!container) return;
+  if (scrollHandler) {
+    container.removeEventListener('scroll', scrollHandler);
+  }
+
+  scrollHandler = () => {
+    if (isFetching || isFetchingNextPage.value || !hasNextPage.value) {
+      return;
+    }
+
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    const distanceFromBottom = scrollHeight - (scrollTop + clientHeight);
+
+    // Trigger when near bottom
+    if (distanceFromBottom < 200) {
+      isFetching = true;
+
+      fetchNextPage().finally(() => {
+        setTimeout(() => {
+          isFetching = false;
+        }, 1000);
+      });
+    }
+  };
+
+  container.addEventListener('scroll', scrollHandler);
+});
+
+onUnmounted(() => {
+  if (scrollContainerRef.value && scrollHandler) {
+    scrollContainerRef.value.removeEventListener('scroll', scrollHandler);
+  }
+});
 </script>
 
 <template>
@@ -115,7 +190,7 @@ function openCategory(cat: Category) {
           <div class="flex items-center gap-3">
             <button
               class="hover:bg-muted-foreground/50 flex items-center justify-center rounded p-1 transition"
-              @click="selectedCategory ? (selectedCategory = null) : $emit('close')"
+              @click="selectedCategory ? closeCategory() : $emit('close')"
             >
               <Icon v-if="!selectedCategory" name="lucide:x" size="1.1rem"></Icon>
               <Icon v-else name="lucide:arrow-left" size="1.1rem"></Icon>
@@ -124,6 +199,7 @@ function openCategory(cat: Category) {
           </div>
         </UiDialogHeader>
 
+        <!-- Categories -->
         <div class="w-full p-0">
           <div v-if="!selectedCategory" class="grid grid-cols-2 gap-0">
             <div
@@ -135,7 +211,6 @@ function openCategory(cat: Category) {
               <div class="relative h-30 overflow-hidden bg-gray-100 sm:h-36 md:h-40">
                 <img :src="cat.cover" class="block h-full w-full object-cover" />
 
-                <!-- Category title overlaid on image -->
                 <div class="absolute start-2 bottom-2 ps-2">
                   <h3
                     class="text-center text-xl font-bold text-white"
@@ -148,22 +223,35 @@ function openCategory(cat: Category) {
             </div>
           </div>
 
-          <!-- category result -->
+          <!-- Results -->
           <div v-else>
-            <UiSpinner v-if="loading" class="mx-auto my-10 h-10 w-10" />
-            <div v-if="error" class="text-destructive">{{ error }}</div>
-
-            <div
-              v-if="!loading"
-              class="grid max-h-[480px] grid-cols-2 gap-0 overflow-y-auto sm:grid-cols-3"
-            >
-              <div
-                v-for="gif in gifs"
-                :key="gif.id"
-                class="overflow-hidden rounded border bg-black/10 hover:cursor-pointer"
-              >
-                <img :src="gif.media_formats.gif.url" class="block h-[100px] w-full object-cover" />
+            <div ref="scrollContainerRef" class="max-h-[480px] overflow-y-auto px-1">
+              <div class="grid grid-cols-3 gap-0">
+                <div
+                  v-for="gif in allGifs"
+                  :key="gif.id"
+                  class="overflow-hidden border bg-black/10 hover:cursor-pointer"
+                >
+                  <img
+                    :src="gif.media_formats.gif.url"
+                    :alt="gif.title"
+                    class="block h-[140px] w-full object-cover"
+                  />
+                </div>
               </div>
+
+              <!-- Loading indicator -->
+              <div v-if="isFetchingNextPage" class="flex items-center justify-center py-4">
+                <UiSpinner class="h-6 w-6" />
+              </div>
+            </div>
+
+            <!-- Initial loading state -->
+            <div
+              v-if="isLoading && allGifs.length === 0"
+              class="flex items-center justify-center py-10"
+            >
+              <UiSpinner class="h-10 w-10" />
             </div>
           </div>
         </div>
