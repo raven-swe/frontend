@@ -15,7 +15,7 @@ export const useTweetComposer = (
 ) => {
   const { t } = useI18n();
 
-  const { uploadImage, uploadVideo } = uploadMediaService();
+  const { uploadImage, uploadVideo, uploadGif } = uploadMediaService();
 
   const isPosting = ref(false);
   const uploadProgress = ref(0);
@@ -62,8 +62,10 @@ export const useTweetComposer = (
             if (!item.file) continue;
             const mediaId = await uploadVideo(item.file, 'tweets');
             mediaIds.push(mediaId);
+          } else if (item?.type === 'gif' && item.tenorId) {
+            const mediaId = await uploadGif(item.tenorId);
+            mediaIds.push(mediaId);
           }
-          // upload gif
 
           uploadProgress.value = Math.round(((i + 1) / media.value.length) * 100);
         }

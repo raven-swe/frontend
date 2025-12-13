@@ -179,7 +179,7 @@ watch(scrollContainerRef, (container) => {
     const distanceFromBottom = scrollHeight - (scrollTop + clientHeight);
 
     // Trigger when near bottom
-    if (distanceFromBottom < 200) {
+    if (distanceFromBottom < 150) {
       isFetching = true;
 
       fetchNextPage().finally(() => {
@@ -216,19 +216,24 @@ function selectGif(gif: GifResult) {
         content-height="h-[600px]"
         content-padding="px-0"
         :hide-close-button="true"
+        header-class="py-6 flex items-center gap-2"
       >
-        <UiDialogHeader class="max-w-2xl ps-6 pe-6">
-          <div class="flex items-center gap-3">
-            <button
-              class="hover:bg-muted-foreground/50 flex items-center justify-center rounded p-1 transition"
-              @click="selectedCategory ? closeCategory() : $emit('close')"
-            >
-              <Icon v-if="!selectedCategory" name="lucide:x" size="1.1rem"></Icon>
-              <Icon v-else name="lucide:arrow-left" size="1.1rem"></Icon>
-            </button>
-            <UiSearchBar v-model="searchQuery" v-model:is-focused="isFocused" class="flex-1" />
-          </div>
-        </UiDialogHeader>
+        <template #header>
+          <UiButton
+            variant="ghost-default"
+            size="icon-lg"
+            class="bg-transparent"
+            @click="selectedCategory ? closeCategory() : $emit('close')"
+          >
+            <Icon
+              v-if="!selectedCategory || searchQuery.trim()"
+              name="lucide:x"
+              size="1.1rem"
+            ></Icon>
+            <Icon v-else name="lucide:arrow-left" size="1.1rem"></Icon>
+          </UiButton>
+          <UiSearchBar v-model="searchQuery" v-model:is-focused="isFocused" class="flex-1" />
+        </template>
 
         <!-- Categories -->
         <div class="w-full p-0">
@@ -236,10 +241,10 @@ function selectGif(gif: GifResult) {
             <div
               v-for="cat in categories"
               :key="cat.name"
-              class="group cursor-pointer overflow-hidden border p-0 transition hover:bg-gray-100"
+              class="group cursor-pointer overflow-hidden border p-0 transition"
               @click="openCategory(cat)"
             >
-              <div class="relative h-30 overflow-hidden bg-gray-100 sm:h-36 md:h-40">
+              <div class="relative h-44 overflow-hidden bg-gray-100">
                 <img :src="cat.cover" class="block h-full w-full object-cover" />
 
                 <div class="absolute start-2 bottom-2 ps-2">
@@ -256,7 +261,7 @@ function selectGif(gif: GifResult) {
 
           <!-- Results -->
           <div v-else-if="selectedCategory || searchQuery.trim()">
-            <div ref="scrollContainerRef" class="max-h-[480px] overflow-y-auto px-1">
+            <div ref="scrollContainerRef" class="max-h-133 overflow-y-auto px-1">
               <div class="grid grid-cols-3 gap-0">
                 <div
                   v-for="gif in allGifs"
