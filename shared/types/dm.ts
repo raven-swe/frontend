@@ -142,6 +142,7 @@ export interface DmWsConversationSeenUpdate {
   type: 'conversation_seen_update';
   conversationId: string;
   username: string;
+  performerUsername: string;
   lastSeenMessageId: string;
   seenAt: string;
 }

@@ -50,6 +50,7 @@ provide('dmSocket', ws);
 const liveMessages = ref<DmMessage[]>([]);
 
 const lastSeenMessageId = ref<string | null>(null);
+const userMarkedAsSeen = ref<string | null>(null);
 const messagesListRef = ref<InstanceType<typeof DmMessagesList> | null>(null);
 
 // Provide scroll function to DmMessageInput
@@ -114,6 +115,7 @@ onMounted(() => {
   ws.onSeenUpdate((data) => {
     if (data.conversationId === conversationId.value && data.username === currentUsername.value) {
       lastSeenMessageId.value = data.lastSeenMessageId;
+      userMarkedAsSeen.value = data.performerUsername;
     }
   });
 
@@ -199,6 +201,7 @@ watch(
         :is-fetching-next-page="isFetchingNextPage || false"
         :on-load-more="fetchNextPage"
         :last-seen-message-id="lastSeenMessageId"
+        :user-marked-as-seen="userMarkedAsSeen"
         :conversation="conversation || null"
         @message-deleted="handleMessageDeleted"
         @reaction="handleReaction"

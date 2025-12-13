@@ -11,8 +11,12 @@ const props = defineProps<{
   isFetchingNextPage?: boolean;
   onLoadMore?: () => void;
   lastSeenMessageId?: string | null;
+  userMarkedAsSeen?: string | null;
   conversation?: DmConversation | null;
 }>();
+
+const userStore = useUserStore();
+const currentUsername = computed(() => userStore.user?.username);
 
 defineEmits<{
   (e: 'message-deleted', messageId: string): void;
@@ -168,7 +172,10 @@ defineExpose({ parentRef, scrollToBottom });
         <template v-if="messages[virtualRow.index]">
           <DmMessageItem
             :message="messages[virtualRow.index]!"
-            :is-seen="messages[virtualRow.index]!.id === props.lastSeenMessageId"
+            :is-seen="
+              messages[virtualRow.index]!.id === props.lastSeenMessageId &&
+              currentUsername !== props.userMarkedAsSeen
+            "
             :conversation-id="conversation?.id || ''"
             @deleted="(messageId) => $emit('message-deleted', messageId)"
             @reaction="(messageId, reaction) => $emit('reaction', messageId, reaction)"
