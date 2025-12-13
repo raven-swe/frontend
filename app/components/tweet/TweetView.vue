@@ -174,6 +174,7 @@ function handleReplied(tweet: Tweet) {
         <div class="relative">
           <div class="absolute end-0 top-1 flex translate-x-2.5 flex-row items-center">
             <UiButton
+              v-if="!(!tweetClone.content || tweetClone.content.trim().length === 0)"
               variant="ghost-default"
               size="icon-sm"
               class="text-muted-foreground"
@@ -183,7 +184,6 @@ function handleReplied(tweet: Tweet) {
             </UiButton>
             <TweetDropdown :tweet="props.tweet" :username="originalUsername">
               <UiButton
-                v-if="!(!tweetClone.content || tweetClone.content.trim().length === 0)"
                 variant="ghost-default"
                 size="icon-xs"
                 class="text-muted-foreground"
