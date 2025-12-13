@@ -1,4 +1,5 @@
 import { apiFetch } from '~/api';
+import { DEFAULT_PAGE_SIZE } from '~/constants/pagination';
 import { PeopleFilter, type SearchQuery, type TweetsSearchQuery } from '~~/shared/types/search';
 
 export const searchService = {
@@ -27,29 +28,27 @@ export const searchService = {
     };
   },
 
-  async getTweets(tweetsSearchQuery: TweetsSearchQuery) {
+  async getTweets(tweetsSearchQuery: TweetsSearchQuery, signal?: AbortSignal) {
     return apiFetch(`/api/search/tweets`, {
       method: 'GET',
       query: {
         query: tweetsSearchQuery.query,
         tab: tweetsSearchQuery.tab,
-        limit: tweetsSearchQuery.pagination.limit,
+        limit: (tweetsSearchQuery.pagination.limit ?? DEFAULT_PAGE_SIZE).toString(),
         cursor: tweetsSearchQuery.pagination.cursor ?? undefined,
         peopleFilter: tweetsSearchQuery.peopleFilter,
         excludeMutedAndBlocked: tweetsSearchQuery.excludeMutedAndBlocked,
       },
+      signal,
     });
   },
 
-  async getPeople(
-    peopleSearchQuery: SearchQuery,
-    signal?: AbortSignal,
-  ): Promise<ApiSuccessResponse<CompactUser[]>> {
+  async getPeople(peopleSearchQuery: SearchQuery, signal?: AbortSignal) {
     return apiFetch(`/api/search/users`, {
       method: 'GET',
       query: {
         query: peopleSearchQuery.query,
-        limit: peopleSearchQuery.pagination.limit,
+        limit: (peopleSearchQuery.pagination.limit ?? DEFAULT_PAGE_SIZE).toString(),
         cursor: peopleSearchQuery.pagination.cursor ?? undefined,
         peopleFilter: peopleSearchQuery.peopleFilter,
         excludeMutedAndBlocked: peopleSearchQuery.excludeMutedAndBlocked,

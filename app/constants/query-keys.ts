@@ -9,8 +9,8 @@ export const tweetKeys = {
 
   timeline: (tab: string) => [...tweetKeys.all, 'timeline', tab] as const, // ['tweets','timeline',tab]
 
-  search: (query: string, tab: string, filter: string) =>
-    [...tweetKeys.all, 'search', query, tab, filter] as const, // ['tweets','search',query,tab,filter]
+  search: (query: string, tab: string, filter: string, excludeMuteBlock: string) =>
+    [...tweetKeys.all, 'search', query, tab, filter, excludeMuteBlock] as const, // ['tweets','search',query,tab,filter,people]
 
   replyList: (tweetId: string) => [...tweetKeys.all, 'replies', tweetId] as const, // ['tweets','replies',tweetId]
 

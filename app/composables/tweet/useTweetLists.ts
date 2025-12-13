@@ -2,6 +2,7 @@ import { useInfiniteQuery, useQueryClient } from '@tanstack/vue-query';
 import { tweetKeys } from '~/constants/query-keys';
 import { homeService } from '~/services/home/homeService';
 import { profileTabsService } from '~/services/profile/profileTabsService';
+import { searchService } from '~/services/search/searchService';
 import { tweetsService } from '~/services/tweet/tweetsService';
 
 function updateCacheWithTweets(tweets: Tweet[], queryClient: ReturnType<typeof useQueryClient>) {
@@ -106,5 +107,52 @@ export function useTweetReplies(
       lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined,
     structuralSharing: false,
     enabled: computed(() => toValue(enabled)),
+  });
+}
+
+export function useTweetSearch(
+  tab: 'latest' | 'top' | 'media',
+  searchQuery: MaybeRefOrGetter<string>,
+  peopleFilter: MaybeRefOrGetter<PeopleFilter>,
+  execludeMutedAndBlocked: MaybeRefOrGetter<boolean> = true,
+) {
+  const queryClient = useQueryClient();
+  const searchQueryValue = computed(() => toValue(searchQuery));
+  const peopleFilterValue = computed(() => toValue(peopleFilter));
+  const excludeMutedAndBlockedValue = computed(() => toValue(execludeMutedAndBlocked));
+
+  return useInfiniteQuery({
+    queryKey: computed(() =>
+      tweetKeys.search(
+        searchQueryValue.value,
+        tab,
+        peopleFilterValue.value,
+        excludeMutedAndBlockedValue.value ? 'exclude' : 'include',
+      ),
+    ),
+    initialPageParam: null as string | null,
+    queryFn: async ({ pageParam = null, signal }) => {
+      const res = await searchService.getTweets(
+        {
+          pagination: { cursor: pageParam },
+          query: searchQueryValue.value,
+          tab: tab,
+          peopleFilter: peopleFilterValue.value,
+          excludeMutedAndBlocked: excludeMutedAndBlockedValue.value,
+        },
+        signal,
+      );
+
+      // Update the tweet cache
+      updateCacheWithTweets(res.data, queryClient);
+      const ids = mapTweetsToIds(res.data);
+      return {
+        ...res,
+        data: ids,
+      };
+    },
+    getNextPageParam: (lastPage) =>
+      lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined,
+    structuralSharing: false,
   });
 }
