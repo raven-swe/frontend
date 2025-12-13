@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onUnmounted, watch } from 'vue';
 import { useInfiniteQuery } from '@tanstack/vue-query';
+import { useDebounceFn } from '@vueuse/core';
 
 const config = useRuntimeConfig();
 const API_KEY = config.public.tenorApiKey;
@@ -75,7 +76,12 @@ const categories: Category[] = [
 
 const selectedCategory = ref<Category | null>(null);
 const currentQuery = ref('');
+const debouncedQuery = ref('');
 const scrollContainerRef = ref<HTMLElement | null>(null);
+
+const debouncedSearch = useDebounceFn((query: string) => {
+  debouncedQuery.value = query;
+}, 500);
 
 async function fetchGifs(query: string, pos?: string | null): Promise<TenorResponse> {
   const params: Record<string, string | number> = {
@@ -105,18 +111,18 @@ const {
   isFetchingNextPage,
   isLoading,
 } = useInfiniteQuery({
-  queryKey: computed(() => ['gifs', currentQuery.value]),
+  queryKey: computed(() => ['gifs', debouncedQuery.value]),
   initialPageParam: null as string | null,
   queryFn: async ({ pageParam = null }) => {
-    if (!currentQuery.value) {
+    if (!debouncedQuery.value) {
       return { results: [], next: '' };
     }
-    return await fetchGifs(currentQuery.value, pageParam);
+    return await fetchGifs(debouncedQuery.value, pageParam);
   },
   getNextPageParam: (lastPage) => {
     return lastPage.next && lastPage.next !== '' ? lastPage.next : undefined;
   },
-  enabled: computed(() => !!currentQuery.value),
+  enabled: computed(() => !!debouncedQuery.value),
   refetchOnWindowFocus: false,
   refetchOnMount: false,
   refetchOnReconnect: false,
@@ -130,12 +136,14 @@ const allGifs = computed(() => {
 function openCategory(cat: Category) {
   selectedCategory.value = cat;
   currentQuery.value = cat.query;
+  debouncedQuery.value = cat.query; // Set immediately for categories
   searchQuery.value = '';
 }
 
 function closeCategory() {
   selectedCategory.value = null;
   currentQuery.value = '';
+  debouncedQuery.value = '';
   searchQuery.value = '';
 }
 
@@ -144,8 +152,10 @@ watch(searchQuery, (newQuery) => {
   if (newQuery.trim()) {
     selectedCategory.value = null; // Clear category when searching
     currentQuery.value = newQuery.trim();
+    debouncedSearch(newQuery.trim());
   } else if (!selectedCategory.value) {
     currentQuery.value = '';
+    debouncedQuery.value = '';
   }
 });
 
