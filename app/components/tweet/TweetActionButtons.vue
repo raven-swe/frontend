@@ -112,6 +112,7 @@ const handleShare = async () => {
         variant="tweet-icon-turquoise"
         size="icon-md"
         data-cy="tweet-reply-button"
+        @click.stop
         @click="showReplyDialog = true"
       >
         <Icon name="tabler:message-circle-2" size="1.2rem" />
@@ -136,6 +137,7 @@ const handleShare = async () => {
             size="icon-md"
             data-testid="retweet-dropdown-trigger"
             data-cy="tweet-retweet-button"
+            @click.stop
           >
             <Icon name="tabler:repeat" size="1.2rem" />
           </Button>
@@ -174,6 +176,7 @@ const handleShare = async () => {
         variant="tweet-icon-red-active"
         size="icon-md"
         data-cy="tweet-unlike-button"
+        @click.stop
         @click.prevent.stop="handleUnlike"
       >
         <Icon name="line-md:heart-filled" size="1.2rem" />
@@ -187,6 +190,7 @@ const handleShare = async () => {
         size="icon-md"
         data-cy="tweet-like-button"
         @click.prevent.stop="handleLike"
+        @click.stop
       >
         <Icon name="tabler:heart" size="1.2rem" />
       </Button>
@@ -199,6 +203,7 @@ const handleShare = async () => {
       class="hover:text-brand-blue"
       data-cy="tweet-share-button"
       @click.prevent.stop="handleShare"
+      @click.stop
     >
       <Icon name="lucide:share" size="1.2rem" />
     </Button>

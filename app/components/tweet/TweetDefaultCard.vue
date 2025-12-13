@@ -270,7 +270,6 @@ function handleReplied(tweet: Tweet) {
       <TweetActionButtons
         v-if="!props.noActions"
         :tweet="tweet"
-        @click.stop
         @like-success="onLikeSuccess"
         @unlike-success="onUnlikeSuccess"
         @retweet-success="onRetweetSuccess"
