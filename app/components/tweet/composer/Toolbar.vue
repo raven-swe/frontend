@@ -232,7 +232,7 @@ const handleEmojiSelect = (emoji: EmojiSelectEvent) => {
         :disabled="disabled || isOverLimit"
         @click="$emit('post')"
       >
-        {{ $t('ui.' + props.buttonText.toLowerCase()) }}
+        {{ props.buttonText }}
       </UiButton>
     </div>
 

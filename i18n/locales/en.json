@@ -261,7 +261,9 @@
       "loading": {
         "uploading": "Uploading media... {progress}%",
         "posting": "Posting tweet..."
-      }
+      },
+      "post-success": "Tweet posted successfully",
+      "post-error": "Failed to post tweet. Please try again."
     },
     "delete-tweet": "Delete",
     "delete-success": "Tweet deleted successfully",

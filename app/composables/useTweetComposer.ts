@@ -77,14 +77,11 @@ export const useTweetComposer = (
         quoteToTweetId: quoteTweetId?.value ?? null,
       });
 
-      showToaster('success', t('tweet.composer.post_success') || 'Tweet posted successfully!');
+      showToaster('success', t('tweet.composer.post-success'));
 
       return newTweet;
     } catch {
-      showToaster(
-        'error',
-        t('tweet.composer.post_error') || 'Error creating tweet. Please try again.',
-      );
+      showToaster('error', t('tweet.composer.post-error'));
       return null;
     } finally {
       isPosting.value = false;
