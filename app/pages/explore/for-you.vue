@@ -1,33 +1,25 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
 import TweetDefaultCard from '~/components/tweet/TweetDefaultCard.vue';
 import Hashtag from '~/components/explore/Hashtag.vue';
 import { exploreService } from '~/services/explore/exploreService';
-import type { TrendingHashtag } from '~~/shared/types/hashtag';
 import { useCategorizedTweet, useTimelineTweets } from '~/composables/tweet/useTweetLists';
 import VirtualInfiniteScroller from '~/components/common/VirtualInfiniteScroller.vue';
 import { getItemKey } from '~/constants/query-keys';
+import { useQuery } from '@tanstack/vue-query';
 
 definePageMeta({
   layout: 'explore',
 });
 
-const trendingHashtags = ref<TrendingHashtag[]>([]);
-const isHashtagsLoading = ref(false);
-
-const loadHashtags = async () => {
-  isHashtagsLoading.value = true;
-  try {
+const { data: trendingHashtags, suspense: hashtagsSuspense } = useQuery({
+  queryKey: ['trending-hashtags'],
+  queryFn: async () => {
     const response = await exploreService.getExploreTab('trending');
-    trendingHashtags.value = response.data.slice(0, 5);
-  } catch (error) {
-    console.error('Failed to load trending hashtags:', error);
-  } finally {
-    isHashtagsLoading.value = false;
-  }
-};
+    return response.data.slice(0, 5);
+  },
+});
 
-const { data: categorizedResponse } = useCategorizedTweet();
+const { data: categorizedResponse, suspense: categorizedSuspense } = useCategorizedTweet();
 
 const categorizedTweets = computed(() => {
   return categorizedResponse.value?.data.categories || [];
@@ -44,19 +36,15 @@ const {
 
 const tweets = computed(() => response.value?.pages.flatMap((page) => page.data) || []);
 
-onMounted(() => {
-  loadHashtags();
-});
-
 onServerPrefetch(async () => {
-  await suspense();
+  await Promise.all([suspense(), hashtagsSuspense(), categorizedSuspense()]);
 });
 </script>
 
 <template>
   <div class="border-border mx-auto max-w-[700px]">
     <!-- Hashtags Section -->
-    <div v-if="trendingHashtags.length > 0" class="border-border border-b py-2">
+    <div v-if="(trendingHashtags?.length ?? 0) > 0" class="border-border border-b py-2">
       <Hashtag
         v-for="(hashtag, index) in trendingHashtags"
         :key="hashtag.hashtag"
@@ -83,6 +71,7 @@ onServerPrefetch(async () => {
         :has-next-page="hasNextPage"
         :is-fetching-next-page="isFetchingNextPage"
         :fetch-next-page="fetchNextPage"
+        :values-to-watch="[trendingHashtags, categorizedTweets]"
       >
         <template #item="{ item }">
           <TweetDefaultCard v-if="item" :tweet-id="item.id" :reposter-id="item.reposterId" />

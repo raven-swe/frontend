@@ -123,6 +123,7 @@ const isLoading = computed(() => isTweetsLoading.value || isUsersLoading.value);
         :has-next-page="hasNextPage"
         :is-fetching-next-page="isFetchingNextPage"
         :fetch-next-page="fetchNextPage"
+        :values-to-watch="[users.length]"
       >
         <template #item="{ item }">
           <TweetDefaultCard v-if="item" :tweet-id="item.id" :reposter-id="item.reposterId" />

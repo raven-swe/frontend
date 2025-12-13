@@ -9,6 +9,7 @@ interface Props<T> {
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
   fetchNextPage: () => void;
+  valuesToWatch?: unknown[];
   getKey?: (
     item: T | undefined,
     index: number,
@@ -62,6 +63,15 @@ watchEffect(() => {
     props.fetchNextPage();
   }
 });
+
+watch(
+  () => props.valuesToWatch,
+  async () => {
+    await nextTick(() => {
+      parentOffsetRef.value = parentRef.value?.offsetTop ?? 0;
+    });
+  },
+);
 </script>
 
 <template>

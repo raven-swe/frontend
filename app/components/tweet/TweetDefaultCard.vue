@@ -98,11 +98,11 @@ const { mutate: blockUser } = useBlockMutation();
             @unfollow="followUser({ username: tweet.author.username, action: 'unfollow' })"
           >
             <NuxtLink
-              :to="`/profile/${props.tweet.author.username}`"
+              :to="`/profile/${tweet.author.username}`"
               class="cursor-pointer truncate overflow-hidden hover:underline"
               @click.stop
             >
-              {{ props.tweet.author.displayName }}
+              {{ tweet.author.displayName }}
             </NuxtLink>
           </UserHoverCard>
           <UserHoverCard
@@ -113,11 +113,11 @@ const { mutate: blockUser } = useBlockMutation();
             @unfollow="followUser({ username: tweet.author.username, action: 'unfollow' })"
           >
             <NuxtLink
-              :to="`/profile/${props.tweet.author.username}`"
+              :to="`/profile/${tweet.author.username}`"
               class="text-muted-foreground cursor-pointer truncate overflow-hidden"
               @click.stop
             >
-              {{ '@' + props.tweet.author.username }}
+              {{ '@' + tweet.author.username }}
             </NuxtLink>
           </UserHoverCard>
           <span class="text-muted-foreground">·</span>
