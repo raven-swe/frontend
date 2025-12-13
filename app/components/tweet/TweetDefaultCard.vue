@@ -7,12 +7,18 @@ import TweetActionButtons from './TweetActionButtons.vue';
 import QuotedTweetCard from './QuotedTweetCard.vue';
 import AiSummary from './AiSummary.vue';
 import { useUserStore } from '~/stores/user';
+import { useQueryClient } from '@tanstack/vue-query';
 interface Props {
   tweet: Tweet;
   isParent?: boolean;
   isRoot?: boolean;
+  noActions?: boolean;
 }
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  noActions: false,
+  isParent: false,
+  isRoot: false,
+});
 const router = useRouter();
 const userStore = useUserStore();
 const originalUsername = ref<string>(userStore.user?.username || '');
@@ -60,6 +66,38 @@ function handleTweetClick() {
 
 const { mutate: followUser } = useFollowMutation();
 const { mutate: blockUser } = useBlockMutation();
+
+const onReplySuccess = (replyTweet: Tweet) => {
+  tweet.value.replyCount = (tweet.value.replyCount ?? 0) + 1;
+  handleReplied(replyTweet);
+};
+const queryClient = useQueryClient();
+const tweetid = computed(() => tweet.value.id as string);
+
+function handleReplied(tweet: Tweet) {
+  if (tweet.replyToTweetId !== tweetid.value) return;
+
+  queryClient.setQueryData<{
+    pages: Array<ApiSuccessResponse<Tweet[]>>;
+    pageParams: Array<string | null>;
+  }>(['tweet-replies', tweetid.value], (old) => {
+    if (!old) return old;
+
+    const first = old.pages[0];
+    if (!first) return old;
+
+    return {
+      ...old,
+      pages: [
+        {
+          ...first,
+          data: [tweet, ...first.data],
+        },
+        ...old.pages.slice(1),
+      ],
+    };
+  });
+}
 </script>
 
 <template>
@@ -230,12 +268,14 @@ const { mutate: blockUser } = useBlockMutation();
 
       <!-- Actions -->
       <TweetActionButtons
+        v-if="!props.noActions"
         :tweet="tweet"
         @click.stop
         @like-success="onLikeSuccess"
         @unlike-success="onUnlikeSuccess"
         @retweet-success="onRetweetSuccess"
         @undo-retweet-success="onUndoRetweetSuccess"
+        @reply-success="onReplySuccess"
       />
     </div>
   </article>

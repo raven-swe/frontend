@@ -184,6 +184,7 @@ const handleFileSelect = (event: Event) => {
         class="post-button"
         size="md"
         :disabled="disabled || isOverLimit"
+        data-cy="tweet-composer-post-button"
         @click="$emit('post')"
       >
         {{ $t('ui.' + props.buttonText.toLowerCase()) }}
@@ -194,6 +195,7 @@ const handleFileSelect = (event: Event) => {
     <input
       ref="fileInputRef"
       type="file"
+      data-cy="tweet-composer-media-input"
       :accept="ALLOWED_IMAGE_TYPES_FOR_HTML + ',' + ALLOWED_VIDEO_TYPES_FOR_HTML"
       multiple
       class="hidden"

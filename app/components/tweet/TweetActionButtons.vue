@@ -10,6 +10,7 @@ import {
 import QuoteTweetDialog from './composer/QuoteTweetDialog.vue';
 import { showToaster } from '~/utils/showToaster';
 import { buildTweetLink } from '~/utils/tweetLink';
+import ReplyTweetDialog from './composer/ReplyTweetDialog.vue';
 
 interface Props {
   tweet: Tweet;
@@ -19,10 +20,12 @@ const props = defineProps<Props>();
 
 const emit = defineEmits<{
   (e: 'like-success' | 'unlike-success' | 'retweet-success' | 'undo-retweet-success'): void;
+  (e: 'reply-success', tweet: Tweet): void;
 }>();
 
 const pendingLike = ref(false);
 const showQuoteDialog = ref(false);
+const showReplyDialog = ref(false);
 
 const handleLike = async () => {
   if (pendingLike.value) return;
@@ -105,7 +108,12 @@ const handleShare = async () => {
 <template>
   <div class="text-muted-foreground text-md mt-1.5 flex w-full items-center justify-between">
     <label class="hover:text-brand-blue relative flex items-center justify-center gap-[1px]">
-      <Button variant="tweet-icon-turquoise" size="icon-md" data-cy="tweet-reply-button">
+      <Button
+        variant="tweet-icon-turquoise"
+        size="icon-md"
+        data-cy="tweet-reply-button"
+        @click="showReplyDialog = true"
+      >
         <Icon name="tabler:message-circle-2" size="1.2rem" />
       </Button>
       <span class="absolute start-8" data-cy="tweet-reply-count">{{ props.tweet.replyCount }}</span>
@@ -200,6 +208,11 @@ const handleShare = async () => {
       v-model:open="showQuoteDialog"
       :quote-to-tweet="props.tweet"
       @quote-success="emit('retweet-success')"
+    />
+    <ReplyTweetDialog
+      v-model:open="showReplyDialog"
+      :reply-tweet="props.tweet"
+      @reply-success="(tweet) => emit('reply-success', tweet)"
     />
   </div>
 </template>
