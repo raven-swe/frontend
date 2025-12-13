@@ -5,8 +5,11 @@ import { VideoPlayer } from '@videojs-player/vue';
 interface Props {
   src: string;
   poster?: string;
+  fluid?: boolean;
 }
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  fluid: true,
+});
 </script>
 
 <template>
@@ -18,7 +21,7 @@ const props = defineProps<Props>();
         autoplay: false,
         preload: 'metadata',
         responsive: true,
-        fluid: true,
+        fluid: props.fluid,
         poster: props.poster,
         controlBar: { autoHide: false },
         sources: [

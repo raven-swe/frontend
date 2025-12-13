@@ -105,10 +105,10 @@ const handleShare = async () => {
 <template>
   <div class="text-muted-foreground text-md mt-1.5 flex w-full items-center justify-between">
     <label class="hover:text-brand-blue relative flex items-center justify-center gap-[1px]">
-      <Button variant="tweet-icon-turquoise" size="icon-md">
+      <Button variant="tweet-icon-turquoise" size="icon-md" data-cy="tweet-reply-button">
         <Icon name="tabler:message-circle-2" size="1.2rem" />
       </Button>
-      <span class="absolute start-8">{{ props.tweet.replyCount }}</span>
+      <span class="absolute start-8" data-cy="tweet-reply-count">{{ props.tweet.replyCount }}</span>
     </label>
 
     <label
@@ -127,6 +127,7 @@ const handleShare = async () => {
             "
             size="icon-md"
             data-testid="retweet-dropdown-trigger"
+            data-cy="tweet-retweet-button"
           >
             <Icon name="tabler:repeat" size="1.2rem" />
           </Button>
@@ -134,6 +135,7 @@ const handleShare = async () => {
         <UiDropdownMenuContent align="center">
           <UiDropdownMenuItem
             data-testid="retweet-action-item"
+            data-cy="tweet-retweet-action"
             @click.prevent.stop="props.tweet.isRetweeted ? handleUndoRetweet() : handleRetweet()"
           >
             <Icon name="tabler:repeat" size="18" />
@@ -141,36 +143,53 @@ const handleShare = async () => {
               props.tweet.isRetweeted ? $t('tweet.actions.unrepost') : $t('tweet.actions.repost')
             }}
           </UiDropdownMenuItem>
-          <UiDropdownMenuItem data-testid="quote-action-item" @click="showQuoteDialog = true">
+          <UiDropdownMenuItem
+            data-testid="quote-action-item"
+            data-cy="tweet-quote-action"
+            @click="showQuoteDialog = true"
+          >
             <Icon name="tabler:pencil" size="18" />
             {{ $t('tweet.actions.quote') }}
           </UiDropdownMenuItem>
         </UiDropdownMenuContent>
       </UiDropdownMenu>
-      <span class="absolute start-8">{{ props.tweet.retweetCount }}</span>
+      <span class="absolute start-8" data-cy="tweet-retweet-count">{{
+        props.tweet.retweetCount
+      }}</span>
     </label>
 
     <label
       v-if="props.tweet.isLiked"
       class="hover:text-brand-red text-brand-red relative flex items-center justify-center"
     >
-      <Button variant="tweet-icon-red-active" size="icon-md" @click.prevent.stop="handleUnlike">
+      <Button
+        variant="tweet-icon-red-active"
+        size="icon-md"
+        data-cy="tweet-unlike-button"
+        @click.prevent.stop="handleUnlike"
+      >
         <Icon name="line-md:heart-filled" size="1.2rem" />
       </Button>
-      <span class="absolute start-8">{{ props.tweet.likeCount }}</span>
+      <span class="absolute start-8" data-cy="tweet-likes-count">{{ props.tweet.likeCount }}</span>
     </label>
 
     <label v-else class="hover:text-brand-red relative flex items-center justify-center gap-[1px]">
-      <Button variant="tweet-icon-red" size="icon-md" @click.prevent.stop="handleLike">
+      <Button
+        variant="tweet-icon-red"
+        size="icon-md"
+        data-cy="tweet-like-button"
+        @click.prevent.stop="handleLike"
+      >
         <Icon name="tabler:heart" size="1.2rem" />
       </Button>
-      <span class="absolute start-8">{{ props.tweet.likeCount }}</span>
+      <span class="absolute start-8" data-cy="tweet-likes-count">{{ props.tweet.likeCount }}</span>
     </label>
 
     <Button
       variant="tweet-icon-blue"
       size="icon-md"
       class="hover:text-brand-blue"
+      data-cy="tweet-share-button"
       @click.prevent.stop="handleShare"
     >
       <Icon name="lucide:share" size="1.2rem" />

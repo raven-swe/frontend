@@ -215,6 +215,7 @@ onMounted(() => {
                 :key="user.username"
                 :to="`/profile/${user.username}`"
                 class="hover:bg-accent flex items-center gap-3 px-4 py-3 transition-colors"
+                data-cy="search-user-result"
                 @click="saveInHistory({ type: 'user', content: user })"
               >
                 <img
@@ -234,6 +235,7 @@ onMounted(() => {
               v-if="isValidUsername(getCleanUsername())"
               :to="`/profile/${getCleanUsername()}`"
               class="hover:bg-accent flex items-center transition-colors"
+              data-cy="search-go-to-profile"
             >
               <p class="text-foreground w-full p-4 break-words">
                 {{ $t('ui.search.search-list.go-to', { query: getCleanUsername() }) }}

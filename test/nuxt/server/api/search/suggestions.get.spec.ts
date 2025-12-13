@@ -1,14 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createMockH3Event } from '~~/test/mocks/h3-event';
 import { useH3TestUtils } from '~~/test/mocks/h3-test-utils';
-import topSearchEventHandler from '~~/server/api/search/hashtags/top.get';
+import topSearchEventHandler from '~~/server/api/search/suggestions.get';
 
 useH3TestUtils();
 
 const mockServerApiFetch = vi.fn();
 vi.stubGlobal('serverApiFetch', () => mockServerApiFetch);
 
-describe('GET /api/search/hashtags/top', () => {
+describe('GET /api/search/suggestions', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -30,7 +30,7 @@ describe('GET /api/search/hashtags/top', () => {
 
     const response = await topSearchEventHandler(event);
 
-    expect(mockServerApiFetch).toHaveBeenCalledWith('/search/hashtags/top', {
+    expect(mockServerApiFetch).toHaveBeenCalledWith('/search/suggestions', {
       method: 'GET',
       query: {
         query: 'java',
@@ -78,7 +78,7 @@ describe('GET /api/search/hashtags/top', () => {
 
     const response = await topSearchEventHandler(event);
 
-    expect(mockServerApiFetch).toHaveBeenCalledWith('/search/hashtags/top', {
+    expect(mockServerApiFetch).toHaveBeenCalledWith('/search/suggestions', {
       method: 'GET',
       query: {
         query: '',

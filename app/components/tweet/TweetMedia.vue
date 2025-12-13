@@ -5,6 +5,7 @@ import MediaItem from './MediaItem.vue';
 interface Props {
   media: TweetMedia[] | undefined;
   compact?: boolean; // when true (quoted tweet), render smaller media
+  tweetId?: string;
 }
 const props = defineProps<Props>();
 const media = ref(props.media || []);
@@ -21,16 +22,27 @@ const compact = computed(() => !!props.compact);
         'grid-rows-2': media.length > 2,
       }"
     >
-      <MediaItem
-        v-for="m in media"
-        :key="m.id || m.url"
-        :media="m"
-        :compact="compact"
-        :rounded="false"
-        :class="{
-          'first:row-span-2': media.length === 3,
-        }"
-      />
+      <template v-for="m in media" :key="m.id || m.url">
+        <NuxtLink
+          v-if="m.type !== 'VIDEO' && props.tweetId"
+          :to="`/media/${props.tweetId}`"
+          class="block h-full w-full"
+        >
+          <MediaItem
+            :media="m"
+            :compact="compact"
+            :rounded="false"
+            :class="{ 'first:row-span-2': media.length === 3 }"
+          />
+        </NuxtLink>
+        <MediaItem
+          v-else
+          :media="m"
+          :compact="compact"
+          :rounded="false"
+          :class="{ 'first:row-span-2': media.length === 3 }"
+        />
+      </template>
     </div>
   </div>
 </template>

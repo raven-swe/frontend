@@ -184,7 +184,11 @@
     },
     "messages": {
       "loadingMore": "Loading more tweets...",
-      "noMoreTweets": "No more tweets"
+      "noMoreTweets": "No more tweets",
+      "empty": {
+        "title": "Welcome to your timeline",
+        "description": "It's empty now, but it won't be for long. Start following people and you'll see posts show up here."
+      }
     }
   },
   "explore": {
@@ -373,6 +377,18 @@
     "block": "Block",
     "unmute": "Unmute",
     "unblock": "Unblock",
+    "carousel": {
+      "carousel": "carousel",
+      "item": "slide",
+      "next": {
+        "icon": "lucide:arrow-right",
+        "label": "Next slide"
+      },
+      "previous": {
+        "icon": "lucide:arrow-left",
+        "label": "Previous slide"
+      }
+    },
     "blocking": "Blocked",
     "search": {
       "searchbar": {
