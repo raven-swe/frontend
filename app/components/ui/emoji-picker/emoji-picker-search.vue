@@ -13,7 +13,9 @@ const props = defineProps<Props>();
 
 <template>
   <div
-    :class="cn('bg-popover flex h-9 items-center gap-2 border-b px-3', props.class)"
+    :class="
+      cn('bg-popover sticky top-0 z-10 flex h-9 items-center gap-2 border-b px-3', props.class)
+    "
     data-slot="emoji-picker-search-wrapper"
   >
     <SearchIcon class="size-4 shrink-0 opacity-50" />
