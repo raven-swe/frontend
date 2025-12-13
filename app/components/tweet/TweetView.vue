@@ -7,12 +7,15 @@ import { useUserStore } from '~/stores/user';
 import QuotedTweetCard from './QuotedTweetCard.vue';
 import AiSummary from './AiSummary.vue';
 import { useQueryClient } from '@tanstack/vue-query';
+import type { TweetWithParents } from '~~/shared/types/tweets';
 interface Props {
   tweet: TweetWithParents;
+  media?: boolean;
 }
 const props = defineProps<Props>();
 const userStore = useUserStore();
 const originalUsername = ref<string>(userStore.user?.username || '');
+const showMedia = computed(() => props.media ?? true);
 
 const tweetClone = ref(structuredClone(toRaw(props.tweet)));
 const aiSummaryRef = ref<InstanceType<typeof AiSummary> | null>(null);
@@ -144,6 +147,7 @@ function handleReplied(tweet: Tweet) {
               <NuxtLink
                 :to="`/profile/${props.tweet.author.username}`"
                 class="cursor-pointer truncate pe-12 leading-tight hover:underline"
+                data-cy="tweet-view-display-name"
                 @click.stop
               >
                 {{ tweetClone.author.displayName }}
@@ -159,6 +163,7 @@ function handleReplied(tweet: Tweet) {
               <NuxtLink
                 :to="`/profile/${props.tweet.author.username}`"
                 class="text-muted-foreground truncate pe-12 leading-tight"
+                data-cy="tweet-view-username"
                 @click.stop
               >
                 {{ '@' + tweetClone.author.username }}
@@ -178,6 +183,7 @@ function handleReplied(tweet: Tweet) {
             </UiButton>
             <TweetDropdown :tweet="props.tweet" :username="originalUsername">
               <UiButton
+                v-if="!(!tweetClone.content || tweetClone.content.trim().length === 0)"
                 variant="ghost-default"
                 size="icon-xs"
                 class="text-muted-foreground"
@@ -191,10 +197,15 @@ function handleReplied(tweet: Tweet) {
       </div>
     </div>
     <div class="border-b-border border-b-1">
-      <p class="pt-2 text-lg leading-relaxed break-words whitespace-pre-wrap">
+      <p
+        class="pt-2 text-lg leading-relaxed break-words whitespace-pre-wrap"
+        data-cy="tweet-view-content"
+      >
         <ContentEntitiesRenderer :content="tweetClone.content" :entities="tweetClone.entities" />
       </p>
-      <TweetMedia :media="tweetClone.media" />
+      <div v-if="showMedia">
+        <TweetMedia :media="tweet.media" :tweet-id="tweet.id" />
+      </div>
 
       <!-- Quoted Tweet -->
       <QuotedTweetCard v-if="tweetClone.quotedTweet" :tweet="tweetClone.quotedTweet" />
@@ -205,6 +216,7 @@ function handleReplied(tweet: Tweet) {
           :title="formatDate(tweetClone.createdAt)"
           :datetime="tweetClone.createdAt"
           class="text-muted-foreground text-md"
+          data-cy="tweet-view-timestamp"
           >{{ formatDate(tweetClone.createdAt) }}</time
         >
       </div>

@@ -138,7 +138,7 @@ const modifiedMutualUsers = computed(() => {
       </div>
 
       <div v-if="isMuted" class="mt-4">
-        <p class="text-muted-foreground text-sm">
+        <p class="text-muted-foreground text-sm" data-cy="profile-muted-info">
           {{ $t('profile-info.user-muted') }}
         </p>
       </div>

@@ -48,13 +48,21 @@ declare namespace Cypress {
     login(email: string, password: string): Chainable<void>;
 
     /**
+     * Custom command to login with external access token
+     * @param email - User email
+     * @param password - User password
+     * @example cy.loginExternal('user@example.com', 'password123')
+     */
+    loginExternal(email: string, password: string): Chainable<void>;
+
+    /**
      * Custom command to mute or unmute a user
      * @param userName - Username of the user to mute/unmute
      * @param mute - true to mute, false to unmute (default: true)
      * @example cy.muteUser('someuser', true) // Mute user
      * @example cy.muteUser('someuser', false) // Unmute user
      */
-    muteUser(userName: string, mute?: boolean): Chainable<void>;
+    muteUser(userName: string, mute?: boolean, useSlave?: boolean): Chainable<void>;
 
     /**
      * Custom command to block or unblock a user
@@ -63,6 +71,52 @@ declare namespace Cypress {
      * @example cy.blockUser('someuser', true) // Block user
      * @example cy.blockUser('someuser', false) // Unblock user
      */
-    blockUser(userName: string, block?: boolean): Chainable<void>;
+    blockUser(userName: string, block?: boolean, useSlave?: boolean): Chainable<void>;
+
+    /**
+     * Custom command to follow or unfollow a user
+     * @param userName - Username of the user to follow/unfollow
+     * @param follow - true to follow, false to unfollow (default: true)
+     * @example cy.followUser('someuser', true) // Follow user
+     * @example cy.followUser('someuser', false) // Unfollow user
+     */
+    followUser(userName: string, follow?: boolean, useSlave?: boolean): Chainable<void>;
+
+    /**
+     * Custom command to upload media files
+     * @param filePath - Path to the media file
+     * @param folder - Destination folder (default: 'tweets')
+     * @param useSlave - Whether to use external access token (default: false)
+     * @example cy.uploadMedia('path/to/image.jpg', 'tweets', false)
+     */
+    uploadMedia(
+      filePath: string,
+      folder?: string,
+      useSlave?: boolean,
+    ): Chainable<Record<string, unknown>>;
+    /**
+     * Custom command to post a tweet
+     * @param content - Content of the tweet
+     * @param mediaIds - Array of media IDs to attach (default: [])
+     * @param useSlave - Whether to use external access token (default: false)
+     * @example cy.postTweet('Hello world!', [], false)
+     */
+    postTweet(
+      content: string,
+      mediaIds?: string[],
+      replyToTweetId?: string | number,
+      quoteToTweetId?: string | number,
+      useSlave?: boolean,
+    ): Chainable<Record<string, unknown>>;
+
+    /**
+     * Custom command to like or unlike a tweet
+     * @param tweetId - ID of the tweet to like/unlike
+     * @param like - true to like, false to unlike (default: true)
+     * @param useSlave - Whether to use external access token (default: false)
+     * @example cy.likeTweet(12345, true, false) // Like tweet
+     * @example cy.likeTweet(12345, false, false) // Unlike tweet
+     */
+    likeTweet(tweetId: string | number, like?: boolean, useSlave?: boolean): Chainable<void>;
   }
 }
