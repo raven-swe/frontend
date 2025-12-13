@@ -48,7 +48,12 @@ const handleFollow = (action: 'follow' | 'unfollow') => {
         @block="() => handleBlock('block')"
         @unblock="() => handleBlock('unblock')"
       >
-        <UiButton data-test="profile-actions-trigger" variant="outline" size="icon-sm">
+        <UiButton
+          data-test="profile-actions-trigger"
+          variant="outline"
+          size="icon-sm"
+          data-cy="profile-action-buttons"
+        >
           <Icon name="lucide:more-horizontal" size="20" />
         </UiButton>
       </UserActionDropdown>

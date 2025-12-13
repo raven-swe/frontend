@@ -71,7 +71,7 @@ onServerPrefetch(async () => {
               <NuxtLink
                 v-for="tweet in item"
                 :key="tweet.id"
-                :to="`/profile/${tweet.author.username}/status/${tweet.id}`"
+                :to="`/media/${tweet.id}`"
                 class="block size-full"
               >
                 <Thumbnail :media="tweet.media?.[0]" :multiple="tweet.media?.length > 1" />
