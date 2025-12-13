@@ -7,7 +7,7 @@ on:
 jobs:
   checklist:
     if: github.event.pull_request.draft == false
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     permissions:
       pull-requests: write
