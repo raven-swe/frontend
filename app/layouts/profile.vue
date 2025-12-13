@@ -3,14 +3,14 @@ import ProfileDetails from '~/components/profile/ProfileDetails.vue';
 import ProfileDetailsSkeleton from '~/components/profile/skeletons/ProfileDetailsSkeleton.vue';
 import Tabs from '@/components/ui/Tabs.vue';
 import Tab from '@/components/ui/Tab.vue';
-import { useQuery, useQueryClient } from '@tanstack/vue-query';
+import { useQuery } from '@tanstack/vue-query';
 import type { FetchError } from 'ofetch';
 import { profileTabsService } from '~/services/profile/profileTabsService';
 
-const route = useRouter();
+const router = useRouter();
 
 const username = computed(() => {
-  const val = route.currentRoute.value.params.username;
+  const val = router.currentRoute.value.params.username;
   return typeof val === 'string' ? val.toLowerCase() : null;
 });
 const profilePath = computed(() => `/profile/${username.value}`);
@@ -23,6 +23,7 @@ const {
   isError,
   error,
   suspense,
+  refetch,
 } = useQuery<User, FetchError<FetchError<ApiErrorResponse>>>({
   queryKey,
   queryFn: async ({ signal }) => profileTabsService.getProfile(username.value!, signal),
@@ -33,22 +34,17 @@ const {
 });
 
 provide('user-data', user);
-const { isCurrentUser } = useIsCurrentUser();
 
 const isUserNotFound = computed(() => {
   if (!isError.value || !error.value) return false;
   const errorData = error.value;
   return errorData?.data?.data?.error?.code === 'USER_NOT_FOUND' || errorData?.statusCode === 404;
 });
-const queryClient = useQueryClient();
 watch(
-  () => route.currentRoute.value.fullPath,
-  () => {
+  () => router.currentRoute.value.fullPath,
+  async () => {
     if (!user.value) return;
-
-    queryClient.invalidateQueries({
-      queryKey: ['profile', username.value],
-    });
+    await refetch();
   },
 );
 
@@ -93,7 +89,6 @@ onServerPrefetch(async () => {
             :is-active="$route.path.toLowerCase() === `${profilePath}/media`"
           />
           <Tab
-            v-if="isCurrentUser"
             :label="$t('profile.tabs.likes')"
             :route="`${profilePath}/likes`"
             :is-active="$route.path.toLowerCase() === `${profilePath}/likes`"
