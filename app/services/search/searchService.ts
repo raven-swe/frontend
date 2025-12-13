@@ -4,7 +4,7 @@ import { PeopleFilter, type SearchQuery, type TweetsSearchQuery } from '~~/share
 
 export const searchService = {
   async getTopThreeHashtags(query: string) {
-    return await apiFetch(`/api/search/hashtags/top`, {
+    return await apiFetch(`/api/search/suggestions`, {
       method: 'GET',
       query: {
         query: query,

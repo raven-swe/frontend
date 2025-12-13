@@ -12,7 +12,7 @@ const props = defineProps<Props>();
 <template>
   <ClientOnly>
     <VideoPlayer
-      class="video-js vjs-default-skin overflow-hidden rounded-xl"
+      class="video-js vjs-default-skin h-full w-full overflow-hidden"
       :options="{
         controls: true,
         autoplay: false,
@@ -31,3 +31,15 @@ const props = defineProps<Props>();
     />
   </ClientOnly>
 </template>
+
+<style scoped>
+.video-js {
+  width: 100%;
+  height: 100%;
+}
+.video-js .vjs-tech {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+</style>

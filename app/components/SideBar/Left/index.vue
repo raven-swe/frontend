@@ -90,7 +90,7 @@ const switchLanguage = () => {
             <UiButton
               variant="ghost-default"
               size="2xl"
-              class="mx-auto mt-auto xl:w-full"
+              class="mx-auto mt-auto overflow-hidden xl:w-full"
               data-cy="logout-btn-trigger"
             >
               <div class="flex w-full items-center gap-3">
@@ -99,8 +99,8 @@ const switchLanguage = () => {
                   :alt="userStore.user?.displayName || 'User Avatar'"
                   size="sm"
                 />
-                <div class="hidden text-start xl:block">
-                  <p>{{ userStore.user?.displayName || 'User' }}</p>
+                <div class="hidden flex-col overflow-hidden text-start xl:flex">
+                  <p class="truncate">{{ userStore.user?.displayName || 'User' }}</p>
                   <p class="text-muted-foreground text-sm">
                     {{ '@' + (userStore.user?.username || 'username') }}
                   </p>

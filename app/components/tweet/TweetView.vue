@@ -67,8 +67,8 @@ function handleAiSummary() {
             </NuxtLink>
           </UserHoverCard>
         </div>
-        <div class="flex w-full items-start justify-between">
-          <div class="flex h-full flex-col justify-end">
+        <div class="flex w-full items-start justify-between overflow-hidden">
+          <div class="flex h-full flex-col justify-end overflow-hidden">
             <UserHoverCard
               :username="props.tweet.author.username"
               @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
@@ -78,7 +78,7 @@ function handleAiSummary() {
             >
               <NuxtLink
                 :to="`/profile/${props.tweet.author.username}`"
-                class="cursor-pointer leading-tight font-semibold hover:underline"
+                class="cursor-pointer truncate pe-12 leading-tight hover:underline"
                 @click.stop
               >
                 {{ tweet.author.displayName }}
@@ -93,34 +93,34 @@ function handleAiSummary() {
             >
               <NuxtLink
                 :to="`/profile/${props.tweet.author.username}`"
-                class="text-muted-foreground leading-tight"
+                class="text-muted-foreground truncate pe-12 leading-tight"
                 @click.stop
               >
                 {{ '@' + tweet.author.username }}
               </NuxtLink>
             </UserHoverCard>
           </div>
-          <div class="relative">
-            <div class="absolute end-0 top-1/2 flex translate-x-2.5 flex-row items-center">
+        </div>
+        <div class="relative">
+          <div class="absolute end-0 top-1 flex translate-x-2.5 flex-row items-center">
+            <UiButton
+              variant="ghost-default"
+              size="icon-sm"
+              class="text-muted-foreground"
+              @click.stop="handleAiSummary"
+            >
+              <Icon name="vscode-icons:file-type-gemini" size="1.2rem" />
+            </UiButton>
+            <TweetDropdown :tweet="props.tweet" :username="originalUsername">
               <UiButton
                 variant="ghost-default"
-                size="icon-sm"
+                size="icon-xs"
                 class="text-muted-foreground"
-                @click.stop="handleAiSummary"
+                @click.stop
               >
-                <Icon name="vscode-icons:file-type-gemini" size="1.2rem" />
+                <Icon name="lucide:more-horizontal" />
               </UiButton>
-              <TweetDropdown :tweet="props.tweet" :username="originalUsername">
-                <UiButton
-                  variant="ghost-default"
-                  size="icon-xs"
-                  class="text-muted-foreground"
-                  @click.stop
-                >
-                  <Icon name="lucide:more-horizontal" />
-                </UiButton>
-              </TweetDropdown>
-            </div>
+            </TweetDropdown>
           </div>
         </div>
       </div>

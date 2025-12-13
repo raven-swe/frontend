@@ -87,7 +87,9 @@ const { mutate: blockUser } = useBlockMutation();
     <div class="min-w-0 flex-1 pt-3 pb-2">
       <!-- Header: display name, username, time -->
       <div class="flex items-center justify-between gap-2">
-        <div class="flex flex-wrap items-center gap-x-1 text-sm">
+        <div
+          class="flex w-full items-center gap-x-1 overflow-hidden pe-12 text-sm whitespace-nowrap"
+        >
           <UserHoverCard
             :username="tweet.author.username"
             @follow="followUser({ username: tweet.author.username, action: 'follow' })"
@@ -95,10 +97,12 @@ const { mutate: blockUser } = useBlockMutation();
             @unblock="blockUser({ username: tweet.author.username, action: 'unblock' })"
             @unfollow="followUser({ username: tweet.author.username, action: 'unfollow' })"
           >
-            <NuxtLink :to="`/profile/${tweet.author.username}`" @click.stop>
-              <span class="cursor-pointer font-semibold hover:underline">{{
-                tweet.author.displayName
-              }}</span>
+            <NuxtLink
+              :to="`/profile/${props.tweet.author.username}`"
+              class="cursor-pointer truncate overflow-hidden hover:underline"
+              @click.stop
+            >
+              {{ props.tweet.author.displayName }}
             </NuxtLink>
           </UserHoverCard>
           <UserHoverCard
@@ -108,8 +112,12 @@ const { mutate: blockUser } = useBlockMutation();
             @unblock="blockUser({ username: tweet.author.username, action: 'unblock' })"
             @unfollow="followUser({ username: tweet.author.username, action: 'unfollow' })"
           >
-            <NuxtLink :to="`/profile/${tweet.author.username}`" @click.stop>
-              <span class="text-muted-foreground ms-1" v-text="'@' + tweet.author.username" />
+            <NuxtLink
+              :to="`/profile/${props.tweet.author.username}`"
+              class="text-muted-foreground cursor-pointer truncate overflow-hidden"
+              @click.stop
+            >
+              {{ '@' + props.tweet.author.username }}
             </NuxtLink>
           </UserHoverCard>
           <span class="text-muted-foreground">·</span>
