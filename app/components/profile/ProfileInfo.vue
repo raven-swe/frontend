@@ -17,7 +17,7 @@ const displayUrl = computed(() => {
   return '';
 });
 
-const isCurrentUser = useIsCurrentUser();
+const { isCurrentUser } = useIsCurrentUser();
 
 const mutualPluralIndex = computed(() => (userProfile?.value.mutualsCount ?? 1) - 1);
 
@@ -31,7 +31,7 @@ const modifiedMutualUsers = computed(() => {
   <div class="my-2 flex flex-col" data-cy="profile-info">
     <div class="px-4">
       <h2
-        class="text-foreground line-clamp-2 pb-0 text-2xl font-bold break-words"
+        class="text-foreground wrap-break-words line-clamp-2 pb-0 text-2xl font-bold"
         data-cy="profile-display-name"
       >
         {{ userProfile?.displayName }}
@@ -39,7 +39,7 @@ const modifiedMutualUsers = computed(() => {
       <p class="text-muted-foreground text-md" data-cy="profile-user-name">{{ displayUsername }}</p>
       <p
         v-if="!isBlocking"
-        class="mt-2 line-clamp-4 break-words whitespace-pre-line"
+        class="wrap-break-words mt-2 line-clamp-4 whitespace-pre-line"
         data-cy="profile-bio"
       >
         <UiContentEntitiesRenderer
