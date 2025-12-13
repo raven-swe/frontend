@@ -69,8 +69,8 @@ jobs:
         run: |
           printenv | grep '^APP_' | sed 's/^APP_//' > .env
 
-      - name: Set up Corepack
-        run: corepack enable
+      # - name: Set up Corepack
+      #   run: corepack enable
         
       - name: Set up pnpm
         run: corepack prepare pnpm@latest --activate
