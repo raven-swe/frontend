@@ -67,6 +67,7 @@ onServerPrefetch(async () => {
     <div
       v-else-if="isUserNotFound"
       class="flex flex-col items-center justify-center p-8 text-center"
+      data-cy="profile-not-found-message"
     >
       <h1 class="mb-2 text-3xl font-bold">{{ $t('errors.ACCOUNT_NOT_FOUND') }}</h1>
       <p class="text-muted-foreground">{{ $t('errors.TRY_SEARCHING') }}</p>
@@ -81,22 +82,26 @@ onServerPrefetch(async () => {
             :label="$t('profile.tabs.posts')"
             :route="profilePath"
             :is-active="$route.path.toLowerCase() === profilePath"
+            data-cy="profile-posts-tab"
           />
           <Tab
             :label="$t('profile.tabs.replies')"
             :route="`${profilePath}/replies`"
             :is-active="$route.path.toLowerCase() === `${profilePath}/replies`"
+            data-cy="profile-replies-tab"
           />
           <Tab
             :label="$t('profile.tabs.media')"
             :route="`${profilePath}/media`"
             :is-active="$route.path.toLowerCase() === `${profilePath}/media`"
+            data-cy="profile-media-tab"
           />
           <Tab
             v-if="isCurrentUser"
             :label="$t('profile.tabs.likes')"
             :route="`${profilePath}/likes`"
             :is-active="$route.path.toLowerCase() === `${profilePath}/likes`"
+            data-cy="profile-likes-tab"
           />
         </Tabs>
 
@@ -105,7 +110,7 @@ onServerPrefetch(async () => {
       </template>
       <template v-else>
         <div class="flex flex-col items-center justify-center p-8 text-center">
-          <h1 class="mb-2 text-3xl font-bold">
+          <h1 class="mb-2 text-3xl font-bold" data-cy="profile-blocked-message">
             {{ $t('profile.messages.blocked', { username: user.username }) }}
           </h1>
         </div>
