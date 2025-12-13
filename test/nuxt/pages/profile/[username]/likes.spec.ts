@@ -11,6 +11,7 @@ import messages from '@@/i18n/locales/en.json';
 // Mock the profileTabsService.getProfile used by the profile layout
 const profileTabsServiceMock = vi.hoisted(() => ({
   getProfile: vi.fn(),
+  getProfileTweetsPaginated: vi.fn(),
 }));
 
 vi.mock('~/services/profile/profileTabsService', async (orig) => {
@@ -20,6 +21,7 @@ vi.mock('~/services/profile/profileTabsService', async (orig) => {
     profileTabsService: {
       ...actual.profileTabsService,
       getProfile: profileTabsServiceMock.getProfile,
+      getProfileTweetsPaginated: profileTabsServiceMock.getProfileTweetsPaginated,
     },
   };
 });

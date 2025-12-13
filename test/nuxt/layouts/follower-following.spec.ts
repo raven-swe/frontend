@@ -3,7 +3,6 @@ import { mountSuspended } from '@nuxt/test-utils/runtime';
 import FollowerFollowingLayout from '~/layouts/follower-following.vue';
 import { createI18n } from 'vue-i18n';
 import messages from '@@/i18n/locales/en.json';
-import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query';
 
 const i18n = createI18n({ locale: 'en', messages: { en: messages } });
 
@@ -18,7 +17,6 @@ vi.mock('~/services/profile/profileTabsService', () => ({
 
 describe('FollowerFollowing Layout', () => {
   it('renders follower tab content', async () => {
-    const queryClient = new QueryClient();
     profileTabsServiceMock.getProfile.mockResolvedValue({
       username: 'testuser',
       displayName: 'Test User',
@@ -60,7 +58,6 @@ describe('FollowerFollowing Layout', () => {
   });
 
   it('renders back button and works correctly', async () => {
-    const queryClient = new QueryClient();
     profileTabsServiceMock.getProfile.mockResolvedValue({
       username: 'testuser',
       displayName: 'Test User',
