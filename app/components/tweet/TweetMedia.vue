@@ -21,7 +21,7 @@ const compact = computed(() => props.compact === true);
     <!-- 2 media: side by side -->
     <div
       v-else-if="media.length === 2"
-      class="border-border grid grid-cols-2 gap-0.5 overflow-hidden rounded-xl border-1"
+      class="border-border grid grid-cols-2 gap-0.5 overflow-hidden rounded-xl border"
     >
       <MediaItem v-for="(m, i) in media" :key="i" :media="m" :compact="compact" />
     </div>

@@ -151,7 +151,7 @@ const isOpen = ref(false);
         </UiPopoverTrigger>
         <UiPopoverContent class="w-fit rounded-xl p-0">
           <UiEmojiPicker
-            class="bg-background h-[342px] !border-none !shadow-none"
+            class="bg-background h-[342px] border-none! shadow-none!"
             @emoji-select="handleEmojiSelect"
           >
             <UiEmojiPickerSearch />
