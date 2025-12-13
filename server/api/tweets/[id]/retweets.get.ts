@@ -4,9 +4,9 @@ import * as yup from 'yup';
 const paramsSchema = yup.object({ id: yup.string().required().min(1) });
 
 type RetweetUser = {
-  username: 'string';
-  displayName: 'string';
-  avatarUrl: 'string';
+  username: string;
+  displayName: string;
+  avatarUrl: string;
   isFollowing?: boolean;
   isFollower?: boolean;
   isBlocked?: boolean;
