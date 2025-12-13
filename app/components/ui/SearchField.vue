@@ -6,6 +6,7 @@ import { searchService } from '~/services/search/searchService';
 import type { CompactUser } from '~~/shared/types/user';
 import Hashtag from '~/components/search/Hashtag.vue';
 import HistoryItem from '~/components/search/HistoryItem.vue';
+import UserCard from '~/components/search/UserCard.vue';
 
 interface Props {
   showBackOnFocus?: boolean;
@@ -214,20 +215,9 @@ onMounted(() => {
                 v-for="user in searchResults.users"
                 :key="user.username"
                 :to="`/profile/${user.username}`"
-                class="hover:bg-accent flex items-center gap-3 px-4 py-3 transition-colors"
                 @click="saveInHistory({ type: 'user', content: user })"
               >
-                <img
-                  :src="user.avatarUrl"
-                  :alt="user.displayName"
-                  class="h-10 w-10 rounded-full object-cover"
-                />
-                <div class="flex-1 overflow-hidden">
-                  <div class="text-foreground truncate font-semibold">{{ user.displayName }}</div>
-                  <div class="text-muted-foreground truncate text-sm">
-                    {{ $t('@') }}{{ user.username }}
-                  </div>
-                </div>
+                <UserCard :user="user" />
               </NuxtLink>
             </div>
             <NuxtLink
