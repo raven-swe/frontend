@@ -7,7 +7,7 @@ export default defineWrappedResponseHandler(async (event) => {
       id: string;
       url: string;
     }>
-  >(`/media/upload/image`, {
+  >(`/media/upload/gif`, {
     method: 'POST',
     body: body,
   });
