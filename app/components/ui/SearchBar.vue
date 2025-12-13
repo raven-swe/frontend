@@ -66,6 +66,7 @@ function handleSubmit() {
       type="text"
       :placeholder="placeholderText"
       class="h-[15px] flex-1 border-none bg-transparent text-[15px] outline-none"
+      data-cy="search-input"
       @input="handleInput"
       @focus="handleFocus"
       @blur="handleBlur"
@@ -75,6 +76,7 @@ function handleSubmit() {
       v-if="modelValue"
       variant="icon"
       size="icon"
+      data-cy="search-clear-button"
       @click="
         emit('update:modelValue', '');
         isFocused = true;
