@@ -230,7 +230,19 @@ describe('TweetView.vue', () => {
     const tweet = makeTweet();
     const wrapper = await mountSuspended(TweetView, {
       props: { tweet, media: false },
-      global: { stubs: { NuxtImg: true, Icon: true } },
+      global: {
+        stubs: {
+          NuxtImg: true,
+          NuxtLink: { template: '<a><slot /></a>' },
+          Icon: true,
+          UserHoverCard: { template: '<div><slot /></div>' },
+          TweetDropdown: true,
+          ContentEntitiesRenderer: true,
+          QuotedTweetCard: true,
+          AiSummary: true,
+          MediaItem: true,
+        },
+      },
     });
 
     const media = wrapper.findComponent(TweetMedia);
