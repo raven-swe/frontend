@@ -6,6 +6,7 @@ import ContentEntitiesRenderer from '../ui/ContentEntitiesRenderer.vue';
 import { useUserStore } from '~/stores/user';
 import QuotedTweetCard from './QuotedTweetCard.vue';
 import AiSummary from './AiSummary.vue';
+import { useQueryClient } from '@tanstack/vue-query';
 import type { TweetWithParents } from '~~/shared/types/tweets';
 interface Props {
   tweet: TweetWithParents;
@@ -48,12 +49,45 @@ const onUndoRetweetSuccess = () => {
     tweetClone.value.retweetCount = next < 0 ? 0 : next;
   }
 };
+const onReplySuccess = (tweet: Tweet) => {
+  tweetClone.value.replyCount = (tweetClone.value.replyCount ?? 0) + 1;
+  handleReplied(tweet);
+};
 
 const { mutate: followUser } = useFollowMutation();
 const { mutate: blockUser } = useBlockMutation();
 
 function handleAiSummary() {
   aiSummaryRef.value?.handleAiSummary?.();
+}
+
+const queryClient = useQueryClient();
+const router = useRouter();
+const tweetid = computed(() => router.currentRoute.value.params.tweetid as string);
+
+function handleReplied(tweet: Tweet) {
+  if (tweet.replyToTweetId !== tweetid.value) return;
+
+  queryClient.setQueryData<{
+    pages: Array<ApiSuccessResponse<Tweet[]>>;
+    pageParams: Array<string | null>;
+  }>(['tweet-replies', tweetid.value], (old) => {
+    if (!old) return old;
+
+    const first = old.pages[0];
+    if (!first) return old;
+
+    return {
+      ...old,
+      pages: [
+        {
+          ...first,
+          data: [tweet, ...first.data],
+        },
+        ...old.pages.slice(1),
+      ],
+    };
+  });
 }
 </script>
 
@@ -194,6 +228,7 @@ function handleAiSummary() {
       @unlike-success="onUnlikeSuccess"
       @retweet-success="onRetweetSuccess"
       @undo-retweet-success="onUndoRetweetSuccess"
+      @reply-success="onReplySuccess"
     />
   </article>
 </template>
