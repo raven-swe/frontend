@@ -95,7 +95,7 @@ watch(
 
 <template>
   <div class="border-border mx-auto max-w-[700px]">
-    <TweetComposer class="mt-15 border-b-1" @posted="handlePost" />
+    <TweetComposer class="border-b-1" @posted="handlePost" />
     <ClientOnly>
       <VirtualInfiniteScroller
         :items="tweets"

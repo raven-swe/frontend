@@ -8,6 +8,7 @@ import Button from '~/components/ui/Button.vue';
 import { useDebounceFn } from '@vueuse/core';
 import { useUserStore } from '~/stores/user';
 import { apiFetch } from '~/api';
+import type { FetchError } from 'ofetch';
 
 definePageMeta({ layout: 'settings' });
 
@@ -79,7 +80,7 @@ const checkUsernameAvailability = useDebounceFn(async (username: string) => {
     }
   } catch (error) {
     // Handle different error status codes
-    const err = error as { data?: { data: { error: { code: string } } } };
+    const err = error as FetchError<FetchError<ApiValidationErrorResponse>>;
     const code = err.data?.data?.error.code;
     const errorKey = code ? `errors.username.${code}` : 'errors.username.error-checking';
     console.error('Error checking username:', errorKey);

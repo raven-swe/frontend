@@ -12,7 +12,7 @@ const router = useRouter();
 const conversationId = computed(() => route.params.conversationId as string | null);
 
 const userStore = useUserStore();
-const currentUsername = computed(() => userStore.user.username);
+const currentUsername = computed(() => userStore.user?.username);
 
 const {
   conversations,

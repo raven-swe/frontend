@@ -86,14 +86,14 @@ export function useDmSocketIO() {
         entities: { mentions: [], hashtags: [] },
         mediaUrl: null,
         createdAt: data.createdAt,
-        isMine: data.sender.username === userStore.user.username,
+        isMine: data.sender.username === userStore.user?.username,
       };
       onMessageCallback.value?.(message);
 
       // Auto-mark as seen if user is currently viewing this conversation and message is not mine
       if (
         selectedConversationId.value === payload.conversationId &&
-        data.sender.username !== userStore.user.username
+        data.sender.username !== userStore.user?.username
       ) {
         markSeen(payload.conversationId, data.id);
       }
