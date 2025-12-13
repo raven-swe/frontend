@@ -83,7 +83,7 @@ async function fetchCategoryGifs(query: string) {
       params: {
         key: API_KEY,
         q: query,
-        limit: 20,
+        limit: 21,
         media_filter: 'gif',
       },
     });
@@ -160,9 +160,9 @@ function openCategory(cat: Category) {
               <div
                 v-for="gif in gifs"
                 :key="gif.id"
-                class="overflow-hidden rounded border bg-black/10"
+                class="overflow-hidden rounded border bg-black/10 hover:cursor-pointer"
               >
-                <img :src="gif.media_formats.gif.url" class="block h-auto w-full" />
+                <img :src="gif.media_formats.gif.url" class="block h-[100px] w-full object-cover" />
               </div>
             </div>
           </div>
