@@ -5,43 +5,44 @@ import MediaItem from './MediaItem.vue';
 interface Props {
   media: TweetMedia[] | undefined;
   compact?: boolean; // when true (quoted tweet), render smaller media
+  tweetId?: string;
 }
 const props = defineProps<Props>();
 const media = ref(props.media || []);
-const compact = computed(() => props.compact === true);
+const compact = computed(() => !!props.compact);
 </script>
 
 <template>
-  <div v-if="media.length > 0" :class="[compact ? 'w-full max-w-[300px]' : 'w-full', 'pt-2']">
-    <!-- 1 media -->
-    <div v-if="media.length === 1" class="grid overflow-hidden rounded-xl">
-      <MediaItem :media="media[0]!" :compact="compact" />
-    </div>
-
-    <!-- 2 media: side by side -->
+  <div v-if="media.length" :class="[compact ? 'w-full max-w-[300px]' : 'w-full', 'pt-2']">
     <div
-      v-else-if="media.length === 2"
-      class="border-border grid grid-cols-2 gap-0.5 overflow-hidden rounded-xl border-1"
+      class="border-border grid max-h-50 gap-0.5 overflow-hidden rounded-xl border"
+      :class="{
+        'max-h-125': !compact,
+        'grid-cols-2': media.length >= 2,
+        'grid-rows-2': media.length > 2,
+      }"
     >
-      <MediaItem v-for="(m, i) in media" :key="i" :media="m" :compact="compact" />
-    </div>
-
-    <!-- 3 media: first spans full height on left -->
-    <div
-      v-else-if="media.length === 3"
-      class="grid grid-cols-2 grid-rows-2 gap-0.5 overflow-hidden rounded-xl"
-    >
-      <div class="col-span-1 row-span-2"><MediaItem :media="media[0]!" :compact="compact" /></div>
-      <MediaItem :media="media[1]!" :compact="compact" />
-      <MediaItem :media="media[2]!" :compact="compact" />
-    </div>
-
-    <!-- 4 media: uniform grid -->
-    <div
-      v-else-if="media.length === 4"
-      class="grid grid-cols-2 grid-rows-2 gap-0.5 overflow-hidden rounded-xl"
-    >
-      <MediaItem v-for="(m, i) in media" :key="i" :media="m!" :compact="compact" />
+      <template v-for="m in media" :key="m.id || m.url">
+        <NuxtLink
+          v-if="m.type !== 'VIDEO' && props.tweetId"
+          :to="`/media/${props.tweetId}`"
+          class="block h-full w-full"
+        >
+          <MediaItem
+            :media="m"
+            :compact="compact"
+            :rounded="false"
+            :class="{ 'first:row-span-2': media.length === 3 }"
+          />
+        </NuxtLink>
+        <MediaItem
+          v-else
+          :media="m"
+          :compact="compact"
+          :rounded="false"
+          :class="{ 'first:row-span-2': media.length === 3 }"
+        />
+      </template>
     </div>
   </div>
 </template>

@@ -10,7 +10,6 @@ useHead(() => ({
   htmlAttrs: {
     lang: locale.value,
     dir: localeProperties.value.dir,
-    // class: 'dark',
   },
 }));
 
@@ -38,9 +37,9 @@ provide('unseenNotificationsCount', unseenNotificationsCount);
 watch(
   () => userStore.user,
   (newUser, oldUser) => {
-    if (newUser.username && !oldUser?.username) {
+    if (newUser?.username && !oldUser?.username) {
       connectDmSse();
-    } else if (!newUser.username && oldUser?.username) {
+    } else if (!newUser?.username && oldUser?.username) {
       disconnectDmSse();
     }
   },

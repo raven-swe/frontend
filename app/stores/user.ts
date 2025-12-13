@@ -3,41 +3,12 @@ import type { User } from '~~/shared/types/user';
 
 export const useUserStore = defineStore('user', {
   state: () => ({
-    user: {
-      username: '',
-      displayName: '',
-      bio: ``,
-      bioEntities: {
-        mentions: [],
-        hashtags: [],
-      },
-      avatarUrl: '',
-      bannerUrl: '',
-      location: '',
-      websiteUrl: '',
-      birthDate: '',
-      joinedAt: '',
-      email: '',
-      phone: '',
-      followingCount: 0,
-      followersCount: 0,
-      mutualsCount: 0,
-      mutualNames: [],
-      languageCode: '',
-    } as User,
-    loading: false,
-    error: null as string | null,
+    user: null as User | null,
   }),
 
   getters: {
-    memberSince: (state) => (state.user ? new Date(state.user.joinedAt).getFullYear() : null),
     isProfileSetup: (state) =>
-      state.user.avatarUrl.includes('default_avatar') && !state.user.bio ? false : true,
-    isCurrentUser: (state) => {
-      return (username: string): boolean => {
-        return state.user?.username === username;
-      };
-    },
+      state.user?.avatarUrl.includes('default_avatar') && !state.user?.bio ? false : true,
   },
 
   actions: {
@@ -50,28 +21,7 @@ export const useUserStore = defineStore('user', {
     },
 
     logout() {
-      this.user = {
-        username: '',
-        displayName: '',
-        bio: ``,
-        bioEntities: {
-          mentions: [],
-          hashtags: [],
-        },
-        avatarUrl: '',
-        bannerUrl: '',
-        location: '',
-        websiteUrl: '',
-        birthDate: '',
-        joinedAt: '',
-        email: '',
-        phone: '',
-        followingCount: 0,
-        followersCount: 0,
-        mutualsCount: 0,
-        mutualNames: [],
-        languageCode: '',
-      } as User;
+      this.user = null;
     },
   },
 });

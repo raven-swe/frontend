@@ -11,7 +11,7 @@ const userStore = useUserStore();
 const highlighted = computed(() => {
   const lastMessage = props.conversation.lastMessage;
   if (!lastMessage) return false;
-  const isNotSender = lastMessage.senderUsername !== userStore.user.username;
+  const isNotSender = lastMessage.senderUsername !== userStore.user?.username;
   return !lastMessage.seen && !props.isSelected && isNotSender;
 });
 </script>

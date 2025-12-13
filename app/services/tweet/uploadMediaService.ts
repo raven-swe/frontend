@@ -39,8 +39,19 @@ export const uploadMediaService = () => {
     }
   };
 
+  // upload gif
+  const uploadGif = async (tenorId: string) => {
+    const response = await apiFetch('/api/media/upload/gif', {
+      method: 'POST',
+      body: JSON.stringify({ tenorId }),
+    });
+
+    return response.data.id;
+  };
+
   return {
     uploadImage,
     uploadVideo,
+    uploadGif,
   };
 };

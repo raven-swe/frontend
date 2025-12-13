@@ -60,18 +60,17 @@ export const useEditProfile = () => {
     }
 
     // Check text fields
-    if (normalize(name.value) !== normalize(userStore.user.displayName)) return true;
-    if (normalize(bio.value) !== normalize(userStore.user.bio)) return true;
-    if (normalize(location.value) !== normalize(userStore.user.location)) return true;
-    if (normalize(website.value) !== normalize(userStore.user.websiteUrl)) return true;
+    if (normalize(name.value) !== normalize(userStore.user?.displayName)) return true;
+    if (normalize(bio.value) !== normalize(userStore.user?.bio)) return true;
+    if (normalize(location.value) !== normalize(userStore.user?.location)) return true;
+    if (normalize(website.value) !== normalize(userStore.user?.websiteUrl)) return true;
 
     // Check images (only if no new file is selected)
-    if (normalize(selectedProfileImage.value) !== normalize(userStore.user.avatarUrl)) return true;
-    if (normalize(selectedImage.value) !== normalize(userStore.user.bannerUrl)) return true;
-
+    if (normalize(selectedProfileImage.value) !== normalize(userStore.user?.avatarUrl)) return true;
+    if (normalize(selectedImage.value) !== normalize(userStore.user?.bannerUrl)) return true;
     // Check birth date
     const currentBirthDate = birthDate.value ? birthDate.value.toISOString().split('T')[0] : null;
-    const originalBirthDate = userStore.user.birthDate
+    const originalBirthDate = userStore.user?.birthDate
       ? new Date(userStore.user.birthDate).toISOString().split('T')[0]
       : null;
     if (currentBirthDate !== originalBirthDate) return true;
@@ -116,12 +115,12 @@ export const useEditProfile = () => {
   const handleSubmit = async () => {
     if (!isFormValid.value) return;
     if (!hasUnsavedChanges.value) {
-      router.push(`/profile/${userStore.user.username}`);
+      router.push(`/profile/${userStore.user?.username}`);
       return;
     }
 
     // optimistic navigation
-    router.push(`/profile/${userStore.user.username}`);
+    router.push(`/profile/${userStore.user?.username}`);
     await nextTick(); // allow DOM and route to update
 
     const formattedBirthDate = birthDate.value
@@ -135,8 +134,8 @@ export const useEditProfile = () => {
       location: normalize(location.value),
       websiteUrl: normalize(website.value),
       birthDate: formattedBirthDate,
-      deleteBanner: !selectedImage.value && !!userStore.user.bannerUrl,
-      deleteAvatar: !selectedProfileImage.value && !!userStore.user.avatarUrl,
+      deleteBanner: !selectedImage.value && !!userStore.user?.bannerUrl,
+      deleteAvatar: !selectedProfileImage.value && !!userStore.user?.avatarUrl,
     };
 
     // Get files
@@ -147,7 +146,9 @@ export const useEditProfile = () => {
 
     // refresh data
     queryClient.invalidateQueries({ queryKey: ['layout-data'] });
-    queryClient.invalidateQueries({ queryKey: ['profile', userStore.user.username.toLowerCase()] });
+    queryClient.invalidateQueries({
+      queryKey: ['profile', userStore.user?.username.toLowerCase()],
+    });
   };
 
   return {

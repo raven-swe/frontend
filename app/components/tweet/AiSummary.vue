@@ -62,12 +62,17 @@ defineExpose({ handleAiSummary });
     </div>
 
     <!-- Summary content -->
-    <div v-else-if="showAiSummary" class="ai-summary-bg ai-summary-anim relative rounded-xl p-3">
+    <div
+      v-else-if="showAiSummary"
+      class="ai-summary-bg ai-summary-anim relative rounded-xl p-3"
+      data-cy="tweet-ai-summary-container"
+    >
       <UiButton
         variant="ghost-default"
         size="icon-xs"
         class="text-foreground/70 hover:text-foreground absolute end-2 top-2 bg-transparent"
         :aria-label="$t('ai-summary.close')"
+        data-cy="tweet-ai-summary-close-button"
         @click.prevent.stop="closeSummary"
       >
         <Icon name="material-symbols:close-rounded" size="1rem" aria-hidden="true" />
@@ -75,7 +80,7 @@ defineExpose({ handleAiSummary });
       <h3 class="font-semibold">
         {{ $t('ai-summary.summary') }}
       </h3>
-      <p class="text-foreground mt-1 text-sm">{{ aiSummary }}</p>
+      <p class="text-foreground mt-1 text-sm" data-cy="tweet-ai-summary-content">{{ aiSummary }}</p>
     </div>
   </div>
 </template>

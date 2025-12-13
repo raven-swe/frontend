@@ -31,7 +31,7 @@ const usernameSchema = usernameSchemaBase.test(
   async (username, ctx) => {
     if (!username) return false;
 
-    const current = userStore.user.username?.toLowerCase();
+    const current = userStore.user?.username?.toLowerCase();
     const normalized = username.toLowerCase();
     if (normalized === current) return true;
 
@@ -52,12 +52,21 @@ const usernameSchema = usernameSchemaBase.test(
   },
 );
 
-const { values, defineField, handleSubmit, isSubmitting, isFieldValid, setFieldValue } = useForm({
+const {
+  values,
+  defineField,
+  handleSubmit,
+  isSubmitting,
+  isFieldValid,
+  setFieldValue,
+  meta,
+  resetForm,
+} = useForm({
   validationSchema: yup.object({
     username: usernameSchema.required(),
   }),
   initialValues: {
-    username: userStore.user.username?.toString() || '',
+    username: userStore.user?.username?.toString() || '',
   },
 });
 
@@ -98,6 +107,21 @@ const actionButton = computed(() => {
     variant: (isUsernameSet ? 'primary' : 'outline') as ButtonVariants['variant'],
   };
 });
+
+watch(
+  () => userStore.user?.username,
+  (username) => {
+    if (!username) return;
+
+    // Avoid overwriting if the user already typed
+    if (meta.value.dirty) return;
+
+    resetForm({
+      values: { username },
+    });
+  },
+  { immediate: true },
+);
 </script>
 
 <template>

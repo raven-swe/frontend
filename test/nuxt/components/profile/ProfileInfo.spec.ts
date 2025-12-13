@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { mountSuspended } from '@nuxt/test-utils/runtime';
 import ProfileInfo from '@/components/profile/ProfileInfo.vue';
 import type { User } from '~~/shared/types/user';
@@ -50,6 +50,20 @@ const mockUser: User = {
     },
   ],
 };
+
+const mockUsIsCurrentUser = vi.hoisted(() => {
+  return {
+    value: false,
+  };
+});
+
+vi.mock('~/composables/useIsCurrentUser', () => {
+  return {
+    useIsCurrentUser: () => ({
+      isCurrentUser: computed(() => mockUsIsCurrentUser.value),
+    }),
+  };
+});
 
 describe('ProfileInfo', () => {
   it('renders component with correct structure', async () => {
@@ -406,6 +420,32 @@ describe('ProfileInfo', () => {
     expect(avatar[0]?.text()).toBe('/mutual1.jpg');
     expect(avatar[1]?.text()).toBe('/mutual2.jpg');
     expect(avatar[2]?.text()).toBe('/mutual3.jpg');
+    wrapper.unmount();
+  });
+
+  it('does not render mutual followrers if am the current user', async () => {
+    mockUsIsCurrentUser.value = true;
+    const wrapper = await mountSuspended(ProfileInfo, {
+      global: {
+        provide: {
+          'user-data': computed(() => ({
+            ...mockUser,
+            mutualsCount: 3,
+          })),
+        },
+        stubs: {
+          UiAvatar: {
+            props: ['img'],
+            template: '<div data-test="avatar">{{ img }}</div>',
+          },
+        },
+      },
+    });
+
+    expect(wrapper.html()).not.toContain('Followed by');
+    const avatar = wrapper.findAll('div[data-test="avatar"]');
+    expect(avatar.length).toBe(0);
+    mockUsIsCurrentUser.value = false;
     wrapper.unmount();
   });
 });

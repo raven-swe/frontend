@@ -13,7 +13,7 @@ defineEmits<{
     v-if="!relationship.following"
     size="xs"
     data-test="follow-button"
-    data-cy="follow-button"
+    data-cy="profile-follow-button"
     @click.prevent.stop="$emit('follow')"
   >
     {{ relationship.follower ? $t('ui.follow-back') : $t('ui.follow') }}
@@ -25,7 +25,7 @@ defineEmits<{
     size="xs"
     data-test="unfollow-button"
     class="group grid-stack"
-    data-cy="unfollow-button"
+    data-cy="profile-unfollow-button"
     @click.prevent.stop="$emit('unfollow')"
   >
     <span class="invisible group-hover:visible">

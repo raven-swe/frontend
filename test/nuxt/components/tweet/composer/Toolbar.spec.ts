@@ -303,7 +303,7 @@ describe('TweetToolbar', () => {
 
     const fileInput = wrapper.find('input[type="file"]');
     expect(fileInput.attributes('accept')).toBe(
-      'image/png,image/jpg,image/jpeg,image/webp,video/mp4,video/x-matroska,video/webm,video/quicktime',
+      'image/png,image/jpg,image/jpeg,image/webp,image/gif,video/mp4,video/mov',
     );
     expect(fileInput.attributes('multiple')).toBeDefined();
   });

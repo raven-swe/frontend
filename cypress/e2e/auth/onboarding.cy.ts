@@ -141,7 +141,7 @@ describe('Onboarding Flow', { testIsolation: false }, function () {
       cy.get('div[data-cy="follow-suggestion-list"]').should('be.visible');
     });
     it('should allow following users and enable next button', function () {
-      cy.get('button[data-cy="follow-button"]').first().click({ force: true });
+      cy.get('button[data-cy="profile-follow-button"]').first().click({ force: true });
       cy.get('button[data-cy="onboarding-follow-users-next-button"]')
         .contains('Next')
         .should('not.be.disabled');
