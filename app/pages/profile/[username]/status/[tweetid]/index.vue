@@ -184,7 +184,7 @@ onServerPrefetch(async () => {
     </ClientOnly>
 
     <div ref="main-tweet-cont" class="min-h-[calc(100vh_-_3.25rem)]">
-      <TweetView :tweet="tweetData" />
+      <TweetView :tweet="tweetData" :media="true" />
 
       <div class="border-b">
         <TweetComposer :reply-to-tweet-id="tweetData?.id" type="reply" @posted="handleReplied" />

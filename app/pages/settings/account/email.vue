@@ -28,7 +28,7 @@ const changeEmailStore = useChangeEmailStore();
     <div class="flex flex-col gap-6 px-4">
       <UiInput
         placeholder="Email"
-        :model-value="userStore.user.email"
+        :model-value="userStore.user?.email"
         data-cy="email-settings-input"
         disabled
       />

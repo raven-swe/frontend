@@ -334,6 +334,18 @@
     "delete": "حذف",
     "post": "نشر",
     "reply": "رد",
+    "carousel": {
+      "carousel": "معرض شرائح",
+      "item": "شريحة",
+      "next": {
+        "icon": "lucide:arrow-left",
+        "label": "الشريحة التالية"
+      },
+      "previous": {
+        "icon": "lucide:arrow-right",
+        "label": "الشريحة السابقة"
+      }
+    },
     "follow": "متابعة",
     "unfollow": "إلغاء المتابعة",
     "following": "متابع",

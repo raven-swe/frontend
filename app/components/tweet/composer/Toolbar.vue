@@ -230,6 +230,7 @@ const handleEmojiSelect = (emoji: EmojiSelectEvent) => {
         class="post-button"
         size="md"
         :disabled="disabled || isOverLimit"
+        data-cy="tweet-composer-post-button"
         @click="$emit('post')"
       >
         {{ props.buttonText }}
@@ -240,6 +241,7 @@ const handleEmojiSelect = (emoji: EmojiSelectEvent) => {
     <input
       ref="fileInputRef"
       type="file"
+      data-cy="tweet-composer-media-input"
       :accept="ALLOWED_IMAGE_TYPES_FOR_HTML + ',' + ALLOWED_VIDEO_TYPES_FOR_HTML"
       multiple
       class="hidden"
