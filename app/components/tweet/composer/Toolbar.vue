@@ -25,6 +25,7 @@ interface Emits {
   (e: 'post'): void;
   (e: 'add-media', files: File[]): void;
   (e: 'insert-emoji', emoji: string): void;
+  (e: 'add-gif', payload: { tenorId: string; url: string }): void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -40,6 +41,8 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<Emits>();
 
 const fileInputRef = ref<HTMLInputElement | null>(null);
+const isEmojiOpen = ref(false);
+const isGifPickerOpen = ref(false);
 
 const progress = computed(() => Math.min(props.characterCount / props.maxLength, 1));
 const circumference = 2 * Math.PI * 10; // radius = 10
@@ -59,6 +62,19 @@ const handleMediaClick = () => {
   if (props.canAddMedia) {
     fileInputRef.value?.click();
   }
+};
+
+const handleGifClick = () => {
+  isGifPickerOpen.value = true;
+};
+
+const handleGifSelect = (payload: { tenorId: string; url: string }) => {
+  isGifPickerOpen.value = false;
+  emit('add-gif', payload);
+};
+
+const handleGifPickerClose = () => {
+  isGifPickerOpen.value = false;
 };
 
 const handleFileSelect = (event: Event) => {
@@ -106,11 +122,9 @@ interface EmojiSelectEvent {
 }
 
 const handleEmojiSelect = (emoji: EmojiSelectEvent) => {
-  isOpen.value = false;
+  isEmojiOpen.value = false;
   emit('insert-emoji', emoji.emoji);
 };
-
-const isOpen = ref(false);
 </script>
 
 <template>
@@ -134,11 +148,12 @@ const isOpen = ref(false);
         :title="$t('tweet.composer.gif')"
         class="text-brand-blue"
         size="icon-md"
+        @click="handleGifClick"
       >
         <Icon name="heroicons:gif-solid" size="20" />
       </UiButton>
       <!--  -->
-      <UiPopover v-model:open="isOpen">
+      <UiPopover v-model:open="isEmojiOpen">
         <UiPopoverTrigger as-child>
           <UiButton
             variant="tweet-icon-blue"
@@ -228,6 +243,13 @@ const isOpen = ref(false);
       multiple
       class="hidden"
       @change="handleFileSelect"
+    />
+
+    <!-- GIF Picker -->
+    <TweetComposerGifPicker
+      v-if="isGifPickerOpen"
+      @close="handleGifPickerClose"
+      @select="handleGifSelect"
     />
   </div>
 </template>

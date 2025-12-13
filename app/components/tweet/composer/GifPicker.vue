@@ -9,8 +9,9 @@ const API_KEY = config.public.tenorApiKey;
 const searchQuery = ref('');
 const isFocused = ref(false);
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'close'): void;
+  (e: 'select', payload: { tenorId: string; url: string }): void;
 }>();
 
 interface Category {
@@ -197,6 +198,13 @@ onUnmounted(() => {
     scrollContainerRef.value.removeEventListener('scroll', scrollHandler);
   }
 });
+
+function selectGif(gif: GifResult) {
+  emit('select', {
+    tenorId: gif.id,
+    url: gif.media_formats.gif.url,
+  });
+}
 </script>
 
 <template>
@@ -253,6 +261,7 @@ onUnmounted(() => {
                   v-for="gif in allGifs"
                   :key="gif.id"
                   class="overflow-hidden border bg-black/10 hover:cursor-pointer"
+                  @click="selectGif(gif)"
                 >
                   <img
                     :src="gif.media_formats.gif.url"
