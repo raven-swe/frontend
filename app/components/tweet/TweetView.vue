@@ -6,12 +6,15 @@ import ContentEntitiesRenderer from '../ui/ContentEntitiesRenderer.vue';
 import { useUserStore } from '~/stores/user';
 import QuotedTweetCard from './QuotedTweetCard.vue';
 import AiSummary from './AiSummary.vue';
+import type { TweetWithParents } from '~~/shared/types/tweets';
 interface Props {
   tweet: TweetWithParents;
+  media?: boolean;
 }
 const props = defineProps<Props>();
 const userStore = useUserStore();
 const originalUsername = ref<string>(userStore.user?.username || '');
+const showMedia = computed(() => props.media ?? true);
 
 const tweetClone = ref(structuredClone(toRaw(props.tweet)));
 const aiSummaryRef = ref<InstanceType<typeof AiSummary> | null>(null);
@@ -161,7 +164,9 @@ function handleAiSummary() {
       <p class="pt-2 text-lg leading-relaxed break-words whitespace-pre-wrap">
         <ContentEntitiesRenderer :content="tweetClone.content" :entities="tweetClone.entities" />
       </p>
-      <TweetMedia :media="tweetClone.media" />
+      <div v-if="showMedia">
+        <TweetMedia :media="tweet.media" :tweet-id="tweet.id" />
+      </div>
 
       <!-- Quoted Tweet -->
       <QuotedTweetCard v-if="tweetClone.quotedTweet" :tweet="tweetClone.quotedTweet" />

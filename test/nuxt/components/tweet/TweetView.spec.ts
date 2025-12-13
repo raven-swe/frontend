@@ -99,11 +99,24 @@ describe('TweetView.vue', () => {
     expect(hashtag.text()).toContain('#Testing');
   });
 
-  it('renders media and action buttons with correct props', async () => {
+  it('renders media and action buttons with correct props when media=true', async () => {
     const tweet = makeTweet();
     const wrapper = await mountSuspended(TweetView, {
-      props: { tweet },
-      global: { stubs: { NuxtImg: true, Icon: true }, plugins: [i18n, VueQueryPlugin] },
+      props: { tweet, media: true },
+      global: {
+        stubs: {
+          NuxtImg: true,
+          NuxtLink: { template: '<a><slot /></a>' },
+          Icon: true,
+          UserHoverCard: { template: '<div><slot /></div>' },
+          TweetDropdown: true,
+          ContentEntitiesRenderer: true,
+          QuotedTweetCard: true,
+          AiSummary: true,
+          MediaItem: true,
+        },
+        plugins: [i18n, VueQueryPlugin],
+      },
     });
 
     const media = wrapper.findComponent(TweetMedia);
@@ -114,6 +127,17 @@ describe('TweetView.vue', () => {
     expect(actions.exists()).toBe(true);
     // Check that the tweet prop is passed (actual values are reactive)
     expect(actions.props('tweet')).toBeDefined();
+  });
+
+  it('does not render media when media=false', async () => {
+    const tweet = makeTweet();
+    const wrapper = await mountSuspended(TweetView, {
+      props: { tweet, media: false },
+      global: { stubs: { NuxtImg: true, Icon: true } },
+    });
+
+    const media = wrapper.findComponent(TweetMedia);
+    expect(media.exists()).toBe(false);
   });
 
   it('handles like/unlike events and updates state', async () => {

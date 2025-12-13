@@ -92,6 +92,12 @@ const { mutate: blockUser } = useBlockMutation();
     </p>
 
     <!-- Media (if any) -->
-    <TweetMedia v-if="tweet.media?.length" :media="tweet.media" compact />
+    <TweetMedia
+      v-if="tweet.media?.length"
+      :media="tweet.media"
+      :tweet-id="tweet.id"
+      compact
+      @click.stop
+    />
   </div>
 </template>

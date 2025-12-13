@@ -14,12 +14,17 @@ const profileTabsServiceMock = vi.hoisted(() => ({
   getProfileTweetsPaginated: vi.fn(),
 }));
 
-vi.mock('~/services/profile/profileTabsService', () => ({
-  profileTabsService: {
-    getProfile: profileTabsServiceMock.getProfile,
-    getProfileTweetsPaginated: profileTabsServiceMock.getProfileTweetsPaginated,
-  },
-}));
+vi.mock('~/services/profile/profileTabsService', async (orig) => {
+  const actual = await orig();
+  return {
+    ...actual,
+    profileTabsService: {
+      ...actual.profileTabsService,
+      getProfile: profileTabsServiceMock.getProfile,
+      getProfileTweetsPaginated: profileTabsServiceMock.getProfileTweetsPaginated,
+    },
+  };
+});
 
 const mockUser: User = {
   joinedAt: '2020-07-15T12:34:56Z',
@@ -83,7 +88,6 @@ describe('likes page', () => {
           Tabs: true,
           Tab: true,
           UiSpinner: true,
-          VirtualInfiniteScroller: { template: '<div><slot name="item" :item="{}" /></div>' },
           ClientOnly: { template: '<slot />' },
         },
         plugins: [[VueQueryPlugin, { queryClient }], i18n],
@@ -160,7 +164,6 @@ describe('likes page', () => {
           Tabs: true,
           Tab: true,
           UiSpinner: true,
-          VirtualInfiniteScroller: { template: '<div><slot name="item" :item="{}" /></div>' },
           ClientOnly: { template: '<slot />' },
         },
         plugins: [[VueQueryPlugin, { queryClient }], i18n],

@@ -218,7 +218,7 @@ const { mutate: blockUser } = useBlockMutation();
       </p>
 
       <!-- Media (single image basic layout) -->
-      <TweetMedia :media="tweet.media" />
+      <TweetMedia :media="tweet.media" :tweet-id="tweet.id" @click.stop />
 
       <!-- Quoted Tweet -->
 

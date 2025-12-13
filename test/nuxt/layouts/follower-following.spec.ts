@@ -3,7 +3,6 @@ import { mountSuspended } from '@nuxt/test-utils/runtime';
 import FollowerFollowingLayout from '~/layouts/follower-following.vue';
 import { createI18n } from 'vue-i18n';
 import messages from '@@/i18n/locales/en.json';
-import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query';
 
 const i18n = createI18n({ locale: 'en', messages: { en: messages } });
 
@@ -18,7 +17,6 @@ vi.mock('~/services/profile/profileTabsService', () => ({
 
 describe('FollowerFollowing Layout', () => {
   it('renders follower tab content', async () => {
-    const queryClient = new QueryClient();
     profileTabsServiceMock.getProfile.mockResolvedValue({
       username: 'testuser',
       displayName: 'Test User',
@@ -32,7 +30,21 @@ describe('FollowerFollowing Layout', () => {
         path: '/profile/testuser/followers',
       },
       global: {
-        plugins: [i18n, [VueQueryPlugin, { queryClient }]],
+        plugins: [i18n],
+        stubs: {
+          // Prevent rendering the full default layout tree
+          NuxtLayout: {
+            template: '<div><slot /></div>',
+          },
+          // Render a real button and forward component click
+          UiButton: {
+            emits: ['click'],
+            template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>',
+          },
+          UiTabs: true,
+          UiTab: true,
+          Icon: true,
+        },
       },
     });
 
@@ -46,7 +58,6 @@ describe('FollowerFollowing Layout', () => {
   });
 
   it('renders back button and works correctly', async () => {
-    const queryClient = new QueryClient();
     profileTabsServiceMock.getProfile.mockResolvedValue({
       username: 'testuser',
       displayName: 'Test User',
@@ -63,7 +74,17 @@ describe('FollowerFollowing Layout', () => {
         },
       },
       global: {
-        plugins: [i18n, [VueQueryPlugin, { queryClient }]],
+        plugins: [i18n],
+        stubs: {
+          NuxtLayout: { template: '<div><slot /></div>' },
+          UiButton: {
+            emits: ['click'],
+            template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>',
+          },
+          UiTabs: true,
+          UiTab: true,
+          Icon: true,
+        },
       },
     });
     const spy = vi.spyOn(wrapper.vm.$router, 'back').mockImplementation(() => {});

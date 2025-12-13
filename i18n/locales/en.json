@@ -348,6 +348,18 @@
     "block": "Block",
     "unmute": "Unmute",
     "unblock": "Unblock",
+    "carousel": {
+      "carousel": "carousel",
+      "item": "slide",
+      "next": {
+        "icon": "lucide:arrow-right",
+        "label": "Next slide"
+      },
+      "previous": {
+        "icon": "lucide:arrow-left",
+        "label": "Previous slide"
+      }
+    },
     "blocking": "Blocked",
     "search": {
       "searchbar": {
