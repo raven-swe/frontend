@@ -340,32 +340,9 @@ const debouncedMentions = useDebounceFn(async (mention) => {
         <div
           v-for="(user, index) in mentionResults"
           :key="user.username"
-          :class="[
-            'mention-items flex cursor-pointer items-center gap-3 p-3 transition-colors',
-            highlightedIndex === index ? 'bg-accent' : '',
-          ]"
-          @click="selectUser(user)"
+          :class="['mention-items', highlightedIndex === index ? 'bg-accent' : '']"
         >
-          <UiAvatar :img="user.avatarUrl" size="sm" />
-          <div class="flex-1 overflow-hidden">
-            <p class="text-foreground truncate text-sm font-bold">{{ user.displayName }}</p>
-            <p class="text-muted-foreground truncate text-sm">{{ $t('@') }}{{ user.username }}</p>
-            <p
-              v-if="user.relationship.follower || user.relationship.following"
-              class="text-muted-foreground truncate text-sm"
-            >
-              <Icon name="material-symbols:person" />
-              {{
-                user.relationship.follower && user.relationship.following
-                  ? $t('ui.you-follow-each-other')
-                  : user.relationship.follower
-                    ? $t('ui.follow-you')
-                    : user.relationship.following
-                      ? $t('ui.following')
-                      : ''
-              }}
-            </p>
-          </div>
+          <SearchUserCard :user="user" @click="selectUser(user)" />
         </div>
       </UiSearchList>
     </div>
