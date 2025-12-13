@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onUnmounted } from 'vue';
+import { ref, computed, onUnmounted, watch } from 'vue';
 import { useInfiniteQuery } from '@tanstack/vue-query';
 
 const config = useRuntimeConfig();
@@ -130,12 +130,24 @@ const allGifs = computed(() => {
 function openCategory(cat: Category) {
   selectedCategory.value = cat;
   currentQuery.value = cat.query;
+  searchQuery.value = '';
 }
 
 function closeCategory() {
   selectedCategory.value = null;
   currentQuery.value = '';
+  searchQuery.value = '';
 }
+
+// Trigger search
+watch(searchQuery, (newQuery) => {
+  if (newQuery.trim()) {
+    selectedCategory.value = null; // Clear category when searching
+    currentQuery.value = newQuery.trim();
+  } else if (!selectedCategory.value) {
+    currentQuery.value = '';
+  }
+});
 
 // Infinite scrolling
 let scrollHandler: ((e: Event) => void) | null = null;
@@ -201,7 +213,7 @@ onUnmounted(() => {
 
         <!-- Categories -->
         <div class="w-full p-0">
-          <div v-if="!selectedCategory" class="grid grid-cols-2 gap-0">
+          <div v-if="!selectedCategory && !searchQuery.trim()" class="grid grid-cols-2 gap-0">
             <div
               v-for="cat in categories"
               :key="cat.name"
@@ -224,7 +236,7 @@ onUnmounted(() => {
           </div>
 
           <!-- Results -->
-          <div v-else>
+          <div v-else-if="selectedCategory || searchQuery.trim()">
             <div ref="scrollContainerRef" class="max-h-[480px] overflow-y-auto px-1">
               <div class="grid grid-cols-3 gap-0">
                 <div
