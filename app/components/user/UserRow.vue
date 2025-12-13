@@ -3,6 +3,11 @@ import type { CompactUser } from '~~/shared/types/user';
 import FollowToggleButton from '@/components/ui/FollowToggleButton.vue';
 import MuteToggleButton from '@/components/ui/MuteToggleButton.vue';
 import BlockToggleButton from '@/components/ui/BlockToggleButton.vue';
+import {
+  useFollowMutation,
+  useMuteMutation,
+  useBlockMutation,
+} from '~/composables/useProfileMutation';
 
 const props = withDefaults(
   defineProps<{
@@ -16,9 +21,6 @@ const props = withDefaults(
   },
 );
 
-defineEmits<{
-  (e: 'follow' | 'unfollow' | 'unblock' | 'block' | 'mute' | 'unmute', username: string): void;
-}>();
 const router = useRouter();
 const userStore = useUserStore();
 
@@ -28,6 +30,10 @@ const relationship = computed(() => props.user.relationship);
 const isCurrentUser = computed(() => {
   return userStore.user?.username.toLowerCase() === props.user.username.toLowerCase();
 });
+
+const { mutate: followUser } = useFollowMutation();
+const { mutate: blockUser } = useBlockMutation();
+const { mutate: muteUser } = useMuteMutation();
 </script>
 
 <template>
@@ -37,13 +43,8 @@ const isCurrentUser = computed(() => {
     data-cy="user-row"
     @click="router.push(`/profile/${user.username}`)"
   >
-    <div class="flex-shrink-0">
-      <UserHoverCard
-        :username="user.username"
-        @follow="$emit('follow', user.username)"
-        @unfollow="$emit('unfollow', user.username)"
-        @unblock="$emit('unblock', user.username)"
-      >
+    <div class="shrink-0">
+      <UserHoverCard :username="user.username">
         <UiAvatar :img="user.avatarUrl" size="sm" />
       </UserHoverCard>
     </div>
@@ -51,23 +52,13 @@ const isCurrentUser = computed(() => {
     <div class="flex flex-1 flex-col gap-1 overflow-hidden">
       <div class="flex flex-1 items-center justify-between gap-2">
         <div class="flex flex-col overflow-hidden">
-          <UserHoverCard
-            :username="user.username"
-            @follow="$emit('follow', user.username)"
-            @unfollow="$emit('unfollow', user.username)"
-            @unblock="$emit('unblock', user.username)"
-          >
+          <UserHoverCard :username="user.username">
             <p class="text-md line-clamp-1 truncate font-semibold">
               {{ user.displayName }}
             </p>
           </UserHoverCard>
           <p class="text-muted-foreground text-sm" data-cy="user-row-username">
-            <UserHoverCard
-              :username="user.username"
-              @follow="$emit('follow', user.username)"
-              @unfollow="$emit('unfollow', user.username)"
-              @unblock="$emit('unblock', user.username)"
-            >
+            <UserHoverCard :username="user.username">
               {{ '@' + user.username + ' ' }}
             </UserHoverCard>
             <span
@@ -82,30 +73,27 @@ const isCurrentUser = computed(() => {
           <BlockToggleButton
             v-if="primaryAction === 'block' || isBlocked"
             :relationship="relationship"
-            @block="$emit('block', user.username)"
-            @unblock="$emit('unblock', user.username)"
+            @block="blockUser({ username: user.username, action: 'block' })"
+            @unblock="blockUser({ username: user.username, action: 'unblock' })"
           />
           <FollowToggleButton
             v-else-if="primaryAction === 'follow'"
             :relationship="relationship"
-            @follow="$emit('follow', user.username)"
-            @unfollow="$emit('unfollow', user.username)"
+            @follow="followUser({ username: user.username, action: 'follow' })"
+            @unfollow="followUser({ username: user.username, action: 'unfollow' })"
           />
           <MuteToggleButton
             v-else-if="primaryAction === 'mute'"
             :relationship="relationship"
-            @mute="$emit('mute', user.username)"
-            @unmute="$emit('unmute', user.username)"
+            @mute="muteUser({ username: user.username, action: 'mute' })"
+            @unmute="muteUser({ username: user.username, action: 'unmute' })"
           />
 
           <UserActionDropdown
             v-if="props.showDropdown"
             :is-muted="isMuted"
             :is-blocked="isBlocked"
-            @mute="$emit('mute', user.username)"
-            @unmute="$emit('unmute', user.username)"
-            @block="$emit('block', user.username)"
-            @unblock="$emit('unblock', user.username)"
+            :username="user.username"
           >
             <UiButton
               data-test="dropdown-trigger"
