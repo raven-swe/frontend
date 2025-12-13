@@ -105,7 +105,7 @@ const handleShare = async () => {
 <template>
   <div class="text-muted-foreground text-md mt-1.5 flex w-full items-center justify-between">
     <label class="hover:text-brand-blue relative flex items-center justify-center gap-[1px]">
-      <Button variant="tweet-icon-turquoise" size="icon-md">
+      <Button variant="tweet-icon-turquoise" size="icon-md" @click.stop>
         <Icon name="tabler:message-circle-2" size="1.2rem" />
       </Button>
       <span class="absolute start-8">{{ props.tweet.replyCount }}</span>
@@ -127,6 +127,7 @@ const handleShare = async () => {
             "
             size="icon-md"
             data-testid="retweet-dropdown-trigger"
+            @click.stop
           >
             <Icon name="tabler:repeat" size="1.2rem" />
           </Button>
@@ -154,14 +155,19 @@ const handleShare = async () => {
       v-if="props.tweet.isLiked"
       class="hover:text-brand-red text-brand-red relative flex items-center justify-center"
     >
-      <Button variant="tweet-icon-red-active" size="icon-md" @click.prevent.stop="handleUnlike">
+      <Button
+        variant="tweet-icon-red-active"
+        size="icon-md"
+        @click.prevent.stop="handleUnlike"
+        @click.stop
+      >
         <Icon name="line-md:heart-filled" size="1.2rem" />
       </Button>
       <span class="absolute start-8">{{ props.tweet.likeCount }}</span>
     </label>
 
     <label v-else class="hover:text-brand-red relative flex items-center justify-center gap-[1px]">
-      <Button variant="tweet-icon-red" size="icon-md" @click.prevent.stop="handleLike">
+      <Button variant="tweet-icon-red" size="icon-md" @click.prevent.stop="handleLike" @click.stop>
         <Icon name="tabler:heart" size="1.2rem" />
       </Button>
       <span class="absolute start-8">{{ props.tweet.likeCount }}</span>
@@ -172,6 +178,7 @@ const handleShare = async () => {
       size="icon-md"
       class="hover:text-brand-blue"
       @click.prevent.stop="handleShare"
+      @click.stop
     >
       <Icon name="lucide:share" size="1.2rem" />
     </Button>

@@ -228,7 +228,6 @@ const { mutate: blockUser } = useBlockMutation();
       <!-- Actions -->
       <TweetActionButtons
         :tweet="tweet"
-        @click.stop
         @like-success="onLikeSuccess"
         @unlike-success="onUnlikeSuccess"
         @retweet-success="onRetweetSuccess"
