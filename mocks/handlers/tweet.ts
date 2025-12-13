@@ -98,6 +98,37 @@ export const handlers = [
     );
   }),
 
+  // POST /media/upload/gif
+  http.post(`${API_URL}/media/upload/gif`, async ({ request }) => {
+    const body = (await request.json()) as { tenorId: string };
+    const { tenorId } = body;
+
+    if (!tenorId) {
+      return HttpResponse.json(
+        { success: false, message: 'No Tenor ID provided.' },
+        { status: 400 },
+      );
+    }
+
+    const id = genId();
+    const url = `https://media.tenor.com/images/${tenorId}/tenor.gif`;
+
+    mediaStore.set(id, { id, url, type: 'GIF' });
+
+    return HttpResponse.json(
+      {
+        success: true,
+        message: 'GIF uploaded successfully.',
+        data: {
+          id,
+          url,
+          message: 'GIF stored in media store (mock).',
+        },
+      },
+      { status: 200 },
+    );
+  }),
+
   // POST /tweets
   http.post(`${API_URL}/tweets`, async ({ request }) => {
     const body = (await request.json()) as CreateTweetRequest;

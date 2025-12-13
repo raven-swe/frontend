@@ -31,7 +31,7 @@ describe('Media Slide Show', () => {
       props: { media },
     });
 
-    const mediaItem = wrapper.find('.aspect-\\[25\\/28\\]');
+    const mediaItem = wrapper.find('.aspect-\\25\\/28\\');
     expect(mediaItem.exists()).toBe(true);
     expect(mediaItem.attributes('style')).toContain('width: 100%');
   });
@@ -42,7 +42,7 @@ describe('Media Slide Show', () => {
       props: { media },
     });
 
-    const mediaItems = wrapper.findAll('.aspect-\\[25\\/28\\]');
+    const mediaItems = wrapper.findAll('.aspect-\\25\\/28\\');
     expect(mediaItems).toHaveLength(3);
     mediaItems.forEach((item) => {
       expect(item.attributes('style')).toContain('width: 43%');

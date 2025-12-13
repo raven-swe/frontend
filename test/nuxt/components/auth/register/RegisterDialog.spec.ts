@@ -40,9 +40,8 @@ describe('RegisterDialog Component', () => {
       }),
     }));
 
-    const { default: RegisterDialogOpened } = await import(
-      '@/components/auth/register/RegisterDialog.vue'
-    );
+    const { default: RegisterDialogOpened } =
+      await import('@/components/auth/register/RegisterDialog.vue');
     await mountSuspended(RegisterDialogOpened, {
       global: {
         plugins: [i18n],
@@ -71,9 +70,8 @@ describe('RegisterDialog Component', () => {
     vi.doMock('@/stores/register', () => ({
       useRegisterStore: () => ({ open: false, step: 0, previousStep: vi.fn() }),
     }));
-    const { default: RegisterDialogClosed } = await import(
-      '@/components/auth/register/RegisterDialog.vue'
-    );
+    const { default: RegisterDialogClosed } =
+      await import('@/components/auth/register/RegisterDialog.vue');
     await mountSuspended(RegisterDialogClosed, {
       global: {
         plugins: [i18n],
@@ -92,9 +90,8 @@ describe('RegisterDialog Component', () => {
       useRegisterStore: () => ({ open: true, step: 1, previousStep: prevMock }),
     }));
 
-    const { default: RegisterDialogStep1 } = await import(
-      '@/components/auth/register/RegisterDialog.vue'
-    );
+    const { default: RegisterDialogStep1 } =
+      await import('@/components/auth/register/RegisterDialog.vue');
     await mountSuspended(RegisterDialogStep1, {
       global: {
         plugins: [i18n],

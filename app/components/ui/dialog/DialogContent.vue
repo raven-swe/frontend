@@ -13,6 +13,7 @@ const props = defineProps<
     headerClass?: HTMLAttributes['class'];
     hideCloseButton?: boolean;
     contentHeight?: string;
+    contentPadding?: string;
   }
 >();
 const emits = defineEmits<DialogContentEmits>();
@@ -21,6 +22,7 @@ const delegatedProps = reactiveOmit(props, 'class', 'headerClass');
 
 const forwarded = useForwardPropsEmits(delegatedProps, emits);
 const contentHeight = computed(() => props.contentHeight ?? 'sm:h-160');
+const contentPadding = computed(() => props.contentPadding ?? 'px-6 pb-6');
 </script>
 
 <template>
@@ -39,7 +41,7 @@ const contentHeight = computed(() => props.contentHeight ?? 'sm:h-160');
       @escape-key-down="(e) => e.preventDefault()"
       @interact-outside="(e) => e.preventDefault()"
     >
-      <div class="relative flex h-auto flex-shrink-0 flex-row items-center justify-start gap-2 p-2">
+      <div class="relative flex h-auto shrink-0 flex-row items-center justify-start gap-2 p-2">
         <DialogClose v-if="!hideCloseButton" data-slot="dialog-close" as-child>
           <Button variant="ghost-default" size="icon-xs" class="absolute inset-2">
             <Icon name="lucide:x" class="size-5" />
@@ -53,7 +55,10 @@ const contentHeight = computed(() => props.contentHeight ?? 'sm:h-160');
         </div>
       </div>
 
-      <div class="flex min-h-0 w-full flex-1 flex-col gap-4 overflow-y-auto px-6 pb-6">
+      <div
+        class="flex min-h-0 w-full flex-1 flex-col gap-4 overflow-y-auto"
+        :class="[contentPadding]"
+      >
         <slot />
       </div>
     </DialogContent>

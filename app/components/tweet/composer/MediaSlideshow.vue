@@ -38,6 +38,10 @@ const itemWidth = computed(() => {
   return props.media.length === 1 ? '100%' : '43%';
 });
 
+const isGif = (item: MediaItem) => {
+  return item.type === 'gif';
+};
+
 const navigateLeft = () => {
   if (!canNavigateLeft.value) return;
   currentIndex.value = Math.max(0, currentIndex.value - 1);
@@ -85,15 +89,40 @@ const removeMedia = (id: string) => {
         <div
           v-for="item in media"
           :key="item.id"
-          class="bg-background/50 relative aspect-[25/28] flex-shrink-0 overflow-hidden"
+          class="bg-background/50 relative aspect-25/28 shrink-0 overflow-hidden"
           :style="{ width: itemWidth }"
         >
-          <component
-            :is="item.type === 'video' ? 'video' : 'img'"
+          <!-- Video -->
+          <video
+            v-if="item.type === 'video'"
             :src="item.url"
             class="h-full w-full object-cover"
-            v-bind="item.type === 'video' ? { controls: true } : {}"
+            controls
           />
+
+          <!-- GIF -->
+          <img
+            v-else-if="isGif(item)"
+            :src="item.url"
+            class="h-full w-full object-cover"
+            :alt="item.altText || 'GIF'"
+          />
+
+          <!-- Image -->
+          <img
+            v-else
+            :src="item.url"
+            class="h-full w-full object-cover"
+            :alt="item.altText || 'Image'"
+          />
+
+          <!-- GIF indicator -->
+          <div
+            v-if="isGif(item)"
+            class="bg-foreground/75 text-background absolute end-2 bottom-2 rounded px-1.5 py-0.5 text-xs font-medium"
+          >
+            {{ $t('tweet.composer.gif') }}
+          </div>
 
           <UiButton
             type="button"

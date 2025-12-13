@@ -287,11 +287,16 @@
       "media": "Media",
       "gif": "GIF",
       "emoji": "Emoji",
+      "no-emojis": "No emojis found",
+      "select-emoji": "Select an emoji",
+      "change-skin-tone": "Change skin tone",
       "profile-alt": "Avatar of {name}",
       "loading": {
         "uploading": "Uploading media... {progress}%",
         "posting": "Posting tweet..."
-      }
+      },
+      "post-success": "Tweet posted successfully",
+      "post-error": "Failed to post tweet. Please try again."
     },
     "delete-tweet": "Delete",
     "delete-success": "Tweet deleted successfully",
@@ -359,6 +364,7 @@
   "ui": {
     "close": "Close",
     "next": "Next",
+    "back": "Back",
     "loading": "Loading",
     "skip-for-now": "Skip for now",
     "save": "Save",

@@ -15,7 +15,7 @@ export const useTweetComposer = (
 ) => {
   const { t } = useI18n();
 
-  const { uploadImage, uploadVideo } = uploadMediaService();
+  const { uploadImage, uploadVideo, uploadGif } = uploadMediaService();
 
   const isPosting = ref(false);
   const uploadProgress = ref(0);
@@ -55,10 +55,15 @@ export const useTweetComposer = (
           const item = media.value[i];
 
           if (item?.type === 'image') {
+            if (!item.file) continue;
             const mediaId = await uploadImage(item.file, 'tweets');
             mediaIds.push(mediaId);
           } else if (item?.type === 'video') {
+            if (!item.file) continue;
             const mediaId = await uploadVideo(item.file, 'tweets');
+            mediaIds.push(mediaId);
+          } else if (item?.type === 'gif' && item.tenorId) {
+            const mediaId = await uploadGif(item.tenorId);
             mediaIds.push(mediaId);
           }
 
@@ -74,14 +79,11 @@ export const useTweetComposer = (
         quoteToTweetId: quoteTweetId?.value ?? null,
       });
 
-      showToaster('success', t('tweet.composer.post_success') || 'Tweet posted successfully!');
+      showToaster('success', t('tweet.composer.post-success'));
 
       return newTweet;
     } catch {
-      showToaster(
-        'error',
-        t('tweet.composer.post_error') || 'Error creating tweet. Please try again.',
-      );
+      showToaster('error', t('tweet.composer.post-error'));
       return null;
     } finally {
       isPosting.value = false;
@@ -103,11 +105,26 @@ export const useTweetComposer = (
     });
   };
 
+  const handleAddGif = (payload: { tenorId: string; url: string }) => {
+    if (media.value.length >= MAX_MEDIA) return;
+
+    const id = `gif-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+    media.value.push({
+      id,
+      url: payload.url,
+      type: 'gif',
+      tenorId: payload.tenorId,
+    });
+  };
+
   const handleRemoveMedia = (id: string) => {
     const index = media.value.findIndex((m) => m.id === id);
 
     if (index !== -1 && index < media.value.length && media.value[index]) {
-      URL.revokeObjectURL(media.value[index].url);
+      if (media.value[index].file) {
+        URL.revokeObjectURL(media.value[index].url);
+      }
       media.value.splice(index, 1);
     }
   };
@@ -126,6 +143,7 @@ export const useTweetComposer = (
     // actions
     handlePost,
     handleAddMedia,
+    handleAddGif,
     handleRemoveMedia,
   };
 };
