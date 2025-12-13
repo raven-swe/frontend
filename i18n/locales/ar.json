@@ -599,7 +599,8 @@
     "message-input": {
       "uploading": "جارٍ رفع الصورة..."
     },
-    "delete": "حذف"
+    "delete": "حذف",
+    "typing": "{username} يكتب..."
   },
   "toaster": {
     "login": {

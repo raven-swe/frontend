@@ -106,6 +106,13 @@ vi.mock('@/components/dm/conversation/DmMessagesList.vue', () => ({
 vi.mock('@/components/dm/conversation/DmMessageInput.vue', () => ({
   default: {
     name: 'DmConversationDmMessageInput',
+    template: '<div data-test="typing-indecator"></div>',
+  },
+}));
+
+vi.mock('@/components/dm/conversation/DmTypingIndicator.vue', () => ({
+  default: {
+    name: 'DmConversationDmTypingIndicator',
     template: '<div data-test="message-input"></div>',
   },
 }));

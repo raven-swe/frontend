@@ -160,6 +160,7 @@ watch(
         @message-deleted="handleMessageDeleted"
       />
     </div>
+    <DmConversationDmTypingIndicator :conversation-id="conversationId" />
     <DmConversationDmMessageInput />
   </div>
 </template>

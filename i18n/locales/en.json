@@ -629,7 +629,8 @@
     "message-input": {
       "uploading": "Uploading image..."
     },
-    "delete": "Delete"
+    "delete": "Delete",
+    "typing": "{username} is typing..."
   },
   "toaster": {
     "login": {
