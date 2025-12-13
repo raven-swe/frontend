@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import UserList from '~/components/user/UserList.vue';
 import { tweetsService } from '~/services/tweet/tweetsService';
 
 definePageMeta({
@@ -6,22 +7,26 @@ definePageMeta({
 });
 
 const router = useRouter();
-const username = computed(() => router.currentRoute.value.params.username as string);
-const tweetid = computed(() => router.currentRoute.value.params.tweetid as string);
+const username = computed(
+  () => router.currentRoute.value.params.username?.toString().toLowerCase() ?? null,
+);
+const tweetid = computed(
+  () => router.currentRoute.value.params.tweetid?.toString().toLowerCase() ?? null,
+);
 </script>
 <template>
   <UserList
     :fetcher-fn="
       (cursor, signal) =>
         tweetsService.likes({
-          tweetid,
+          tweetid: tweetid ?? '',
           cursor,
           signal,
         })
     "
     :current-username="username"
     query-key-suffix="likes"
-    :query-key-suffix-array="['tweet', tweetid]"
+    :query-key-suffix-array="['tweet', tweetid ?? '']"
     :empty-title="$t('tweet.engagement.likes.empty.title')"
     :empty-description="$t('tweet.engagement.likes.empty.description')"
   />
