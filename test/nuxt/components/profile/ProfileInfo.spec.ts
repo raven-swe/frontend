@@ -59,7 +59,9 @@ const mockUsIsCurrentUser = vi.hoisted(() => {
 
 vi.mock('~/composables/useIsCurrentUser', () => {
   return {
-    useIsCurrentUser: () => mockUsIsCurrentUser.value,
+    useIsCurrentUser: () => ({
+      isCurrentUser: computed(() => mockUsIsCurrentUser.value),
+    }),
   };
 });
 
