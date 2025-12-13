@@ -34,11 +34,13 @@ defineProps<{
       v-if="media?.type === 'IMAGE' || media?.type === 'GIF'"
       :src="media?.url"
       :alt="media?.altText || 'Media image'"
+      data-cy="thumbnail-image"
       class="border-background flex aspect-square size-full object-cover"
     />
     <video
       v-else-if="media?.type === 'VIDEO'"
       :src="media?.url"
+      data-cy="thumbnail-video"
       class="border-background flex aspect-square size-full object-cover"
       @loadedmetadata="(event) => setDuration(event)"
     ></video>

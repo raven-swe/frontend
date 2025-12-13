@@ -110,6 +110,7 @@ function handleAiSummary() {
               <NuxtLink
                 :to="`/profile/${props.tweet.author.username}`"
                 class="cursor-pointer truncate pe-12 leading-tight hover:underline"
+                data-cy="tweet-view-display-name"
                 @click.stop
               >
                 {{ tweetClone.author.displayName }}
@@ -125,6 +126,7 @@ function handleAiSummary() {
               <NuxtLink
                 :to="`/profile/${props.tweet.author.username}`"
                 class="text-muted-foreground truncate pe-12 leading-tight"
+                data-cy="tweet-view-username"
                 @click.stop
               >
                 {{ '@' + tweetClone.author.username }}
@@ -157,7 +159,10 @@ function handleAiSummary() {
       </div>
     </div>
     <div class="border-b-border border-b-1">
-      <p class="pt-2 text-lg leading-relaxed break-words whitespace-pre-wrap">
+      <p
+        class="pt-2 text-lg leading-relaxed break-words whitespace-pre-wrap"
+        data-cy="tweet-view-content"
+      >
         <ContentEntitiesRenderer :content="tweetClone.content" :entities="tweetClone.entities" />
       </p>
       <TweetMedia :media="tweetClone.media" />
@@ -171,6 +176,7 @@ function handleAiSummary() {
           :title="formatDate(tweetClone.createdAt)"
           :datetime="tweetClone.createdAt"
           class="text-muted-foreground text-md"
+          data-cy="tweet-view-timestamp"
           >{{ formatDate(tweetClone.createdAt) }}</time
         >
       </div>

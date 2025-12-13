@@ -87,7 +87,7 @@ const { mutate: blockUser } = useBlockMutation();
     </div>
 
     <!-- Content -->
-    <p class="leading-relaxed break-words whitespace-pre-wrap">
+    <p class="leading-relaxed break-words whitespace-pre-wrap" data-cy="quoted-tweet-content">
       <UiContentEntitiesRenderer :content="tweet.content" :entities="tweet.entities" />
     </p>
 

@@ -162,6 +162,7 @@ const { mutate: blockUser } = useBlockMutation();
               variant="ghost-default"
               size="icon-sm"
               class="text-muted-foreground"
+              data-cy="tweet-ai-summary-button"
               @click.stop="handleAiSummary"
             >
               <Icon name="vscode-icons:file-type-gemini" size="1.2rem" />
@@ -171,6 +172,7 @@ const { mutate: blockUser } = useBlockMutation();
                 variant="ghost-default"
                 size="icon-xs"
                 class="text-muted-foreground"
+                data-cy="tweet-dropdown-trigger"
                 @click.stop
               >
                 <Icon name="lucide:more-horizontal" />
@@ -212,7 +214,7 @@ const { mutate: blockUser } = useBlockMutation();
       </div>
 
       <!-- Content -->
-      <p class="leading-relaxed break-words whitespace-pre-wrap">
+      <p class="leading-relaxed break-words whitespace-pre-wrap" data-cy="tweet-content">
         <UiContentEntitiesRenderer :content="tweet.content" :entities="tweet.entities" />
       </p>
 
