@@ -14,9 +14,8 @@ describe('server/api/conversations/[conversationId]/index.get', () => {
   });
 
   it('should fetch a single conversation by id', async () => {
-    const { default: handler } = await import(
-      '~~/server/api/conversations/[conversationId]/index.get'
-    );
+    const { default: handler } =
+      await import('~~/server/api/conversations/[conversationId]/index.get');
 
     const mockResponse = {
       success: true,
@@ -40,9 +39,8 @@ describe('server/api/conversations/[conversationId]/index.get', () => {
   });
 
   it('should handle different conversation ids', async () => {
-    const { default: handler } = await import(
-      '~~/server/api/conversations/[conversationId]/index.get'
-    );
+    const { default: handler } =
+      await import('~~/server/api/conversations/[conversationId]/index.get');
 
     const mockResponse = {
       success: true,
