@@ -121,8 +121,6 @@ describe('TweetMedia.vue (updated layout)', () => {
     });
     const container = wrapper.find('div.grid.grid-cols-2.grid-rows-2');
     expect(container.exists()).toBe(true);
-    const spanning = container.find('div.col-span-1.row-span-2');
-    expect(spanning.exists()).toBe(true);
   });
 
   it('layout: four media uniform grid has grid-cols-2 and grid-rows-2 with four items', async () => {

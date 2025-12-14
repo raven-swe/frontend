@@ -61,6 +61,9 @@ onServerPrefetch(async () => {
           :has-next-page="hasNextPage"
           :is-fetching-next-page="isFetchingNextPage"
           :fetch-next-page="fetchNextPage"
+          :get-key="
+            (item, index, key) => `${item.map((tweet) => `${tweet.id}-${key || index}`).join('-')}`
+          "
         >
           <template #item="{ item }">
             <div class="grid grid-cols-3 gap-1 overflow-hidden pt-1">
@@ -68,7 +71,7 @@ onServerPrefetch(async () => {
               <NuxtLink
                 v-for="tweet in item"
                 :key="tweet.id"
-                :to="`/profile/${tweet.author.username}/status/${tweet.id}`"
+                :to="`/media/${tweet.id}`"
                 class="block size-full"
               >
                 <Thumbnail :media="tweet.media?.[0]" :multiple="tweet.media?.length > 1" />

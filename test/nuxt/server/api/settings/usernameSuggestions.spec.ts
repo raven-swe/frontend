@@ -28,12 +28,12 @@ describe('server/api/settings/username/suggestions.get', () => {
 
     const response = await usernameSuggestionsHandler(event);
 
-    expect(mockServerApiFetch).toHaveBeenCalledWith(
-      `/onboarding/username-suggestions?typed=ahmedamr`,
-      {
-        method: 'GET',
+    expect(mockServerApiFetch).toHaveBeenCalledWith(`/onboarding/username-suggestions`, {
+      method: 'GET',
+      query: {
+        typed: 'ahmedamr',
       },
-    );
+    });
 
     expect(response).toEqual({
       success: true,

@@ -47,6 +47,7 @@ onServerPrefetch(async () => {
         :has-next-page="hasNextPage"
         :is-fetching-next-page="isFetchingNextPage"
         :fetch-next-page="fetchNextPage"
+        :get-key="(item, index, key) => `${item?.id}-${key || index}`"
       >
         <template #item="{ item }">
           <TweetDefaultCard v-if="item" :tweet="item" />

@@ -9,10 +9,12 @@ const props = withDefaults(
     user: CompactUser;
     primaryAction?: 'mute' | 'follow' | 'block';
     showDropdown?: boolean;
+    compact?: boolean;
   }>(),
   {
     primaryAction: 'follow',
     showDropdown: false,
+    compact: false,
   },
 );
 
@@ -32,7 +34,7 @@ const isCurrentUser = computed(() => {
 
 <template>
   <div
-    class="border-border hover:bg-foreground/5 flex cursor-pointer gap-2 overflow-hidden py-3 ps-4 pe-2 transition-colors duration-100"
+    class="border-border hover:bg-foreground/5 flex cursor-pointer gap-2 py-3 ps-4 pe-2 transition-colors duration-100"
     :class="{ 'pe-3': !props.showDropdown }"
     data-cy="user-row"
     @click="router.push(`/profile/${user.username}`)"
@@ -48,16 +50,18 @@ const isCurrentUser = computed(() => {
       </UserHoverCard>
     </div>
 
-    <div class="flex flex-1 flex-col gap-1">
-      <div class="flex flex-1 items-center justify-between">
-        <div>
+    <div class="flex flex-1 flex-col gap-1 overflow-hidden">
+      <div class="flex flex-1 items-center justify-between gap-2">
+        <div class="flex flex-col overflow-hidden">
           <UserHoverCard
             :username="user.username"
             @follow="$emit('follow', user.username)"
             @unfollow="$emit('unfollow', user.username)"
             @unblock="$emit('unblock', user.username)"
           >
-            <p class="text-md font-semibold break-all">{{ user.displayName }}</p>
+            <p class="text-md line-clamp-1 truncate font-semibold">
+              {{ user.displayName }}
+            </p>
           </UserHoverCard>
           <p class="text-muted-foreground text-sm" data-cy="user-row-username">
             <UserHoverCard
@@ -69,14 +73,14 @@ const isCurrentUser = computed(() => {
               {{ '@' + user.username + ' ' }}
             </UserHoverCard>
             <span
-              v-if="user.relationship.follower"
+              v-if="user.relationship.follower && !isCurrentUser && !compact"
               class="bg-muted rounded-sm p-0.5 px-0.75 text-xs font-semibold"
             >
               {{ $t('ui.follows-you') }}
             </span>
           </p>
         </div>
-        <div v-if="!isCurrentUser" class="flex items-center gap-1">
+        <div v-if="!isCurrentUser" class="flex items-center gap-1 ps-2">
           <BlockToggleButton
             v-if="primaryAction === 'block' || isBlocked"
             :relationship="relationship"
@@ -117,7 +121,7 @@ const isCurrentUser = computed(() => {
           </UserActionDropdown>
         </div>
       </div>
-      <p class="text-md line-clamp-3 break-all">
+      <p v-if="!compact" class="text-md line-clamp-3 break-all">
         <UiContentEntitiesRenderer :content="user.bio ?? ''" :entities="user.bioEntities" />
       </p>
     </div>

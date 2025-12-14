@@ -87,6 +87,7 @@ export const useRegisterStore = defineStore('register', () => {
       await registerationService.complete(password, creationToken.value);
       resetInitialData();
       open.value = false;
+      sessionStorage.setItem('showAccountSetup', 'true');
       navigateTo('/home');
     } catch (error) {
       if (isApiValidationError(error)) {

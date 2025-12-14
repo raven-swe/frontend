@@ -33,7 +33,7 @@ const handleOpenChange = (value: boolean) => {
 };
 
 watch(
-  () => userStore.user.bio,
+  () => userStore.user?.bio,
   (newVal) => {
     if (!bio.value.trim()) {
       bio.value = newVal || '';

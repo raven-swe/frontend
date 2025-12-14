@@ -56,7 +56,7 @@ const deleteFromHistory = (event: Event) => {
       <div class="flex min-w-0 flex-1 items-center gap-3">
         <Icon size="20" name="ic:outline-search" class="text-muted-foreground flex-shrink-0" />
         <p class="text-foreground text-md overflow-hidden break-words">
-          {{ props.type === 'hashtag' ? $t('#') + props.content : props.content }}
+          {{ props.content }}
         </p>
       </div>
       <UiButton

@@ -56,3 +56,18 @@ export const undoRetweetTweet = async (tweetId: string) => {
     throw error;
   }
 };
+
+export const deleteTweet = async (tweetId: string) => {
+  try {
+    const response = await apiFetch<{
+      success: boolean;
+      message: string;
+    }>(`/api/tweets/${tweetId}/delete`, {
+      method: 'DELETE',
+    });
+    return response;
+  } catch (error) {
+    console.error(`Failed to delete tweet:`, error);
+    throw error;
+  }
+};

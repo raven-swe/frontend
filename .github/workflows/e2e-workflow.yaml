@@ -7,7 +7,7 @@ on:
 
 jobs:
   e2e-tests:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     environment: e2e
     env:
       APP_POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
@@ -46,6 +46,13 @@ jobs:
       APP_SEED_ENV: ${{ secrets.SEED_ENV }}
       APP_BACKEND_URL: ${{ secrets.BACKEND_URL }}
       APP_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      APP_CLASSIFICATION_INTERVAL_MINUTES: ${{ secrets.CLASSIFICATION_INTERVAL_MINUTES }}
+      APP_CLASSIFY_REQ_LIMIT: ${{ secrets.CLASSIFY_REQ_LIMIT }}
+      APP_CLASSIFICATION_API_URL: ${{ secrets.CLASSIFICATION_API_URL }}
+      APP_CLASSIFY_TWEETS: ${{ secrets.CLASSIFY_TWEETS }}
+      APP_SUMMARY_API_KEY: ${{ secrets.SUMMARY_API_KEY }}
+      APP_RAVEN_TENOR_KEY: ${{ secrets.RAVEN_TENOR_KEY }}
+      APP_NUXT_PUBLIC_DM_WS_URL: ${{ secrets.NUXT_PUBLIC_DM_WS_URL_DEV }}
       APP_NUXT_PUBLIC_GOOGLE_CLIENT_ID: ${{ secrets.NUXT_PUBLIC_GOOGLE_CLIENT_ID }}
       APP_NUXT_PUBLIC_GITHUB_CLIENT_ID: ${{ secrets.NUXT_PUBLIC_GITHUB_CLIENT_ID }}
       APP_NUXT_PUBLIC_GITHUB_REDIRECT_URI: ${{ secrets.NUXT_PUBLIC_GITHUB_REDIRECT_URI }}
@@ -62,8 +69,8 @@ jobs:
         run: |
           printenv | grep '^APP_' | sed 's/^APP_//' > .env
 
-      - name: Set up Corepack
-        run: corepack enable
+      # - name: Set up Corepack
+      #   run: corepack enable
         
       - name: Set up pnpm
         run: corepack prepare pnpm@latest --activate

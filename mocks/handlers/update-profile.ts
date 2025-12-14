@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw';
 import type { UpdateProfileRequest, UserData } from '~~/shared/types/shared';
-import type { ApiSuccessResponse, ApiErrorResponse } from '~~/shared/types/api';
+import type { ApiSuccessResponse, ApiErrorResponse, ApiResponseBase } from '~~/shared/types/api';
 import type { User } from '#shared/types/user';
 import jwt from 'jsonwebtoken';
 import { mockUserInfos } from './mockUserDB';
@@ -268,10 +268,11 @@ export const handlers = [
     }
   }),
 
-  http.post(`${API_URL}/me/username`, async () => {
-    mockUserData.username = '';
+  http.patch(`${API_URL}/me/settings/username`, async ({ request }) => {
+    const { newUsername } = (await request.json()) as { newUsername: string };
+    mockUserData.username = newUsername;
 
-    return HttpResponse.json(
+    return HttpResponse.json<ApiResponseBase>(
       {
         success: true,
         message: 'Username updated successfully',

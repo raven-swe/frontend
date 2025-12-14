@@ -34,9 +34,8 @@ describe('RegisterInfoForm.vue', () => {
         render: recaptchaRenderfn,
       }),
     }));
-    const { default: RegisterationInfoForm } = await import(
-      '@/components/auth/register/RegisterationInfoForm.vue'
-    );
+    const { default: RegisterationInfoForm } =
+      await import('@/components/auth/register/RegisterationInfoForm.vue');
     const wrapper = await mountSuspended(
       {
         components: { RegisterationInfoForm, Dialog },
@@ -92,9 +91,8 @@ describe('RegisterInfoForm.vue', () => {
       }),
     }));
 
-    const { default: RegisterationInfoForm } = await import(
-      '@/components/auth/register/RegisterationInfoForm.vue'
-    );
+    const { default: RegisterationInfoForm } =
+      await import('@/components/auth/register/RegisterationInfoForm.vue');
     const wrapper = await mountSuspended(
       {
         components: { RegisterationInfoForm, Dialog },
@@ -160,9 +158,8 @@ describe('RegisterInfoForm.vue', () => {
       }),
     }));
 
-    const { default: RegisterationInfoForm } = await import(
-      '@/components/auth/register/RegisterationInfoForm.vue'
-    );
+    const { default: RegisterationInfoForm } =
+      await import('@/components/auth/register/RegisterationInfoForm.vue');
 
     const wrapper = await mountSuspended(
       {
@@ -221,9 +218,8 @@ describe('RegisterInfoForm.vue', () => {
       }),
     }));
 
-    const { default: RegisterationInfoForm } = await import(
-      '@/components/auth/register/RegisterationInfoForm.vue'
-    );
+    const { default: RegisterationInfoForm } =
+      await import('@/components/auth/register/RegisterationInfoForm.vue');
 
     const wrapper = await mountSuspended(
       {

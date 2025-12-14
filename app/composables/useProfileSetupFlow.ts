@@ -69,7 +69,7 @@ export const useProfileSetupFlow = () => {
     currentStep.value = 'picture';
     // nav to profile page
     const userStore = useUserStore();
-    navigateTo(`/profile/${userStore.user.username}`);
+    navigateTo(`/profile/${userStore.user?.username}`);
   };
 
   const resetFlow = () => {
@@ -113,7 +113,7 @@ export const useProfileSetupFlow = () => {
       // refresh data
       queryClient.invalidateQueries({ queryKey: ['layout-data'] });
       queryClient.invalidateQueries({
-        queryKey: ['profile', userStore.user.username.toLowerCase()],
+        queryKey: ['profile', userStore.user?.username.toLowerCase()],
       });
     }
   };

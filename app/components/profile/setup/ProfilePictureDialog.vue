@@ -8,6 +8,7 @@ import {
 
 const props = defineProps<{
   open: boolean;
+  disableClose?: boolean;
 }>();
 
 interface Emits {
@@ -71,12 +72,16 @@ const handleOpenChange = (value: boolean) => {
 
 <template>
   <UiDialog :open="props.open" @update:open="handleOpenChange">
-    <UiDialogContent header-class="flex items-center justify-center p-0" class="h-auto">
+    <UiDialogContent
+      :hide-close-button="disableClose"
+      header-class="flex items-center justify-center p-0"
+      class="h-auto"
+    >
       <template #header>
         <LogoRaven class="h-10 w-10" />
       </template>
       <template #dialog-close>
-        <Button
+        <UiButton
           variant="ghost-default"
           size="icon-xs"
           class="absolute inset-2"
@@ -84,7 +89,7 @@ const handleOpenChange = (value: boolean) => {
         >
           <Icon name="lucide:x" class="size-5" />
           <span class="sr-only">{{ $t('ui.close') }}</span>
-        </Button>
+        </UiButton>
       </template>
       <UiDialogHeader class="px-8 py-4">
         <UiDialogTitle class="text-3xl font-bold">{{
