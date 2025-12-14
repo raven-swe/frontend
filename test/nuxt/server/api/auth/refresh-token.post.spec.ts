@@ -20,8 +20,9 @@ describe('server/api/auth/refresh-token.post', () => {
     vi.doMock('~~/server/utils/auth/setAuthCookies', () => ({
       setAuthCookies: setAuthCookiesMock,
     }));
-    const { default: refreshTokenEventHandler } =
-      await import('~~/server/api/auth/refresh-token.post');
+    const { default: refreshTokenEventHandler } = await import(
+      '~~/server/api/auth/refresh-token.post'
+    );
     const token = jwt.sign({}, 'secret');
     const mockResponse = {
       _data: {
@@ -49,8 +50,9 @@ describe('server/api/auth/refresh-token.post', () => {
     vi.doMock('~~/server/utils/auth/setAuthCookies', () => ({
       setAuthCookies: setAuthCookiesMock,
     }));
-    const { default: refreshTokenEventHandler } =
-      await import('~~/server/api/auth/refresh-token.post');
+    const { default: refreshTokenEventHandler } = await import(
+      '~~/server/api/auth/refresh-token.post'
+    );
     const mockResponse = {
       _data: {
         success: true,

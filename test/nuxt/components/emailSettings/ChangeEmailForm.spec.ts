@@ -59,8 +59,9 @@ describe('ChangeEmailForm.vue', () => {
       registerationService,
     }));
 
-    const { default: ChangeEmailForm } =
-      await import('@/components/emailSettings/ChangeEmailForm.vue');
+    const { default: ChangeEmailForm } = await import(
+      '@/components/emailSettings/ChangeEmailForm.vue'
+    );
 
     const wrapper = await mountSuspended(ChangeEmailForm, {
       global: {
@@ -105,8 +106,9 @@ describe('ChangeEmailForm.vue', () => {
       registerationService,
     }));
 
-    const { default: ChangeEmailForm } =
-      await import('@/components/emailSettings/ChangeEmailForm.vue');
+    const { default: ChangeEmailForm } = await import(
+      '@/components/emailSettings/ChangeEmailForm.vue'
+    );
 
     const wrapper = await mountSuspended(ChangeEmailForm, {
       global: {
@@ -176,8 +178,9 @@ describe('ChangeEmailForm.vue', () => {
       registerationService,
     }));
 
-    const { default: ChangeEmailForm } =
-      await import('@/components/emailSettings/ChangeEmailForm.vue');
+    const { default: ChangeEmailForm } = await import(
+      '@/components/emailSettings/ChangeEmailForm.vue'
+    );
 
     const wrapper = await mountSuspended(ChangeEmailForm, {
       global: {

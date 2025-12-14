@@ -44,8 +44,9 @@ const i18n = createI18n({
 });
 
 const createWrapper = async () => {
-  const { default: ProfileAvatarSection } =
-    await import('@/components/profile/ProfileAvatarSection.vue');
+  const { default: ProfileAvatarSection } = await import(
+    '@/components/profile/ProfileAvatarSection.vue'
+  );
   return await mountSuspended(ProfileAvatarSection, {
     global: {
       provide: {
