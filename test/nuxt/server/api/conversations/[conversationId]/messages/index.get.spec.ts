@@ -14,9 +14,8 @@ describe('server/api/conversations/[conversationId]/messages/index.get', () => {
   });
 
   it('should fetch messages for a conversation with default limit', async () => {
-    const { default: handler } = await import(
-      '~~/server/api/conversations/[conversationId]/messages/index.get'
-    );
+    const { default: handler } =
+      await import('~~/server/api/conversations/[conversationId]/messages/index.get');
 
     const mockResponse = {
       success: true,
@@ -50,9 +49,8 @@ describe('server/api/conversations/[conversationId]/messages/index.get', () => {
   });
 
   it('should fetch messages with cursor for pagination', async () => {
-    const { default: handler } = await import(
-      '~~/server/api/conversations/[conversationId]/messages/index.get'
-    );
+    const { default: handler } =
+      await import('~~/server/api/conversations/[conversationId]/messages/index.get');
 
     const mockResponse = {
       success: true,
@@ -81,9 +79,8 @@ describe('server/api/conversations/[conversationId]/messages/index.get', () => {
   });
 
   it('should fetch messages with custom limit', async () => {
-    const { default: handler } = await import(
-      '~~/server/api/conversations/[conversationId]/messages/index.get'
-    );
+    const { default: handler } =
+      await import('~~/server/api/conversations/[conversationId]/messages/index.get');
 
     const mockResponse = {
       success: true,
@@ -111,9 +108,8 @@ describe('server/api/conversations/[conversationId]/messages/index.get', () => {
   });
 
   it('should handle pagination with hasNextPage true', async () => {
-    const { default: handler } = await import(
-      '~~/server/api/conversations/[conversationId]/messages/index.get'
-    );
+    const { default: handler } =
+      await import('~~/server/api/conversations/[conversationId]/messages/index.get');
 
     const mockResponse = {
       success: true,

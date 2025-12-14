@@ -14,9 +14,8 @@ describe('server/api/conversations/with/[username]/index.post', () => {
   });
 
   it('should start a conversation with a user by username', async () => {
-    const { default: handler } = await import(
-      '~~/server/api/conversations/with/[username]/index.post'
-    );
+    const { default: handler } =
+      await import('~~/server/api/conversations/with/[username]/index.post');
 
     const mockResponse = {
       success: true,
@@ -42,9 +41,8 @@ describe('server/api/conversations/with/[username]/index.post', () => {
   });
 
   it('should handle different usernames', async () => {
-    const { default: handler } = await import(
-      '~~/server/api/conversations/with/[username]/index.post'
-    );
+    const { default: handler } =
+      await import('~~/server/api/conversations/with/[username]/index.post');
 
     const mockResponse = {
       success: true,
@@ -67,9 +65,8 @@ describe('server/api/conversations/with/[username]/index.post', () => {
   });
 
   it('should return existing conversation if already exists', async () => {
-    const { default: handler } = await import(
-      '~~/server/api/conversations/with/[username]/index.post'
-    );
+    const { default: handler } =
+      await import('~~/server/api/conversations/with/[username]/index.post');
 
     const mockResponse = {
       success: true,

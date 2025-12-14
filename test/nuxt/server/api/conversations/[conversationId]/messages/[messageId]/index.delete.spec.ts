@@ -14,9 +14,8 @@ describe('server/api/conversations/[conversationId]/messages/[messageId]/index.d
   });
 
   it('should delete a message successfully', async () => {
-    const { default: handler } = await import(
-      '~~/server/api/conversations/[conversationId]/messages/[messageId]/index.delete'
-    );
+    const { default: handler } =
+      await import('~~/server/api/conversations/[conversationId]/messages/[messageId]/index.delete');
 
     const mockResponse = {
       success: true,
@@ -39,9 +38,8 @@ describe('server/api/conversations/[conversationId]/messages/[messageId]/index.d
   });
 
   it('should handle errors during deletion', async () => {
-    const { default: handler } = await import(
-      '~~/server/api/conversations/[conversationId]/messages/[messageId]/index.delete'
-    );
+    const { default: handler } =
+      await import('~~/server/api/conversations/[conversationId]/messages/[messageId]/index.delete');
 
     const mockError = new Error('Failed to delete message');
     mockServerApiFetch.mockRejectedValueOnce(mockError);
