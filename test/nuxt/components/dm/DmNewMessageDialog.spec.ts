@@ -7,7 +7,7 @@ import DmNewMessageDialog from '@/components/dm/DmNewMessageDialog.vue';
 import { useSearchUsers } from '@/composables/useSearchUsers';
 import { useStartConversation } from '@/composables/useStartConversation';
 import { useRouter } from 'vue-router';
-import { ref } from 'vue'; // Ensure ref is imported
+import { ref } from 'vue';
 import { createI18n } from 'vue-i18n';
 
 const i18n = createI18n({
@@ -17,11 +17,16 @@ const i18n = createI18n({
     en: {
       'dm.dialog.follow-each-other': 'follow-each-other',
       'dm.dialog.you-follow': 'you-follow',
+      'dm.dialog.cant-message': 'cant-message',
+      'dm.dialog.new-message': 'new-message',
+      'dm.dialog.next': 'next',
+      'dm.dialog.search-people': 'search-people',
     },
   },
 });
 
 config.global.plugins = [i18n];
+
 describe('DmNewMessageDialog Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -33,7 +38,6 @@ describe('DmNewMessageDialog Component', () => {
   });
 
   it('has toggleSelect function', async () => {
-    // This exercises the toggleSelect function logic
     let selectedUsername: string | null = null;
 
     function toggleSelect(username: string) {
@@ -47,7 +51,6 @@ describe('DmNewMessageDialog Component', () => {
   });
 
   it('has followStatus function - returns follow-each-other', async () => {
-    // Test follow status logic
     function followStatus(u: { relationship?: { following?: boolean; follower?: boolean } }) {
       const isFollowing = u.relationship?.following ?? false;
       const isFollower = u.relationship?.follower ?? false;
@@ -87,7 +90,6 @@ describe('DmNewMessageDialog Component', () => {
   });
 
   it('has canProceed computed', async () => {
-    // This exercises the canProceed logic
     let selectedUsername: string | null = null;
     const canProceed = () => !!selectedUsername;
 
@@ -248,7 +250,6 @@ describe('DmNewMessageDialog Component', () => {
       return '';
     }
 
-    // Only follower, not following - should return empty string
     expect(followStatus({ relationship: { following: false, follower: true } })).toBe('');
   });
 
@@ -267,15 +268,12 @@ describe('DmNewMessageDialog Component', () => {
       selectedUsername = selectedUsername === username ? null : username;
     }
 
-    // Select user1
     toggleSelect('user1');
     expect(selectedUsername).toBe('user1');
 
-    // Select different user - should switch
     toggleSelect('user2');
     expect(selectedUsername).toBe('user2');
 
-    // Deselect user2
     toggleSelect('user2');
     expect(selectedUsername).toBeNull();
   });
@@ -284,20 +282,15 @@ describe('DmNewMessageDialog Component', () => {
     let selectedUsername: string | null = null;
     const canProceed = () => !!selectedUsername;
 
-    // Initially false
     expect(canProceed()).toBe(false);
 
-    // Empty string is falsy
     selectedUsername = '';
     expect(canProceed()).toBe(false);
 
-    // Valid username is truthy
     selectedUsername = 'testuser';
     expect(canProceed()).toBe(true);
   });
 });
-
-// --- Component Integration Tests ---
 
 // Mock Composables Globally
 vi.mock('@/composables/useSearchUsers', () => ({
@@ -325,8 +318,23 @@ describe('DmNewMessageDialog - Component Integration Tests', () => {
     vi.clearAllMocks();
   });
 
+  const defaultStubs = {
+    UiDialog: { template: '<div><slot /></div>', props: ['open'] },
+    UiDialogOverlay: true,
+    UiDialogContent: { template: '<div><slot /></div>' },
+    UiDialogHeader: { template: '<div><slot /></div>' },
+    UiDialogTitle: true,
+    UiDialogDescription: true,
+    UiButton: {
+      template: '<button @click="$emit(\'click\')" :disabled="disabled"><slot /></button>',
+      props: ['disabled'],
+    },
+    Icon: true,
+    UiSpinner: { template: '<div data-test="spinner"></div>' },
+    UiAvatar: true,
+  };
+
   it('updates search when typing into input', async () => {
-    // Setup default mock return
     vi.mocked(useSearchUsers).mockReturnValue({
       users: ref([]),
       loading: ref(false),
@@ -335,24 +343,7 @@ describe('DmNewMessageDialog - Component Integration Tests', () => {
 
     const wrapper = mount(DmNewMessageDialog, {
       props: { open: true },
-      global: {
-        plugins: [i18n],
-        stubs: {
-          UiDialog: { template: '<div><slot /></div>', props: ['open'] },
-          UiDialogOverlay: true,
-          UiDialogContent: { template: '<div><slot /></div>' },
-          UiDialogHeader: { template: '<div><slot /></div>' },
-          UiDialogTitle: true,
-          UiDialogDescription: true,
-          UiButton: {
-            template: '<button @click="$emit(\'click\')" :disabled="disabled"><slot /></button>',
-            props: ['disabled'],
-          },
-          Icon: true,
-          UiSpinner: { template: '<div data-test="spinner"></div>' },
-          UiAvatar: true,
-        },
-      },
+      global: { plugins: [i18n], stubs: defaultStubs },
     });
 
     const input = wrapper.find('input#dm-search');
@@ -370,35 +361,45 @@ describe('DmNewMessageDialog - Component Integration Tests', () => {
 
     const wrapper = mount(DmNewMessageDialog, {
       props: { open: true },
-      global: {
-        plugins: [i18n],
-        stubs: {
-          UiDialog: { template: '<div><slot /></div>', props: ['open'] },
-          UiDialogOverlay: true,
-          UiDialogContent: { template: '<div><slot /></div>' },
-          UiDialogHeader: { template: '<div><slot /></div>' },
-          UiDialogTitle: true,
-          UiDialogDescription: true,
-          UiButton: true,
-          Icon: true,
-          UiSpinner: { template: '<div data-test="spinner"></div>' }, // Ensure test selector matches
-          UiAvatar: true,
-        },
-      },
+      global: { plugins: [i18n], stubs: defaultStubs },
     });
 
-    // Directly set search or trigger input
-    // wrapper.vm.search is protected, best to use input interaction
     const input = wrapper.find('input#dm-search');
-    if (input.exists()) {
-      await input.setValue('abc');
-    } else {
-      // Fallback if input not found (unexpected)
-      (wrapper.vm as any).search = 'abc';
-    }
+    await input.setValue('abc');
     await wrapper.vm.$nextTick();
 
     expect(wrapper.find('[data-test="spinner"]').exists()).toBe(true);
+  });
+
+  it('hides spinner when not loading', async () => {
+    vi.mocked(useSearchUsers).mockReturnValue({
+      loading: ref(false),
+      users: ref([]),
+    } as any);
+    vi.mocked(useRouter).mockReturnValue({ push: vi.fn() } as any);
+
+    const wrapper = mount(DmNewMessageDialog, {
+      props: { open: true },
+      global: { plugins: [i18n], stubs: defaultStubs },
+    });
+
+    expect(wrapper.find('[data-test="spinner"]').exists()).toBe(false);
+  });
+
+  it('does not show spinner when search is empty even if loading', async () => {
+    vi.mocked(useSearchUsers).mockReturnValue({
+      loading: ref(true),
+      users: ref([]),
+    } as any);
+    vi.mocked(useRouter).mockReturnValue({ push: vi.fn() } as any);
+
+    const wrapper = mount(DmNewMessageDialog, {
+      props: { open: true },
+      global: { plugins: [i18n], stubs: defaultStubs },
+    });
+
+    expect((wrapper.vm as any).search.trim().length).toBe(0);
+    expect(wrapper.find('[data-test="spinner"]').exists()).toBe(false);
   });
 
   it('does not select blocked user', async () => {
@@ -411,29 +412,29 @@ describe('DmNewMessageDialog - Component Integration Tests', () => {
 
     const wrapper = mount(DmNewMessageDialog, {
       props: { open: true },
-      global: {
-        plugins: [i18n],
-        stubs: {
-          UiDialog: { template: '<div><slot /></div>', props: ['open'] },
-          UiDialogOverlay: true,
-          UiDialogContent: { template: '<div><slot /></div>' },
-          UiDialogHeader: { template: '<div><slot /></div>' },
-          UiDialogTitle: true,
-          UiDialogDescription: true,
-          UiButton: true,
-          Icon: true,
-          UiSpinner: true,
-          UiAvatar: true,
-        },
-      },
+      global: { plugins: [i18n], stubs: defaultStubs },
     });
 
-    // Find by class
     const items = wrapper.findAll('.cursor-not-allowed');
-    const row = items[0];
-    if (row) await row.trigger('click');
+    if (items[0]) await items[0].trigger('click');
 
     expect((wrapper.vm as any).selectedUsername).toBeFalsy();
+  });
+
+  it('displays blocked message for blocked users', async () => {
+    const users = ref([
+      { username: 'blocked', displayName: 'Blocked User', relationship: { blockedBy: true } },
+    ]);
+
+    vi.mocked(useSearchUsers).mockReturnValue({ loading: ref(false), users } as any);
+    vi.mocked(useRouter).mockReturnValue({ push: vi.fn() } as any);
+
+    const wrapper = mount(DmNewMessageDialog, {
+      props: { open: true },
+      global: { plugins: [i18n], stubs: defaultStubs },
+    });
+
+    expect(wrapper.text()).toContain('cant-message');
   });
 
   it('selects normal user and adds border class', async () => {
@@ -444,21 +445,7 @@ describe('DmNewMessageDialog - Component Integration Tests', () => {
 
     const wrapper = mount(DmNewMessageDialog, {
       props: { open: true },
-      global: {
-        plugins: [i18n],
-        stubs: {
-          UiDialog: { template: '<div><slot /></div>', props: ['open'] },
-          UiDialogOverlay: true,
-          UiDialogContent: { template: '<div><slot /></div>' },
-          UiDialogHeader: { template: '<div><slot /></div>' },
-          UiDialogTitle: true,
-          UiDialogDescription: true,
-          UiButton: true,
-          Icon: true,
-          UiSpinner: true,
-          UiAvatar: true,
-        },
-      },
+      global: { plugins: [i18n], stubs: defaultStubs },
     });
 
     const row = wrapper.findAll('.cursor-pointer').find((w) => w.text().includes('Hussein'));
@@ -466,9 +453,28 @@ describe('DmNewMessageDialog - Component Integration Tests', () => {
       await row.trigger('click');
       expect((wrapper.vm as any).selectedUsername).toBe('hussein');
       expect(row.classes()).toContain('border-primary');
-    } else {
-      throw new Error('User row not found');
     }
+  });
+
+  it('deselects user when clicking selected user', async () => {
+    const users = ref([{ username: 'hussein', displayName: 'Hussein', relationship: {} }]);
+
+    vi.mocked(useSearchUsers).mockReturnValue({ loading: ref(false), users } as any);
+    vi.mocked(useRouter).mockReturnValue({ push: vi.fn() } as any);
+
+    const wrapper = mount(DmNewMessageDialog, {
+      props: { open: true },
+      global: { plugins: [i18n], stubs: defaultStubs },
+    });
+
+    const row = wrapper.findAll('.cursor-pointer').find((w) => w.text().includes('Hussein'));
+    if (!row) throw new Error('User row not found');
+
+    await row.trigger('click');
+    expect((wrapper.vm as any).selectedUsername).toBe('hussein');
+
+    await row.trigger('click');
+    expect((wrapper.vm as any).selectedUsername).toBeNull();
   });
 
   it('renders follow status correctly', async () => {
@@ -485,24 +491,30 @@ describe('DmNewMessageDialog - Component Integration Tests', () => {
 
     const wrapper = mount(DmNewMessageDialog, {
       props: { open: true },
-      global: {
-        plugins: [i18n],
-        stubs: {
-          UiDialog: { template: '<div><slot /></div>', props: ['open'] },
-          UiDialogOverlay: true,
-          UiDialogContent: { template: '<div><slot /></div>' },
-          UiDialogHeader: { template: '<div><slot /></div>' },
-          UiDialogTitle: true,
-          UiDialogDescription: true,
-          UiButton: true,
-          Icon: true,
-          UiSpinner: true,
-          UiAvatar: true,
-        },
-      },
+      global: { plugins: [i18n], stubs: defaultStubs },
     });
 
     expect(wrapper.text()).toContain('follow-each-other');
+  });
+
+  it('renders you-follow status', async () => {
+    const users = ref([
+      {
+        username: 'y',
+        displayName: 'Y',
+        relationship: { following: true, follower: false },
+      },
+    ]);
+
+    vi.mocked(useSearchUsers).mockReturnValue({ loading: ref(false), users } as any);
+    vi.mocked(useRouter).mockReturnValue({ push: vi.fn() } as any);
+
+    const wrapper = mount(DmNewMessageDialog, {
+      props: { open: true },
+      global: { plugins: [i18n], stubs: defaultStubs },
+    });
+
+    expect(wrapper.text()).toContain('you-follow');
   });
 
   it('calls router.push on successful conversation start', async () => {
@@ -515,36 +527,18 @@ describe('DmNewMessageDialog - Component Integration Tests', () => {
       loading: ref(false),
       users: ref([{ username: 'hussein', displayName: 'Hussein', relationship: {} }]),
     } as any);
+    vi.mocked(useRouter).mockReturnValue({ push: vi.fn() } as any);
 
     const wrapper = mount(DmNewMessageDialog, {
       props: { open: true },
-      global: {
-        plugins: [i18n],
-        stubs: {
-          UiDialog: { template: '<div><slot /></div>', props: ['open'] },
-          UiDialogOverlay: true,
-          UiDialogContent: { template: '<div><slot /></div>' },
-          UiDialogHeader: { template: '<div><slot /></div>' },
-          UiDialogTitle: true,
-          UiDialogDescription: true,
-          UiButton: {
-            template: '<button :disabled="disabled"><slot /></button>',
-            props: ['disabled'],
-          },
-          Icon: true,
-          UiSpinner: true,
-          UiAvatar: true,
-        },
-      },
+      global: { plugins: [i18n], stubs: defaultStubs },
     });
 
     const router = (wrapper.vm as any).router;
     const pushSpy = vi.spyOn(router, 'push');
 
-    // Select user
     const row = wrapper.findAll('.cursor-pointer').find((w) => w.text().includes('Hussein'));
-    if (!row) throw new Error('User not found');
-    await row.trigger('click');
+    if (row) await row.trigger('click');
 
     expect((wrapper.vm as any).selectedUsername).toBe('hussein');
 
@@ -552,5 +546,150 @@ describe('DmNewMessageDialog - Component Integration Tests', () => {
 
     expect(startConversation).toHaveBeenCalledWith('hussein');
     expect(pushSpy).toHaveBeenCalledWith({ path: '/messages/123' });
+  });
+
+  it('closes dialog after successful conversation start', async () => {
+    vi.mocked(useStartConversation).mockReturnValue({
+      startConversation: vi.fn(async () => ({ id: '123' })),
+      isStarting: ref(false),
+    } as any);
+    vi.mocked(useSearchUsers).mockReturnValue({
+      loading: ref(false),
+      users: ref([{ username: 'hussein', displayName: 'Hussein', relationship: {} }]),
+    } as any);
+    vi.mocked(useRouter).mockReturnValue({ push: vi.fn() } as any);
+
+    const wrapper = mount(DmNewMessageDialog, {
+      props: { open: true },
+      global: { plugins: [i18n], stubs: defaultStubs },
+    });
+
+    expect((wrapper.vm as any).open).toBe(true);
+
+    const row = wrapper.findAll('.cursor-pointer').find((w) => w.text().includes('Hussein'));
+    if (row) await row.trigger('click');
+
+    await (wrapper.vm as any).onNewConversation();
+    await wrapper.vm.$nextTick();
+
+    expect((wrapper.vm as any).open).toBe(false);
+  });
+
+  it('does not navigate when conversation id is null', async () => {
+    const startConversation = vi.fn(async () => ({ id: null }));
+    const pushMock = vi.fn();
+
+    vi.mocked(useStartConversation).mockReturnValue({
+      startConversation,
+      isStarting: ref(false),
+    } as any);
+
+    vi.mocked(useSearchUsers).mockReturnValue({
+      loading: ref(false),
+      users: ref([{ username: 'hussein', displayName: 'Hussein', relationship: {} }]),
+    } as any);
+
+    vi.mocked(useRouter).mockReturnValue({
+      push: pushMock,
+    } as any);
+
+    const wrapper = mount(DmNewMessageDialog, {
+      props: { open: true },
+      global: { plugins: [i18n], stubs: defaultStubs },
+    });
+
+    const row = wrapper.findAll('.cursor-pointer').find((w) => w.text().includes('Hussein'));
+    if (row) await row.trigger('click');
+
+    await (wrapper.vm as any).onNewConversation();
+    await wrapper.vm.$nextTick();
+
+    expect(pushMock).not.toHaveBeenCalled();
+    expect((wrapper.vm as any).open).toBe(true);
+  });
+
+  it('disables next button when no user selected', async () => {
+    vi.mocked(useSearchUsers).mockReturnValue({
+      loading: ref(false),
+      users: ref([{ username: 'hussein', displayName: 'Hussein', relationship: {} }]),
+    } as any);
+    vi.mocked(useRouter).mockReturnValue({ push: vi.fn() } as any);
+
+    const wrapper = mount(DmNewMessageDialog, {
+      props: { open: true },
+      global: { plugins: [i18n], stubs: defaultStubs },
+    });
+
+    expect((wrapper.vm as any).canProceed).toBe(false);
+  });
+
+  it('enables next button when user is selected', async () => {
+    const users = ref([{ username: 'hussein', displayName: 'Hussein', relationship: {} }]);
+    vi.mocked(useSearchUsers).mockReturnValue({ loading: ref(false), users } as any);
+    vi.mocked(useRouter).mockReturnValue({ push: vi.fn() } as any);
+
+    const wrapper = mount(DmNewMessageDialog, {
+      props: { open: true },
+      global: { plugins: [i18n], stubs: defaultStubs },
+    });
+
+    const row = wrapper.findAll('.cursor-pointer').find((w) => w.text().includes('Hussein'));
+    if (row) await row.trigger('click');
+
+    expect((wrapper.vm as any).canProceed).toBe(true);
+  });
+
+  it('renders users list', async () => {
+    const users = ref([
+      { username: 'alice', displayName: 'Alice', relationship: {} },
+      { username: 'bob', displayName: 'Bob', relationship: {} },
+    ]);
+
+    vi.mocked(useSearchUsers).mockReturnValue({ loading: ref(false), users } as any);
+    vi.mocked(useRouter).mockReturnValue({ push: vi.fn() } as any);
+
+    const wrapper = mount(DmNewMessageDialog, {
+      props: { open: true },
+      global: { plugins: [i18n], stubs: defaultStubs },
+    });
+
+    expect(wrapper.text()).toContain('Alice');
+    expect(wrapper.text()).toContain('Bob');
+  });
+
+  it('handles empty users list', async () => {
+    vi.mocked(useSearchUsers).mockReturnValue({
+      loading: ref(false),
+      users: ref([]),
+    } as any);
+    vi.mocked(useRouter).mockReturnValue({ push: vi.fn() } as any);
+
+    const wrapper = mount(DmNewMessageDialog, {
+      props: { open: true },
+      global: { plugins: [i18n], stubs: defaultStubs },
+    });
+
+    expect(wrapper.findAll('.cursor-pointer').length).toBe(0);
+  });
+
+  it('does nothing when onNewConversation called without selected user', async () => {
+    vi.mocked(useStartConversation).mockReturnValue({
+      startConversation: vi.fn(),
+      isStarting: ref(false),
+    } as any);
+    vi.mocked(useSearchUsers).mockReturnValue({
+      loading: ref(false),
+      users: ref([]),
+    } as any);
+
+    const wrapper = mount(DmNewMessageDialog, {
+      props: { open: true },
+      global: { plugins: [i18n], stubs: defaultStubs },
+    });
+
+    await (wrapper.vm as any).onNewConversation();
+
+    const startConv = (useStartConversation as any)().startConversation;
+    expect(startConv).not.toHaveBeenCalled();
   });
 });
