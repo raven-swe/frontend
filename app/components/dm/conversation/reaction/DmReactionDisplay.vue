@@ -15,7 +15,7 @@ const emit = defineEmits<{
 }>();
 
 const userStore = useUserStore();
-const currentUsername = computed(() => userStore.user.username);
+const currentUsername = computed(() => userStore.user?.username);
 
 const displayReaction = computed(() => {
   if (props.isMine) {
