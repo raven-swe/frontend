@@ -49,6 +49,7 @@ const mockConversations: DmConversation[] = [
       content: 'Hello from user 1',
       senderUsername: 'user1',
       sentAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+      seen: true,
     },
     isMuted: false,
   },
@@ -63,6 +64,7 @@ const mockConversations: DmConversation[] = [
       content: 'Hello from user 2',
       senderUsername: 'user2',
       sentAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+      seen: false,
     },
     isMuted: false,
   },
@@ -409,5 +411,116 @@ describe('DmConversationList Component', () => {
     // Check that the inner container exists
     const innerContainer = wrapper.find('div > div');
     expect(innerContainer.exists()).toBe(true);
+  });
+  it('renders spinner when hasNextPage is true and virtual row index exceeds conversation length', async () => {
+    // Mock useVirtualizer to include an extra row for the spinner
+    const { useVirtualizer } = await import('@tanstack/vue-virtual');
+    vi.mocked(useVirtualizer).mockReturnValue({
+      value: {
+        getVirtualItems: () => [
+          { index: 3, key: '3', start: 252 }, // Index 3 is > mockConversations.length - 1 (2)
+        ],
+        getTotalSize: () => 336,
+      },
+    } as unknown as ReturnType<typeof useVirtualizer>);
+
+    const wrapper = await mountSuspended(DmConversationList, {
+      props: {
+        conversations: mockConversations,
+        selectedId: null,
+        hasNextPage: true,
+        isFetchingNextPage: false,
+      },
+    });
+
+    await flushPromises();
+    const spinner = wrapper.findComponent({ name: 'UiSpinner' });
+    expect(spinner.exists()).toBe(true);
+  });
+
+  it('does not render spinner when hasNextPage is false', async () => {
+    const { useVirtualizer } = await import('@tanstack/vue-virtual');
+    vi.mocked(useVirtualizer).mockReturnValue({
+      value: {
+        getVirtualItems: () => [{ index: 3, key: '3', start: 252 }],
+        getTotalSize: () => 336,
+      },
+    } as unknown as ReturnType<typeof useVirtualizer>);
+
+    const wrapper = await mountSuspended(DmConversationList, {
+      props: {
+        conversations: mockConversations,
+        selectedId: null,
+        hasNextPage: false,
+        isFetchingNextPage: false,
+      },
+    });
+
+    await flushPromises();
+    const spinner = wrapper.findComponent({ name: 'UiSpinner' });
+    expect(spinner.exists()).toBe(false);
+  });
+
+  it('applies blocked styling to blocked conversations', async () => {
+    // Mock useVirtualizer to show blocked conversation (id: 4)
+    const blockedConversation: DmConversation = {
+      ...mockConversations[0]!,
+      id: '4',
+      isBlocking: true,
+    };
+
+    const { useVirtualizer } = await import('@tanstack/vue-virtual');
+    vi.mocked(useVirtualizer).mockReturnValue({
+      value: {
+        getVirtualItems: () => [{ index: 0, key: '0', start: 0 }],
+        getTotalSize: () => 84,
+      },
+    } as unknown as ReturnType<typeof useVirtualizer>);
+
+    const wrapper = await mountSuspended(DmConversationList, {
+      props: {
+        conversations: [blockedConversation],
+        selectedId: null,
+        hasNextPage: false,
+        isFetchingNextPage: false,
+      },
+    });
+
+    await flushPromises();
+    const item = wrapper.findComponent({ name: 'DmConversationItem' });
+    expect(item.classes()).toContain('cursor-not-allowed');
+    expect(item.classes()).toContain('opacity-50');
+    expect(item.classes()).not.toContain('cursor-pointer');
+  });
+
+  it('does not emit select when clicking blocked conversation', async () => {
+    const blockedConversation: DmConversation = {
+      ...mockConversations[0]!,
+      id: '4',
+      isBlocking: true,
+    };
+
+    const { useVirtualizer } = await import('@tanstack/vue-virtual');
+    vi.mocked(useVirtualizer).mockReturnValue({
+      value: {
+        getVirtualItems: () => [{ index: 0, key: '0', start: 0 }],
+        getTotalSize: () => 84,
+      },
+    } as unknown as ReturnType<typeof useVirtualizer>);
+
+    const wrapper = await mountSuspended(DmConversationList, {
+      props: {
+        conversations: [blockedConversation],
+        selectedId: null,
+        hasNextPage: false,
+        isFetchingNextPage: false,
+      },
+    });
+
+    await flushPromises();
+    const item = wrapper.findComponent({ name: 'DmConversationItem' });
+    await item.trigger('click');
+
+    expect(wrapper.emitted('select')).toBeFalsy();
   });
 });

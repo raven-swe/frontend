@@ -1,53 +1,103 @@
 <script lang="ts" setup>
 import type { DmMessage } from '#shared/types/dm';
-import { renderSegments, formatTime } from '../../../utils/dm';
+import { renderSegments } from '../../../utils/dm';
+import DmMessageDropDown from './DmMessageDropDown.vue';
+import DmReactionDisplay from './reaction/DmReactionDisplay.vue';
+import DmReactionPicker from './reaction/DmReactionPicker.vue';
 
 const props = defineProps<{
   message: DmMessage;
   isSeen?: boolean;
+  conversationId: string;
+}>();
+
+const emit = defineEmits<{
+  (e: 'deleted', messageId: string): void;
+  (e: 'reaction', messageId: string, reaction: string): void;
 }>();
 
 const textColor = props.message.isMine ? 'text-white' : 'text-foreground';
+
+const handleDeleted = () => {
+  emit('deleted', props.message.id);
+};
+
+const handleReaction = (reaction: string) => {
+  emit('reaction', props.message.id, reaction);
+};
+
+const hasReaction = computed(() => {
+  if (!props.message.reactions) return false;
+  return !!props.message.reactions.receiver?.reaction;
+});
 </script>
 <template>
-  <div :class="message.isMine ? 'flex justify-end' : 'flex justify-start'">
+  <div class="group flex py-1" :class="message.isMine ? 'justify-end' : 'justify-start'">
     <div
       class="flex max-w-[68%] flex-col gap-1"
       :class="message.isMine ? 'items-end' : 'items-start'"
     >
-      <template v-if="message.mediaUrl">
-        <div class="overflow-hidden rounded-xl">
-          <NuxtImg
-            :src="message.mediaUrl"
-            :alt="$t('dm.attachedImage')"
-            class="max-h-64 object-cover"
-            loading="eager"
+      <!-- Message bubble with reactions -->
+      <div class="flex items-end gap-2">
+        <div v-if="message.isMine">
+          <DmMessageDropDown
+            :conversation-id="conversationId"
+            :message-id="message.id"
+            @deleted="handleDeleted"
           />
         </div>
-      </template>
-      <template v-if="message.content">
         <div
-          class="rounded-3xl px-4 py-2 text-sm leading-relaxed break-all whitespace-pre-wrap"
-          :class="message.isMine ? 'bg-primary text-white' : 'bg-accent text-foreground'"
+          class="relative flex w-fit flex-col"
+          :class="message.isMine ? 'items-end' : 'items-start'"
         >
-          <template v-for="(segment, idx) in renderSegments(message)" :key="idx">
-            <span
-              v-if="segment.type === 'mention'"
-              :class="['cursor-pointer font-medium hover:underline', textColor]"
-              :data-user="segment.value"
-              >{{ segment.value }}</span
-            >
-            <span
-              v-else-if="segment.type === 'hashtag'"
-              :class="['cursor-pointer font-medium hover:underline', textColor]"
-              >#{{ segment.value }}</span
-            >
-            <span v-else>{{ segment.value }}</span>
+          <template v-if="message.mediaUrl">
+            <div class="overflow-hidden rounded-xl">
+              <NuxtImg
+                :src="message.mediaUrl"
+                :alt="$t('dm.attachedImage')"
+                class="max-h-64 object-cover"
+                loading="eager"
+              />
+            </div>
           </template>
+          <template v-if="message.content">
+            <div
+              class="w-fit rounded-3xl px-4 py-2 text-sm leading-relaxed break-all whitespace-pre-wrap"
+              :class="message.isMine ? 'bg-primary text-white' : 'bg-accent text-foreground'"
+            >
+              <template v-for="(segment, idx) in renderSegments(message)" :key="idx">
+                <span
+                  v-if="segment.type === 'mention'"
+                  :class="['cursor-pointer font-medium hover:underline', textColor]"
+                  :data-user="segment.value"
+                  >{{ segment.value }}</span
+                >
+                <span
+                  v-else-if="segment.type === 'hashtag'"
+                  :class="['cursor-pointer font-medium hover:underline', textColor]"
+                  >#{{ segment.value }}</span
+                >
+                <span v-else>{{ segment.value }}</span>
+              </template>
+            </div>
+          </template>
+
+          <DmReactionDisplay
+            v-if="hasReaction && message.reactions"
+            :reactions="message.reactions"
+            :is-mine="message.isMine"
+            @remove="handleReaction"
+          />
+          <DmReactionPicker
+            v-else-if="!message.isMine"
+            :is-mine="message.isMine"
+            @select="handleReaction"
+          />
         </div>
-      </template>
+      </div>
+
       <span class="text-muted-foreground text-[11px]" :class="message.isMine ? 'self-end' : ''">
-        {{ formatTime(message.createdAt) }}
+        {{ formatDate(message.createdAt) }}
         <span v-if="isSeen && message.isMine" class="text-primary ms-1">· {{ $t('dm.seen') }}</span>
       </span>
     </div>

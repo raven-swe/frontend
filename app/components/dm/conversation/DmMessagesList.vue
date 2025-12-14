@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, watchEffect, watch, ref, onMounted, nextTick } from 'vue';
 
-import type { DmMessage } from '#shared/types/dm';
+import type { DmMessage, DmConversation } from '#shared/types/dm';
 import DmMessageItem from './DmMessageItem.vue';
 import { useVirtualizer } from '@tanstack/vue-virtual';
 
@@ -11,15 +11,26 @@ const props = defineProps<{
   isFetchingNextPage?: boolean;
   onLoadMore?: () => void;
   lastSeenMessageId?: string | null;
+  userMarkedAsSeen?: string | null;
+  conversation?: DmConversation | null;
 }>();
 
-// console.log('DmMessagesList props.messages:', props.messages.length);
+const userStore = useUserStore();
+const currentUsername = computed(() => userStore.user?.username);
+
+defineEmits<{
+  (e: 'message-deleted', messageId: string): void;
+  (e: 'reaction', messageId: string, reaction: string): void;
+}>();
+
 const parentRef = ref<HTMLElement | null>(null);
 const scrollToBottom = () => {
-  if (rowVirtualizer.value && props.messages.length > 0) {
-    rowVirtualizer.value.scrollToIndex(props.messages.length - 1, {
-      align: 'end',
-      behavior: 'auto',
+  if (parentRef.value) {
+    // Use native scroll for more reliable behavior
+    nextTick(() => {
+      if (parentRef.value) {
+        parentRef.value.scrollTop = parentRef.value.scrollHeight;
+      }
     });
   }
 };
@@ -28,8 +39,18 @@ const rowVirtualizerOptions = computed(() => {
   return {
     count: props.messages.length,
     getScrollElement: () => parentRef.value,
-    estimateSize: () => 120,
+    estimateSize: (index: number) => {
+      const message = props.messages[index];
+      if (message?.mediaUrl) {
+        return 320; // Larger estimate for messages with images
+      }
+      return 80; // Default for text messages
+    },
     overscan: 5,
+    measureElement: (element: HTMLElement) => {
+      // Measure actual element height for accurate positioning
+      return element.getBoundingClientRect().height;
+    },
   };
 });
 
@@ -53,7 +74,6 @@ onMounted(() => {
 watch(
   () => props.messages.length,
   (newLength, oldLength) => {
-    // If messages were cleared (conversation switch), reset initial load state
     if (oldLength > 0 && newLength === 0) {
       isInitialLoad.value = true;
     }
@@ -97,7 +117,7 @@ watchEffect(() => {
   }
 });
 
-// Auto-scroll to bottom when new messages arrive (only if already near bottom)
+// Auto scroll to bottom when new messages arrive only if already near bottom
 watch(
   () => props.messages.length,
   (newLength, oldLength) => {
@@ -123,7 +143,8 @@ defineExpose({ parentRef, scrollToBottom });
 </script>
 <template>
   <div ref="parentRef" class="h-full gap-2 overflow-y-auto">
-    <!-- Loader at top for loading older messages -->
+    <DmConversationInfo v-if="conversation" :conversation="conversation" class="pt-4" />
+
     <div v-if="hasNextPage && isFetchingNextPage" class="flex items-center justify-center p-4">
       <UiSpinner size="1.5rem" />
     </div>
@@ -138,6 +159,8 @@ defineExpose({ parentRef, scrollToBottom });
       <div
         v-for="virtualRow in virtualRows"
         :key="String(virtualRow.key)"
+        :ref="(el) => el && rowVirtualizer.measureElement(el as HTMLElement)"
+        :data-index="virtualRow.index"
         :style="{
           position: 'absolute',
           top: 0,
@@ -149,7 +172,13 @@ defineExpose({ parentRef, scrollToBottom });
         <template v-if="messages[virtualRow.index]">
           <DmMessageItem
             :message="messages[virtualRow.index]!"
-            :is-seen="messages[virtualRow.index]!.id === props.lastSeenMessageId"
+            :is-seen="
+              messages[virtualRow.index]!.id === props.lastSeenMessageId &&
+              currentUsername !== props.userMarkedAsSeen
+            "
+            :conversation-id="conversation?.id || ''"
+            @deleted="(messageId) => $emit('message-deleted', messageId)"
+            @reaction="(messageId, reaction) => $emit('reaction', messageId, reaction)"
           />
         </template>
       </div>

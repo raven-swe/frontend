@@ -137,4 +137,111 @@ describe('useStartConversation', () => {
       expect(mockSetQueryData).toHaveBeenCalledWith(['dm-conversations'], expect.any(Function));
     }
   });
+
+  it('onSuccess creates initial cache structure when no cache exists', async () => {
+    await import('@/composables/useStartConversation');
+
+    const onSuccess = (globalThis as Record<string, unknown>).__testOnSuccess as (newConversation: {
+      id: string;
+    }) => void;
+
+    if (onSuccess) {
+      const newConversation = { id: 'new-conv', participant: { username: 'testuser' } };
+
+      // Get the update function passed to setQueryData
+      mockSetQueryData.mockImplementation((key, updaterFn) => {
+        // Call updater with null (no existing cache)
+        const result = updaterFn(null);
+        expect(result).toEqual({
+          pages: [
+            {
+              success: true,
+              data: [newConversation],
+              pagination: { hasNextPage: false },
+            },
+          ],
+          pageParams: [undefined],
+        });
+      });
+
+      onSuccess(newConversation);
+    }
+  });
+
+  it('onSuccess does not duplicate existing conversation', async () => {
+    await import('@/composables/useStartConversation');
+
+    const onSuccess = (globalThis as Record<string, unknown>).__testOnSuccess as (newConversation: {
+      id: string;
+    }) => void;
+
+    if (onSuccess) {
+      const existingConversation = { id: 'existing-conv' };
+      const existingCache = {
+        pages: [{ data: [existingConversation] }],
+        pageParams: [undefined],
+      };
+
+      mockSetQueryData.mockImplementation((key, updaterFn) => {
+        // Call updater with existing cache that already has the conversation
+        const result = updaterFn(existingCache);
+        // Should return unchanged data since conversation already exists
+        expect(result).toEqual(existingCache);
+      });
+
+      onSuccess(existingConversation);
+    }
+  });
+
+  it('onSuccess adds conversation to beginning of first page', async () => {
+    await import('@/composables/useStartConversation');
+
+    const onSuccess = (globalThis as Record<string, unknown>).__testOnSuccess as (newConversation: {
+      id: string;
+    }) => void;
+
+    if (onSuccess) {
+      const newConversation = { id: 'new-conv' };
+      const existingConversation = { id: 'existing-conv' };
+      const existingCache = {
+        pages: [{ data: [existingConversation] }],
+        pageParams: [undefined],
+      };
+
+      mockSetQueryData.mockImplementation((key, updaterFn) => {
+        const result = updaterFn(existingCache);
+        // New conversation should be at the beginning
+        expect(result.pages[0].data[0]).toEqual(newConversation);
+        expect(result.pages[0].data[1]).toEqual(existingConversation);
+      });
+
+      onSuccess(newConversation);
+    }
+  });
+
+  it('onSuccess preserves other pages when adding to first page', async () => {
+    await import('@/composables/useStartConversation');
+
+    const onSuccess = (globalThis as Record<string, unknown>).__testOnSuccess as (newConversation: {
+      id: string;
+    }) => void;
+
+    if (onSuccess) {
+      const newConversation = { id: 'new-conv' };
+      const existingCache = {
+        pages: [{ data: [{ id: 'conv-1' }] }, { data: [{ id: 'conv-2' }] }],
+        pageParams: [undefined, 'cursor-1'],
+      };
+
+      mockSetQueryData.mockImplementation((key, updaterFn) => {
+        const result = updaterFn(existingCache);
+        // First page should have new conversation prepended
+        expect(result.pages[0].data.length).toBe(2);
+        // Second page should be unchanged
+        expect(result.pages[1].data).toEqual([{ id: 'conv-2' }]);
+      });
+
+      onSuccess(newConversation);
+    }
+  });
 });

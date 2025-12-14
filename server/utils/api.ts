@@ -30,6 +30,7 @@ export const serverApiFetch = (event: H3Event) =>
       }
       // Ensure the X-Client-Type header is set to web
       options.headers.append('X-Client-Type', 'web');
+      options.headers.append('ngrok-skip-browser-warning', 'web');
     },
 
     async onResponseError({ response }) {

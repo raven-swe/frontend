@@ -5,12 +5,13 @@ import { useDmMessages } from '@/composables/useDmMessages';
 
 import { showToaster } from '@/utils/showToaster';
 import Spinner from '~/components/ui/Spinner.vue';
-import type { DmMessage } from '~~/shared/types/dm';
+import type { DmMessage, DmReactionUser } from '~~/shared/types/dm';
+import { useQueryClient } from '@tanstack/vue-query';
 
 const route = useRoute();
 const router = useRouter();
 const conversationId = computed(() => route.params.conversationId as string | null);
-
+const queryClient = useQueryClient();
 const userStore = useUserStore();
 const currentUsername = computed(() => userStore.user?.username);
 
@@ -25,6 +26,16 @@ const conversation = computed<DmConversation | null>(() => {
   return conversations.value?.find((c) => c.id === conversationId.value) || null;
 });
 
+watch(
+  () => conversation.value?.isBlocking,
+  (isBlocking) => {
+    if (isBlocking) {
+      router.replace('/messages');
+    }
+  },
+  { immediate: true },
+);
+
 const {
   messages: initialMessages,
   loading: messagesLoading,
@@ -32,6 +43,7 @@ const {
   fetchNextPage,
   hasNextPage,
   isFetchingNextPage,
+  refresh: refreshMessages,
 } = useDmMessages(() => conversationId.value);
 
 const ws = useDmSocketIO();
@@ -39,13 +51,25 @@ provide('dmSocket', ws);
 const liveMessages = ref<DmMessage[]>([]);
 
 const lastSeenMessageId = ref<string | null>(null);
+const userMarkedAsSeen = ref<string | null>(null);
+const messagesListRef = ref<InstanceType<typeof DmMessagesList> | null>(null);
+
+// Provide scroll function to DmMessageInput
+const scrollToBottom = () => {
+  nextTick(() => {
+    messagesListRef.value?.scrollToBottom();
+    setTimeout(() => {
+      messagesListRef.value?.scrollToBottom();
+    }, 100);
+  });
+};
+provide('scrollToBottom', scrollToBottom);
 
 const messages = computed(() => {
   const initial = initialMessages.value || [];
-  // Add live messages at the END (bottom) so they appear as newest
-  const combined = [...initial, ...liveMessages.value];
-
-  return combined;
+  const initialIds = new Set(initial.map((m) => m.id));
+  const uniqueLiveMessages = liveMessages.value.filter((m) => !initialIds.has(m.id));
+  return [...initial, ...uniqueLiveMessages];
 });
 
 watch(
@@ -72,7 +96,7 @@ watch(
   ([msgs, connected, convId]) => {
     if (connected && convId && msgs.length > 0) {
       const lastMessage = msgs[msgs.length - 1];
-      if (lastMessage?.id && !lastMessage.isMine) {
+      if (lastMessage?.id) {
         ws.markSeen(convId, lastMessage.id);
       }
     }
@@ -92,6 +116,13 @@ onMounted(() => {
   ws.onSeenUpdate((data) => {
     if (data.conversationId === conversationId.value && data.username === currentUsername.value) {
       lastSeenMessageId.value = data.lastSeenMessageId;
+      userMarkedAsSeen.value = data.performerUsername;
+    }
+  });
+
+  ws.onReactionReceived((data) => {
+    if (data.conversationId === conversationId.value) {
+      updateMessageReaction(data.messageId, data.reactions);
     }
   });
 
@@ -99,6 +130,40 @@ onMounted(() => {
     showToaster('error', `Socket error: ${error}`);
   });
 });
+
+const handleMessageDeleted = (messageId: string) => {
+  const wasLastMessage = messageId === messages.value[messages.value.length - 1]?.id;
+  liveMessages.value = liveMessages.value.filter((m) => m.id !== messageId);
+  if (wasLastMessage) {
+    queryClient.invalidateQueries({ queryKey: ['dm-conversations'] });
+  }
+  refreshMessages();
+};
+
+const handleReaction = (messageId: string, reaction: string) => {
+  if (!conversationId.value) return;
+  ws.sendReaction(conversationId.value, messageId, reaction);
+};
+
+// Update message reactions in cache when reaction received
+const updateMessageReaction = (
+  messageId: string,
+  reactions: { sender: DmReactionUser; receiver: DmReactionUser },
+) => {
+  // Update in live messages
+  const liveIdx = liveMessages.value.findIndex((m) => m.id === messageId);
+  if (liveIdx !== -1) {
+    const existingMessage = liveMessages.value[liveIdx];
+    if (existingMessage) {
+      liveMessages.value[liveIdx] = {
+        ...existingMessage,
+        reactions: reactions as DmMessage['reactions'],
+      };
+    }
+  }
+  // Refresh to update initial messages from server
+  refreshMessages();
+};
 
 watch(messagesError, (val) => val && showToaster('error', 'Failed to load messages'));
 watch(conversationsError, (val) => val && showToaster('error', 'Failed to load conversation'));
@@ -126,7 +191,6 @@ watch(
       :avatar-url="conversation?.participant.avatarUrl || ''"
     />
     <div class="flex flex-1 flex-col overflow-hidden">
-      <DmConversationInfo :conversation="conversation || null" class="px-4 pt-4" />
       <div
         v-if="conversationsLoading || messagesLoading"
         class="flex flex-1 items-center justify-center p-4"
@@ -135,14 +199,20 @@ watch(
       </div>
       <DmMessagesList
         v-else
+        ref="messagesListRef"
         class="flex-1 px-4 pb-4"
         :messages="messages || []"
         :has-next-page="hasNextPage || false"
         :is-fetching-next-page="isFetchingNextPage || false"
         :on-load-more="fetchNextPage"
         :last-seen-message-id="lastSeenMessageId"
+        :user-marked-as-seen="userMarkedAsSeen"
+        :conversation="conversation || null"
+        @message-deleted="handleMessageDeleted"
+        @reaction="handleReaction"
       />
     </div>
+    <DmConversationDmTypingIndicator :conversation-id="conversationId" />
     <DmConversationDmMessageInput />
   </div>
 </template>

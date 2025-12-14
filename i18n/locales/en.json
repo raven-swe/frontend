@@ -673,6 +673,9 @@
     "placeholder-start-message": "Start a new message",
     "attachedImage": "Attached image",
     "seen": "Seen",
+    "no-messages-yet": "No messages yet",
+    "sent-photo": "Sent a photo",
+    "cant-message": "can't be messaged",
     "empty": {
       "select": "Select a message",
       "description": "Choose from your existing conversations, start a new one, or just keep swimming.",
@@ -685,6 +688,15 @@
       "you-follow": "Following",
       "follow-each-other": "You follow each other",
       "cant-message": "can't be messaged"
+    },
+    "message-input": {
+      "uploading": "Uploading image..."
+    },
+    "delete": "Delete",
+    "typing": "{username} is typing...",
+    "reaction": {
+      "add": "Add reaction",
+      "remove": "Remove reaction"
     }
   },
   "toaster": {
