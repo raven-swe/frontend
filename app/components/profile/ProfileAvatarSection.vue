@@ -40,6 +40,7 @@ const handleFollow = (action: 'follow' | 'unfollow') => {
         data-cy="profile-avatar"
         loading="eager"
         class="outline-background outline-4"
+        data-testid="profile-avatar"
         @click="isAvatarModalOpen = true"
       />
       <AvatarModal
