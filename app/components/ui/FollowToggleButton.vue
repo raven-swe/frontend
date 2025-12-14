@@ -24,8 +24,8 @@ defineEmits<{
     variant="outline-destructive-hover"
     size="xs"
     data-test="unfollow-button"
-    data-cy="profile-unfollow-button"
     class="group grid-stack"
+    data-cy="profile-unfollow-button"
     @click.prevent.stop="$emit('unfollow')"
   >
     <span class="invisible group-hover:visible">

@@ -3,6 +3,7 @@ import { useIsCurrentUser } from '~/composables/useIsCurrentUser';
 import { useUserStore } from '~/stores/user';
 import FollowToggleButton from '../ui/FollowToggleButton.vue';
 import BlockToggleButton from '../ui/BlockToggleButton.vue';
+import AvatarModal from './ProfileAvatarModal.vue';
 const userStore = useUserStore();
 
 const { isCurrentUser } = useIsCurrentUser();
@@ -12,6 +13,7 @@ const user = inject<ComputedRef<User>>('user-data');
 const isMuted = computed(() => user?.value.relationship.muted || false);
 const isBlocked = computed(() => user?.value.relationship.blocking || false);
 const relationship = computed(() => user?.value.relationship);
+const isAvatarModalOpen = ref(false);
 
 const { mutate: muteUser } = useMuteMutation();
 const { mutate: blockUser } = useBlockMutation();
@@ -31,15 +33,27 @@ const handleFollow = (action: 'follow' | 'unfollow') => {
 <template>
   <div class="mx-4 flex flex-wrap items-center justify-between gap-4">
     <div>
-      <NuxtImg
-        :src="user?.avatarUrl || ''"
+      <UiAvatar
+        :img="user?.avatarUrl || ''"
         alt="Profile picture"
-        class="z-20 -mt-16 size-34 rounded-full border-4 object-cover"
+        size="xl"
         data-cy="profile-avatar"
         loading="eager"
+        class="outline-background outline-4"
+        data-testid="profile-avatar"
+        @click="isAvatarModalOpen = true"
+      />
+      <AvatarModal
+        v-if="isAvatarModalOpen"
+        :avatar-img="user?.avatarUrl"
+        @close="isAvatarModalOpen = false"
       />
     </div>
-    <div v-if="!isCurrentUser" class="flex items-center gap-2" data-test="profile-action-buttons">
+    <div
+      v-if="!isCurrentUser"
+      class="mt-15 flex items-center gap-2"
+      data-test="profile-action-buttons"
+    >
       <UserActionDropdown
         :is-muted="isMuted"
         :is-blocked="isBlocked"
@@ -91,13 +105,21 @@ const handleFollow = (action: 'follow' | 'unfollow') => {
       v-else-if="!userStore.isProfileSetup && isCurrentUser"
       data-test="setup-profile-button"
       variant="outline"
+      size="xs"
+      class="mt-15"
     >
-      <NuxtLink to="/setup/profile" data-cy="profile-setup-button">
+      <NuxtLink to="/setup/profile" data-cy="profile-setup-button" class="font-extrabold">
         {{ $t('profile.setup.setup-profile') }}
       </NuxtLink>
     </UiButton>
-    <UiButton v-else-if="isCurrentUser" data-test="edit-profile-button" variant="outline">
-      <NuxtLink to="/settings/profile" data-cy="profile-edit-button">
+    <UiButton
+      v-else-if="isCurrentUser"
+      data-test="edit-profile-button"
+      variant="outline"
+      size="xs"
+      class="mt-15"
+    >
+      <NuxtLink to="/settings/profile" data-cy="profile-edit-button" class="font-extrabold">
         {{ $t('profile-info.edit-profile') }}
       </NuxtLink>
     </UiButton>

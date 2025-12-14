@@ -198,6 +198,7 @@ onServerPrefetch(async () => {
           :is-fetching-next-page="isFetchingNextPage"
           :fetch-next-page="fetchNextPage"
           :get-key="(tweet, idx, key) => tweet.id ?? key"
+          data-cy="tweet-replies"
         >
           <template #item="{ item: tweet }">
             <TweetDefaultCard v-if="tweet" :tweet="tweet" />

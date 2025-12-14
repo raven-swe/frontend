@@ -118,5 +118,15 @@ declare namespace Cypress {
      * @example cy.likeTweet(12345, false, false) // Unlike tweet
      */
     likeTweet(tweetId: string | number, like?: boolean, useSlave?: boolean): Chainable<void>;
+
+    /**
+     * Custom command to retweet or unretweet a tweet
+     * @param tweetId - ID of the tweet to retweet/unretweet
+     * @param retweet - true to retweet, false to unretweet (default: true)
+     * @param useSlave - Whether to use external access token (default: false)
+     * @example cy.retweetTweet(12345, true, false) // Retweet tweet
+     * @example cy.retweetTweet(12345, false, false) // Unretweet tweet
+     */
+    retweetTweet(tweetId: string | number, retweet?: boolean, useSlave?: boolean): Chainable<void>;
   }
 }

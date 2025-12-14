@@ -20,9 +20,13 @@ describe('GET /api/users/[username]/mutual', () => {
         {
           username: 'janedoe',
           fullName: 'Jane Doe',
-          isFollowing: false,
-          followsYou: false,
-          isBlocked: false,
+          relationship: {
+            blocking: false,
+            blockedBy: false,
+            muted: false,
+            following: false,
+            follower: false,
+          },
         },
       ],
     };

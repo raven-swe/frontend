@@ -78,16 +78,19 @@ onServerPrefetch(async () => {
           :route="`${tweetPath}/quotes`"
           :is-active="$route.path.toLowerCase() === `${tweetPath}/quotes`"
           :label="$t('tweet.engagement.quotes.title')"
+          data-cy="tweet-engagement-quotes-tab"
         />
         <UiTab
           :route="`${tweetPath}/reposts`"
           :is-active="$route.path.toLowerCase() === `${tweetPath}/reposts`"
           :label="$t('tweet.engagement.reposts.title')"
+          data-cy="tweet-engagement-reposts-tab"
         />
         <UiTab
           :route="`${tweetPath}/likes`"
           :is-active="$route.path.toLowerCase() === `${tweetPath}/likes`"
           :label="$t('tweet.engagement.likes.title')"
+          data-cy="tweet-engagement-likes-tab"
         />
       </UiTabs>
     </div>
