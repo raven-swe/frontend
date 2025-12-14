@@ -69,6 +69,7 @@ const i18n = createI18n({
     en: {
       'dm.no-messages-yet': 'No messages yet',
       'dm.sent-photo': 'Sent a photo',
+      'dm.cant-message': 'You cannot message this user',
     },
   },
 });
@@ -305,6 +306,43 @@ describe('DmConversationItem Component', () => {
       'span[title="' + mockConversation.participant.displayName + '"]',
     );
     expect(displayNameSpan.exists()).toBe(true);
+  });
+
+  it('displays "You cannot message this user" when conversation is blocking', async () => {
+    const blockingConversation: DmConversation = {
+      ...mockConversation,
+      isBlocking: true,
+    };
+
+    const wrapper = await mountSuspended(DmConversationItem, {
+      props: {
+        conversation: blockingConversation,
+      },
+      global: { plugins: [i18n] },
+    });
+
+    const html = wrapper.html();
+    expect(html).toContain('You cannot message this user');
+  });
+
+  it('displays "Sent a photo" when lastMessage content is empty but message exists', async () => {
+    const conversationWithPhoto: DmConversation = {
+      ...mockConversation,
+      lastMessage: {
+        ...mockConversation.lastMessage!,
+        content: '',
+      },
+    };
+
+    const wrapper = await mountSuspended(DmConversationItem, {
+      props: {
+        conversation: conversationWithPhoto,
+      },
+      global: { plugins: [i18n] },
+    });
+
+    const html = wrapper.html();
+    expect(html).toContain('Sent a photo');
   });
 
   it('has title attribute on username for truncation tooltip', async () => {
