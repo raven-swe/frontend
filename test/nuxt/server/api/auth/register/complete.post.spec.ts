@@ -20,8 +20,9 @@ describe('server/api/auth/register/complete.post', () => {
     vi.doMock('~~/server/utils/auth/setAuthCookies', () => ({
       setAuthCookies: setAuthCookiesMock,
     }));
-    const { default: completePostEventHandler } =
-      await import('~~/server/api/auth/register/complete.post');
+    const { default: completePostEventHandler } = await import(
+      '~~/server/api/auth/register/complete.post'
+    );
     const token = jwt.sign({}, 'secret');
     const mockResponse = {
       _data: {

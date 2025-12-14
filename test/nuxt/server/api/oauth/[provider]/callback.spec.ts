@@ -25,8 +25,9 @@ describe('POST /api/oauth/[provider]/callback', () => {
         setAuthCookies: setAuthCookiesMock,
       };
     });
-    const { default: callbackPostEventHandler } =
-      await import('~~/server/api/oauth/[provider]/callback/index.post');
+    const { default: callbackPostEventHandler } = await import(
+      '~~/server/api/oauth/[provider]/callback/index.post'
+    );
     const token = jwt.sign({}, 'secret');
     const mockResponse = {
       _data: {
@@ -58,8 +59,9 @@ describe('POST /api/oauth/[provider]/callback', () => {
         setAuthCookies: setAuthCookiesMock,
       };
     });
-    const { default: callbackPostEventHandler } =
-      await import('~~/server/api/oauth/[provider]/callback/index.post');
+    const { default: callbackPostEventHandler } = await import(
+      '~~/server/api/oauth/[provider]/callback/index.post'
+    );
     const mockResponse = {
       _data: {
         success: true,

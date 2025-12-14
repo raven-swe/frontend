@@ -100,6 +100,7 @@ const hasFollowedAtLeastOne = computed(() => {
           v-if="users && users.length !== 0"
           ref="parentRef"
           class="mb-4 w-full flex-1 overflow-y-auto contain-strict"
+          data-cy="follow-suggestion-list"
         >
           <div
             :style="{
@@ -160,6 +161,7 @@ const hasFollowedAtLeastOne = computed(() => {
           class="w-full max-w-100"
           size="xl"
           data-test="submit-follow-users"
+          data-cy="onboarding-follow-users-next-button"
           :disabled="!hasFollowedAtLeastOne"
           @click="accountSetup.goToNextStep()"
         >

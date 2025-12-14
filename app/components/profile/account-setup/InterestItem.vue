@@ -20,9 +20,10 @@ const handleClick = () => {
       'border-primary bg-primary hover:bg-primary focus-visible:ring-primary focus-visible:bg-primary':
         props.isActive,
     }"
+    data-cy="interest-item"
     @click="handleClick"
   >
-    <p class="items-end justify-start">
+    <p class="items-end justify-start" data-cy="intereset-item-name">
       {{ props.interest }}
     </p>
     <Icon
@@ -30,6 +31,7 @@ const handleClick = () => {
       size="24"
       name="lets-icons:check-fill"
       class="text-foreground absolute end-3 top-3"
+      data-cy="interest-item-active-icon"
     />
   </button>
 </template>
