@@ -33,7 +33,6 @@ const {
 });
 
 provide('user-data', user);
-const { isCurrentUser } = useIsCurrentUser();
 
 const isUserNotFound = computed(() => {
   if (!isError.value || !error.value) return false;
@@ -97,7 +96,6 @@ onServerPrefetch(async () => {
             data-cy="profile-media-tab"
           />
           <Tab
-            v-if="isCurrentUser"
             :label="$t('profile.tabs.likes')"
             :route="`${profilePath}/likes`"
             :is-active="$route.path.toLowerCase() === `${profilePath}/likes`"
