@@ -32,6 +32,7 @@ const aspectStyle = computed(() => {
       :style="aspectStyle"
       format="webp"
       loading="lazy"
+      data-cy="tweet-media-viewer-image"
     />
 
     <div

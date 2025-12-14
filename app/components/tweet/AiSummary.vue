@@ -37,7 +37,11 @@ defineExpose({ handleAiSummary });
 <template>
   <div class="mt-2">
     <!-- Skeleton shimmer while loading -->
-    <div v-if="aiSummaryLoading" class="ai-summary-bg ai-summary-anim space-y-2 rounded-xl p-3">
+    <div
+      v-if="aiSummaryLoading"
+      class="ai-summary-bg ai-summary-anim space-y-2 rounded-xl p-3"
+      data-cy="tweet-ai-summary-loading"
+    >
       <div class="skeleton-shimmer h-3 w-10/12 rounded"></div>
       <div class="skeleton-shimmer h-3 w-9/12 rounded"></div>
       <div class="skeleton-shimmer h-3 w-7/12 rounded"></div>
@@ -47,6 +51,7 @@ defineExpose({ handleAiSummary });
     <div
       v-else-if="aiSummaryError"
       class="ai-summary-bg ai-summary-anim flex items-center gap-2 rounded-xl p-3"
+      data-cy="tweet-ai-summary-error"
     >
       <Icon
         name="material-symbols:error-outline-rounded"

@@ -120,6 +120,7 @@ function handleReplied(tweet: Tweet) {
     :class="{
       'border-b-1': !isParent && !isRoot,
     }"
+    data-cy="tweet"
     @click.prevent.stop="handleTweetClick"
   >
     <div class="flex flex-col items-center gap-1">

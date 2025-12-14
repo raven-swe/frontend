@@ -218,6 +218,7 @@ function handleReplied(tweet: Tweet) {
     <button
       class="bg-background/60 hover:bg-muted absolute start-2 top-2 z-50 inline-flex size-10 items-center justify-center rounded-full shadow"
       :aria-label="$t('ui.close')"
+      data-cy="media-viewer-back-button"
       @click="goBackToHome"
     >
       <Icon :name="$t('icons.back-button-icon')" class="text-foreground" size="1.3rem" />
