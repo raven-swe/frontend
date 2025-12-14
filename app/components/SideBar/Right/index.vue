@@ -20,7 +20,7 @@ const peopleFilter = computed(() => {
 
 const { data: trendingHashtagsData, isLoading: trendingIsLoading } = useQuery({
   queryKey: ['trending-hashtags', 'sidebar'],
-  queryFn: async () => (await exploreService.getExploreTab('trending')).data ?? [],
+  queryFn: async () => (await exploreService.getExploreTab('trending')).data.slice(0, 5) ?? [],
 });
 
 const goToExplore = () => {
