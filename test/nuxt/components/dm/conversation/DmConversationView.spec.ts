@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { mountSuspended } from '@nuxt/test-utils/runtime';
 import { flushPromises } from '@vue/test-utils';
@@ -432,7 +433,17 @@ describe('DmConversationView Component', () => {
   it('handles socket seenUpdate event', async () => {
     const { useUserStore } = await import('@/stores/user');
     const userStore = useUserStore();
-    userStore.user.username = 'testuser';
+    // Initialize userStore.user to avoid null TypeError
+    userStore.user = {
+      username: 'testuser',
+      avatarUrl: '',
+      bio: '',
+      displayName: '',
+      email: '',
+      id: '',
+      createdAt: '',
+      updatedAt: '',
+    } as any;
 
     let onSeenUpdateCallback:
       | ((data: { conversationId: string; username: string; lastSeenMessageId: string }) => void)
