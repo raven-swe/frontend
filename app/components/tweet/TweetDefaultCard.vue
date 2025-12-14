@@ -13,11 +13,13 @@ interface Props {
   isParent?: boolean;
   isRoot?: boolean;
   noActions?: boolean;
+  showReplyingTo?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
   noActions: false,
   isParent: false,
   isRoot: false,
+  showReplyingTo: true,
 });
 const router = useRouter();
 const userStore = useUserStore();
@@ -223,7 +225,7 @@ function handleReplied(tweet: Tweet) {
       </div>
 
       <div
-        v-if="tweet.replyToTweet"
+        v-if="tweet.replyToTweet && props.showReplyingTo"
         class="text-muted-foreground mb-1 flex items-center gap-1 text-sm"
       >
         <p>
