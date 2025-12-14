@@ -58,6 +58,7 @@ const contentPadding = computed(() => props.contentPadding ?? 'px-6 pb-6');
       <div
         class="flex min-h-0 w-full flex-1 flex-col gap-4 overflow-y-auto"
         :class="[contentPadding]"
+        data-cy="dialog-content-body"
       >
         <slot />
       </div>

@@ -178,6 +178,7 @@ function handleReplied(tweet: Tweet) {
               variant="ghost-default"
               size="icon-sm"
               class="text-muted-foreground"
+              data-cy="tweet-view-ai-summary-button"
               @click.stop="handleAiSummary"
             >
               <Icon name="vscode-icons:file-type-gemini" size="1.2rem" />
@@ -187,6 +188,7 @@ function handleReplied(tweet: Tweet) {
                 variant="ghost-default"
                 size="icon-xs"
                 class="text-muted-foreground"
+                data-cy="tweet-view-dropdown-trigger"
                 @click.stop
               >
                 <Icon name="lucide:more-horizontal" />

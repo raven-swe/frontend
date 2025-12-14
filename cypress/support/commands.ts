@@ -241,6 +241,24 @@ Cypress.Commands.add(
   },
 );
 
+Cypress.Commands.add(
+  'retweetTweet',
+  (tweetId: string | number, retweet: boolean = true, useSlave = false) => {
+    const action = retweet ? 'POST' : 'DELETE';
+    const tokenCookie = useSlave ? 'external_access_token' : 'access_token';
+    cy.getCookie(tokenCookie).then((cookie) => {
+      cy.request({
+        method: action,
+        url: `${Cypress.env('API_URL')}/tweets/${tweetId}/retweet`,
+        headers: {
+          Authorization: `Bearer ${cookie?.value}`,
+        },
+      }).as('retweetRequest');
+      cy.get('@retweetRequest').its('status').should('be.oneOf', [200, 201]);
+    });
+  },
+);
+
 //
 // -- This is a parent command --
 // Cypress.Commands.add('login', (email, password) => { ... })
