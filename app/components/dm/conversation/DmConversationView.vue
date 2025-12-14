@@ -6,11 +6,12 @@ import { useDmMessages } from '@/composables/useDmMessages';
 import { showToaster } from '@/utils/showToaster';
 import Spinner from '~/components/ui/Spinner.vue';
 import type { DmMessage, DmReactionUser } from '~~/shared/types/dm';
+import { useQueryClient } from '@tanstack/vue-query';
 
 const route = useRoute();
 const router = useRouter();
 const conversationId = computed(() => route.params.conversationId as string | null);
-
+const queryClient = useQueryClient();
 const userStore = useUserStore();
 const currentUsername = computed(() => userStore.user?.username);
 
@@ -131,7 +132,11 @@ onMounted(() => {
 });
 
 const handleMessageDeleted = (messageId: string) => {
+  const wasLastMessage = messageId === messages.value[messages.value.length - 1]?.id;
   liveMessages.value = liveMessages.value.filter((m) => m.id !== messageId);
+  if (wasLastMessage) {
+    queryClient.invalidateQueries({ queryKey: ['dm-conversations'] });
+  }
   refreshMessages();
 };
 

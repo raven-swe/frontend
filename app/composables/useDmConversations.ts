@@ -27,7 +27,6 @@ function updateConversationInCache(
   });
 }
 
-// Update lastMessage when new SSE message arrives
 export function updateConversationLastMessage(
   queryClient: ReturnType<typeof useQueryClient>,
   conversationId: string,
