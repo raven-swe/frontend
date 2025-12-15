@@ -9,4 +9,9 @@ export const settingSections = [
     route: '/settings/privacy',
     cy: 'privacy-settings-btn',
   },
+  {
+    title: 'setting.display.title',
+    route: '/settings/display',
+    cy: 'display-settings-btn',
+  },
 ];
