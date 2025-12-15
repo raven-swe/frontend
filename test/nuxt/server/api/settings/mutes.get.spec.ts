@@ -19,6 +19,13 @@ describe('GET /settings/mutes', () => {
         {
           username: 'janedoe',
           displayName: 'Jane Doe',
+          relationship: {
+            blocking: false,
+            blockedBy: false,
+            muted: true,
+            following: false,
+            follower: false,
+          },
         },
       ],
     };

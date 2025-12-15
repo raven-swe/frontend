@@ -22,12 +22,13 @@ const onBlock = () => {
       <UiDropdownMenuItem
         v-if="!isBlocked"
         data-test="mute-button"
+        data-cy="mute-button"
         @click="muteUser({ username: username, action: isMuted ? 'unmute' : 'mute' })"
       >
         <Icon :name="isMuted ? 'lucide:volume' : 'lucide:volume-off'" size="18" />
         {{ isMuted ? $t('ui.unmute') : $t('ui.mute') }}
       </UiDropdownMenuItem>
-      <UiDropdownMenuItem data-test="block-button" @click="onBlock">
+      <UiDropdownMenuItem data-test="block-button" data-cy="block-button" @click="onBlock">
         <Icon name="lucide:ban" size="18" class="text-foreground" />
         {{ isBlocked ? $t('ui.unblock') : $t('ui.block') }}
       </UiDropdownMenuItem>

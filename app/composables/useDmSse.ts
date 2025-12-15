@@ -94,6 +94,7 @@ export function useDmSse(options: UseDmSseOptions = {}) {
       es.addEventListener('dm.unseen_conversations_count', (evt: MessageEvent) => {
         try {
           const data = JSON.parse(evt.data) as DmSseEventMap['dm.unseen_conversations_count'];
+
           unseenCount.value = data.count;
           // console.log('Received unseen_conversations_count event:', data);
         } catch {
@@ -113,7 +114,7 @@ export function useDmSse(options: UseDmSseOptions = {}) {
           // If user is currently in this conversation and is not the sender mark as seen
           // Otherwise mark as unseen
           const isCurrentConversation = selectedConversationId.value === data.conversationId;
-          const isNotSender = data.sender.username !== userStore.user.username;
+          const isNotSender = data.sender.username !== userStore.user?.username;
           const shouldMarkAsSeen = isCurrentConversation && isNotSender;
           updateConversationLastMessage(queryClient, data.conversationId, {
             content: data.bodySnippet,

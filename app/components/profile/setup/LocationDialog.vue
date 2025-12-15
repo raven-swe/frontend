@@ -34,7 +34,7 @@ const handleOpenChange = (value: boolean) => {
 };
 
 watch(
-  () => userStore.user.location,
+  () => userStore.user?.location,
   (newVal) => {
     if (!location.value.trim()) {
       location.value = newVal || '';

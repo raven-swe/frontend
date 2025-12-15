@@ -103,4 +103,27 @@ describe('actionButtonsService', () => {
     expect(spy).toHaveBeenCalled();
     spy.mockRestore();
   });
+
+  it('deleteTweet calls correct endpoint and returns response', async () => {
+    const mockRes = { success: true, message: 'deleted' };
+    fetchMock.mockResolvedValue(mockRes);
+
+    const { deleteTweet } = await import('@/services/tweet/actionButtonsService');
+    const res = await deleteTweet('tw-123');
+
+    expect(fetchMock).toHaveBeenCalledWith('/api/tweets/tw-123/delete', { method: 'DELETE' });
+    expect(res).toEqual(mockRes);
+  });
+
+  it('deleteTweet rethrows on error and logs', async () => {
+    const err = new Error('forbidden');
+    fetchMock.mockRejectedValue(err);
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const { deleteTweet } = await import('@/services/tweet/actionButtonsService');
+    await expect(deleteTweet('tw-err')).rejects.toBe(err);
+
+    expect(spy).toHaveBeenCalled();
+    spy.mockRestore();
+  });
 });

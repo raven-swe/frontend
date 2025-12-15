@@ -28,6 +28,7 @@ const isImage = computed(() => props.media.type === 'IMAGE' || isGif.value);
       :alt="props.media.altText || 'Tweet media'"
       class="h-full w-full object-cover object-center"
       format="webp"
+      data-cy="tweet-media-image"
     />
 
     <div
@@ -40,6 +41,7 @@ const isImage = computed(() => props.media.type === 'IMAGE' || isGif.value);
         :src="props.media.url"
         :poster="props.media.altText"
         class="h-auto max-h-full w-full object-contain"
+        data-cy="tweet-media-video"
       />
     </div>
   </div>

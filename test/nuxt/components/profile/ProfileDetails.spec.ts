@@ -67,8 +67,7 @@ describe('ProfileDetails Component', () => {
       },
     });
 
-    const profileImage = wrapper.find('img[alt="Profile picture"]');
-    expect(profileImage.exists()).toBe(true);
+    expect(wrapper.find('[data-testid="profile-avatar"]').exists()).toBe(true);
   });
 
   it('passes correct coverImg prop to ProfileCover', async () => {
@@ -95,8 +94,10 @@ describe('ProfileDetails Component', () => {
       },
     });
 
-    const profileImage = wrapper.find('img[alt="Profile picture"]');
-    expect(profileImage.attributes('src')).toContain('avatar.jpg');
+    const avatarImg = wrapper.find('[data-testid="profile-avatar"] img');
+
+    expect(avatarImg.exists()).toBe(true);
+    expect(avatarImg.attributes('src')).toContain('avatar.jpg');
   });
 
   it('passes correct userProfile prop to ProfileInfo', async () => {

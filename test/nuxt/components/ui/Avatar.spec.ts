@@ -78,6 +78,14 @@ describe('Avatar Component', () => {
       props: { size: 'xl' },
     });
     const root = wrapper.findComponent({ name: 'AvatarRoot' });
+    expect(root.classes()).toContain('size-34');
+  });
+
+  it('applies correct classes for size: 2xl', async () => {
+    const wrapper = await mountSuspended(Avatar, {
+      props: { size: '2xl' },
+    });
+    const root = wrapper.findComponent({ name: 'AvatarRoot' });
     expect(root.classes()).toContain('size-92');
   });
 

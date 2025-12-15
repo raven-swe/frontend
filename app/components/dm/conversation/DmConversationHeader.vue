@@ -17,8 +17,9 @@ defineProps<{
         alt="Profile picture"
         class="z-20 size-12 rounded-full border-1 object-cover"
         loading="eager"
+        data-cy="dm-conversation-header-avatar"
       />
-      <span class="text-lg font-bold">
+      <span class="text-lg font-bold" data-cy="dm-conversation-header-username">
         {{ username }}
       </span>
     </div>

@@ -24,6 +24,8 @@ interface Props {
 interface Emits {
   (e: 'post'): void;
   (e: 'add-media', files: File[]): void;
+  (e: 'insert-emoji', emoji: string): void;
+  (e: 'insert-gif', payload: { tenorId: string; url: string }): void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -39,6 +41,8 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<Emits>();
 
 const fileInputRef = ref<HTMLInputElement | null>(null);
+const isEmojiOpen = ref(false);
+const isGifPickerOpen = ref(false);
 
 const progress = computed(() => Math.min(props.characterCount / props.maxLength, 1));
 const circumference = 2 * Math.PI * 10; // radius = 10
@@ -58,6 +62,19 @@ const handleMediaClick = () => {
   if (props.canAddMedia) {
     fileInputRef.value?.click();
   }
+};
+
+const handleGifClick = () => {
+  isGifPickerOpen.value = true;
+};
+
+const handleGifSelect = (payload: { tenorId: string; url: string }) => {
+  isGifPickerOpen.value = false;
+  emit('insert-gif', payload);
+};
+
+const handleGifPickerClose = () => {
+  isGifPickerOpen.value = false;
 };
 
 const handleFileSelect = (event: Event) => {
@@ -98,6 +115,16 @@ const handleFileSelect = (event: Event) => {
     target.value = '';
   }
 };
+
+interface EmojiSelectEvent {
+  emoji: string;
+  label: string;
+}
+
+const handleEmojiSelect = (emoji: EmojiSelectEvent) => {
+  isEmojiOpen.value = false;
+  emit('insert-emoji', emoji.emoji);
+};
 </script>
 
 <template>
@@ -121,17 +148,36 @@ const handleFileSelect = (event: Event) => {
         :title="$t('tweet.composer.gif')"
         class="text-brand-blue"
         size="icon-md"
+        :disabled="!canAddMedia"
+        @click="handleGifClick"
       >
         <Icon name="heroicons:gif-solid" size="20" />
       </UiButton>
-      <UiButton
-        variant="tweet-icon-blue"
-        :title="$t('tweet.composer.emoji')"
-        class="text-brand-blue"
-        size="icon-md"
-      >
-        <Icon name="heroicons:face-smile" size="20" />
-      </UiButton>
+      <!--  -->
+      <UiPopover v-model:open="isEmojiOpen">
+        <UiPopoverTrigger as-child>
+          <UiButton
+            variant="tweet-icon-blue"
+            :title="$t('tweet.composer.emoji')"
+            class="text-brand-blue"
+            size="icon-md"
+          >
+            <Icon name="heroicons:face-smile" size="20" />
+          </UiButton>
+        </UiPopoverTrigger>
+        <UiPopoverContent class="w-fit rounded-xl p-0">
+          <UiEmojiPicker
+            class="bg-background h-[342px] border-none! shadow-none!"
+            @emoji-select="handleEmojiSelect"
+          >
+            <UiEmojiPickerSearch />
+            <UiEmojiPickerContent />
+            <UiEmojiPickerFooter />
+          </UiEmojiPicker>
+        </UiPopoverContent>
+      </UiPopover>
+
+      <!--  -->
     </div>
 
     <div class="flex items-center gap-3">
@@ -184,9 +230,10 @@ const handleFileSelect = (event: Event) => {
         class="post-button"
         size="md"
         :disabled="disabled || isOverLimit"
+        data-cy="tweet-composer-post-button"
         @click="$emit('post')"
       >
-        {{ $t('ui.' + props.buttonText.toLowerCase()) }}
+        {{ props.buttonText }}
       </UiButton>
     </div>
 
@@ -194,10 +241,18 @@ const handleFileSelect = (event: Event) => {
     <input
       ref="fileInputRef"
       type="file"
+      data-cy="tweet-composer-media-input"
       :accept="ALLOWED_IMAGE_TYPES_FOR_HTML + ',' + ALLOWED_VIDEO_TYPES_FOR_HTML"
       multiple
       class="hidden"
       @change="handleFileSelect"
+    />
+
+    <!-- GIF Picker -->
+    <TweetComposerGifPicker
+      v-if="isGifPickerOpen"
+      @close="handleGifPickerClose"
+      @select="handleGifSelect"
     />
   </div>
 </template>

@@ -14,10 +14,12 @@ const props = withDefaults(
     user: CompactUser;
     primaryAction?: 'mute' | 'follow' | 'block';
     showDropdown?: boolean;
+    compact?: boolean;
   }>(),
   {
     primaryAction: 'follow',
     showDropdown: false,
+    compact: false,
   },
 );
 
@@ -62,14 +64,14 @@ const { mutate: muteUser } = useMuteMutation();
               {{ '@' + user.username + ' ' }}
             </UserHoverCard>
             <span
-              v-if="user.relationship.follower"
+              v-if="user.relationship.follower && !isCurrentUser && !compact"
               class="bg-muted rounded-sm p-0.5 px-0.75 text-xs font-semibold"
             >
               {{ $t('ui.follows-you') }}
             </span>
           </p>
         </div>
-        <div v-if="!isCurrentUser" class="flex items-center gap-1">
+        <div v-if="!isCurrentUser" class="flex items-center gap-1 ps-2">
           <BlockToggleButton
             v-if="primaryAction === 'block' || isBlocked"
             :relationship="relationship"
@@ -107,7 +109,7 @@ const { mutate: muteUser } = useMuteMutation();
           </UserActionDropdown>
         </div>
       </div>
-      <p class="text-md line-clamp-3 break-all">
+      <p v-if="!compact" class="text-md line-clamp-3 break-all">
         <UiContentEntitiesRenderer :content="user.bio ?? ''" :entities="user.bioEntities" />
       </p>
     </div>

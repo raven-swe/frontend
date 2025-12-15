@@ -69,6 +69,7 @@ export const useRegisterStore = defineStore('register', () => {
       await registerationService.complete(password, creationToken.value);
       resetInitialData();
       open.value = false;
+      sessionStorage.setItem('showAccountSetup', 'true');
       navigateTo('/home');
     }, 'Failed to complete registration');
   };

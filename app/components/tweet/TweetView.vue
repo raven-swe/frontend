@@ -6,12 +6,16 @@ import ContentEntitiesRenderer from '../ui/ContentEntitiesRenderer.vue';
 import { useUserStore } from '~/stores/user';
 import QuotedTweetCard from './QuotedTweetCard.vue';
 import AiSummary from './AiSummary.vue';
+import { useQueryClient } from '@tanstack/vue-query';
+import type { TweetWithParents } from '~~/shared/types/tweets';
 interface Props {
   tweet: TweetWithParents;
+  media?: boolean;
 }
 const props = defineProps<Props>();
 const userStore = useUserStore();
 const originalUsername = ref<string>(userStore.user?.username || '');
+const showMedia = computed(() => props.media ?? true);
 
 const tweetClone = ref(structuredClone(toRaw(props.tweet)));
 const aiSummaryRef = ref<InstanceType<typeof AiSummary> | null>(null);
@@ -45,12 +49,45 @@ const onUndoRetweetSuccess = () => {
     tweetClone.value.retweetCount = next < 0 ? 0 : next;
   }
 };
+const onReplySuccess = (tweet: Tweet) => {
+  tweetClone.value.replyCount = (tweetClone.value.replyCount ?? 0) + 1;
+  handleReplied(tweet);
+};
 
 const { mutate: followUser } = useFollowMutation();
 const { mutate: blockUser } = useBlockMutation();
 
 function handleAiSummary() {
   aiSummaryRef.value?.handleAiSummary?.();
+}
+
+const queryClient = useQueryClient();
+const router = useRouter();
+const tweetid = computed(() => router.currentRoute.value.params.tweetid as string);
+
+function handleReplied(tweet: Tweet) {
+  if (tweet.replyToTweetId !== tweetid.value) return;
+
+  queryClient.setQueryData<{
+    pages: Array<ApiSuccessResponse<Tweet[]>>;
+    pageParams: Array<string | null>;
+  }>(['tweet-replies', tweetid.value], (old) => {
+    if (!old) return old;
+
+    const first = old.pages[0];
+    if (!first) return old;
+
+    return {
+      ...old,
+      pages: [
+        {
+          ...first,
+          data: [tweet, ...first.data],
+        },
+        ...old.pages.slice(1),
+      ],
+    };
+  });
 }
 </script>
 
@@ -110,6 +147,7 @@ function handleAiSummary() {
               <NuxtLink
                 :to="`/profile/${props.tweet.author.username}`"
                 class="cursor-pointer truncate pe-12 leading-tight hover:underline"
+                data-cy="tweet-view-display-name"
                 @click.stop
               >
                 {{ tweetClone.author.displayName }}
@@ -125,6 +163,7 @@ function handleAiSummary() {
               <NuxtLink
                 :to="`/profile/${props.tweet.author.username}`"
                 class="text-muted-foreground truncate pe-12 leading-tight"
+                data-cy="tweet-view-username"
                 @click.stop
               >
                 {{ '@' + tweetClone.author.username }}
@@ -135,9 +174,11 @@ function handleAiSummary() {
         <div class="relative">
           <div class="absolute end-0 top-1 flex translate-x-2.5 flex-row items-center">
             <UiButton
+              v-if="!(!tweetClone.content || tweetClone.content.trim().length === 0)"
               variant="ghost-default"
               size="icon-sm"
               class="text-muted-foreground"
+              data-cy="tweet-view-ai-summary-button"
               @click.stop="handleAiSummary"
             >
               <Icon name="vscode-icons:file-type-gemini" size="1.2rem" />
@@ -147,6 +188,7 @@ function handleAiSummary() {
                 variant="ghost-default"
                 size="icon-xs"
                 class="text-muted-foreground"
+                data-cy="tweet-view-dropdown-trigger"
                 @click.stop
               >
                 <Icon name="lucide:more-horizontal" />
@@ -157,10 +199,15 @@ function handleAiSummary() {
       </div>
     </div>
     <div class="border-b-border border-b-1">
-      <p class="pt-2 text-lg leading-relaxed break-words whitespace-pre-wrap">
+      <p
+        class="pt-2 text-lg leading-relaxed break-words whitespace-pre-wrap"
+        data-cy="tweet-view-content"
+      >
         <ContentEntitiesRenderer :content="tweetClone.content" :entities="tweetClone.entities" />
       </p>
-      <TweetMedia :media="tweetClone.media" />
+      <div v-if="showMedia">
+        <TweetMedia :media="tweet.media" :tweet-id="tweet.id" />
+      </div>
 
       <!-- Quoted Tweet -->
       <QuotedTweetCard v-if="tweetClone.quotedTweet" :tweet="tweetClone.quotedTweet" />
@@ -171,6 +218,7 @@ function handleAiSummary() {
           :title="formatDate(tweetClone.createdAt)"
           :datetime="tweetClone.createdAt"
           class="text-muted-foreground text-md"
+          data-cy="tweet-view-timestamp"
           >{{ formatDate(tweetClone.createdAt) }}</time
         >
       </div>
@@ -182,6 +230,7 @@ function handleAiSummary() {
       @unlike-success="onUnlikeSuccess"
       @retweet-success="onRetweetSuccess"
       @undo-retweet-success="onUndoRetweetSuccess"
+      @reply-success="onReplySuccess"
     />
   </article>
 </template>

@@ -7,12 +7,18 @@ import TweetActionButtons from './TweetActionButtons.vue';
 import QuotedTweetCard from './QuotedTweetCard.vue';
 import AiSummary from './AiSummary.vue';
 import { useUserStore } from '~/stores/user';
+import { useQueryClient } from '@tanstack/vue-query';
 interface Props {
   tweet: Tweet;
   isParent?: boolean;
   isRoot?: boolean;
+  noActions?: boolean;
 }
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  noActions: false,
+  isParent: false,
+  isRoot: false,
+});
 const router = useRouter();
 const userStore = useUserStore();
 const originalUsername = ref<string>(userStore.user?.username || '');
@@ -60,6 +66,38 @@ function handleTweetClick() {
 
 const { mutate: followUser } = useFollowMutation();
 const { mutate: blockUser } = useBlockMutation();
+
+const onReplySuccess = (replyTweet: Tweet) => {
+  tweet.value.replyCount = (tweet.value.replyCount ?? 0) + 1;
+  handleReplied(replyTweet);
+};
+const queryClient = useQueryClient();
+const tweetid = computed(() => tweet.value.id as string);
+
+function handleReplied(tweet: Tweet) {
+  if (tweet.replyToTweetId !== tweetid.value) return;
+
+  queryClient.setQueryData<{
+    pages: Array<ApiSuccessResponse<Tweet[]>>;
+    pageParams: Array<string | null>;
+  }>(['tweet-replies', tweetid.value], (old) => {
+    if (!old) return old;
+
+    const first = old.pages[0];
+    if (!first) return old;
+
+    return {
+      ...old,
+      pages: [
+        {
+          ...first,
+          data: [tweet, ...first.data],
+        },
+        ...old.pages.slice(1),
+      ],
+    };
+  });
+}
 </script>
 
 <template>
@@ -82,6 +120,7 @@ const { mutate: blockUser } = useBlockMutation();
     :class="{
       'border-b-1': !isParent && !isRoot,
     }"
+    data-cy="tweet"
     @click.prevent.stop="handleTweetClick"
   >
     <div class="flex flex-col items-center gap-1">
@@ -159,9 +198,11 @@ const { mutate: blockUser } = useBlockMutation();
             class="absolute end-0 top-1/2 flex translate-x-2.5 -translate-y-1/2 flex-row items-center"
           >
             <UiButton
+              v-if="!(!tweet.content || tweet.content.trim().length === 0)"
               variant="ghost-default"
               size="icon-sm"
               class="text-muted-foreground"
+              data-cy="tweet-ai-summary-button"
               @click.stop="handleAiSummary"
             >
               <Icon name="vscode-icons:file-type-gemini" size="1.2rem" />
@@ -171,6 +212,7 @@ const { mutate: blockUser } = useBlockMutation();
                 variant="ghost-default"
                 size="icon-xs"
                 class="text-muted-foreground"
+                data-cy="tweet-dropdown-trigger"
                 @click.stop
               >
                 <Icon name="lucide:more-horizontal" />
@@ -212,12 +254,12 @@ const { mutate: blockUser } = useBlockMutation();
       </div>
 
       <!-- Content -->
-      <p class="leading-relaxed break-words whitespace-pre-wrap">
+      <p class="leading-relaxed break-words whitespace-pre-wrap" data-cy="tweet-content">
         <UiContentEntitiesRenderer :content="tweet.content" :entities="tweet.entities" />
       </p>
 
       <!-- Media (single image basic layout) -->
-      <TweetMedia :media="tweet.media" />
+      <TweetMedia :media="tweet.media" :tweet-id="tweet.id" @click.stop />
 
       <!-- Quoted Tweet -->
 
@@ -227,12 +269,13 @@ const { mutate: blockUser } = useBlockMutation();
 
       <!-- Actions -->
       <TweetActionButtons
+        v-if="!props.noActions"
         :tweet="tweet"
-        @click.stop
         @like-success="onLikeSuccess"
         @unlike-success="onUnlikeSuccess"
         @retweet-success="onRetweetSuccess"
         @undo-retweet-success="onUndoRetweetSuccess"
+        @reply-success="onReplySuccess"
       />
     </div>
   </article>
