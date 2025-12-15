@@ -1,5 +1,6 @@
 import rawUsers from '../data/mock-users.json' assert { type: 'json' };
 import type { User } from '#shared/types/user';
+import type { Interest } from '#shared/types/interests';
 
 const exampleUser: User = {
   username: 'ravencmp123',
@@ -28,6 +29,115 @@ const exampleUser: User = {
     muted: false,
   },
 };
+
+export const interests: Interest[] = [
+  {
+    name: 'News',
+    code: 'NEWS',
+    isSelected: false,
+  },
+  {
+    name: 'Sports',
+    code: 'SPORTS',
+    isSelected: false,
+  },
+  {
+    name: 'Entertainment',
+    code: 'ENTERTAINMENT',
+    isSelected: false,
+  },
+  {
+    name: 'Technology',
+    code: 'TECHNOLOGY',
+    isSelected: false,
+  },
+  {
+    name: 'Music',
+    code: 'MUSIC',
+    isSelected: false,
+  },
+  {
+    name: 'Art',
+    code: 'ART',
+    isSelected: false,
+  },
+  {
+    name: 'Travel',
+    code: 'TRAVEL',
+    isSelected: false,
+  },
+  {
+    name: 'Food',
+    code: 'FOOD',
+    isSelected: false,
+  },
+  {
+    name: 'Fashion',
+    code: 'FASHION',
+    isSelected: false,
+  },
+  {
+    name: 'Health',
+    code: 'HEALTH',
+    isSelected: false,
+  },
+  {
+    name: 'Science',
+    code: 'SCIENCE',
+    isSelected: false,
+  },
+  {
+    name: 'Gaming',
+    code: 'GAMING',
+    isSelected: false,
+  },
+  {
+    name: 'Movies',
+    code: 'MOVIES',
+    isSelected: false,
+  },
+  {
+    name: 'Books',
+    code: 'BOOKS',
+    isSelected: false,
+  },
+  {
+    name: 'Photography',
+    code: 'PHOTOGRAPHY',
+    isSelected: false,
+  },
+  {
+    name: 'Business',
+    code: 'BUSINESS',
+    isSelected: false,
+  },
+  {
+    name: 'Education',
+    code: 'EDUCATION',
+    isSelected: false,
+  },
+  {
+    name: 'Nature',
+    code: 'NATURE',
+    isSelected: false,
+  },
+  {
+    name: 'History',
+    code: 'HISTORY',
+    isSelected: false,
+  },
+  {
+    name: 'Politics',
+    code: 'POLITICS',
+    isSelected: false,
+  },
+  {
+    name: 'Comedy',
+    code: 'COMEDY',
+    isSelected: false,
+  },
+];
+
 export const users: User[] = [...(rawUsers as User[]), exampleUser];
 // Create a mapping of username to user info for easy lookup
 export const mockUserInfos: Record<string, User> = Object.fromEntries(
