@@ -21,10 +21,12 @@ const i18n = createI18n({
 const settingsServiceMock = vi.hoisted(() => {
   return {
     getInterests: vi.fn(() => ({
-      data: [
-        { code: 'sports', isSelected: true },
-        { code: 'music', isSelected: false },
-      ],
+      data: {
+        interests: [
+          { code: 'sports', isSelected: true },
+          { code: 'music', isSelected: false },
+        ],
+      },
     })),
     updateInterests: vi.fn(() => undefined),
   };

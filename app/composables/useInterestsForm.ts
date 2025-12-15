@@ -23,9 +23,11 @@ export const useInterestsForm = () => {
       .of(yup.string().required()),
   });
 
-  const extractSelected = (newData: ApiSuccessResponse<Interest[]> | undefined) => {
+  const extractSelected = (newData: ApiSuccessResponse<{ interests: Interest[] }> | undefined) => {
     if (!newData) return [] as string[];
-    return newData.data.filter((interest) => interest.isSelected).map((interest) => interest.code);
+    return newData.data.interests
+      .filter((interest) => interest.isSelected)
+      .map((interest) => interest.code);
   };
 
   const {
@@ -117,7 +119,7 @@ export const useInterestsForm = () => {
     isLoading,
     errors,
     isSubmitting,
-    interests: computed(() => interestsResponse.value?.data),
+    interests: computed(() => interestsResponse.value?.data.interests || []),
     selectedOne: computed(() => fields.value.length > 0),
     onSubmit,
     handleToggleInterest,
