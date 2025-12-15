@@ -23,6 +23,8 @@ const {
   lastNewMessageinfo,
   lastNotification,
   unseenNotificationsCount,
+  timelineFollowingAvatars,
+  clearTimelineFollowingAvatars,
 } = useDmSse({
   autoReconnect: true,
   maxReconnectAttempts: 5,
@@ -33,6 +35,8 @@ provide('dmUnseenCount', unseenCount);
 provide('lastNewMessageinfo', lastNewMessageinfo);
 provide('lastNotification', lastNotification);
 provide('unseenNotificationsCount', unseenNotificationsCount);
+provide('timelineFollowingAvatars', timelineFollowingAvatars);
+provide('clearTimelineFollowingAvatars', clearTimelineFollowingAvatars);
 
 watch(
   () => userStore.user,
