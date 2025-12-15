@@ -31,6 +31,7 @@ const lastMessageText = computed(() => {
       props.isSelected ? 'border-e-primary' : 'border-e-transparent',
       highlighted ? 'bg-foreground/5' : '',
     ]"
+    data-cy="dm-conversation-item"
   >
     <div class="flex-shrink-0">
       <NuxtImg
@@ -38,6 +39,7 @@ const lastMessageText = computed(() => {
         alt="Profile picture"
         class="z-20 size-13 rounded-full border-1 object-cover"
         loading="eager"
+        data-cy="dm-conversation-item-avatar"
       />
     </div>
     <div class="flex min-w-0 flex-col gap-0.5">
@@ -46,6 +48,7 @@ const lastMessageText = computed(() => {
           class="max-w-[110px] truncate"
           :class="highlighted ? 'text-primary font-bold' : 'font-bold'"
           :title="props.conversation.participant.displayName"
+          data-cy="dm-conversation-item-name"
         >
           {{ props.conversation.participant.displayName }}
         </span>
@@ -53,6 +56,7 @@ const lastMessageText = computed(() => {
           class="max-w-[100px] truncate"
           :class="highlighted ? 'text-primary' : 'text-muted-foreground'"
           :title="props.conversation.participant.username"
+          data-cy="dm-conversation-item-username"
         >
           {{ '@' + props.conversation.participant.username }}
         </span>
@@ -60,6 +64,7 @@ const lastMessageText = computed(() => {
           v-if="props.conversation.lastMessage?.sentAt"
           class="flex-shrink-0"
           :class="highlighted ? 'text-primary' : 'text-muted-foreground'"
+          data-cy="dm-conversation-item-timestamp"
         >
           {{ relativeTime(props.conversation.lastMessage.sentAt) }}
         </span>
@@ -68,6 +73,7 @@ const lastMessageText = computed(() => {
         <span
           class="block truncate"
           :class="highlighted ? 'text-primary font-bold' : 'text-muted-foreground'"
+          data-cy="dm-conversation-item-last-message"
         >
           {{ lastMessageText }}
         </span>

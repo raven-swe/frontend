@@ -40,6 +40,7 @@ const handleDelete = async () => {
         size="icon-sm"
         class="opacity-0 transition-opacity group-hover:opacity-100"
         data-test="dm-message-actions-trigger"
+        data-cy="dm-message-actions-trigger"
       >
         <Icon name="lucide:more-horizontal" size="18" />
       </UiButton>
@@ -49,6 +50,7 @@ const handleDelete = async () => {
         data-test="delete-message-button"
         class="text-destructive focus:text-destructive"
         :disabled="isDeleting"
+        data-cy="dm-message-delete-button"
         @click="handleDelete"
       >
         <Icon name="lucide:trash-2" size="18" />

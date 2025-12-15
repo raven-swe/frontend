@@ -159,6 +159,7 @@ const previewBoxStyle = computed(() => {
         type="file"
         accept="image/*"
         class="hidden"
+        data-cy="dm-message-attachment-input"
         @change="onImageChange"
       />
     </div>
