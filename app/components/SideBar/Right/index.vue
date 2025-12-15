@@ -87,13 +87,17 @@ const { mutate: followUser } = useFollowMutation();
               <Label class="text-md" for="r1">{{
                 $t('rightsidebar.search-filters.people.any-one')
               }}</Label>
-              <UiRadioGroupItem id="r1" value="anyone" />
+              <UiRadioGroupItem id="r1" value="anyone" data-cy="search-filter-people-anyone" />
             </div>
             <div class="flex items-center justify-between">
               <Label class="text-md" for="r2">{{
                 $t('rightsidebar.search-filters.people.you-follow')
               }}</Label>
-              <UiRadioGroupItem id="r2" value="you-follow" />
+              <UiRadioGroupItem
+                id="r2"
+                value="you-follow"
+                data-cy="search-filter-people-you-follow"
+              />
             </div>
           </UiRadioGroup>
         </div>
@@ -104,6 +108,7 @@ const { mutate: followUser } = useFollowMutation();
       v-if="showWhatIsHappening"
       :title="$t('rightsidebar.whats-happening.title')"
       data-test="whats-happening-card"
+      data-cy="whats-happening-card"
     >
       <div
         v-if="trendingIsLoading"
@@ -118,13 +123,21 @@ const { mutate: followUser } = useFollowMutation();
         :hashtag="hashtag"
         :rank="index"
       />
-      <UiButton variant="ghost-primary" size="sm" @click="goToExplore">
+      <UiButton
+        variant="ghost-primary"
+        size="sm"
+        data-cy="show-more-hashtags-button"
+        @click="goToExplore"
+      >
         {{ $t('rightsidebar.show-more') }}
       </UiButton>
     </SideBarRightPreviewCard>
     <!-- Who to follow -->
     <ClientOnly>
-      <SideBarRightPreviewCard :title="$t('rightsidebar.who-to-follow.title')">
+      <SideBarRightPreviewCard
+        :title="$t('rightsidebar.who-to-follow.title')"
+        data-cy="who-to-follow-card"
+      >
         <UserRow
           v-for="item in whoToFollowItems?.pages.flatMap((page) => page.data) || []"
           :key="item.username"

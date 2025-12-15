@@ -151,7 +151,11 @@ watch(
     </div>
 
     <!-- Tweets Section -->
-    <div ref="parentRef" class="border-border mx-auto max-w-[700px]">
+    <div
+      ref="parentRef"
+      class="border-border mx-auto max-w-[700px]"
+      data-cy="explore-for-you-tweets"
+    >
       <ClientOnly>
         <div v-if="tweets">
           <div
