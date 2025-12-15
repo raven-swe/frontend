@@ -163,8 +163,7 @@ const hasErrors = computed(() => Object.values(errors.value).some((msg) => !!msg
         :name="$t('setting.back-button-icon')"
         size="1.5rem"
         class="cursor-pointer"
-        to="/settings/account"
-        @click="router.push('/settings/account')"
+        @click="router.back()"
       />
       <h1 class="text-2xl font-bold">{{ $t('setting.username.change-username') }}</h1>
     </div>
