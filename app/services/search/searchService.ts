@@ -57,4 +57,14 @@ export const searchService = {
       signal,
     });
   },
+
+  async getMentionSuggestions(query: string, signal?: AbortSignal) {
+    return apiFetch(`/api/search/users`, {
+      method: 'GET',
+      query: {
+        query: query,
+      },
+      signal,
+    });
+  },
 };
