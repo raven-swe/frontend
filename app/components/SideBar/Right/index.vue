@@ -70,8 +70,8 @@ const { mutate: followUser } = useFollowMutation();
 </script>
 
 <template>
-  <div class="ms-4">
-    <div v-if="showSearchField" class="bg-background/60 sticky top-0 z-50 backdrop-blur-sm">
+  <div class="sticky top-0 z-50 ms-4">
+    <div v-if="showSearchField" class="bg-background/60 backdrop-blur-sm">
       <UiSearchField />
     </div>
     <!-- Search Filters -->
@@ -110,19 +110,22 @@ const { mutate: followUser } = useFollowMutation();
       data-test="whats-happening-card"
       data-cy="whats-happening-card"
     >
-      <div
-        v-if="trendingIsLoading"
-        class="text-primary flex shrink-0 items-center justify-center py-2"
-      >
-        <UiSpinner />
-      </div>
-      <Hashtag
-        v-for="(hashtag, index) in trendingHashtagsData"
-        v-else
-        :key="hashtag.hashtag"
-        :hashtag="hashtag"
-        :rank="index"
-      />
+      <ClientOnly>
+        <div
+          v-if="trendingIsLoading"
+          class="text-primary flex shrink-0 items-center justify-center py-2"
+        >
+          <UiSpinner />
+        </div>
+
+        <Hashtag
+          v-for="(hashtag, index) in trendingHashtagsData"
+          v-else
+          :key="hashtag.hashtag"
+          :hashtag="hashtag"
+          :rank="index"
+        />
+      </ClientOnly>
       <UiButton
         variant="ghost-primary"
         size="sm"
