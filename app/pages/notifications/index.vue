@@ -38,7 +38,8 @@ const {
   isFetchingNextPage,
   isLoading,
   markAllSeen,
-  getPrimaryActor,
+  getActors,
+  getTotalActorsCount,
 } = useNotificationsList({
   queryKey: ['notifications-main'],
   filter: null,
@@ -89,20 +90,21 @@ onMounted(() => {
                 :is="componentForType(notifications[virtualRow.index]!.type)"
                 v-if="notifications[virtualRow.index]"
                 :timestamp="notifications[virtualRow.index]!.latestEventAt ?? ''"
-                :actor="getPrimaryActor(notifications[virtualRow.index]!.actorSummary)"
+                :actors="getActors(notifications[virtualRow.index]!.actorSummary)"
+                :total-actors-count="
+                  getTotalActorsCount(notifications[virtualRow.index]!.actorSummary)
+                "
                 :is-seen="notifications[virtualRow.index]!.isSeen"
                 :tweet="notifications[virtualRow.index]!.tweetSummary?.primaryTweet"
                 @follow="
                   followUser({
-                    username: getPrimaryActor(notifications[virtualRow.index]!.actorSummary)
-                      .username,
+                    username: 'temp', // figure out how to get username
                     action: 'follow',
                   })
                 "
                 @unfollow="
                   followUser({
-                    username: getPrimaryActor(notifications[virtualRow.index]!.actorSummary)
-                      .username,
+                    username: 'temp', // figure out how to get username
                     action: 'unfollow',
                   })
                 "

@@ -168,6 +168,14 @@ export function useNotificationsList(options: {
     }
   };
 
+  const getActors = (actorSummary?: ActorSummaryContainer | null): ActorSummary[] => {
+    return actorSummary?.previewActors ?? [];
+  };
+
+  const getTotalActorsCount = (actorSummary?: ActorSummaryContainer | null): number => {
+    return actorSummary?.totalCount ?? 0;
+  };
+
   const getPrimaryActor = (actorSummary?: ActorSummaryContainer | null): ActorSummary => {
     return (
       actorSummary?.previewActors?.[0] ?? {
@@ -191,6 +199,8 @@ export function useNotificationsList(options: {
     isLoading,
 
     markAllSeen,
+    getActors,
+    getTotalActorsCount,
     getPrimaryActor,
   };
 }
