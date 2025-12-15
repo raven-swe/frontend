@@ -4,6 +4,7 @@ import { showToaster } from '@/utils/showToaster';
 import { useDebounceFn } from '@vueuse/core';
 import { searchService } from '~/services/search/searchService';
 import type { CompactUser } from '~~/shared/types/user';
+import getCaretCoordinates from 'textarea-caret';
 import {
   MAX_IMAGE_SIZE_BYTES,
   MAX_IMAGE_SIZE_MB,
@@ -36,6 +37,9 @@ const mentionResults = ref<CompactUser[] | null>(null);
 const mention = ref<string>('');
 const highlightedIndex = ref<number>(0);
 const isFocused = ref<boolean>(false);
+const dropdownPosition = ref({ top: 0, left: 0, bottom: 0, right: 0 });
+const showAbove = ref(false);
+const showRight = ref(false);
 
 const characterCount = computed(() => props.modelValue.length);
 const isOverLimit = computed(() => characterCount.value > props.maxLength);
@@ -83,6 +87,33 @@ const adjustHeight = () => {
   }
 };
 
+const updateDropdownPosition = () => {
+  if (!textareaRef.value) return;
+
+  const coords = getCaretCoordinates(textareaRef.value, textareaRef.value.selectionStart || 0);
+
+  const textareaRect = textareaRef.value.getBoundingClientRect();
+  const estimatedDropdownHeight = 300; // Approximate max height of dropdown
+  const estimatedDropdownWidth = 150;
+  const spaceBelow = window.innerHeight - (textareaRect.top + coords.top + coords.height);
+  const spaceAbove = textareaRect.top + coords.top;
+  const spaceRight = window.innerWidth - (textareaRect.left + coords.left);
+  const spaceLeft = textareaRect.left + coords.left;
+
+  // Show above if not enough space below
+  showAbove.value = spaceBelow < estimatedDropdownHeight && spaceAbove > spaceBelow;
+
+  // Show on left if not enough space on right
+  showRight.value = spaceRight < estimatedDropdownWidth && spaceLeft > spaceRight;
+
+  dropdownPosition.value = {
+    top: coords.top + coords.height,
+    left: coords.left,
+    bottom: coords.top,
+    right: window.innerWidth - textareaRect.left - coords.left,
+  };
+};
+
 const handleInput = (event: Event) => {
   adjustHeight();
   const target = event.target as HTMLTextAreaElement;
@@ -101,6 +132,7 @@ const handleInput = (event: Event) => {
   if (activeMentionMatch) {
     mention.value = activeMentionMatch[1] + textAfter;
     debouncedMentions(mention.value);
+    updateDropdownPosition();
     return;
   }
 
@@ -111,6 +143,7 @@ const handleInput = (event: Event) => {
   if (leftPart && rightPart.length > 0) {
     mention.value = leftPart[1] + rightPart;
     debouncedMentions(mention.value);
+    updateDropdownPosition();
     return;
   }
 
@@ -333,19 +366,32 @@ const debouncedMentions = useDebounceFn(async (mention) => {
       </div>
     </div>
     <slot name="reposted-tweet" />
-    <div
-      v-if="mentionResults && mentionResults.length > 0 && isFocused"
-      class="absolute start-15 z-50 mt-2 w-90"
-    >
-      <UiSearchList :max-height="'50vh'">
-        <div
-          v-for="(user, index) in mentionResults"
-          :key="user.username"
-          :class="['mention-items', highlightedIndex === index ? 'bg-accent' : '']"
-        >
-          <SearchUserCard :user="user" @click="selectUser(user)" />
-        </div>
-      </UiSearchList>
-    </div>
+    <Popover :open="!!(mentionResults && mentionResults.length > 0 && isFocused)">
+      <PopoverTrigger as-child>
+        <div class="hidden" />
+      </PopoverTrigger>
+      <PopoverContent
+        :style="{
+          position: 'absolute',
+          top: showAbove ? 'auto' : `${dropdownPosition.top + 20}px`,
+          bottom: showAbove ? `calc(100% - ${dropdownPosition.bottom}px)` : 'auto',
+          left: showRight ? 'auto' : `${dropdownPosition.left}px`,
+          right: showRight ? `${dropdownPosition.right}px` : 'auto',
+        }"
+        class="w-90vm z-50 p-0"
+        :side-offset="0"
+        align="start"
+      >
+        <UiSearchList :max-height="'50vh'" class="border-none">
+          <div
+            v-for="(user, index) in mentionResults"
+            :key="user.username"
+            :class="['mention-items', highlightedIndex === index ? 'bg-accent' : '']"
+          >
+            <SearchUserCard :user="user" @click="selectUser(user)" />
+          </div>
+        </UiSearchList>
+      </PopoverContent>
+    </Popover>
   </div>
 </template>
