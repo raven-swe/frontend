@@ -10,11 +10,7 @@ const { data: tweet } = useTweet(computed(() => props.tweetId));
 </script>
 
 <template>
-  <NuxtLink
-    v-if="tweet"
-    :to="`/profile/${tweet.author.username}/status/${tweet.id}`"
-    class="block size-full"
-  >
+  <NuxtLink v-if="tweet" :to="`/media/${tweet.id}`" class="block size-full">
     <Thumbnail :media="tweet.media?.[0]" :multiple="tweet.media?.length > 1" />
   </NuxtLink>
 </template>
