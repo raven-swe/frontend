@@ -2,6 +2,7 @@
 import { Like, Follow, Repost, Reply, QuoteMention } from '~/components/notifications';
 import { useNotificationsList } from '~/composables/useNotificationsList';
 import type { Notification } from '~~/shared/types/notifications';
+import { watch } from 'vue';
 
 definePageMeta({
   layout: 'notifications',
@@ -50,14 +51,18 @@ const {
 
 const { mutate: followUser } = useFollowMutation();
 
-onMounted(() => {
-  const hasUnseen = notifications.value.some((n) => !n.isSeen);
-  if (hasUnseen) {
-    setTimeout(() => {}, 500);
-    markAllSeen();
-    unseenNotificationsCount.value = 0;
-  }
-});
+watch(
+  () => notifications.value.some((n) => !n.isSeen),
+  (hasUnseen) => {
+    if (hasUnseen) {
+      setTimeout(() => {
+        markAllSeen();
+        unseenNotificationsCount.value = 0;
+      }, 600);
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
