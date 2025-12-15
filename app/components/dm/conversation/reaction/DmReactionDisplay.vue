@@ -38,13 +38,19 @@ const handleClick = () => {
 </script>
 
 <template>
-  <div v-if="displayReaction" class="absolute -bottom-2" :class="isMine ? '-left-1' : '-right-1'">
+  <div
+    v-if="displayReaction"
+    class="absolute -bottom-2"
+    :class="isMine ? '-left-1' : '-right-1'"
+    data-cy="dm-reaction-display"
+  >
     <HoverCard :open-delay="200" :close-delay="100">
       <HoverCardTrigger as-child>
         <button
           class="bg-background hover:bg-accent flex h-5 items-center justify-center rounded-full border px-1 text-xs shadow-sm transition-colors"
           :class="canRemove ? 'cursor-pointer' : 'cursor-default'"
           :title="canRemove ? $t('dm.reaction.remove') : undefined"
+          data-cy="dm-reaction-display-button"
           @click="handleClick"
         >
           {{ displayReaction.reaction }}
@@ -53,7 +59,9 @@ const handleClick = () => {
       <HoverCardContent class="w-auto min-w-[120px] p-2" side="top">
         <div class="flex items-center gap-2">
           <Avatar :img="displayReaction.avatarUrl" size="xs" variant="secondary" />
-          <span class="text-sm font-medium">{{ displayReaction.displayName }}</span>
+          <span class="text-sm font-medium" data-cy="dm-reaction-display-name">{{
+            displayReaction.displayName
+          }}</span>
         </div>
       </HoverCardContent>
     </HoverCard>

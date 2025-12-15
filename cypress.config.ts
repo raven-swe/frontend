@@ -7,6 +7,8 @@ export default defineConfig({
       API_URL: 'http://localhost:3001', // backend API
     },
   },
+  viewportWidth: 1280,
+  viewportHeight: 800,
   reporter: 'mochawesome',
   reporterOptions: {
     reportDir: 'cypress/results',

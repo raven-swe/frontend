@@ -62,22 +62,21 @@ Cypress.Commands.add('login', (email: string, password: string) => {
   cy.session(
     [email, password], // unique identifier for this session
     () => {
-      // This function only runs if session doesn't exist
-      cy.visitAndWaitForHydration('/');
-
-      cy.get('button[data-cy="signin-start-button"]').should('be.visible').click();
-      cy.get('[data-cy="signin-email-form"]').should('be.visible');
-
-      // Enter email
-      cy.get('input[data-cy="signin-identifier-input"]').type(email);
-      cy.get('button[data-cy="signin-next-button"]').click();
-
-      // Enter password
-      cy.get('[data-cy="signin-password-input"] input').type(password);
-      cy.get('button[data-cy="signin-next-button"]').should('not.be.disabled').click();
-
-      // Wait for redirect to home
-      cy.url({ timeout: 10000 }).should('include', '/home');
+      cy.request({
+        method: 'POST',
+        url: `${Cypress.env('API_URL')}/auth/login`,
+        body: {
+          identifier: email,
+          password: password,
+        },
+        headers: {
+          'X-Client-Type': 'web',
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(200);
+        // set the access token cookie
+        cy.setCookie('access_token', response.body.data.accessToken);
+      });
     },
     {
       validate() {

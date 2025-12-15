@@ -85,6 +85,7 @@ function onKeydown(e: KeyboardEvent) {
     :disabled="disabled"
     rows="1"
     class="placeholder:text-muted-foreground/80 flex-1 resize-none bg-transparent text-[15px] leading-relaxed outline-none disabled:cursor-not-allowed disabled:opacity-50"
+    data-cy="dm-message-textfield"
     @input="onInput"
     @keydown="onKeydown"
   />
