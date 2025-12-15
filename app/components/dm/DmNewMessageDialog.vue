@@ -58,7 +58,11 @@ async function onNewConversation() {
             {{ $t('dm.dialog.new-message') }}
           </UiDialogTitle>
 
-          <UiButton :disabled="!canProceed || isStarting" @click="onNewConversation">
+          <UiButton
+            :disabled="!canProceed || isStarting"
+            data-cy="dm-dialog-next-button"
+            @click="onNewConversation"
+          >
             {{ $t('dm.dialog.next') }}
           </UiButton>
         </div>
@@ -76,6 +80,7 @@ async function onNewConversation() {
               type="text"
               :placeholder="$t('dm.dialog.search-people')"
               class="placeholder:text-muted-foreground/70 w-full bg-transparent outline-none"
+              data-cy="dm-search-input"
             />
           </div>
         </div>
@@ -99,18 +104,32 @@ async function onNewConversation() {
               'hover:bg-muted/20 cursor-pointer': !isBlocked(u),
               'cursor-not-allowed opacity-50': isBlocked(u),
             }"
+            data-cy="dm-user-item"
             @click="handleUserClick(u)"
           >
             <UiAvatar size="sm" :img="u.avatarUrl" />
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-2">
-                <p class="truncate font-medium">{{ u.displayName }}</p>
-                <p class="text-muted-foreground truncate before:content-['@']">{{ u.username }}</p>
+                <p class="truncate font-medium" data-cy="dm-user-item-name">{{ u.displayName }}</p>
+                <p
+                  class="text-muted-foreground truncate before:content-['@']"
+                  data-cy="dm-user-item-username"
+                >
+                  {{ u.username }}
+                </p>
               </div>
-              <p v-if="isBlocked(u)" class="text-destructive mt-0.5 flex text-sm">
+              <p
+                v-if="isBlocked(u)"
+                class="text-destructive mt-0.5 flex text-sm"
+                data-cy="dm-user-item-blocked"
+              >
                 {{ $t('dm.dialog.cant-message') }}
               </p>
-              <p v-else-if="followStatus(u)" class="text-muted-foreground mt-0.5 flex text-sm">
+              <p
+                v-else-if="followStatus(u)"
+                class="text-muted-foreground mt-0.5 flex text-sm"
+                data-cy="dm-user-item-follow-status"
+              >
                 <Icon name="ic:sharp-person" size="18" class="text-muted-foreground" />
                 {{ followStatus(u) }}
               </p>
