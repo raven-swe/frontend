@@ -76,8 +76,7 @@ const onSubmit = handleSubmit(async (values) => {
         :name="$t('setting.back-button-icon')"
         size="1.5rem"
         class="cursor-pointer"
-        to="/playground/settings"
-        @click="router.push('/settings/account')"
+        @click="router.back()"
       />
       <h1 class="text-2xl font-bold">{{ $t('setting.password.change-password') }}</h1>
     </div>

@@ -6,6 +6,7 @@ definePageMeta({ layout: 'settings' });
 
 const userStore = useUserStore();
 const changeEmailStore = useChangeEmailStore();
+const router = useRouter();
 </script>
 
 <template>
@@ -13,16 +14,12 @@ const changeEmailStore = useChangeEmailStore();
     <ChangeEmailForm />
     <OtpForm />
     <div class="mb-4 flex items-center gap-4 p-4">
-      <NuxtLink
-        to="/settings/account"
-        class="hover:bg-foreground/10 flex size-8 items-center justify-center rounded-full"
-      >
-        <Icon
-          :name="$t('setting.back-button-icon')"
-          size="1.5rem"
-          class="aspect-square cursor-pointer"
-        />
-      </NuxtLink>
+      <Icon
+        :name="$t('setting.back-button-icon')"
+        size="1.5rem"
+        class="cursor-pointer"
+        @click="router.back()"
+      />
       <h1 class="text-2xl font-bold">{{ $t('setting.change-email.title') }}</h1>
     </div>
     <div class="flex flex-col gap-6 px-4">
