@@ -17,8 +17,10 @@ const { play } = useNotificationSound();
 watch(
   () => props.tab.badgeCount,
   (newCount, oldCount) => {
+    // console.log('Badge count changed from', oldCount, 'to', newCount);
     if (oldCount === undefined || newCount === undefined) return;
     if (newCount > oldCount) {
+      // console.log('Playing notification sound for badge count increase');
       play();
     }
   },

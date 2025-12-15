@@ -137,10 +137,24 @@ export function useDmSse(options: UseDmSseOptions = {}) {
         }
       });
 
+      es.addEventListener('notifications.delete', () => {
+        // console.log('Received notifications.delete event:');
+        // invalidate notifications queries to refetch immediatly and update list
+        queryClient.invalidateQueries({ queryKey: ['notifications-main'] });
+      });
+
+      // negative updates: unlike/unretweet/unfollow
+      es.addEventListener('notifications.update', () => {
+        // console.log('Received notifications.update event:');
+        // invalidate notifications queries to refetch immediatly and update list
+        queryClient.invalidateQueries({ queryKey: ['notifications-main'] });
+      });
+
       es.addEventListener('notifications.new', (evt: MessageEvent) => {
         try {
           const notif = JSON.parse(evt.data) as Notification;
           lastNotification.value = notif;
+          // figure out how to update a notification and not insert a new one if it already exists here
           queryClient.setQueryData(['notifications-main'], (oldData: unknown) => {
             if (!oldData || typeof oldData !== 'object') return oldData;
 
