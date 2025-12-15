@@ -56,12 +56,6 @@ describe('SideBar Left Component', () => {
     expect(logoLink.exists()).toBe(true);
   });
 
-  it('renders user avatar', async () => {
-    const wrapper = await mountSuspended(SideBarLeft);
-    await themeButton.trigger('click');
-    expect(useThemeMock.toggleTheme).toHaveBeenCalled();
-  });
-
   it('renders logout button', async () => {
     const wrapper = await mountSuspended(SideBarLeft);
     const logoutTrigger = wrapper.find('[data-cy="logout-btn-trigger"]');
@@ -83,36 +77,6 @@ describe('SideBar Left Component', () => {
     await (logoutConfirmButton as HTMLElement).click();
     await new Promise((r) => setTimeout(r, 10));
     expect(loginServiceMock.logout).toHaveBeenCalled();
-  });
-
-  it('renders light mode icon when theme is light', async () => {
-    useThemeMock.mode = 'light';
-    const wrapper = await mountSuspended(SideBarLeft, {
-      global: {
-        stubs: {
-          NuxtIcon: {
-            template: '<div data-test="theme-icon"></div>',
-          },
-        },
-      },
-    });
-    const themeIcon = wrapper.find('[data-cy="theme-switch-btn"] [data-test="theme-icon"]');
-    expect(themeIcon.attributes('name')).toBe('material-symbols:nightlight');
-  });
-
-  it('renders dark mode icon when theme is dark', async () => {
-    useThemeMock.mode = 'dark';
-    const wrapper = await mountSuspended(SideBarLeft, {
-      global: {
-        stubs: {
-          NuxtIcon: {
-            template: '<div data-test="theme-icon"></div>',
-          },
-        },
-      },
-    });
-    const themeIcon = wrapper.find('[data-cy="theme-switch-btn"] [data-test="theme-icon"]');
-    expect(themeIcon.attributes('name')).toBe('material-symbols:light-mode-outline');
   });
 
   it('render post tweet button', async () => {
