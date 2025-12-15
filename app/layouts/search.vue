@@ -72,6 +72,7 @@ const tabs = computed(() => {
           :label="tab.label"
           :route="tab.route"
           :is-active="$route.path === tab.path"
+          :data-cy="`search-${tab.path.split('/')[2]}-tab`"
         />
       </Tabs>
     </template>
