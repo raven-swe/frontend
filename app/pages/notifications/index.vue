@@ -70,6 +70,7 @@ watch(
     <ClientOnly>
       <div v-if="notifications">
         <div
+          data-testid="notifications-list"
           :style="{
             height: `${totalSize}px`,
             width: '100%',
