@@ -1,13 +1,12 @@
 <script lang="ts" setup>
 import { exploreService } from '~/services/explore/exploreService';
-import type { TrendingHashtag } from '~~/shared/types/hashtag';
 import Hashtag from '~/components/explore/Hashtag.vue';
 import { Label } from 'reka-ui';
-import { onMounted, ref, computed, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { settingsService } from '~/services/settingsService';
+import { useInfiniteQuery, useQuery } from '@tanstack/vue-query';
 
-const trendingHashtags = ref<TrendingHashtag[]>([]);
-const isLoading = ref(false);
 const router = useRouter();
 const route = useRoute();
 const showWhatIsHappening = ref(true);
@@ -19,17 +18,10 @@ const peopleFilter = computed(() => {
   return route.query.pf === 'on' ? 'you-follow' : 'anyone';
 });
 
-const loadHashtags = async () => {
-  isLoading.value = true;
-  try {
-    const response = await exploreService.getExploreTab('trending');
-    trendingHashtags.value = response.data.slice(0, 5);
-  } catch (error) {
-    console.error('Failed to load trending hashtags:', error);
-  } finally {
-    isLoading.value = false;
-  }
-};
+const { data: trendingHashtagsData, isLoading: trendingIsLoading } = useQuery({
+  queryKey: ['trending-hashtags', 'sidebar'],
+  queryFn: async () => (await exploreService.getExploreTab('trending')).data.slice(0, 4) ?? [],
+});
 
 const goToExplore = () => {
   router.push({ name: 'explore', params: { tab: 'for-you' } });
@@ -60,42 +52,26 @@ watch(
   { immediate: true },
 );
 
-onMounted(() => {
-  loadHashtags();
+const { data: whoToFollowItems } = useInfiniteQuery({
+  queryKey: ['user-list', 'follow-suggestions', 'sidebar'],
+  initialPageParam: null as string | null,
+  queryFn: async ({ signal, pageParam }) =>
+    await settingsService.getFollowSuggestions({
+      cursor: pageParam,
+      limit: 5,
+      signal,
+    }),
+  getNextPageParam: (lastPage) =>
+    lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined,
+  structuralSharing: false,
 });
 
-const whoToFollowItems = [
-  {
-    name: 'Hussein',
-    username: '@hussein',
-    image: 'https://i.pravatar.cc/150?img=2',
-  },
-  {
-    name: 'Ahmed Amr',
-    username: '@btngana',
-    image: 'https://i.pravatar.cc/150?img=3',
-  },
-  {
-    name: 'Abdullah Farag',
-    username: '@farag',
-    image: 'https://i.pravatar.cc/150?img=12',
-  },
-  {
-    name: 'mostafa Hassan',
-    username: '@mostafa',
-    image: 'https://i.pravatar.cc/150?img=13',
-  },
-  {
-    name: 'Habiba Ayman',
-    username: '@habiba',
-    image: 'https://i.pravatar.cc/150?img=10',
-  },
-];
+const { mutate: followUser } = useFollowMutation();
 </script>
 
 <template>
-  <div class="ms-4">
-    <div v-if="showSearchField" class="bg-background/60 sticky top-0 z-50 backdrop-blur-sm">
+  <div class="sticky top-0 z-50 ms-4">
+    <div v-if="showSearchField" class="bg-background/60 backdrop-blur-sm">
       <UiSearchField />
     </div>
     <!-- Search Filters -->
@@ -111,13 +87,17 @@ const whoToFollowItems = [
               <Label class="text-md" for="r1">{{
                 $t('rightsidebar.search-filters.people.any-one')
               }}</Label>
-              <UiRadioGroupItem id="r1" value="anyone" />
+              <UiRadioGroupItem id="r1" value="anyone" data-cy="search-filter-people-anyone" />
             </div>
             <div class="flex items-center justify-between">
               <Label class="text-md" for="r2">{{
                 $t('rightsidebar.search-filters.people.you-follow')
               }}</Label>
-              <UiRadioGroupItem id="r2" value="you-follow" />
+              <UiRadioGroupItem
+                id="r2"
+                value="you-follow"
+                data-cy="search-filter-people-you-follow"
+              />
             </div>
           </UiRadioGroup>
         </div>
@@ -127,48 +107,50 @@ const whoToFollowItems = [
     <SideBarRightPreviewCard
       v-if="showWhatIsHappening"
       :title="$t('rightsidebar.whats-happening.title')"
+      data-test="whats-happening-card"
+      data-cy="whats-happening-card"
     >
-      <div v-if="isLoading" class="text-primary mt-10 flex shrink-0 items-center justify-center">
-        <UiSpinner />
-      </div>
-      <Hashtag
-        v-for="(hashtag, index) in trendingHashtags"
-        v-else
-        :key="hashtag.hashtag"
-        :hashtag="hashtag"
-        :rank="index"
-      />
-      <UiButton variant="ghost-primary" size="sm" @click="goToExplore">
+      <ClientOnly>
+        <div
+          v-if="trendingIsLoading"
+          class="text-primary flex shrink-0 items-center justify-center py-2"
+        >
+          <UiSpinner />
+        </div>
+
+        <Hashtag
+          v-for="(hashtag, index) in trendingHashtagsData"
+          v-else
+          :key="hashtag.hashtag"
+          :hashtag="hashtag"
+          :rank="index"
+        />
+      </ClientOnly>
+      <UiButton
+        variant="ghost-primary"
+        size="sm"
+        data-cy="show-more-hashtags-button"
+        @click="goToExplore"
+      >
         {{ $t('rightsidebar.show-more') }}
       </UiButton>
     </SideBarRightPreviewCard>
     <!-- Who to follow -->
-    <SideBarRightPreviewCard :title="$t('rightsidebar.who-to-follow.title')">
-      <SideBarRightPreviewCardItem
-        v-for="whoFollowItem in whoToFollowItems"
-        :key="whoFollowItem.username"
+    <ClientOnly>
+      <SideBarRightPreviewCard
+        :title="$t('rightsidebar.who-to-follow.title')"
+        data-cy="who-to-follow-card"
       >
-        <div class="flex items-center justify-between">
-          <div class="flex flex-row">
-            <img
-              :src="whoFollowItem.image"
-              :alt="whoFollowItem.name"
-              class="h-10 w-10 rounded-full"
-            />
-            <div class="ms-3 flex flex-col">
-              <h1 class="text-md text-foreground font-bold">
-                {{ whoFollowItem.name }}
-              </h1>
-              <p class="text-muted-foreground text-xs">{{ whoFollowItem.username }}</p>
-            </div>
-          </div>
-          <div class="flex h-full">
-            <button class="bg-foreground text-background cursor-pointer rounded-full px-4 py-2">
-              {{ $t('rightsidebar.who-to-follow.follow') }}
-            </button>
-          </div>
-        </div>
-      </SideBarRightPreviewCardItem>
-    </SideBarRightPreviewCard>
+        <UserRow
+          v-for="item in whoToFollowItems?.pages.flatMap((page) => page.data) || []"
+          :key="item.username"
+          :user="item"
+          :show-dropdown="false"
+          :compact="true"
+          @follow="followUser({ username: item.username, action: 'follow' })"
+          @unfollow="followUser({ username: item.username, action: 'unfollow' })"
+        />
+      </SideBarRightPreviewCard>
+    </ClientOnly>
   </div>
 </template>

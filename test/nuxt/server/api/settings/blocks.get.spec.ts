@@ -19,6 +19,13 @@ describe('GET /settings/blocks', () => {
         {
           username: 'janedoe',
           displayName: 'Jane Doe',
+          relationship: {
+            blocking: true,
+            blockedBy: false,
+            muted: false,
+            following: false,
+            follower: false,
+          },
         },
       ],
     };

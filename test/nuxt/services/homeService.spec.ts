@@ -19,7 +19,7 @@ describe('homeService', () => {
     });
 
     const payload = { limit: 10, cursor: null };
-    const res = await homeService.getHomeTab(payload, 'for-you');
+    const res = await homeService.getHomeTab({ ...payload, tab: 'for-you' });
 
     expect(res).toEqual({
       data: {
@@ -40,7 +40,7 @@ describe('homeService', () => {
     });
 
     const payload = { limit: 10, cursor: null };
-    const res = await homeService.getHomeTab(payload, 'following');
+    const res = await homeService.getHomeTab({ ...payload, tab: 'following' });
 
     expect(res).toEqual({
       data: {

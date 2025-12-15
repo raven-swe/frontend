@@ -6,48 +6,20 @@ import ContentEntitiesRenderer from '../ui/ContentEntitiesRenderer.vue';
 import { useUserStore } from '~/stores/user';
 import QuotedTweetCard from './QuotedTweetCard.vue';
 import AiSummary from './AiSummary.vue';
+import type { TweetWithParents } from '~~/shared/types/tweets';
 interface Props {
   tweet: TweetWithParents;
+  media?: boolean;
 }
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  media: true,
+});
+
 const userStore = useUserStore();
-const originalUsername = ref<string>(userStore.user?.username || '');
+const originalUsername = computed(() => userStore.user?.username ?? '');
+const showMedia = computed(() => props.media ?? true);
 
-const tweetClone = ref(structuredClone(toRaw(props.tweet)));
 const aiSummaryRef = ref<InstanceType<typeof AiSummary> | null>(null);
-// Update local tweet state when like/unlike succeeds
-const onLikeSuccess = () => {
-  if (!tweetClone.value.isLiked) {
-    tweetClone.value.isLiked = true;
-    tweetClone.value.likeCount = (tweetClone.value.likeCount ?? 0) + 1;
-  }
-};
-
-const onUnlikeSuccess = () => {
-  if (tweetClone.value.isLiked) {
-    tweetClone.value.isLiked = false;
-    const next = (tweetClone.value.likeCount ?? 0) - 1;
-    tweetClone.value.likeCount = next < 0 ? 0 : next;
-  }
-};
-
-const onRetweetSuccess = () => {
-  if (!tweetClone.value.isRetweeted) {
-    tweetClone.value.isRetweeted = true;
-    tweetClone.value.retweetCount += 1;
-  }
-};
-
-const onUndoRetweetSuccess = () => {
-  if (tweetClone.value.isRetweeted) {
-    tweetClone.value.isRetweeted = false;
-    const next = (tweetClone.value.retweetCount ?? 0) - 1;
-    tweetClone.value.retweetCount = next < 0 ? 0 : next;
-  }
-};
-
-const { mutate: followUser } = useFollowMutation();
-const { mutate: blockUser } = useBlockMutation();
 
 function handleAiSummary() {
   aiSummaryRef.value?.handleAiSummary?.();
@@ -78,19 +50,13 @@ function handleAiSummary() {
           <div
             class="h-2 w-0.5 shrink-0"
             :class="{
-              'bg-thread-foreground': tweetClone.rootTweet,
+              'bg-thread-foreground': tweet.rootTweet,
             }"
           ></div>
-          <UserHoverCard
-            :username="props.tweet.author.username"
-            @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
-            @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
-            @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
-            @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
-          >
+          <UserHoverCard :username="props.tweet.author.username">
             <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
               <Avatar
-                :img="tweetClone.author.avatarUrl || '/default_profile.png'"
+                :img="tweet.author.avatarUrl || '/default_profile.png'"
                 size="sm"
                 variant="primary"
                 class="shrink-0"
@@ -98,90 +64,83 @@ function handleAiSummary() {
             </NuxtLink>
           </UserHoverCard>
         </div>
-        <div class="flex w-full items-start justify-between">
-          <div class="flex h-full flex-col justify-end">
-            <UserHoverCard
-              :username="props.tweet.author.username"
-              @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
-              @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
-              @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
-              @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
-            >
+        <div class="flex w-full items-start justify-between overflow-hidden">
+          <div class="flex h-full flex-col justify-end overflow-hidden">
+            <UserHoverCard :username="props.tweet.author.username">
               <NuxtLink
                 :to="`/profile/${props.tweet.author.username}`"
-                class="cursor-pointer leading-tight font-semibold hover:underline"
+                class="cursor-pointer truncate pe-12 leading-tight hover:underline"
+                data-cy="tweet-view-display-name"
                 @click.stop
               >
-                {{ tweetClone.author.displayName }}
+                {{ tweet.author.displayName }}
               </NuxtLink>
             </UserHoverCard>
-            <UserHoverCard
-              :username="props.tweet.author.username"
-              @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
-              @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
-              @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
-              @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
-            >
+            <UserHoverCard :username="props.tweet.author.username">
               <NuxtLink
                 :to="`/profile/${props.tweet.author.username}`"
-                class="text-muted-foreground leading-tight"
+                class="text-muted-foreground truncate pe-12 leading-tight"
+                data-cy="tweet-view-username"
                 @click.stop
               >
-                {{ '@' + tweetClone.author.username }}
+                {{ '@' + tweet.author.username }}
               </NuxtLink>
             </UserHoverCard>
           </div>
-          <div class="relative">
-            <div class="absolute end-0 top-1/2 flex translate-x-2.5 flex-row items-center">
+        </div>
+        <div class="relative">
+          <div class="absolute end-0 top-1 flex translate-x-2.5 flex-row items-center">
+            <UiButton
+              v-if="!(!tweet.content || tweet.content.trim().length === 0)"
+              variant="ghost-default"
+              size="icon-sm"
+              class="text-muted-foreground"
+              data-cy="tweet-view-ai-summary-button"
+              @click.stop="handleAiSummary"
+            >
+              <Icon name="vscode-icons:file-type-gemini" size="1.2rem" />
+            </UiButton>
+            <TweetDropdown :tweet="props.tweet" :username="originalUsername" :in-tweet-view="true">
               <UiButton
                 variant="ghost-default"
-                size="icon-sm"
+                size="icon-xs"
                 class="text-muted-foreground"
-                @click.stop="handleAiSummary"
+                data-cy="tweet-view-dropdown-trigger"
+                @click.stop
               >
-                <Icon name="vscode-icons:file-type-gemini" size="1.2rem" />
+                <Icon name="lucide:more-horizontal" />
               </UiButton>
-              <TweetDropdown :tweet="props.tweet" :username="originalUsername">
-                <UiButton
-                  variant="ghost-default"
-                  size="icon-xs"
-                  class="text-muted-foreground"
-                  @click.stop
-                >
-                  <Icon name="lucide:more-horizontal" />
-                </UiButton>
-              </TweetDropdown>
-            </div>
+            </TweetDropdown>
           </div>
         </div>
       </div>
     </div>
     <div class="border-b-border border-b-1">
-      <p class="pt-2 text-lg leading-relaxed break-words whitespace-pre-wrap">
-        <ContentEntitiesRenderer :content="tweetClone.content" :entities="tweetClone.entities" />
+      <p
+        class="pt-2 text-lg leading-relaxed break-words whitespace-pre-wrap"
+        data-cy="tweet-view-content"
+      >
+        <ContentEntitiesRenderer :content="tweet.content" :entities="tweet.entities" />
       </p>
-      <TweetMedia :media="tweetClone.media" />
+      <div v-if="showMedia">
+        <TweetMedia :media="tweet.media" />
+      </div>
 
       <!-- Quoted Tweet -->
-      <QuotedTweetCard v-if="tweetClone.quotedTweet" :tweet="tweetClone.quotedTweet" />
+      <QuotedTweetCard v-if="tweet.quotedTweet" :tweet="tweet.quotedTweet" />
 
       <AiSummary ref="aiSummaryRef" :tweet-id="props.tweet.id" />
       <div class="py-2">
         <time
-          :title="formatDate(tweetClone.createdAt)"
-          :datetime="tweetClone.createdAt"
+          :title="formatDate(tweet.createdAt)"
+          :datetime="tweet.createdAt"
           class="text-muted-foreground text-md"
-          >{{ formatDate(tweetClone.createdAt) }}</time
+          data-cy="tweet-view-timestamp"
+          >{{ formatDate(tweet.createdAt) }}</time
         >
       </div>
     </div>
 
-    <TweetActionButtons
-      :tweet="tweetClone"
-      @like-success="onLikeSuccess"
-      @unlike-success="onUnlikeSuccess"
-      @retweet-success="onRetweetSuccess"
-      @undo-retweet-success="onUndoRetweetSuccess"
-    />
+    <TweetActionButtons :tweet="tweet" />
   </article>
 </template>

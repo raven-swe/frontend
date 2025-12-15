@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import Button from '~/components/ui/Button.vue';
+import { useOAuthHandlers } from '~/composables/useOAuthHandlers';
 import { useLoginStore } from '~/stores/auth/login';
-import { ref } from 'vue';
+import { useRegisterStore } from '~/stores/register';
+import { onMounted, ref } from 'vue';
 import { useI18n } from '#imports';
 
 const { locale, setLocale } = useI18n();
@@ -32,7 +34,7 @@ const switchLanguage = () => {
 </script>
 
 <template>
-  <div class="bg-background flex h-screen w-screen flex-col">
+  <div class="bg-background flex h-screen w-screen flex-col overflow-hidden">
     <UiButton class="fixed start-5 top-5" size="icon-lg" @click="switchLanguage()">
       <Icon size="1.2rem" name="material-symbols:language" />
     </UiButton>
@@ -100,7 +102,14 @@ const switchLanguage = () => {
               >{{ $t('root.auth.signup') }}</Button
             >
             <p class="text-muted-foreground mt-4 max-w-75 text-xs">
-              {{ $t('root.auth.signup-info') }}
+              {{ $t('root.auth.signup-info-prefix') }}
+              <NuxtLink to="/terms-of-service" class="text-primary hover:underline">
+                {{ $t('legal.terms.title') }}
+              </NuxtLink>
+              {{ $t('root.auth.signup-info-and') }}
+              <NuxtLink to="/privacy-policy" class="text-primary hover:underline">
+                {{ $t('legal.privacy.title') }} </NuxtLink
+              >{{ $t('root.auth.signup-info-suffix') }}
             </p>
           </section>
           <section class="mt-12">
@@ -121,8 +130,14 @@ const switchLanguage = () => {
       </section>
     </div>
     <footer class="text-muted-foreground p-4 text-center text-sm">
-      {{ $t('root.footer.about') }} | {{ $t('root.footer.developers') }} |
-      {{ $t('root.footer.copyright') }}
+      <NuxtLink to="/terms-of-service" class="hover:text-primary hover:underline">
+        {{ $t('legal.terms.title') }}
+      </NuxtLink>
+      |
+      <NuxtLink to="/privacy-policy" class="hover:text-primary hover:underline">
+        {{ $t('legal.privacy.title') }}
+      </NuxtLink>
+      | {{ $t('root.footer.copyright') }}
     </footer>
   </div>
 </template>

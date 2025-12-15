@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createMockH3Event } from '~~/test/mocks/h3-event';
 import { useH3TestUtils } from '~~/test/mocks/h3-test-utils';
-import usersSearchEventHandler from '~~/server/api/search/users.get';
+import usersSearchEventHandler from '~~/server/api/search/users/index.get';
 import type { CompactUser } from '~~/shared/types/user';
 
 useH3TestUtils();

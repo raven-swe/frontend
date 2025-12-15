@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
+import { mockNuxtImport } from '@nuxt/test-utils/runtime';
 import TweetQuoteCard from '@/components/tweet/TweetQuoteCard.vue';
 import Avatar from '@/components/ui/Avatar.vue';
 import TweetMedia from '@/components/tweet/TweetMedia.vue';
@@ -15,22 +16,15 @@ const i18n = createI18n({
   },
 });
 
-// Mock useRouter to capture push calls
-let pushMock: ReturnType<typeof vi.fn> | undefined;
-vi.mock('vue-router', () => ({
-  useRouter: () => ({
-    push: (...args: unknown[]) => pushMock && pushMock(...args),
-  }),
-}));
+const routerMock = vi.hoisted(() => {
+  return {
+    push: vi.fn(),
+  };
+});
 
-vi.mock('~/composables/useProfileMutation', () => ({
-  useFollowMutation: () => ({
-    mutate: vi.fn(),
-  }),
-  useBlockMutation: () => ({
-    mutate: vi.fn(),
-  }),
-}));
+mockNuxtImport('useRouter', () => {
+  return () => routerMock;
+});
 
 // Common stubs
 const stubs = {
@@ -43,6 +37,12 @@ const stubs = {
   VideoPlayer: { template: '<div class="video-player-stub"></div>' },
   Avatar: Avatar,
   TweetMedia: TweetMedia,
+  UserHoverCard: {
+    name: 'UserHoverCard',
+    template: '<div><slot /></div>',
+    props: ['username'],
+    emits: ['follow', 'block', 'unblock', 'unfollow'],
+  },
 };
 
 const globalConfig = {
@@ -217,5 +217,32 @@ describe('TweetQuoteCard.vue', () => {
     expect(mediaWrap.exists()).toBe(true);
     // Assert compact prop toggles component; internal class is applied at TweetMedia root
     expect(mediaWrap.props('compact')).toBe(true);
+  });
+
+  it('navigates to tweet detail on click', async () => {
+    routerMock.push.mockClear();
+    const tweet = makeTweet();
+    const wrapper = mount(TweetQuoteCard, { props: { tweet }, global: globalConfig });
+
+    const card = wrapper.find(`#quoted-tweet-${tweet.id}`);
+    await card.trigger('click');
+
+    expect(routerMock.push).toHaveBeenCalledWith(
+      `/profile/${tweet.author.username}/status/${tweet.id}`,
+    );
+  });
+
+  it('does not navigate on click when isPreview is true', async () => {
+    routerMock.push.mockClear();
+    const tweet = makeTweet();
+    const wrapper = mount(TweetQuoteCard, {
+      props: { tweet, isPreview: true },
+      global: globalConfig,
+    });
+
+    const card = wrapper.find(`#quoted-tweet-${tweet.id}`);
+    await card.trigger('click');
+
+    expect(routerMock.push).not.toHaveBeenCalled();
   });
 });

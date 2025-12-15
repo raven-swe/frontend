@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { onMounted, computed, watch, onServerPrefetch } from 'vue';
-import { searchService } from '~/services/search/searchService';
-import { useInfiniteQuery } from '@tanstack/vue-query';
+import { computed, watch, onServerPrefetch } from 'vue';
 import { useSearchQuery } from '~/composables/useSearchQuery';
 import { useSearchStore } from '~/stores/search';
 import { PeopleFilter } from '~~/shared/types/search';
 import VirtualInfiniteScroller from '~/components/common/VirtualInfiniteScroller.vue';
-import Thumbnail from '~/components/ui/Thumbnail.vue';
+import { useTweetSearch } from '~/composables/tweet/useTweetLists';
+import { getItemKey } from '~/constants/query-keys';
 
 definePageMeta({
   layout: 'search',
@@ -22,9 +21,7 @@ const peopleFilter = computed(() =>
 );
 
 // Initialize search query from URL
-onMounted(() => {
-  initializeFromRoute();
-});
+initializeFromRoute();
 
 // Watch for route query changes
 watch(
@@ -44,28 +41,12 @@ const {
   isFetchingNextPage,
   isFetching: isLoading,
   suspense,
-} = useInfiniteQuery({
-  queryKey: computed(() => [
-    'search',
-    'tweets',
-    'media',
-    searchQuery.value,
-    peopleFilter.value,
-    searchStore.excludeMutedAndBlocked,
-  ]),
-  initialPageParam: null as string | null,
-  queryFn: async ({ pageParam = null }) =>
-    await searchService.getTweets({
-      pagination: { limit: 10, cursor: pageParam },
-      query: searchQuery.value,
-      tab: 'media',
-      peopleFilter: peopleFilter.value,
-      excludeMutedAndBlocked: searchStore.excludeMutedAndBlocked,
-    }),
-  getNextPageParam: (lastPage) =>
-    lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined,
-  structuralSharing: false,
-});
+} = useTweetSearch(
+  'media',
+  searchQuery,
+  peopleFilter,
+  computed(() => searchStore.excludeMutedAndBlocked),
+);
 
 const tweets = computed(() => {
   const flat = response.value?.pages.flatMap((page) => page.data) || [];
@@ -90,18 +71,18 @@ onServerPrefetch(async () => {
           :has-next-page="hasNextPage"
           :is-fetching-next-page="isFetchingNextPage"
           :fetch-next-page="fetchNextPage"
+          :get-key="
+            (item, index, key) =>
+              `${item?.map((tweet) => getItemKey(tweet, index)).join('-') ?? key}`
+          "
         >
           <template #item="{ item }">
             <div class="grid grid-cols-3 gap-1 overflow-hidden pt-1">
-              <!-- Always delegate media rendering to Thumbnail -->
-              <NuxtLink
-                v-for="tweet in item"
-                :key="tweet.id"
-                :to="`/profile/${tweet.author.username}/status/${tweet.id}`"
-                class="block size-full"
-              >
-                <Thumbnail :media="tweet.media?.[0]" :multiple="tweet.media?.length > 1" />
-              </NuxtLink>
+              <TweetMediaThumbnail
+                v-for="(tweet, index) in item"
+                :key="index"
+                :tweet-id="tweet.id"
+              />
             </div>
           </template>
         </VirtualInfiniteScroller>

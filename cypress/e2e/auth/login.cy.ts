@@ -101,8 +101,12 @@ describe('Login Flow', () => {
         cy.visitAndWaitForHydration('/home/for-you');
         // Verify url redirection to home page
         cy.url({ timeout: 10000 }).should('eq', `${Cypress.config().baseUrl}/home/for-you`);
+        // Open Actions Menu
+        cy.get('div[data-cy="user-actions-button"]').click();
         // Click logout button
-        cy.get('button[data-cy="logout-button"]').click();
+        cy.get('[data-cy="logout-button"]').click();
+        // Confirm logout in dialog
+        cy.get('button[data-cy="confirm-logout-button"]').click();
         // Verify redirection to login page
         cy.url({ timeout: 10000 }).should('eq', `${Cypress.config().baseUrl}/`);
       });

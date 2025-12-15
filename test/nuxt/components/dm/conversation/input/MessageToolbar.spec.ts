@@ -17,7 +17,7 @@ describe('MessageToolbar Component', () => {
     const wrapper = await mountSuspended(MessageToolbar);
 
     const buttons = wrapper.findAll('button');
-    expect(buttons.length).toBe(3);
+    expect(buttons.length).toBe(1);
   });
 
   it('renders add image button with icon', async () => {
@@ -25,20 +25,6 @@ describe('MessageToolbar Component', () => {
 
     const html = wrapper.html();
     expect(html).toContain('ic:outline-add-photo-alternate');
-  });
-
-  it('renders add gif button with icon', async () => {
-    const wrapper = await mountSuspended(MessageToolbar);
-
-    const html = wrapper.html();
-    expect(html).toContain('ic:outline-gif-box');
-  });
-
-  it('renders add emoji button with icon', async () => {
-    const wrapper = await mountSuspended(MessageToolbar);
-
-    const html = wrapper.html();
-    expect(html).toContain('ic:baseline-insert-emoticon');
   });
 
   it('emits add-image event when image button is clicked', async () => {
@@ -51,30 +37,6 @@ describe('MessageToolbar Component', () => {
 
     expect(wrapper.emitted('add-image')).toBeTruthy();
     expect(wrapper.emitted('add-image')?.length).toBe(1);
-  });
-
-  it('emits add-gif event when gif button is clicked', async () => {
-    const wrapper = await mountSuspended(MessageToolbar);
-
-    const buttons = wrapper.findAll('button');
-    const gifButton = buttons[1];
-    if (!gifButton) throw new Error('GIF button not found');
-    await gifButton.trigger('click');
-
-    expect(wrapper.emitted('add-gif')).toBeTruthy();
-    expect(wrapper.emitted('add-gif')?.length).toBe(1);
-  });
-
-  it('emits add-emoji event when emoji button is clicked', async () => {
-    const wrapper = await mountSuspended(MessageToolbar);
-
-    const buttons = wrapper.findAll('button');
-    const emojiButton = buttons[2];
-    if (!emojiButton) throw new Error('Emoji button not found');
-    await emojiButton.trigger('click');
-
-    expect(wrapper.emitted('add-emoji')).toBeTruthy();
-    expect(wrapper.emitted('add-emoji')?.length).toBe(1);
   });
 
   it('all buttons have type="button"', async () => {
@@ -117,22 +79,10 @@ describe('MessageToolbar Component', () => {
     const wrapper = await mountSuspended(MessageToolbar);
 
     const buttons = wrapper.findAll('button');
-    if (buttons.length < 3) throw new Error('Expected 3 buttons');
+    if (buttons.length < 1) throw new Error('Expected 1 button');
 
     await buttons[0]!.trigger('click');
     expect(wrapper.emitted('add-image')?.length).toBe(1);
-    expect(wrapper.emitted('add-gif')).toBeFalsy();
-    expect(wrapper.emitted('add-emoji')).toBeFalsy();
-
-    await buttons[1]!.trigger('click');
-    expect(wrapper.emitted('add-image')?.length).toBe(1);
-    expect(wrapper.emitted('add-gif')?.length).toBe(1);
-    expect(wrapper.emitted('add-emoji')).toBeFalsy();
-
-    await buttons[2]!.trigger('click');
-    expect(wrapper.emitted('add-image')?.length).toBe(1);
-    expect(wrapper.emitted('add-gif')?.length).toBe(1);
-    expect(wrapper.emitted('add-emoji')?.length).toBe(1);
   });
 
   it('buttons can be clicked multiple times', async () => {

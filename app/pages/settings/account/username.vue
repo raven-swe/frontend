@@ -8,6 +8,7 @@ import Button from '~/components/ui/Button.vue';
 import { useDebounceFn } from '@vueuse/core';
 import { useUserStore } from '~/stores/user';
 import { apiFetch } from '~/api';
+import type { FetchError } from 'ofetch';
 
 definePageMeta({ layout: 'settings' });
 
@@ -56,6 +57,7 @@ const [_username, usernameAttrs] = defineField('username');
 
 const checkUsernameAvailability = useDebounceFn(async (username: string) => {
   // Guard: skip network call if unchanged or invalid
+  username = username.toLocaleLowerCase();
   if (!username || errors.value.username) return;
   if (username === originalUsername.value) return;
 
@@ -78,7 +80,7 @@ const checkUsernameAvailability = useDebounceFn(async (username: string) => {
     }
   } catch (error) {
     // Handle different error status codes
-    const err = error as { data?: { data: { error: { code: string } } } };
+    const err = error as FetchError<FetchError<ApiValidationErrorResponse>>;
     const code = err.data?.data?.error.code;
     const errorKey = code ? `errors.username.${code}` : 'errors.username.error-checking';
     console.error('Error checking username:', errorKey);
@@ -88,6 +90,7 @@ const checkUsernameAvailability = useDebounceFn(async (username: string) => {
   }
 }, 300);
 const dynamicUsernameSuggestions = useDebounceFn(async (username: string) => {
+  username = username.toLocaleLowerCase();
   // Guard: skip suggestions fetch if unchanged or invalid
   if (!username || errors.value.username) return;
   if (username === originalUsername.value) return;
@@ -160,8 +163,7 @@ const hasErrors = computed(() => Object.values(errors.value).some((msg) => !!msg
         :name="$t('setting.back-button-icon')"
         size="1.5rem"
         class="cursor-pointer"
-        to="/settings/account"
-        @click="router.push('/settings/account')"
+        @click="router.back()"
       />
       <h1 class="text-2xl font-bold">{{ $t('setting.username.change-username') }}</h1>
     </div>

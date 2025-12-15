@@ -118,12 +118,12 @@ describe('Search HistoryItem Component', () => {
   });
 
   describe('Hashtag type', () => {
-    it('renders hashtag with # prefix', async () => {
+    it('renders hashtag', async () => {
       const wrapper = await mountSuspended(HistoryItem, {
         props: { type: 'hashtag', content: 'javascript' },
         global: globalConfig,
       });
-      expect(wrapper.text()).toContain('#javascript');
+      expect(wrapper.text()).toContain('javascript');
     });
 
     it('links to hashtag search results', async () => {

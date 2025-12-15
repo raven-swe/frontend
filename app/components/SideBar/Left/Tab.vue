@@ -5,12 +5,11 @@ const props = defineProps<{
   tab: LeftSidebarTab;
 }>();
 
-const route = useRoute();
+const router = useRouter();
 const isActive = computed(() => {
   if (props.tab.route === '#') return false;
-  return route.path.startsWith(props.tab.route);
+  return router.currentRoute.value.path.startsWith(props.tab.route);
 });
-const textStyle = computed(() => (isActive.value ? 'font-bold' : 'font-normal'));
 const iconType = computed(() => (isActive.value ? '' : 'outline-'));
 const { play } = useNotificationSound();
 
@@ -18,7 +17,7 @@ watch(
   () => props.tab.badgeCount,
   (newCount, oldCount) => {
     if (oldCount === undefined || newCount === undefined) return;
-    if (newCount > oldCount) {
+    if (newCount > oldCount && props.tab.route.includes('notifications')) {
       play();
     }
   },
@@ -26,22 +25,26 @@ watch(
 </script>
 
 <template>
-  <NuxtLink
-    :to="tab.route"
-    class="text-foreground hover:bg-foreground/10 flex items-center justify-start rounded-full p-4 xl:w-auto"
-  >
-    <div class="text-foreground relative flex h-8 w-8 items-center justify-center">
-      <Icon :name="`ic:${iconType}${tab.icon}`" size="28" />
-      <span
-        v-if="tab.badgeCount && tab.badgeCount > 0"
-        class="bg-primary text-primary-foreground absolute -top-3 -me-1 inline-flex h-6 min-w-[22px] items-center justify-center rounded-full px-1.5 text-[11px] leading-none font-semibold"
-      >
-        {{ tab.badgeCount > 99 ? '99+' : tab.badgeCount }}
-      </span>
-    </div>
-
-    <div class="ms-4 hidden text-xl xl:block" :class="textStyle">
-      {{ $t(`leftsidebar.nav.${tab.label}`) }}
+  <NuxtLink :to="tab.route" class="group flex h-14.5 w-full items-center py-2">
+    <div
+      class="group-hover:bg-secondary/50 flex flex-row items-center gap-2 rounded-full p-3 xl:pe-6"
+    >
+      <div class="text-foreground relative flex items-center justify-center transition-[width]">
+        <Icon :name="`ic:${iconType}${tab.icon}`" size="1.6rem" />
+        <ClientOnly>
+          <span
+            v-if="tab.badgeCount && tab.badgeCount > 0"
+            data-test="count-badge"
+            class="bg-primary text-foreground border-background absolute -end-1 -top-1 inline-flex min-w-5 items-center justify-center rounded-full border-1 p-0.75 text-xs leading-none"
+            :data-cy="`left-sidebar-tab-badge-${tab.label}`"
+          >
+            {{ tab.badgeCount > 99 ? '99+' : tab.badgeCount }}
+          </span>
+        </ClientOnly>
+      </div>
+      <p class="hidden xl:inline-block" :class="isActive ? 'font-bold' : ''">
+        {{ $t(`leftsidebar.nav.${tab.label}`) }}
+      </p>
     </div>
   </NuxtLink>
 </template>

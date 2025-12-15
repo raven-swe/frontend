@@ -36,6 +36,7 @@ const tabs = [
           :label="tab.label"
           :route="tab.route"
           :is-active="$route.path === tab.route"
+          :data-cy="`explore-${tab.route.split('/')[2]}-tab`"
         />
       </Tabs>
     </template>

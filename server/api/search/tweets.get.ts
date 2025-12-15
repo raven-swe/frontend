@@ -1,4 +1,3 @@
-import type { Tweet } from '~~/shared/types/tweet';
 import { defineWrappedResponseHandler } from '~~/server/utils/handler';
 
 export default defineWrappedResponseHandler(async (event) => {

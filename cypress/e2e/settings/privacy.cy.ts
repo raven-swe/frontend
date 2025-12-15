@@ -15,7 +15,7 @@ describe('Privacy Settings Actions', function () {
   describe('Privacy and Safety settings', function () {
     describe('Mutes and Blocks settings', function () {
       beforeEach(() => {
-        cy.get('[data-cy="mutes-blocks-settings-btn"]').should('be.visible').click();
+        cy.get('[data-cy="mutes-and-blocks-settings-btn"]').should('be.visible').click();
         cy.url().should('include', '/settings/mute-and-block'); // TODO: should be /settings/privacy/mute-and-block
       });
 
@@ -105,6 +105,54 @@ describe('Privacy Settings Actions', function () {
             });
           });
         });
+      });
+    });
+
+    describe('Safety settings', function () {
+      beforeEach(() => {
+        cy.get('[data-cy="content-you-see-settings-btn"]').should('be.visible').click();
+        cy.url().should('include', '/settings/content-you-see');
+        // data-cy="interests-settings-btn"
+        cy.get('[data-cy="interests-settings-btn"]').should('be.visible').click();
+        cy.url().should('include', '/settings/interests');
+      });
+      it('should show interest entries', function () {
+        cy.get('[data-cy="interest-entry"]').should('have.length.greaterThan', 0);
+      });
+
+      it('should toggle an interest entry', function () {
+        cy.get('[data-cy="interest-entry"]')
+          .first()
+          .within(() => {
+            // data-state="checked"
+            cy.get('[data-cy="interest-checkbox"]').then(($checkbox) => {
+              const isChecked = $checkbox.attr('data-state') === 'checked';
+              cy.get('[data-cy="interest-checkbox"]').click();
+              cy.get('[data-cy="interest-checkbox"]').should(($cb) => {
+                const newIsChecked = $cb.attr('data-state') === 'checked';
+                expect(newIsChecked).to.eq(!isChecked);
+              });
+            });
+          });
+      });
+      it('should toggle multiple interest entries and save', function () {
+        cy.get('[data-cy="interest-entry"]').each(($el, index) => {
+          if (index < 3) {
+            cy.wrap($el).within(() => {
+              cy.get('[data-cy="interest-checkbox"]').then(($checkbox) => {
+                const isChecked = $checkbox.attr('data-state') === 'checked';
+                cy.get('[data-cy="interest-checkbox"]').click();
+                cy.get('[data-cy="interest-checkbox"]').should(($cb) => {
+                  const newIsChecked = $cb.attr('data-state') === 'checked';
+                  expect(newIsChecked).to.eq(!isChecked);
+                });
+              });
+            });
+          }
+        });
+        // Click save button
+        cy.get('button[data-cy="save-interests-button"]').should('not.be.disabled').click();
+        cy.get('button[data-cy="save-interests-button"]').should('be.disabled');
       });
     });
   });

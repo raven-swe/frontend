@@ -37,7 +37,11 @@ defineExpose({ handleAiSummary });
 <template>
   <div class="mt-2">
     <!-- Skeleton shimmer while loading -->
-    <div v-if="aiSummaryLoading" class="ai-summary-bg ai-summary-anim space-y-2 rounded-xl p-3">
+    <div
+      v-if="aiSummaryLoading"
+      class="ai-summary-bg ai-summary-anim space-y-2 rounded-xl p-3"
+      data-cy="tweet-ai-summary-loading"
+    >
       <div class="skeleton-shimmer h-3 w-10/12 rounded"></div>
       <div class="skeleton-shimmer h-3 w-9/12 rounded"></div>
       <div class="skeleton-shimmer h-3 w-7/12 rounded"></div>
@@ -47,6 +51,7 @@ defineExpose({ handleAiSummary });
     <div
       v-else-if="aiSummaryError"
       class="ai-summary-bg ai-summary-anim flex items-center gap-2 rounded-xl p-3"
+      data-cy="tweet-ai-summary-error"
     >
       <Icon
         name="material-symbols:error-outline-rounded"
@@ -62,12 +67,17 @@ defineExpose({ handleAiSummary });
     </div>
 
     <!-- Summary content -->
-    <div v-else-if="showAiSummary" class="ai-summary-bg ai-summary-anim relative rounded-xl p-3">
+    <div
+      v-else-if="showAiSummary"
+      class="ai-summary-bg ai-summary-anim relative rounded-xl p-3"
+      data-cy="tweet-ai-summary-container"
+    >
       <UiButton
         variant="ghost-default"
         size="icon-xs"
         class="text-foreground/70 hover:text-foreground absolute end-2 top-2 bg-transparent"
         :aria-label="$t('ai-summary.close')"
+        data-cy="tweet-ai-summary-close-button"
         @click.prevent.stop="closeSummary"
       >
         <Icon name="material-symbols:close-rounded" size="1rem" aria-hidden="true" />
@@ -75,7 +85,7 @@ defineExpose({ handleAiSummary });
       <h3 class="font-semibold">
         {{ $t('ai-summary.summary') }}
       </h3>
-      <p class="text-foreground mt-1 text-sm">{{ aiSummary }}</p>
+      <p class="text-foreground mt-1 text-sm" data-cy="tweet-ai-summary-content">{{ aiSummary }}</p>
     </div>
   </div>
 </template>

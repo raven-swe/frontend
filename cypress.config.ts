@@ -4,9 +4,11 @@ export default defineConfig({
   e2e: {
     baseUrl: 'http://localhost:3000',
     env: {
-      API_URL: 'https://test.api.raven.cmp27.space', // backend API
+      API_URL: 'https://stress.api.raven.cmp27.space',
     },
   },
+  viewportWidth: 1280,
+  viewportHeight: 800,
   reporter: 'mochawesome',
   reporterOptions: {
     reportDir: 'cypress/results',

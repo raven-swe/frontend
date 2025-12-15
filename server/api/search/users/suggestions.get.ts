@@ -1,10 +1,11 @@
+import type { CompactUser } from '~~/shared/types/user';
 import { defineWrappedResponseHandler } from '~~/server/utils/handler';
 
 export default defineWrappedResponseHandler(async (event) => {
   const fetcher = serverApiFetch(event);
   const query = getQuery(event);
 
-  return await fetcher<ApiSuccessResponse<string[]>>('/search/hashtags/top', {
+  return await fetcher<ApiSuccessResponse<CompactUser[]>>('/search/users/suggestions', {
     method: 'GET',
     query: {
       query: query.query,

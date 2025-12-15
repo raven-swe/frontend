@@ -14,7 +14,8 @@ const avatarRoot = cva('relative flex shrink-0 overflow-hidden rounded-full', {
       sm: 'size-10',
       md: 'size-16',
       lg: 'size-24',
-      xl: 'size-92',
+      xl: 'size-34',
+      '2xl': 'size-92',
     },
   },
   defaultVariants: {

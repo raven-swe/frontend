@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import type { ActorSummary } from '~~/shared/types/notifications';
 import type { Tweet } from '~~/shared/types/tweets';
 import TweetQuoteCard from '../tweet/TweetQuoteCard.vue';
+import { QueryClient } from '@tanstack/vue-query';
 
 const props = defineProps<{
   timestamp: string;
-  actor: ActorSummary;
+  actors: ActorSummary[];
+  totalActorsCount: number;
   isSeen?: boolean;
   tweet: Tweet;
 }>();
@@ -14,17 +17,35 @@ const icon = {
   color: 'text-brand-turquoise',
 };
 
-const linkTo = `/profile/${props.tweet.author.username}}/status/${props.tweet.id}`;
+const queryClient = new QueryClient();
+queryClient.invalidateQueries({
+  queryKey: ['user-list', props.tweet.author.username, 'tweet', props.tweet.id, 'reposts'],
+});
+const linkTo = `/profile/${props.tweet.author.username}/status/${props.tweet.id}/reposts`;
+const repostPluralIndex = computed(() => Math.min(props.totalActorsCount - 1, 3));
 
-const message = $t('notifications.message.repost');
+// Get up to 3 actors for display in the message
+const displayActors = computed(() => props.actors.slice(0, 3));
+
+const messageParams = computed(() => ({
+  named: {
+    others: Math.max(props.totalActorsCount - 3, 0),
+    user1: displayActors.value[0]?.username,
+    user2: displayActors.value[1]?.username,
+    user3: displayActors.value[2]?.username,
+  },
+}));
 </script>
 
 <template>
   <NotificationsBase
-    :message="message"
+    message-key="notifications.message.repost"
+    :message-plural-index="repostPluralIndex"
+    :message-params="messageParams"
+    :display-actors="displayActors"
     :timestamp="props.timestamp"
     :icon="icon"
-    :actor="props.actor"
+    :actors="props.actors"
     :link-to="linkTo"
     :is-seen="props.isSeen"
   >

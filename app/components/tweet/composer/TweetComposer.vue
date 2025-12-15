@@ -5,9 +5,9 @@ import TweetEditor from './TweetEditor.vue';
 import Toolbar from './Toolbar.vue';
 import MediaSlideshow from './MediaSlideshow.vue';
 import type { MediaItem } from '~~/shared/types/shared';
-import type { Tweet } from '~~/shared/types/tweets';
 import Avatar from '~/components/ui/Avatar.vue';
 import { useTweetComposer } from '~/composables/useTweetComposer';
+import { usePostTweet } from '~/composables/tweet/usePostTweet';
 
 interface Props {
   replyToTweetId?: string | null;
@@ -38,22 +38,29 @@ const {
   handlePost,
   handleAddMedia,
   handleRemoveMedia,
+  handleAddGif,
 } = useTweetComposer(tweetContent, media, replyToRef, quoteToRef);
 
+const { postTweet } = usePostTweet();
+
 const emit = defineEmits<{
-  (e: 'posted', tweet: Tweet): void;
+  (event: 'post-success'): void;
 }>();
 
 const handlePostWrapper = async () => {
   const newTweet = await handlePost();
   if (!newTweet) return;
-
-  emit('posted', newTweet);
-
+  postTweet(newTweet, replyToRef.value, quoteToRef.value);
+  emit('post-success'); // to close reply/post/quote dialog
   // Cleanup
-  media.value.forEach((item) => URL.revokeObjectURL(item.url));
+  media.value.forEach((item: MediaItem) => URL.revokeObjectURL(item.url));
   tweetContent.value = '';
   media.value = [];
+  tweetEditorRef.value?.resetHeight();
+};
+
+const handleInsertEmoji = (emoji: string) => {
+  tweetContent.value += emoji;
   tweetEditorRef.value?.resetHeight();
 };
 </script>
@@ -61,7 +68,7 @@ const handlePostWrapper = async () => {
 <template>
   <div class="bg-background relative max-w-[598px] p-4 pb-15">
     <div class="mb-3 flex gap-3">
-      <div class="flex-shrink-0">
+      <div class="shrink-0">
         <Avatar
           :img="userStore.user?.avatarUrl"
           :alt="$t('tweet.composer.profile-alt', { name: userStore.user?.username || '' })"
@@ -105,6 +112,8 @@ const handlePostWrapper = async () => {
         :composer-type="type"
         @post="handlePostWrapper"
         @add-media="handleAddMedia"
+        @insert-emoji="handleInsertEmoji"
+        @insert-gif="handleAddGif"
       />
     </div>
   </div>

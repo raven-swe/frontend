@@ -6,6 +6,7 @@ import { searchService } from '~/services/search/searchService';
 import type { CompactUser } from '~~/shared/types/user';
 import Hashtag from '~/components/search/Hashtag.vue';
 import HistoryItem from '~/components/search/HistoryItem.vue';
+import UserCard from '~/components/search/UserCard.vue';
 
 interface Props {
   showBackOnFocus?: boolean;
@@ -143,13 +144,13 @@ onMounted(() => {
   <div class="relative flex w-full items-center gap-2 px-2 pt-2">
     <UiButton
       v-if="props.showBackOnFocus && isFocused"
-      variant="icon"
-      size="icon"
+      variant="ghost-default"
+      size="icon-lg"
       @click="isFocused = false"
     >
-      <Icon class="mx-3" :name="$t('icons.back-button-icon')" size="1.3rem" />
+      <Icon :name="$t('icons.back-button-icon')" size="1.3rem" />
     </UiButton>
-    <div class="relative flex-1">
+    <div class="relative w-full flex-1">
       <UiSearchBar
         v-model="searchQuery"
         v-model:is-focused="isFocused"
@@ -200,6 +201,7 @@ onMounted(() => {
               <NuxtLink
                 :to="`/search/top?q=${encodeURIComponent(searchQuery)}`"
                 class="hover:bg-accent flex items-center transition-colors"
+                data-cy="search-search-for-text"
                 @click="saveInHistory({ type: 'hashtag', content: searchQuery })"
               >
                 <p class="text-foreground w-full p-4 break-words">
@@ -214,26 +216,17 @@ onMounted(() => {
                 v-for="user in searchResults.users"
                 :key="user.username"
                 :to="`/profile/${user.username}`"
-                class="hover:bg-accent flex items-center gap-3 px-4 py-3 transition-colors"
+                data-cy="search-user-result"
                 @click="saveInHistory({ type: 'user', content: user })"
               >
-                <img
-                  :src="user.avatarUrl"
-                  :alt="user.displayName"
-                  class="h-10 w-10 rounded-full object-cover"
-                />
-                <div class="flex-1 overflow-hidden">
-                  <div class="text-foreground truncate font-semibold">{{ user.displayName }}</div>
-                  <div class="text-muted-foreground truncate text-sm">
-                    {{ $t('@') }}{{ user.username }}
-                  </div>
-                </div>
+                <UserCard :user="user" />
               </NuxtLink>
             </div>
             <NuxtLink
               v-if="isValidUsername(getCleanUsername())"
               :to="`/profile/${getCleanUsername()}`"
               class="hover:bg-accent flex items-center transition-colors"
+              data-cy="search-go-to-profile"
             >
               <p class="text-foreground w-full p-4 break-words">
                 {{ $t('ui.search.search-list.go-to', { query: getCleanUsername() }) }}

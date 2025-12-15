@@ -108,6 +108,8 @@ export function useNotificationsList(options: {
       queryClient.setQueryData(queryKey, (oldData: unknown) => {
         const od = oldData as QueryPages;
         if (!od?.pages?.length) return oldData;
+        // only insert in mentions tab if it's a mention
+        if (filter === 'mentions' && notif.type !== 'MENTION') return oldData;
 
         const firstPage = od.pages[0];
         const exists = od.pages.some((page) =>
@@ -168,6 +170,14 @@ export function useNotificationsList(options: {
     }
   };
 
+  const getActors = (actorSummary?: ActorSummaryContainer | null): ActorSummary[] => {
+    return actorSummary?.previewActors ?? [];
+  };
+
+  const getTotalActorsCount = (actorSummary?: ActorSummaryContainer | null): number => {
+    return actorSummary?.totalCount ?? 0;
+  };
+
   const getPrimaryActor = (actorSummary?: ActorSummaryContainer | null): ActorSummary => {
     return (
       actorSummary?.previewActors?.[0] ?? {
@@ -191,6 +201,8 @@ export function useNotificationsList(options: {
     isLoading,
 
     markAllSeen,
+    getActors,
+    getTotalActorsCount,
     getPrimaryActor,
   };
 }

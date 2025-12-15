@@ -1,6 +1,6 @@
 <script lang="ts" setup></script>
 <template>
-  <div class="relative inline-block">
+  <div class="relative inline-block" v-bind="$attrs">
     <img
       src="https://cdn.raven.cmp27.space/light-raven.jpg"
       alt=""

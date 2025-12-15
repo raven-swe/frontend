@@ -7,7 +7,7 @@ import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime';
 type FormValues = { currentPassword: string; newPassword: string; confirmPassword?: string };
 
 // Use hoisted containers to avoid TDZ with vi.mock factories
-const routerHoisted = vi.hoisted(() => ({ pushMock: vi.fn() }));
+const routerHoisted = vi.hoisted(() => ({ pushMock: vi.fn(), backMock: vi.fn() }));
 const apiHoisted = vi.hoisted(() => ({ apiFetchMock: vi.fn() }));
 const veeHoisted = vi.hoisted(() => ({
   setFieldErrorMock: vi.fn(),
@@ -19,7 +19,7 @@ const i18nHoisted = vi.hoisted(() => ({ tImpl: (k: string) => k }));
 
 // Mock vue-router useRouter
 vi.mock('vue-router', () => ({
-  useRouter: () => ({ push: routerHoisted.pushMock }),
+  useRouter: () => ({ push: routerHoisted.pushMock, back: routerHoisted.backMock }),
 }));
 
 // Mock Nuxt auto-imported useI18n to avoid requiring the plugin installation
@@ -82,6 +82,7 @@ const flush = () => new Promise<void>((resolve) => setTimeout(resolve));
 describe('Settings ChangePasswordEditor Page', () => {
   beforeEach(() => {
     routerHoisted.pushMock.mockReset();
+    routerHoisted.backMock.mockReset();
     apiHoisted.apiFetchMock.mockReset();
     veeHoisted.setFieldErrorMock.mockReset();
     veeHoisted.submitValues = undefined;
@@ -236,6 +237,7 @@ describe('Settings ChangePasswordEditor Page', () => {
 
     const iconEl = wrapper.find('.cursor-pointer');
     await iconEl.trigger('click');
-    expect(routerHoisted.pushMock).toHaveBeenCalledWith('/settings/account');
+
+    expect(routerHoisted.backMock).toHaveBeenCalled();
   });
 });

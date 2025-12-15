@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, watch } from 'vue';
+import { computed, watch } from 'vue';
 import { searchService } from '~/services/search/searchService';
 import { useSearchQuery } from '~/composables/useSearchQuery';
 import { useSearchStore } from '~/stores/search';
@@ -20,9 +20,7 @@ const peopleFilter = computed(() =>
 );
 
 // Initialize search query from URL - must happen before defining fetcherFn
-onMounted(() => {
-  initializeFromRoute();
-});
+initializeFromRoute();
 
 // Watch for route query changes
 watch(
@@ -39,7 +37,7 @@ watch(
 const fetcherFn = (cursor: string | null, signal: AbortSignal) => {
   return searchService.getPeople(
     {
-      pagination: { limit: 20, cursor },
+      pagination: { cursor },
       query: searchQuery.value,
       peopleFilter: peopleFilter.value,
       excludeMutedAndBlocked: searchStore.excludeMutedAndBlocked,

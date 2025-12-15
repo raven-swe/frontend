@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, type InfiniteData, type QueryKey } from '@tanstack/vue-query';
 import type { FetchError } from 'ofetch';
 import { profileInteractionService } from '~/services/profile/profileInteractionService';
 
@@ -37,15 +37,7 @@ export function useProfileMutation<ActionType extends Actions, Q = void>({
     FetchError<FetchError<ApiErrorResponse>>,
     { username: string; action: ActionType },
     {
-      previousLists?: [
-        readonly unknown[],
-        (
-          | {
-              pages: ApiSuccessResponse<CompactUser[]>[];
-            }
-          | undefined
-        ),
-      ][];
+      previousLists?: [QueryKey, InfiniteData<ApiSuccessResponse<CompactUser[]>> | undefined][];
       previousUser?: User;
     }
   >({
@@ -67,16 +59,12 @@ export function useProfileMutation<ActionType extends Actions, Q = void>({
         });
       }
 
-      const previousLists = client.getQueriesData<{
-        pages: ApiSuccessResponse<CompactUser[]>[];
-      }>({
+      const previousLists = client.getQueriesData<InfiniteData<ApiSuccessResponse<CompactUser[]>>>({
         predicate: (query) => query.queryKey[0] === 'user-list',
       });
 
       // Optimistically update all user-lists
-      client.setQueriesData<{
-        pages: ApiSuccessResponse<CompactUser[]>[];
-      }>(
+      client.setQueriesData<InfiniteData<ApiSuccessResponse<CompactUser[]>>>(
         {
           predicate: (query) => query.queryKey[0] === 'user-list',
         },
@@ -131,8 +119,16 @@ export function useProfileMutation<ActionType extends Actions, Q = void>({
 
     // Invalidate queries on finishing request
     // To sync up with the backend
-    onSettled: (_data, _err, { username }, mutationResult, { client }) => {
+    onSettled: (_data, _err, { username, action }, mutationResult, { client }) => {
       const loweredUsername = username.toLowerCase();
+
+      // Always invalidate dm-conversations cache when blocking/unblocking a user
+      if (action === 'block' || action === 'unblock') {
+        client.invalidateQueries({
+          queryKey: ['dm-conversations'],
+        });
+      }
+
       const stillRunning = client.isMutating({
         mutationKey: ['profile-interaction'],
       });

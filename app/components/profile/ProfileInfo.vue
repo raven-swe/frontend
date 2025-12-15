@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import type { User } from '~~/shared/types/user';
 import { formatMonthYear } from '~/utils/date';
 import { cleanUrl } from '~/utils/cleanUrl';
+import { useIsCurrentUser } from '~/composables/useIsCurrentUser';
 
 const userProfile = inject<ComputedRef<User>>('user-data');
 
@@ -17,6 +17,8 @@ const displayUrl = computed(() => {
   return '';
 });
 
+const { isCurrentUser } = useIsCurrentUser();
+
 const mutualPluralIndex = computed(() => (userProfile?.value.mutualsCount ?? 1) - 1);
 
 const modifiedMutualUsers = computed(() => {
@@ -29,7 +31,7 @@ const modifiedMutualUsers = computed(() => {
   <div class="my-2 flex flex-col" data-cy="profile-info">
     <div class="px-4">
       <h2
-        class="text-foreground line-clamp-2 pb-0 text-2xl font-bold break-words"
+        class="text-foreground wrap-break-words line-clamp-2 pb-0 text-xl font-bold"
         data-cy="profile-display-name"
       >
         {{ userProfile?.displayName }}
@@ -37,7 +39,7 @@ const modifiedMutualUsers = computed(() => {
       <p class="text-muted-foreground text-md" data-cy="profile-user-name">{{ displayUsername }}</p>
       <p
         v-if="!isBlocking"
-        class="mt-2 line-clamp-4 break-words whitespace-pre-line"
+        class="wrap-break-words mt-2 line-clamp-4 whitespace-pre-line"
         data-cy="profile-bio"
       >
         <UiContentEntitiesRenderer
@@ -62,7 +64,7 @@ const modifiedMutualUsers = computed(() => {
           :href="userProfile?.websiteUrl"
           target="_blank"
           rel="noopener noreferrer"
-          class="text-brand-blue me-2 flex items-center gap-1 hover:underline"
+          class="text-primary me-2 flex items-center gap-1 hover:underline"
           data-cy="profile-website-url"
         >
           <Icon class="text-muted-foreground" name="ic:sharp-link" size="18" />
@@ -104,7 +106,7 @@ const modifiedMutualUsers = computed(() => {
       </div>
 
       <!-- Mutual Followers -->
-      <div v-if="userProfile?.mutualsCount !== 0" class="mt-3">
+      <div v-if="userProfile?.mutualsCount !== 0 && !isCurrentUser" class="mt-3">
         <NuxtLink
           :to="`/profile/${userProfile?.username}/followers-you-follow`"
           class="decoration-muted-foreground flex w-fit items-center gap-2 hover:underline"
@@ -138,7 +140,7 @@ const modifiedMutualUsers = computed(() => {
       </div>
 
       <div v-if="isMuted" class="mt-4">
-        <p class="text-muted-foreground text-sm">
+        <p class="text-muted-foreground text-sm" data-cy="profile-muted-info">
           {{ $t('profile-info.user-muted') }}
         </p>
       </div>

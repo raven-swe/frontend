@@ -59,13 +59,14 @@ function handleSubmit() {
       isFocused ? 'border-primary shadow-accent shadow-md' : '',
     ]"
   >
-    <Icon size="20" name="ic:outline-search" class="text-muted-foreground" />
+    <Icon size="1.3rem" name="ic:outline-search" class="text-muted-foreground shrink-0" />
     <input
       ref="inputRef"
       :value="modelValue || ''"
       type="text"
       :placeholder="placeholderText"
-      class="h-[15px] flex-1 border-none bg-transparent text-[15px] outline-none"
+      class="w-full flex-1 border-none bg-transparent outline-none"
+      data-cy="search-input"
       @input="handleInput"
       @focus="handleFocus"
       @blur="handleBlur"
@@ -73,8 +74,10 @@ function handleSubmit() {
     />
     <UiButton
       v-if="modelValue"
-      variant="icon"
-      size="icon"
+      variant="ghost-default"
+      size="icon-xs"
+      data-cy="search-clear-button"
+      class="h-5 w-5"
       @click="
         emit('update:modelValue', '');
         isFocused = true;
@@ -82,9 +85,8 @@ function handleSubmit() {
     >
       <Icon
         v-if="modelValue"
-        size="20"
+        size="1rem"
         name="zondicons:close-solid"
-        class="text-foreground cursor-pointer"
         @mousedown.prevent="clearInput"
       />
     </UiButton>

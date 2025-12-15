@@ -1,12 +1,42 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime';
 import SideBarLeft from '@/components/SideBar/Left/index.vue';
 
-mockNuxtImport('useI18n', () => {
-  return () => ({
-    locale: { value: 'en' },
+const useI18nMock = vi.hoisted(() => {
+  return {
+    locale: { value: 'en-US' },
     localeProperties: { value: { dir: 'ltr' } },
-  });
+    setLocale: vi.fn(),
+  };
+});
+
+mockNuxtImport('useI18n', () => {
+  return () => useI18nMock;
+});
+
+const useThemeMock = vi.hoisted(() => {
+  return {
+    mode: 'light',
+    toggleTheme: vi.fn(),
+  };
+});
+
+vi.mock('~/composables/useTheme', () => {
+  return {
+    useTheme: () => useThemeMock,
+  };
+});
+
+const loginServiceMock = vi.hoisted(() => {
+  return {
+    logout: vi.fn().mockResolvedValue(true),
+  };
+});
+
+vi.mock('~/services/auth/loginService', () => {
+  return {
+    loginService: loginServiceMock,
+  };
 });
 
 describe('SideBar Left Component', () => {
@@ -26,18 +56,50 @@ describe('SideBar Left Component', () => {
     expect(logoLink.exists()).toBe(true);
   });
 
-  it('renders sidebar tabs', async () => {
+  it('renders logout button', async () => {
     const wrapper = await mountSuspended(SideBarLeft);
+    const logoutTrigger = wrapper.find('[data-cy="logout-btn-trigger"]');
 
-    // Check if tabs container exists
-    const tabsContainer = wrapper.find('.mt-2.space-y-3');
-    expect(tabsContainer.exists()).toBe(true);
+    expect(logoutTrigger.exists()).toBe(true);
+    await logoutTrigger.trigger('click');
+    await new Promise((r) => setTimeout(r, 10));
+    const logoutButton = document.querySelector('[data-cy="logout-button"]');
+    expect(logoutButton).not.toBeNull();
+
+    (logoutButton as HTMLElement).click();
+    await new Promise((r) => setTimeout(r, 10));
+
+    const title = document.querySelector('[data-test="logout-dialog-title"]');
+    expect(title?.textContent).toBe('Log out of Raven?');
+
+    const logoutConfirmButton = document.querySelector('[data-cy="confirm-logout-button"]');
+    expect(logoutConfirmButton).not.toBeNull();
+    await (logoutConfirmButton as HTMLElement).click();
+    await new Promise((r) => setTimeout(r, 10));
+    expect(loginServiceMock.logout).toHaveBeenCalled();
   });
 
-  it('has proper layout structure', async () => {
-    const wrapper = await mountSuspended(SideBarLeft);
+  it('render post tweet button', async () => {
+    const wrapper = await mountSuspended(SideBarLeft, {
+      global: {
+        stubs: {
+          PostTweetDialog: {
+            template: '<div data-test="post-tweet-dialog"></div>',
+          },
+        },
+      },
+    });
+    const postButton = wrapper.find('[data-cy="sidebar-post-btn"]');
+    expect(postButton.exists()).toBe(true);
+    expect(postButton.text()).toContain('Post');
 
-    const container = wrapper.find('.flex.h-screen.flex-col');
-    expect(container.exists()).toBe(true);
+    const postDialog = wrapper.find('[data-test="post-tweet-dialog"]');
+    expect(postDialog.exists()).toBe(true);
+    expect(postDialog.attributes('open')).toBe('false');
+
+    await postButton.trigger('click');
+    await wrapper.vm.$nextTick();
+
+    expect(postDialog.attributes('open')).toBe('true');
   });
 });

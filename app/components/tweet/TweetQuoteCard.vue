@@ -3,7 +3,6 @@ import { ref } from 'vue';
 import Avatar from '~/components/ui/Avatar.vue';
 import type { Tweet } from '~~/shared/types/tweets';
 import TweetMedia from './TweetMedia.vue';
-import { useFollowMutation, useBlockMutation } from '~/composables/useProfileMutation';
 interface Props {
   tweet: Tweet;
   isPreview?: boolean;
@@ -17,9 +16,6 @@ function handleTweetClick() {
   if (props.isPreview) return;
   router.push(`/profile/${props.tweet.author.username}/status/${props.tweet.id}`);
 }
-
-const { mutate: followUser } = useFollowMutation();
-const { mutate: blockUser } = useBlockMutation();
 </script>
 
 <template>
@@ -31,27 +27,15 @@ const { mutate: blockUser } = useBlockMutation();
   >
     <!-- Header: avatar + names inline -->
     <div class="mb-1 flex items-center">
-      <UserHoverCard
-        :username="props.tweet.author.username"
-        @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
-        @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
-        @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
-        @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
-      >
+      <UserHoverCard :username="props.tweet.author.username">
         <NuxtLink :to="`/profile/${props.tweet.author.username}`" class="pe-2" @click.stop>
           <Avatar :img="props.tweet.author.avatarUrl || '/default_profile.png'" class="h-6 w-6" />
         </NuxtLink>
       </UserHoverCard>
-      <UserHoverCard
-        :username="props.tweet.author.username"
-        @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
-        @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
-        @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
-        @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
-      >
+      <UserHoverCard :username="props.tweet.author.username">
         <NuxtLink
           :to="`/profile/${props.tweet.author.username}`"
-          class="flex items-center"
+          class="flex cursor-pointer items-center truncate overflow-hidden hover:underline"
           @click.stop
         >
           <span class="max-w-[8rem] truncate font-semibold hover:underline">{{
@@ -59,22 +43,13 @@ const { mutate: blockUser } = useBlockMutation();
           }}</span>
         </NuxtLink>
       </UserHoverCard>
-      <UserHoverCard
-        :username="props.tweet.author.username"
-        @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
-        @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
-        @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
-        @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
-      >
+      <UserHoverCard :username="props.tweet.author.username">
         <NuxtLink
           :to="`/profile/${props.tweet.author.username}`"
-          class="flex items-center"
+          class="text-muted-foreground cursor-pointer truncate overflow-hidden"
           @click.stop
         >
-          <span
-            class="text-muted-foreground ms-1 max-w-[6rem] truncate"
-            v-text="'@' + props.tweet.author.username"
-          />
+          {{ '@' + tweet.author.username }}
         </NuxtLink>
       </UserHoverCard>
       <span class="text-muted-foreground mx-1">·</span>
@@ -87,11 +62,17 @@ const { mutate: blockUser } = useBlockMutation();
     </div>
 
     <!-- Content -->
-    <p class="leading-relaxed break-words whitespace-pre-wrap">
+    <p class="leading-relaxed break-words whitespace-pre-wrap" data-cy="quoted-tweet-content">
       <UiContentEntitiesRenderer :content="tweet.content" :entities="tweet.entities" />
     </p>
 
     <!-- Media (if any) -->
-    <TweetMedia v-if="tweet.media?.length" :media="tweet.media" compact />
+    <TweetMedia
+      v-if="tweet.media?.length"
+      :media="tweet.media"
+      :tweet-id="tweet.id"
+      compact
+      @click.stop
+    />
   </div>
 </template>

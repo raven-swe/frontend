@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import TweetDefaultCard from '~/components/tweet/TweetDefaultCard.vue';
-import { homeService } from '~/services/home/homeService';
-import { useInfiniteQuery, useQueryClient, type InfiniteData } from '@tanstack/vue-query';
-import { useWindowVirtualizer } from '@tanstack/vue-virtual';
+import VirtualInfiniteScroller from '~/components/common/VirtualInfiniteScroller.vue';
+import { useTimelineTweets } from '~/composables/tweet/useTweetLists';
+import { getItemKey } from '~/constants/query-keys';
 
 function isTab(value: unknown): value is HomeTab {
   return typeof value === 'string' && validHomeTabs.includes(value as HomeTab);
@@ -25,142 +24,35 @@ const {
   isFetchingNextPage,
   isLoading,
   suspense,
-} = useInfiniteQuery({
-  queryKey: [tab.value],
-  initialPageParam: null as string | null,
-  queryFn: async ({ pageParam = null }) =>
-    await homeService.getHomeTab({ limit: 10, cursor: pageParam }, tab.value),
-  getNextPageParam: (lastPage) =>
-    lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined,
-  structuralSharing: false,
-});
+} = useTimelineTweets(computed(() => tab.value));
 
 const tweets = computed(() => response.value?.pages.flatMap((page) => page.data) || []);
-
-//  Virtualization setup
-const parentRef = ref<HTMLElement | null>(null);
-const parentOffsetRef = ref(0);
-onMounted(() => {
-  parentOffsetRef.value = parentRef.value?.offsetTop ?? 0;
-});
-
-const rowVirtualizerOptions = computed(() => {
-  return {
-    count: hasNextPage ? tweets.value.length + 1 : tweets.value.length,
-    estimateSize: () => 120,
-    overscan: 3,
-    scrollMargin: parentOffsetRef.value,
-  };
-});
-
-const rowVirtualizer = useWindowVirtualizer(rowVirtualizerOptions);
-const virtualRows = computed(() => rowVirtualizer.value.getVirtualItems());
-const totalSize = computed(() => rowVirtualizer.value.getTotalSize());
-
-const measureElement = (el: Element | ComponentPublicInstance | null) => {
-  if (!el) return;
-  const element = 'nodeType' in el ? (el as HTMLElement) : (el as ComponentPublicInstance).$el;
-  rowVirtualizer.value.measureElement(element);
-};
-
-watchEffect(() => {
-  const [lastItem] = [...virtualRows.value].reverse();
-
-  if (!lastItem) {
-    return;
-  }
-
-  if (lastItem.index >= tweets.value.length - 3 && hasNextPage.value && !isFetchingNextPage.value) {
-    fetchNextPage();
-  }
-});
 
 onServerPrefetch(async () => {
   await suspense();
 });
-
-const queryClient = useQueryClient();
-
-function handlePost(tweet: Tweet) {
-  // Optimistically add the new tweet to the top of the list
-  if (!tab.value) return;
-  queryClient.setQueryData<InfiniteData<{ data: Tweet[]; pagination?: CursorPagination }>>(
-    [tab.value],
-    (oldData) => {
-      if (!oldData) return oldData;
-      const newData = {
-        ...oldData,
-        pages: [
-          {
-            data: [tweet, ...(oldData.pages[0]?.data || [])],
-            pagination: oldData.pages[0]?.pagination,
-          },
-          ...oldData.pages.slice(1),
-        ],
-      };
-      return newData;
-    },
-  );
-}
-
-watch(
-  () => tweets.value.length,
-  () => {
-    setTimeout(() => {
-      if (parentRef.value) {
-        parentOffsetRef.value = parentRef.value.offsetTop;
-      }
-    }, 100);
-  },
-  { flush: 'post' },
-);
-
-watch(
-  () => tab.value,
-  () => {
-    // Invalidate and refetch tweets when tab changes
-    queryClient.invalidateQueries({ queryKey: [tab.value] });
-  },
-);
 </script>
 
 <template>
   <div class="border-border mx-auto max-w-[700px]">
-    <TweetComposer class="mt-15 border-b-1" @posted="handlePost" />
-    <ClientOnly>
-      <div v-if="tweets" ref="parentRef">
-        <div
-          :style="{
-            height: `${totalSize}px`,
-            width: '100%',
-            position: 'relative',
-          }"
-        >
-          <div
-            :style="{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              transform: `translateY(${
-                virtualRows[0] ? virtualRows[0].start - rowVirtualizer.options.scrollMargin : 0
-              }px)`,
-            }"
-          >
-            <div
-              v-for="virtualRow in virtualRows"
-              :key="tweets[virtualRow.index]?.id || String(virtualRow.key)"
-              :ref="measureElement"
-              :data-index="virtualRow.index"
-            >
-              <TweetDefaultCard
-                v-if="tweets[virtualRow.index]"
-                :tweet="tweets[virtualRow.index]!"
-              />
-            </div>
-          </div>
+    <ClientOnly fallback="span">
+      <template #fallback>
+        <div class="text-primary mt-20 flex shrink-0 items-center justify-center py-4">
+          <UiSpinner />
         </div>
-      </div>
+      </template>
+
+      <VirtualInfiniteScroller
+        :items="tweets"
+        :get-key="getItemKey"
+        :has-next-page="hasNextPage"
+        :is-fetching-next-page="isFetchingNextPage"
+        :fetch-next-page="fetchNextPage"
+      >
+        <template #item="{ item }">
+          <TweetDefaultCard v-if="item" :tweet-id="item.id" :reposter-id="item.reposterId" />
+        </template>
+      </VirtualInfiniteScroller>
 
       <div
         v-if="(hasNextPage && isFetchingNextPage) || isLoading"
@@ -168,13 +60,13 @@ watch(
       >
         <UiSpinner />
       </div>
+      <div
+        v-if="tweets.length === 0 && !isFetchingNextPage && !isLoading"
+        data-testid="empty-state"
+        class="mx-auto my-10 max-w-90 px-8 text-start break-words"
+      >
+        <p class="text-[2rem] leading-tight font-black">{{ $t('errors.TWEET_NOT_FOUND') }}</p>
+      </div>
     </ClientOnly>
-    <div
-      v-if="tweets.length === 0 && !isFetchingNextPage && !isLoading"
-      data-testid="empty-state"
-      class="mx-auto my-10 max-w-90 px-8 text-start break-words"
-    >
-      <p class="text-[2rem] leading-tight font-black">{{ $t('errors.TWEET_NOT_FOUND') }}</p>
-    </div>
   </div>
 </template>

@@ -1,13 +1,12 @@
-import { describe, it, expect, vi } from 'vitest';
-import { nextTick } from 'vue';
-import { mount } from '@vue/test-utils';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { ref, type Ref } from 'vue';
 import { VueQueryPlugin } from '@tanstack/vue-query';
 import TweetDefaultCard from '@/components/tweet/TweetDefaultCard.vue';
 import Avatar from '@/components/ui/Avatar.vue';
 import TweetMedia from '@/components/tweet/TweetMedia.vue';
 import TweetActionButtons from '@/components/tweet/TweetActionButtons.vue';
 import type { Tweet } from '~~/shared/types/tweets';
-import { mockNuxtImport } from '@nuxt/test-utils/runtime';
+import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime';
 import en from '~~/i18n/locales/en.json';
 import { createI18n } from 'vue-i18n';
 
@@ -19,18 +18,43 @@ const i18n = createI18n({
   },
 });
 
-vi.mock('~/composables/useProfileMutation', () => ({
-  useFollowMutation: () => ({
-    mutate: vi.fn(),
-  }),
-  useBlockMutation: () => ({
-    mutate: vi.fn(),
+const { mutateFollow, mutateBlock } = vi.hoisted(() => ({
+  mutateFollow: vi.fn(),
+  mutateBlock: vi.fn(),
+}));
+
+vi.mock('~/stores/user', () => ({
+  useUserStore: () => ({
+    user: { username: 'current_user' },
   }),
 }));
+
+vi.mock('~/composables/useProfileMutation', () => ({
+  useFollowMutation: () => ({
+    mutate: mutateFollow,
+  }),
+  useBlockMutation: () => ({
+    mutate: mutateBlock,
+  }),
+}));
+
+const setQueryDataMock = vi.hoisted(() => vi.fn());
+
+vi.mock('@tanstack/vue-query', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@tanstack/vue-query')>();
+  return {
+    ...actual,
+    useQueryClient: () => ({
+      setQueryData: setQueryDataMock,
+    }),
+  };
+});
 
 const routerMock = vi.hoisted(() => {
   return {
     push: vi.fn(),
+    replace: vi.fn(),
+    resolve: vi.fn(() => ({ href: '' })),
   };
 });
 
@@ -44,6 +68,66 @@ mockNuxtImport('useI18n', () => {
   });
 });
 
+const handleAiSummaryMock = vi.fn();
+
+const tweetContent = 'Look @john_doe and #Nuxt3 is cool';
+
+const tweetMock: Tweet = {
+  id: 'tw-1',
+  content: tweetContent,
+  createdAt: new Date(Date.now() - 2 * 3600 * 1000).toISOString(), // 2h ago
+  author: {
+    username: 'aestheticsguy',
+    displayName: 'Aesthetics X',
+    avatarUrl: '/avatar.jpg',
+    isFollowing: false,
+    isFollower: false,
+  },
+  replyCount: 31,
+  retweetCount: 1205,
+  likeCount: 205000,
+  isLiked: false,
+  isRetweeted: false,
+  entities: {
+    mentions: [{ username: 'john_doe', startPosition: tweetContent.indexOf('@john_doe') }],
+    hashtags: [{ hashtag: 'Nuxt3', startPosition: tweetContent.indexOf('#Nuxt3') }],
+  },
+  media: [{ type: 'GIF', url: '/gif-1.gif', altText: 'gif', width: 200, height: 200 }],
+};
+
+const useTweetMock = vi.hoisted(() =>
+  vi.fn((tweetId: string) => {
+    const tweet = { ...tweetMock, id: tweetId };
+    return { data: tweet as Tweet | Ref<Tweet> };
+  }),
+);
+
+const useTweetReposterMock = vi.hoisted(() =>
+  vi.fn((_reposterId: string) => {
+    return {
+      data: null as null | {
+        username: string;
+        displayName: string;
+      },
+    };
+  }),
+);
+
+vi.mock('~/composables/tweet/useTweet', () => {
+  return {
+    useTweet: useTweetMock,
+    useTweetReposter: useTweetReposterMock,
+  };
+});
+
+vi.mock('~/stores/user', () => ({
+  useUserStore: () => ({
+    user: {
+      username: 'current_user',
+    },
+  }),
+}));
+
 // Stub components for faster tests
 const stubs = {
   NuxtLink: {
@@ -56,6 +140,22 @@ const stubs = {
   Avatar: Avatar,
   TweetMedia: TweetMedia,
   TweetActionButtons: TweetActionButtons,
+  AiSummary: {
+    template: '<div class="ai-summary-stub"></div>',
+    methods: {
+      handleAiSummary: handleAiSummaryMock,
+    },
+  },
+  UserHoverCard: {
+    name: 'UserHoverCard',
+    template: '<div><slot /></div>',
+    props: ['username'],
+    emits: ['follow', 'block', 'unblock', 'unfollow'],
+  },
+  TweetDropdown: {
+    template: '<div><slot /></div>',
+    props: ['tweet', 'username'],
+  },
 };
 
 const globalConfig = {
@@ -63,38 +163,15 @@ const globalConfig = {
   plugins: [i18n, VueQueryPlugin],
 };
 
-function makeTweet(overrides: Partial<Tweet> = {}): Tweet {
-  const content = 'Look @john_doe and #Nuxt3 is cool';
-  const tweet: Tweet = {
-    id: 'tw-1',
-    content,
-    createdAt: new Date(Date.now() - 2 * 3600 * 1000).toISOString(), // 2h ago
-    author: {
-      username: 'aestheticsguy',
-      displayName: 'Aesthetics X',
-      avatarUrl: '/avatar.jpg',
-      isFollowing: false,
-      isFollower: false,
-    },
-    replyCount: 31,
-    retweetCount: 1205,
-    likeCount: 205000,
-    isLiked: false,
-    isRetweeted: false,
-    entities: {
-      mentions: [{ username: 'john_doe', startPosition: content.indexOf('@john_doe') }],
-      hashtags: [{ hashtag: 'Nuxt3', startPosition: content.indexOf('#Nuxt3') }],
-    },
-    media: [{ type: 'GIF', url: '/gif-1.gif', altText: 'gif', width: 200, height: 200 }],
-  };
-  return { ...tweet, ...overrides };
-}
-
 describe('TweetDefaultCard.vue', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.resetAllMocks();
+  });
+
   it('renders header: avatar, display name, @username and relative time', async () => {
-    const tweet = makeTweet();
-    const wrapper = mount(TweetDefaultCard, {
-      props: { tweet },
+    const wrapper = await mountSuspended(TweetDefaultCard, {
+      props: { tweetId: 'tw-1' },
       global: globalConfig,
     });
 
@@ -111,14 +188,28 @@ describe('TweetDefaultCard.vue', () => {
 
     // Relative time: should be "2h"
     expect(wrapper.text()).toContain('2h');
+
+    const profileLink = wrapper.find('a[href="/profile/aestheticsguy"]');
+    expect(profileLink.exists()).toBe(true);
+    // Use wrapper text to assert display name to avoid potential slot timing issues
+    expect(wrapper.text()).toContain('Aesthetics X');
+
+    const timeEl = wrapper.find('time');
+    expect(timeEl.exists()).toBe(true);
+    expect(timeEl.attributes('datetime')).toBe(tweetMock.createdAt);
+    const title = timeEl.attributes('title');
+    expect(title && title.length > 0).toBe(true);
   });
 
   it('falls back to default avatar when no avatarUrl is provided', async () => {
-    const tweet = makeTweet();
-    // trigger fallback
-    tweet.author.avatarUrl = '' as unknown as string;
-    const wrapper = mount(TweetDefaultCard, {
-      props: { tweet },
+    useTweetMock.mockImplementationOnce((tweetId: string) => {
+      const tweet = { ...tweetMock, id: tweetId };
+      tweet.author.avatarUrl = '' as unknown as string;
+      return { data: tweet };
+    });
+
+    const wrapper = await mountSuspended(TweetDefaultCard, {
+      props: { tweetId: 'tw-1' },
       global: globalConfig,
     });
 
@@ -127,336 +218,40 @@ describe('TweetDefaultCard.vue', () => {
     expect(avatar.props('img')).toBe('/default_profile.png');
   });
 
-  it('links display name to the correct profile URL', async () => {
-    const tweet = makeTweet();
-    const wrapper = mount(TweetDefaultCard, {
-      props: { tweet },
-      global: globalConfig,
-    });
-
-    const profileLink = wrapper.find('a[href="/profile/aestheticsguy"]');
-    expect(profileLink.exists()).toBe(true);
-    // Use wrapper text to assert display name to avoid potential slot timing issues
-    expect(wrapper.text()).toContain('Aesthetics X');
-  });
-
-  it('sets time element attributes: datetime and non-empty title', async () => {
-    const tweet = makeTweet();
-    const wrapper = mount(TweetDefaultCard, {
-      props: { tweet },
-      global: globalConfig,
-    });
-
-    const timeEl = wrapper.find('time');
-    expect(timeEl.exists()).toBe(true);
-    expect(timeEl.attributes('datetime')).toBe(tweet.createdAt);
-    const title = timeEl.attributes('title');
-    expect(title && title.length > 0).toBe(true);
-  });
-
-  it('splits content into text + mention + hashtag links with correct hrefs', async () => {
-    const tweet = makeTweet();
-    const wrapper = mount(TweetDefaultCard, {
-      props: { tweet },
-      global: globalConfig,
-    });
-
-    // Mention link
-    const mention = wrapper.find('a[href="/profile/john_doe"]');
-    expect(mention.exists()).toBe(true);
-    expect(mention.text()).toContain('@john_doe');
-
-    // Hashtag link
-    const hashtag = wrapper.find('a[href="/search/top?q=%23Nuxt3"]');
-    expect(hashtag.exists()).toBe(true);
-    expect(hashtag.text()).toContain('#Nuxt3');
-
-    // Plain text chunks remain present
-    expect(wrapper.text()).toContain('Look');
-    expect(wrapper.text()).toContain('and');
-    expect(wrapper.text()).toContain('is cool');
-  });
-
   it('renders media and action buttons components with correct props', async () => {
-    const tweet = makeTweet({
-      media: [
-        {
-          type: 'VIDEO',
-          url: '/video.mp4',
-          altText: 'v',
-          width: 640,
-          height: 360,
-        },
-      ],
+    const mockTweetLocal = JSON.parse(JSON.stringify(tweetMock));
+    mockTweetLocal.media = [
+      { type: 'IMAGE', url: '/image-1.jpg', altText: 'image1', width: 400, height: 300 },
+      { type: 'VIDEO', url: '/video-1.mp4', altText: 'video1', width: 640, height: 360 },
+    ];
+
+    useTweetMock.mockImplementationOnce((tweetId: string) => {
+      const tweet = { ...mockTweetLocal, id: tweetId };
+      return { data: tweet };
     });
-    const wrapper = mount(TweetDefaultCard, {
-      props: { tweet },
+
+    const wrapper = await mountSuspended(TweetDefaultCard, {
+      props: { tweetId: 'tw-1' },
       global: globalConfig,
     });
 
     const media = wrapper.findComponent(TweetMedia);
     expect(media.exists()).toBe(true);
-    expect(media.props('media')).toEqual(tweet.media);
+    expect(media.props('media')).toEqual(mockTweetLocal.media);
 
     const actions = wrapper.findComponent(TweetActionButtons);
     expect(actions.exists()).toBe(true);
-    expect(actions.props('tweet')).toEqual(tweet);
-  });
-
-  it('handles adjacent entities without extra text (covers no-gap branch)', async () => {
-    const content = '@john_doe #Nuxt3';
-    const tweet = makeTweet({
-      content,
-      entities: {
-        mentions: [{ username: 'john_doe', startPosition: 0 }],
-        hashtags: [{ hashtag: 'Nuxt3', startPosition: content.indexOf('#Nuxt3') }],
-      },
-    });
-    const wrapper = mount(TweetDefaultCard, {
-      props: { tweet },
-      global: globalConfig,
-    });
-
-    // Find links within the tweet content area (excluding author username link)
-    const mentionLink = wrapper.find('a[href="/profile/john_doe"]');
-    const hashtagLink = wrapper.find('a[href="/search/top?q=%23Nuxt3"]');
-
-    expect(mentionLink.exists()).toBe(true);
-    expect(mentionLink.text()).toContain('@john_doe');
-    expect(hashtagLink.exists()).toBe(true);
-    expect(hashtagLink.text()).toContain('#Nuxt3');
-  });
-
-  it('renders plain text when there are no entities (covers early return)', async () => {
-    const tweet = makeTweet({
-      content: 'Just a plain tweet with no entities.',
-      entities: { mentions: [], hashtags: [] },
-    });
-    const wrapper = mount(TweetDefaultCard, {
-      props: { tweet },
-      global: globalConfig,
-    });
-
-    const contentP = wrapper.find('p');
-    expect(contentP.exists()).toBe(true);
-    // Should render text without any links
-    expect(contentP.text()).toContain('Just a plain tweet with no entities.');
-    expect(contentP.findAll('a').length).toBe(0);
-  });
-
-  it('updates like state on like-success when not previously liked', async () => {
-    const tweet = makeTweet({ isLiked: false, likeCount: 10 });
-    const wrapper = mount(TweetDefaultCard, {
-      props: { tweet },
-      global: globalConfig,
-    });
-
-    const actions = wrapper.findComponent(TweetActionButtons);
-    expect(actions.exists()).toBe(true);
-
-    // Emit like-success from child
-    actions.vm.$emit('like-success');
-    await nextTick();
-
-    // Props passed to child should reflect updated reactive tweet
-    const updated = actions.props('tweet') as Tweet;
-    expect(updated.isLiked).toBe(true);
-    expect(updated.likeCount).toBe(11);
-  });
-
-  it('increments likeCount from 0 when likeCount is undefined (nullish coalescing path)', async () => {
-    const tweet = makeTweet({ isLiked: false } as Partial<Tweet>);
-    // simulate missing likeCount -> should be treated as 0
-    (tweet as unknown as { likeCount?: number }).likeCount = undefined;
-    const wrapper = mount(TweetDefaultCard, {
-      props: { tweet },
-      global: globalConfig,
-    });
-
-    const actions = wrapper.findComponent(TweetActionButtons);
-    actions.vm.$emit('like-success');
-    await nextTick();
-
-    const updated = actions.props('tweet') as Tweet;
-    expect(updated.isLiked).toBe(true);
-    expect(updated.likeCount).toBe(1);
-  });
-
-  it('does nothing on like-success if already liked (no-op branch)', async () => {
-    const tweet = makeTweet({ isLiked: true, likeCount: 5 });
-    const wrapper = mount(TweetDefaultCard, {
-      props: { tweet },
-      global: globalConfig,
-    });
-
-    const actions = wrapper.findComponent(TweetActionButtons);
-    actions.vm.$emit('like-success');
-    await nextTick();
-
-    const updated = actions.props('tweet') as Tweet;
-    expect(updated.isLiked).toBe(true);
-    expect(updated.likeCount).toBe(5);
-  });
-
-  it('updates like state on unlike-success and clamps likeCount at 0', async () => {
-    // Case 1: normal decrement
-    const tweet1 = makeTweet({ isLiked: true, likeCount: 2 });
-    const wrapper1 = mount(TweetDefaultCard, {
-      props: { tweet: tweet1 },
-      global: globalConfig,
-    });
-    const actions1 = wrapper1.findComponent(TweetActionButtons);
-    actions1.vm.$emit('unlike-success');
-    await nextTick();
-    const updated1 = actions1.props('tweet') as Tweet;
-    expect(updated1.isLiked).toBe(false);
-    expect(updated1.likeCount).toBe(1);
-
-    // Case 2: clamp at zero
-    const tweet2 = makeTweet({ isLiked: true, likeCount: 0 });
-    const wrapper2 = mount(TweetDefaultCard, {
-      props: { tweet: tweet2 },
-      global: globalConfig,
-    });
-    const actions2 = wrapper2.findComponent(TweetActionButtons);
-    actions2.vm.$emit('unlike-success');
-    await nextTick();
-    const updated2 = actions2.props('tweet') as Tweet;
-    expect(updated2.isLiked).toBe(false);
-    expect(updated2.likeCount).toBe(0);
-  });
-
-  it('decrements likeCount from 0 when likeCount is undefined (clamp path)', async () => {
-    const tweet = makeTweet({ isLiked: true } as Partial<Tweet>);
-    (tweet as unknown as { likeCount?: number }).likeCount = undefined;
-    const wrapper = mount(TweetDefaultCard, {
-      props: { tweet },
-      global: globalConfig,
-    });
-    const actions = wrapper.findComponent(TweetActionButtons);
-    actions.vm.$emit('unlike-success');
-    await nextTick();
-
-    const updated = actions.props('tweet') as Tweet;
-    expect(updated.isLiked).toBe(false);
-    expect(updated.likeCount).toBe(0);
-  });
-
-  it('does nothing on unlike-success if not liked (no-op branch)', async () => {
-    const tweet = makeTweet({ isLiked: false, likeCount: 3 });
-    const wrapper = mount(TweetDefaultCard, {
-      props: { tweet },
-      global: globalConfig,
-    });
-    const actions = wrapper.findComponent(TweetActionButtons);
-    actions.vm.$emit('unlike-success');
-    await nextTick();
-    const updated = actions.props('tweet') as Tweet;
-    expect(updated.isLiked).toBe(false);
-    expect(updated.likeCount).toBe(3);
-  });
-
-  it('updates retweet state on retweet-success when not previously retweeted', async () => {
-    const tweet = makeTweet({ isRetweeted: false, retweetCount: 4 });
-    const wrapper = mount(TweetDefaultCard, {
-      props: { tweet },
-      global: globalConfig,
-    });
-    const actions = wrapper.findComponent(TweetActionButtons);
-    actions.vm.$emit('retweet-success');
-    await nextTick();
-    const updated = actions.props('tweet') as Tweet;
-    expect(updated.isRetweeted).toBe(true);
-    expect(updated.retweetCount).toBe(5);
-  });
-
-  it('does nothing on retweet-success if already retweeted (no-op branch)', async () => {
-    const tweet = makeTweet({ isRetweeted: true, retweetCount: 8 });
-    const wrapper = mount(TweetDefaultCard, {
-      props: { tweet },
-      global: globalConfig,
-    });
-    const actions = wrapper.findComponent(TweetActionButtons);
-    actions.vm.$emit('retweet-success');
-    await nextTick();
-    const updated = actions.props('tweet') as Tweet;
-    expect(updated.isRetweeted).toBe(true);
-    expect(updated.retweetCount).toBe(8);
-  });
-
-  it('updates retweet state on undo-retweet-success and clamps retweetCount at 0', async () => {
-    // Case 1: normal decrement
-    const tweet1 = makeTweet({ isRetweeted: true, retweetCount: 2 });
-    const wrapper1 = mount(TweetDefaultCard, {
-      props: { tweet: tweet1 },
-      global: globalConfig,
-    });
-    const actions1 = wrapper1.findComponent(TweetActionButtons);
-    actions1.vm.$emit('undo-retweet-success');
-    await nextTick();
-    const updated1 = actions1.props('tweet') as Tweet;
-    expect(updated1.isRetweeted).toBe(false);
-    expect(updated1.retweetCount).toBe(1);
-
-    // Case 2: clamp at zero
-    const tweet2 = makeTweet({ isRetweeted: true, retweetCount: 0 });
-    const wrapper2 = mount(TweetDefaultCard, {
-      props: { tweet: tweet2 },
-      global: globalConfig,
-    });
-    const actions2 = wrapper2.findComponent(TweetActionButtons);
-    actions2.vm.$emit('undo-retweet-success');
-    await nextTick();
-    const updated2 = actions2.props('tweet') as Tweet;
-    expect(updated2.isRetweeted).toBe(false);
-    expect(updated2.retweetCount).toBe(0);
-  });
-
-  it('decrements retweetCount from 0 when retweetCount is undefined (clamp path)', async () => {
-    const tweet = makeTweet({ isRetweeted: true } as Partial<Tweet>);
-    (tweet as unknown as { retweetCount?: number }).retweetCount = undefined;
-    const wrapper = mount(TweetDefaultCard, {
-      props: { tweet },
-      global: globalConfig,
-    });
-    const actions = wrapper.findComponent(TweetActionButtons);
-    actions.vm.$emit('undo-retweet-success');
-    await nextTick();
-
-    const updated = actions.props('tweet') as Tweet;
-    expect(updated.isRetweeted).toBe(false);
-    expect(updated.retweetCount).toBe(0);
-  });
-
-  it('uses empty-string fallback for content when tweet.content is empty (content || "")', async () => {
-    const tweet = makeTweet({ content: '', entities: { mentions: [], hashtags: [] } });
-    const wrapper = mount(TweetDefaultCard, {
-      props: { tweet },
-      global: globalConfig,
-    });
-    const contentP = wrapper.find('p');
-    expect(contentP.exists()).toBe(true);
-    expect(contentP.text().trim()).toBe('');
-  });
-
-  it('does nothing on undo-retweet-success if not retweeted (no-op branch)', async () => {
-    const tweet = makeTweet({ isRetweeted: false, retweetCount: 7 });
-    const wrapper = mount(TweetDefaultCard, {
-      props: { tweet },
-      global: globalConfig,
-    });
-    const actions = wrapper.findComponent(TweetActionButtons);
-    actions.vm.$emit('undo-retweet-success');
-    await nextTick();
-    const updated = actions.props('tweet') as Tweet;
-    expect(updated.isRetweeted).toBe(false);
-    expect(updated.retweetCount).toBe(7);
+    expect(actions.props('tweet')).toEqual(mockTweetLocal);
   });
 
   it('handle clicking on tweet navigates to tweet detail page', async () => {
-    const tweet = makeTweet();
-    const wrapper = mount(TweetDefaultCard, {
-      props: { tweet },
+    useTweetMock.mockImplementationOnce((tweetId: string) => {
+      const tweet = { ...tweetMock, id: tweetId };
+      return { data: ref(tweet) };
+    });
+
+    const wrapper = await mountSuspended(TweetDefaultCard, {
+      props: { tweetId: 'tw-1' },
       global: globalConfig,
     });
 
@@ -466,7 +261,99 @@ describe('TweetDefaultCard.vue', () => {
     await article.trigger('click');
 
     expect(routerMock.push).toHaveBeenCalledWith(
-      `/profile/${tweet.author.username}/status/${tweet.id}`,
+      `/profile/${tweetMock.author.username}/status/tw-1`,
     );
+  });
+
+  it('triggers AI summary when button is clicked', async () => {
+    const wrapper = await mountSuspended(TweetDefaultCard, {
+      props: { tweetId: 'tw-1' },
+      global: globalConfig,
+    });
+
+    const buttons = wrapper.findAll('button');
+    const aiBtn = buttons.find((b) => b.html().includes('vscode-icons:file-type-gemini'));
+
+    expect(aiBtn?.exists()).toBe(true);
+    await aiBtn?.trigger('click');
+
+    expect(handleAiSummaryMock).toHaveBeenCalled();
+  });
+
+  it('renders "Retweeted by" header correctly', async () => {
+    useTweetMock.mockImplementationOnce((tweetId: string) => {
+      const tweet = {
+        ...tweetMock,
+        id: tweetId,
+      };
+      return { data: tweet };
+    });
+
+    useTweetReposterMock.mockImplementationOnce(() => {
+      const reposter = {
+        username: 'retweeter',
+        displayName: 'Retweeter',
+      };
+      return { data: reposter };
+    });
+    const wrapper = await mountSuspended(TweetDefaultCard, {
+      props: { tweetId: 'tw-1' },
+      global: globalConfig,
+    });
+
+    expect(wrapper.text()).toContain('Retweeter');
+    expect(wrapper.text()).toContain('Reposted');
+  });
+
+  it('renders "Retweeted by you" when reposted by current user', async () => {
+    useTweetMock.mockImplementationOnce((tweetId: string) => {
+      const tweet = {
+        ...tweetMock,
+        id: tweetId,
+      };
+      return { data: tweet };
+    });
+
+    useTweetReposterMock.mockImplementationOnce(() => {
+      const reposter = {
+        username: 'current_user',
+        displayName: 'Current User',
+      };
+      return { data: reposter };
+    });
+    const wrapper = await mountSuspended(TweetDefaultCard, {
+      props: { tweetId: 'tw-1' },
+      global: globalConfig,
+    });
+
+    expect(wrapper.text()).toContain('You Reposted');
+  });
+
+  it('renders "Replying to" header', async () => {
+    useTweetMock.mockImplementationOnce((tweetId: string) => {
+      const parent = {
+        ...tweetMock,
+        id: 'tw-parent',
+        author: {
+          username: 'parent_user',
+          displayName: 'Parent User',
+          avatarUrl: '/parent-avatar.jpg',
+          isFollowing: false,
+        },
+      };
+      const childTweet = {
+        ...tweetMock,
+        id: tweetId,
+        replyToTweet: parent,
+      };
+      return { data: childTweet };
+    });
+    const wrapper = await mountSuspended(TweetDefaultCard, {
+      props: { tweetId: 'tw-1' },
+      global: globalConfig,
+    });
+
+    expect(wrapper.text()).toContain('Replying to');
+    expect(wrapper.text()).toContain('@parent_user');
   });
 });

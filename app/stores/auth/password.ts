@@ -58,10 +58,10 @@ export const usePasswordStore = defineStore('password', () => {
           const errorCode = error.data?.data?.error?.code;
           return [{ field: 'identifier', code: errorCode }];
         } else if (error.data?.statusCode === 429) {
-          showToaster('error', 'toaster.checkUser.rateLimit');
+          showToaster('error', 'toaster.checkUser.rateLimit', true);
         }
       } else {
-        showToaster('error', 'toaster.checkUser.error');
+        showToaster('error', 'toaster.checkUser.error', true);
       }
     } finally {
       loading.value = false;
@@ -82,7 +82,7 @@ export const usePasswordStore = defineStore('password', () => {
         const errors = error.data?.data?.error.errors;
         return errors;
       } else {
-        showToaster('error', 'toaster.verifyUser.error');
+        showToaster('error', 'toaster.verifyUser.error', true);
       }
     } finally {
       loading.value = false;
@@ -93,17 +93,17 @@ export const usePasswordStore = defineStore('password', () => {
     try {
       await passwordService.resendOtp(confirmationToken.value);
       step.value = 1;
-      showToaster('success', 'toaster.resendOtp.success');
+      showToaster('success', 'toaster.resendOtp.success', true);
     } catch (error) {
       if (isApiError(error) && error.status === 429) {
         const apiError = error.data?.data;
-        showToaster('error', apiError?.message || 'toaster.resendOtp.rateLimit');
+        showToaster('error', apiError?.message || 'toaster.resendOtp.rateLimit', true);
         const { retryAfter } = apiError?.error as unknown as { retryAfter: number };
         if (retryAfter) {
           return retryAfter;
         }
       } else {
-        showToaster('error', 'toaster.resendOtp.error');
+        showToaster('error', 'toaster.resendOtp.error', true);
       }
     }
   };
@@ -118,14 +118,14 @@ export const usePasswordStore = defineStore('password', () => {
       await passwordService.resetPassword(data);
       resetData();
       open.value = false;
-      showToaster('success', 'toaster.resetPassword.success');
+      showToaster('success', 'toaster.resetPassword.success', true);
       router.push('/home');
     } catch (error) {
       if (isApiValidationError(error)) {
         const errors = error.data?.data?.error.errors;
         return errors;
       } else {
-        showToaster('error', 'toaster.resetPassword.error');
+        showToaster('error', 'toaster.resetPassword.error', true);
       }
     } finally {
       loading.value = false;

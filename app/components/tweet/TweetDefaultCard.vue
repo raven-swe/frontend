@@ -1,87 +1,69 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import Avatar from '~/components/ui/Avatar.vue';
-import type { Tweet } from '~~/shared/types/tweets';
 import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
 import QuotedTweetCard from './QuotedTweetCard.vue';
 import AiSummary from './AiSummary.vue';
 import { useUserStore } from '~/stores/user';
+import { useTweet, useTweetReposter } from '~/composables/tweet/useTweet';
 interface Props {
-  tweet: Tweet;
+  tweetId: string;
+  reposterId?: string | null;
   isParent?: boolean;
   isRoot?: boolean;
+  noActions?: boolean;
+  showReplyingTo?: boolean;
 }
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  noActions: false,
+  isParent: false,
+  isRoot: false,
+  reposterId: null,
+  showReplyingTo: true,
+});
 const router = useRouter();
 const userStore = useUserStore();
-const originalUsername = ref<string>(userStore.user?.username || '');
+const originalUsername = computed(() => userStore.user?.username ?? '');
+
+const { data: tweet } = useTweet(props.tweetId);
+
+const { data: reposter } = useTweetReposter(props.reposterId);
 
 // Format createdAt to a short relative time like "6h", "3d", "2m"
-const tweet = ref<Tweet>(JSON.parse(JSON.stringify(props.tweet)));
 const aiSummaryRef = ref<InstanceType<typeof AiSummary> | null>(null);
-
-const onLikeSuccess = () => {
-  if (!tweet.value.isLiked) {
-    tweet.value.isLiked = true;
-    tweet.value.likeCount = (tweet.value.likeCount ?? 0) + 1;
-  }
-};
-
-const onUnlikeSuccess = () => {
-  if (tweet.value.isLiked) {
-    tweet.value.isLiked = false;
-    const next = (tweet.value.likeCount ?? 0) - 1;
-    tweet.value.likeCount = next < 0 ? 0 : next;
-  }
-};
-const onRetweetSuccess = () => {
-  if (!tweet.value.isRetweeted) {
-    tweet.value.isRetweeted = true;
-    tweet.value.retweetCount += 1;
-  }
-};
-
-const onUndoRetweetSuccess = () => {
-  if (tweet.value.isRetweeted) {
-    tweet.value.isRetweeted = false;
-    const next = (tweet.value.retweetCount ?? 0) - 1;
-    tweet.value.retweetCount = next < 0 ? 0 : next;
-  }
-};
 
 function handleAiSummary() {
   aiSummaryRef.value?.handleAiSummary?.();
 }
 
 function handleTweetClick() {
-  router.push(`/profile/${props.tweet.author.username}/status/${props.tweet.id}`);
+  router.push(`/profile/${tweet.value?.author.username}/status/${tweet.value?.id}`);
 }
 
-const { mutate: followUser } = useFollowMutation();
-const { mutate: blockUser } = useBlockMutation();
+const onReplySuccess = () => {};
 </script>
 
 <template>
+  <!-- note that we need to change the username here to be the id once backend provide it -->
   <NuxtLink
-    v-if="props.tweet.repostedBy"
-    :to="`/profile/${props.tweet.repostedBy.username}`"
+    v-if="reposter"
+    :to="`/profile/${reposter.username}`"
     class="text-muted-foreground ms-5 mt-1 flex items-center gap-2 px-6 text-sm"
   >
     <Icon name="tabler:repeat" />
-    <span v-if="props.tweet.repostedBy.username === originalUsername">
+    <span v-if="reposter.username === originalUsername">
       {{ $t('tweet.retweeted-by-you') }}
     </span>
-    <span v-else>{{
-      $t('tweet.retweeted-by', { username: props.tweet.repostedBy.displayName })
-    }}</span>
+    <span v-else>{{ $t('tweet.retweeted-by', { username: reposter.displayName }) }}</span>
   </NuxtLink>
   <article
-    :id="'tweet-' + props.tweet.id"
+    v-if="tweet"
     class="border-b-border bg-background hover:bg-foreground/5 flex w-full max-w-[700px] cursor-pointer gap-2 px-4 transition-colors duration-100"
     :class="{
       'border-b-1': !isParent && !isRoot,
     }"
+    data-cy="tweet"
     @click.prevent.stop="handleTweetClick"
   >
     <div class="flex flex-col items-center gap-1">
@@ -91,16 +73,10 @@ const { mutate: blockUser } = useBlockMutation();
           'bg-thread-foreground': isParent,
         }"
       ></div>
-      <UserHoverCard
-        :username="props.tweet.author.username"
-        @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
-        @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
-        @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
-        @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
-      >
-        <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
+      <UserHoverCard :username="tweet.author.username">
+        <NuxtLink :to="`/profile/${tweet.author.username}`" @click.stop>
           <Avatar
-            :img="props.tweet.author.avatarUrl || '/default_profile.png'"
+            :img="tweet.author.avatarUrl || '/default_profile.png'"
             size="sm"
             variant="primary"
           />
@@ -113,29 +89,25 @@ const { mutate: blockUser } = useBlockMutation();
     <div class="min-w-0 flex-1 pt-3 pb-2">
       <!-- Header: display name, username, time -->
       <div class="flex items-center justify-between gap-2">
-        <div class="flex flex-wrap items-center gap-x-1 text-sm">
-          <UserHoverCard
-            :username="props.tweet.author.username"
-            @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
-            @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
-            @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
-            @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
-          >
-            <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
-              <span class="cursor-pointer font-semibold hover:underline">{{
-                props.tweet.author.displayName
-              }}</span>
+        <div
+          class="flex w-full items-center gap-x-1 overflow-hidden pe-12 text-sm whitespace-nowrap"
+        >
+          <UserHoverCard :username="tweet.author.username">
+            <NuxtLink
+              :to="`/profile/${tweet.author.username}`"
+              class="cursor-pointer truncate overflow-hidden hover:underline"
+              @click.stop
+            >
+              {{ tweet.author.displayName }}
             </NuxtLink>
           </UserHoverCard>
-          <UserHoverCard
-            :username="props.tweet.author.username"
-            @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
-            @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
-            @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
-            @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
-          >
-            <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
-              <span class="text-muted-foreground ms-1" v-text="'@' + props.tweet.author.username" />
+          <UserHoverCard :username="tweet.author.username">
+            <NuxtLink
+              :to="`/profile/${tweet.author.username}`"
+              class="text-muted-foreground cursor-pointer truncate overflow-hidden"
+              @click.stop
+            >
+              {{ '@' + tweet.author.username }}
             </NuxtLink>
           </UserHoverCard>
           <span class="text-muted-foreground">·</span>
@@ -151,18 +123,21 @@ const { mutate: blockUser } = useBlockMutation();
             class="absolute end-0 top-1/2 flex translate-x-2.5 -translate-y-1/2 flex-row items-center"
           >
             <UiButton
+              v-if="!(!tweet.content || tweet.content.trim().length === 0)"
               variant="ghost-default"
               size="icon-sm"
               class="text-muted-foreground"
+              data-cy="tweet-ai-summary-button"
               @click.stop="handleAiSummary"
             >
               <Icon name="vscode-icons:file-type-gemini" size="1.2rem" />
             </UiButton>
-            <TweetDropdown :tweet="props.tweet" :username="originalUsername">
+            <TweetDropdown :tweet="tweet" :username="originalUsername">
               <UiButton
                 variant="ghost-default"
                 size="icon-xs"
                 class="text-muted-foreground"
+                data-cy="tweet-dropdown-trigger"
                 @click.stop
               >
                 <Icon name="lucide:more-horizontal" />
@@ -173,58 +148,45 @@ const { mutate: blockUser } = useBlockMutation();
       </div>
 
       <div
-        v-if="tweet.replyToTweet"
+        v-if="tweet.replyToTweet && props.showReplyingTo"
         class="text-muted-foreground mb-1 flex items-center gap-1 text-sm"
       >
         <p>
           {{ $t('tweet.replying-to') }}
         </p>
-        <UserHoverCard
-          v-if="props.tweet.replyToTweet"
-          :username="props.tweet.replyToTweet.author.username"
-          @follow="
-            followUser({ username: props.tweet.replyToTweet.author.username, action: 'follow' })
-          "
-          @block="
-            blockUser({ username: props.tweet.replyToTweet.author.username, action: 'block' })
-          "
-          @unblock="
-            blockUser({ username: props.tweet.replyToTweet.author.username, action: 'unblock' })
-          "
-          @unfollow="
-            followUser({ username: props.tweet.replyToTweet.author.username, action: 'unfollow' })
-          "
-        >
-          <NuxtLink :to="`/profile/${props.tweet.replyToTweet.author.username}`" @click.stop>
+        <UserHoverCard v-if="tweet.replyToTweet" :username="tweet.replyToTweet.author.username">
+          <NuxtLink :to="`/profile/${tweet.replyToTweet.author.username}`" @click.stop>
             <span class="text-primary cursor-pointer hover:underline">{{
-              '@' + props.tweet.replyToTweet.author.username
+              '@' + tweet.replyToTweet.author.username
             }}</span>
           </NuxtLink>
         </UserHoverCard>
       </div>
 
       <!-- Content -->
-      <p class="leading-relaxed break-words whitespace-pre-wrap">
+      <p class="leading-relaxed break-words whitespace-pre-wrap" data-cy="tweet-content">
         <UiContentEntitiesRenderer :content="tweet.content" :entities="tweet.entities" />
       </p>
 
       <!-- Media (single image basic layout) -->
-      <TweetMedia :media="tweet.media" />
+      <TweetMedia :media="tweet.media" :tweet-id="tweet.id" @click.stop />
 
       <!-- Quoted Tweet -->
 
       <QuotedTweetCard v-if="tweet.quotedTweet" :tweet="tweet.quotedTweet" />
 
-      <AiSummary ref="aiSummaryRef" :tweet-id="props.tweet.id" />
+      <AiSummary ref="aiSummaryRef" :tweet-id="tweet.id" />
 
       <!-- Actions -->
       <TweetActionButtons
+        v-if="!props.noActions"
         :tweet="tweet"
         @click.stop
-        @like-success="onLikeSuccess"
-        @unlike-success="onUnlikeSuccess"
-        @retweet-success="onRetweetSuccess"
-        @undo-retweet-success="onUndoRetweetSuccess"
+        @like-success="() => {}"
+        @unlike-success="() => {}"
+        @retweet-success="() => {}"
+        @undo-retweet-success="() => {}"
+        @reply-success="onReplySuccess"
       />
     </div>
   </article>
