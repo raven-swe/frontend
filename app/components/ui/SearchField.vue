@@ -150,7 +150,7 @@ onMounted(() => {
     >
       <Icon :name="$t('icons.back-button-icon')" size="1.3rem" />
     </UiButton>
-    <div class="relative flex-1">
+    <div class="relative w-full flex-1">
       <UiSearchBar
         v-model="searchQuery"
         v-model:is-focused="isFocused"
