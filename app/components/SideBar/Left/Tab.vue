@@ -25,7 +25,7 @@ watch(
 </script>
 
 <template>
-  <NuxtLink :to="tab.route" class="group flex h-12.5 w-full items-center">
+  <NuxtLink :to="tab.route" class="group flex h-14.5 w-full items-center py-2">
     <div
       class="group-hover:bg-secondary/50 flex flex-row items-center gap-2 rounded-full p-3 xl:pe-6"
     >

@@ -37,7 +37,7 @@ const switchLanguage = () => {
     <NuxtLink to="/" class="size-12">
       <LogoRaven />
     </NuxtLink>
-    <div class="flex w-full flex-col items-center gap-2 xl:items-start">
+    <div class="flex w-full flex-col items-center xl:items-start">
       <SideBarLeftTab :tab="{ label: 'home', icon: 'home', route: '/home' }"></SideBarLeftTab>
       <SideBarLeftTab
         :tab="{ label: 'explore', icon: 'search', route: '/explore' }"
