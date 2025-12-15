@@ -79,6 +79,35 @@
       "media": "Media",
       "likes": "Likes"
     },
+    "account-setup": {
+      "username": {
+        "title": "What Should we call you?",
+        "description": "{'Your @username is unique. You can change it later.'}",
+        "username-label": "Username"
+      },
+      "interests": {
+        "title": "What do you want to see on Raven?",
+        "description": "Choose what you like, and we will customize your Raven experience with more of what you're interested in.",
+        "interest-label": "Interest",
+        "CULTURE": "Culture",
+        "FINANCE": "Finance",
+        "MEDICAL": "Medical",
+        "POLITICS": "Politics",
+        "SPORTS": "Sports",
+        "TECH": "Tech",
+        "ENTERTAINMENT": "Entertainment",
+        "GENERAL": "General",
+        "FOOD": "Food",
+        "LEARNING": "Learning",
+        "TRAVEL": "Travel",
+        "selected-count": "{count} of 1 selected",
+        "selected-done": "Great work 🎉"
+      },
+      "follow-user": {
+        "title": "Don't miss out",
+        "description": "When you follow someone, you'll see their posts in your Timeline. you'll also get more relevant recommendations."
+      }
+    },
     "setup": {
       "setup-profile": "Set up profile",
       "pick-profile-picture": "Pick a profile picture",
@@ -155,7 +184,11 @@
     },
     "messages": {
       "loadingMore": "Loading more tweets...",
-      "noMoreTweets": "No more tweets"
+      "noMoreTweets": "No more tweets",
+      "empty": {
+        "title": "Welcome to your timeline",
+        "description": "It's empty now, but it won't be for long. Start following people and you'll see posts show up here."
+      }
     }
   },
   "explore": {
@@ -254,11 +287,16 @@
       "media": "Media",
       "gif": "GIF",
       "emoji": "Emoji",
+      "no-emojis": "No emojis found",
+      "select-emoji": "Select an emoji",
+      "change-skin-tone": "Change skin tone",
       "profile-alt": "Avatar of {name}",
       "loading": {
         "uploading": "Uploading media... {progress}%",
         "posting": "Posting tweet..."
-      }
+      },
+      "post-success": "Tweet posted successfully",
+      "post-error": "Failed to post tweet. Please try again."
     },
     "delete-tweet": "Delete",
     "delete-success": "Tweet deleted successfully",
@@ -326,6 +364,7 @@
   "ui": {
     "close": "Close",
     "next": "Next",
+    "back": "Back",
     "loading": "Loading",
     "skip-for-now": "Skip for now",
     "save": "Save",
@@ -345,6 +384,18 @@
     "block": "Block",
     "unmute": "Unmute",
     "unblock": "Unblock",
+    "carousel": {
+      "carousel": "carousel",
+      "item": "slide",
+      "next": {
+        "icon": "lucide:arrow-right",
+        "label": "Next slide"
+      },
+      "previous": {
+        "icon": "lucide:arrow-left",
+        "label": "Previous slide"
+      }
+    },
     "blocking": "Blocked",
     "search": {
       "searchbar": {
@@ -386,6 +437,8 @@
     "PASSWORD_REQUIRED": "Please enter your password",
     "GENERIC_ERROR": "Something went wrong. Please try again.",
     "EMPTY_NAME": "Name can't be blank",
+    "USERNAME_ALREADY_EXISTS": "That username has been taken. Please choose another.",
+    "INVALID_USERNAME": "Usernames can only contain letters, numbers, and underscores, and must be between 3 and 15 characters long.",
     "RECAPTCHA_REQUIRED": "Please complete the reCAPTCHA challenge",
     "ACCOUNT_NOT_FOUND": "This account doesn't \nexist",
     "TRY_SEARCHING": "Try searching for another one",
@@ -444,6 +497,9 @@
     },
     "username": {
       "RATE_LIMIT_EXCEEDED": "Too many requests. Please try again later."
+    },
+    "interests": {
+      "REQUIRED": "Select atleast one interest."
     },
     "RATE_LIMIT_EXCEEDED": "Too many requests. Please try again later.",
     "CANNOT_BLOCK_USER": "You cannot block this user.",
@@ -618,6 +674,9 @@
     "placeholder-start-message": "Start a new message",
     "attachedImage": "Attached image",
     "seen": "Seen",
+    "no-messages-yet": "No messages yet",
+    "sent-photo": "Sent a photo",
+    "cant-message": "can't be messaged",
     "empty": {
       "select": "Select a message",
       "description": "Choose from your existing conversations, start a new one, or just keep swimming.",
@@ -630,6 +689,15 @@
       "you-follow": "Following",
       "follow-each-other": "You follow each other",
       "cant-message": "can't be messaged"
+    },
+    "message-input": {
+      "uploading": "Uploading image..."
+    },
+    "delete": "Delete",
+    "typing": "{username} is typing...",
+    "reaction": {
+      "add": "Add reaction",
+      "remove": "Remove reaction"
     }
   },
   "toaster": {

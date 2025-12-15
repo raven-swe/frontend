@@ -14,10 +14,6 @@ const { users, loading } = useSearchUsers(search);
 const router = useRouter();
 const { startConversation, isStarting } = useStartConversation();
 
-watch(users, (newUsers) => {
-  console.warn('Users updated:', toRaw(newUsers));
-});
-
 const canProceed = computed(() => !!selectedUsername.value);
 
 function toggleSelect(username: string) {
@@ -53,7 +49,6 @@ async function onNewConversation() {
 </script>
 
 <template>
-  <!-- Root dialog controlled via v-model:open -->
   <UiDialog v-model:open="open">
     <UiDialogOverlay />
     <UiDialogContent class="w-full max-w-xl overflow-hidden p-0">
@@ -86,7 +81,6 @@ async function onNewConversation() {
         </div>
       </UiDialogHeader>
 
-      <!-- List -->
       <div class="max-h-[60vh] overflow-y-auto">
         <div
           v-if="loading && search.trim().length > 0"

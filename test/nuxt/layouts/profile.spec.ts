@@ -225,9 +225,10 @@ describe('ProfileLayout.vue', () => {
 
     const tabs = wrapper.findAllComponents({ name: 'Tab' });
     // Should have 3 tabs for non-current user (posts, replies, media)
-    expect(tabs).toHaveLength(3);
+    expect(tabs).toHaveLength(4);
     expect(tabs[0]?.props('label')).toBe('profile.tabs.posts');
     expect(tabs[1]?.props('label')).toBe('profile.tabs.replies');
     expect(tabs[2]?.props('label')).toBe('profile.tabs.media');
+    expect(tabs[3]?.props('label')).toBe('profile.tabs.likes');
   });
 });

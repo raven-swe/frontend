@@ -22,20 +22,5 @@ export default defineWrappedResponseHandler(async (event) => {
       query,
     },
   );
-  // note that the backend will update the format to fix this, this is temporary
-  const normalizedUsers: CompactUser[] = response.data.map((user) => ({
-    ...user,
-    relationship: {
-      blocking: user.isBlocked,
-      blockedBy: false, // Assuming we don't have this info in the current response
-      muted: false, // Assuming we don't have this info in the current response
-      following: user.isFollowing,
-      follower: user.followsYou,
-    },
-  }));
-  const modifiedResponse: ApiSuccessResponse<CompactUser[]> = {
-    ...response,
-    data: normalizedUsers,
-  };
-  return modifiedResponse;
+  return response;
 });

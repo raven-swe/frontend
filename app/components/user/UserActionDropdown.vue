@@ -15,11 +15,19 @@ defineProps<{
       <slot />
     </UiDropdownMenuTrigger>
     <UiDropdownMenuContent align="end" class="bg-background">
-      <UiDropdownMenuItem data-test="mute-button" @click="$emit(isMuted ? 'unmute' : 'mute')">
+      <UiDropdownMenuItem
+        data-test="mute-button"
+        data-cy="mute-button"
+        @click="$emit(isMuted ? 'unmute' : 'mute')"
+      >
         <Icon :name="isMuted ? 'lucide:volume' : 'lucide:volume-off'" size="18" />
         {{ isMuted ? $t('ui.unmute') : $t('ui.mute') }}
       </UiDropdownMenuItem>
-      <UiDropdownMenuItem data-test="block-button" @click="$emit(isBlocked ? 'unblock' : 'block')">
+      <UiDropdownMenuItem
+        data-test="block-button"
+        data-cy="block-button"
+        @click="$emit(isBlocked ? 'unblock' : 'block')"
+      >
         <Icon name="lucide:ban" size="18" class="text-foreground" />
         {{ isBlocked ? $t('ui.unblock') : $t('ui.block') }}
       </UiDropdownMenuItem>

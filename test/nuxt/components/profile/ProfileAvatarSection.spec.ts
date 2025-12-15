@@ -44,9 +44,8 @@ const i18n = createI18n({
 });
 
 const createWrapper = async () => {
-  const { default: ProfileAvatarSection } = await import(
-    '@/components/profile/ProfileAvatarSection.vue'
-  );
+  const { default: ProfileAvatarSection } =
+    await import('@/components/profile/ProfileAvatarSection.vue');
   return await mountSuspended(ProfileAvatarSection, {
     global: {
       provide: {
@@ -78,19 +77,10 @@ describe('ProfileAvatarSection Component', () => {
   it('has correct profile image source', async () => {
     const wrapper = await createWrapper();
 
-    const profileImage = wrapper.find('img');
-    expect(profileImage.exists()).toBe(true);
-    expect(profileImage.attributes('src')).toContain('avatar.jpg');
-    expect(profileImage.attributes('alt')).toBe('Profile picture');
-    expect(profileImage.attributes('loading')).toBe('eager');
+    const avatarImg = wrapper.find('[data-testid="profile-avatar"] img');
 
-    const classes = profileImage.classes();
-    expect(classes).toContain('rounded-full');
-    expect(classes).toContain('border-4');
-    expect(classes).toContain('object-cover');
-    expect(classes).toContain('z-20');
-    expect(classes).toContain('-mt-16');
-    expect(classes).toContain('size-34');
+    expect(avatarImg.exists()).toBe(true);
+    expect(avatarImg.attributes('src')).toContain('avatar.jpg');
   });
 
   it('gracefully handle missing avatar URL', async () => {

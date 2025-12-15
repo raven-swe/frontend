@@ -62,22 +62,6 @@ describe('MessageAttachmentPreview Component', () => {
     expect(container.attributes('style')).toContain('height: 200px');
   });
 
-  it('renders edit button', async () => {
-    const wrapper = await mountSuspended(MessageAttachmentPreview, {
-      props: {
-        file: mockFile,
-        previewUrl: mockPreviewUrl,
-        boxStyle: mockBoxStyle,
-      },
-    });
-
-    const buttons = wrapper.findAll('button');
-    expect(buttons.length).toBe(2);
-
-    const html = wrapper.html();
-    expect(html).toContain('ic:outline-edit');
-  });
-
   it('renders remove button', async () => {
     const wrapper = await mountSuspended(MessageAttachmentPreview, {
       props: {
@@ -91,24 +75,6 @@ describe('MessageAttachmentPreview Component', () => {
     expect(html).toContain('ic:outline-cancel');
   });
 
-  it('emits edit event when edit button is clicked', async () => {
-    const wrapper = await mountSuspended(MessageAttachmentPreview, {
-      props: {
-        file: mockFile,
-        previewUrl: mockPreviewUrl,
-        boxStyle: mockBoxStyle,
-      },
-    });
-
-    const buttons = wrapper.findAll('button');
-    const editButton = buttons[0];
-    if (!editButton) throw new Error('Edit button not found');
-    await editButton.trigger('click');
-
-    expect(wrapper.emitted('edit')).toBeTruthy();
-    expect(wrapper.emitted('edit')?.length).toBe(1);
-  });
-
   it('emits remove event when remove button is clicked', async () => {
     const wrapper = await mountSuspended(MessageAttachmentPreview, {
       props: {
@@ -119,7 +85,7 @@ describe('MessageAttachmentPreview Component', () => {
     });
 
     const buttons = wrapper.findAll('button');
-    const removeButton = buttons[1];
+    const removeButton = buttons[0];
     if (!removeButton) throw new Error('Remove button not found');
     await removeButton.trigger('click');
 

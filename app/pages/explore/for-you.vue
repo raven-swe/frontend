@@ -20,7 +20,7 @@ const loadHashtags = async () => {
   isHashtagsLoading.value = true;
   try {
     const response = await exploreService.getExploreTab('trending');
-    trendingHashtags.value = response.data.slice(0, 5);
+    trendingHashtags.value = response.data.slice(0, 6);
   } catch (error) {
     console.error('Failed to load trending hashtags:', error);
   } finally {

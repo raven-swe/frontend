@@ -249,6 +249,8 @@
         "reply": "رد",
         "quote": "نشر"
       },
+      "post-success": "تم نشر التغريدة بنجاح",
+      "post-error": "فشل في نشر التغريدة. يرجى المحاولة مرة أخرى.",
       "media": "الوسائط",
       "gif": "GIF صور متحركة",
       "emoji": "رموز ايموجي",
@@ -332,6 +334,18 @@
     "delete": "حذف",
     "post": "نشر",
     "reply": "رد",
+    "carousel": {
+      "carousel": "معرض شرائح",
+      "item": "شريحة",
+      "next": {
+        "icon": "lucide:arrow-left",
+        "label": "الشريحة التالية"
+      },
+      "previous": {
+        "icon": "lucide:arrow-right",
+        "label": "الشريحة السابقة"
+      }
+    },
     "follow": "متابعة",
     "unfollow": "إلغاء المتابعة",
     "following": "متابع",
@@ -615,6 +629,9 @@
     "placeholder-start-message": "ابدأ رسالة جديدة",
     "attachedImage": "صورة مرفقة",
     "seen": "تمت المشاهدة",
+    "no-messages-yet": "لا توجد رسائل بعد",
+    "cant-message": "لا يمكن إرسال رسالة",
+    "sent-photo": "تم إرسال صورة",
     "empty": {
       "select": "اختر رسالة",
       "description": "اختر من محادثاتك الحالية، ابدأ محادثة جديدة، أو استمر في التصفح.",
@@ -627,6 +644,15 @@
       "you-follow": "تتابع",
       "follow-each-other": "تتابعان بعضكما البعض",
       "cant-message": "لا يمكن مراسلة"
+    },
+    "message-input": {
+      "uploading": "جارٍ رفع الصورة..."
+    },
+    "delete": "حذف",
+    "typing": "{username} يكتب...",
+    "reaction": {
+      "add": "إضافة تفاعل",
+      "remove": "إزالة التفاعل"
     }
   },
   "toaster": {

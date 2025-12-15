@@ -310,6 +310,7 @@ const debouncedMentions = useDebounceFn(async (mention) => {
         :placeholder="placeholder"
         class="caret-foreground absolute inset-0 z-10 w-full resize-none border-none bg-transparent text-lg leading-7 text-transparent outline-none"
         rows="1"
+        data-cy="tweet-composer-textarea"
         @input="handleInput"
         @keydown="handleKeydown"
         @focus="isFocused = true"

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { buttonVariants, type ButtonVariants } from '@/components/ui/button/variants';
 
+export type ButtonVariants = NonNullable<Parameters<typeof buttonVariants>[0]>;
+
 interface Props {
   variant?: ButtonVariants['variant'];
   size?: ButtonVariants['size'];
