@@ -44,6 +44,7 @@ const {
   virtualizerMock,
   useInfiniteQueryMock,
   useInfiniteQueryReturnValue,
+  virtualizerOptions,
 } = vi.hoisted(() => ({
   queryClientMock: { setQueryData: vi.fn() },
   fetchNextPageMock: vi.fn(),
@@ -57,6 +58,9 @@ const {
     options: { scrollMargin: 0 },
   },
   useInfiniteQueryMock: vi.fn(),
+  virtualizerOptions: {
+    current: null as { value: { scrollMargin: number; count: number } } | null,
+  },
   useInfiniteQueryReturnValue: {
     data: { value: { pages: [{ data: [] as Record<string, unknown>[] }] } },
     fetchNextPage: vi.fn(),
@@ -113,7 +117,10 @@ vi.mock('@tanstack/vue-query', () => ({
 vi.mock('@tanstack/vue-virtual', async () => {
   const { ref } = await import('vue');
   return {
-    useWindowVirtualizer: () => ref(virtualizerMock),
+    useWindowVirtualizer: (options: { value: { scrollMargin: number; count: number } }) => {
+      virtualizerOptions.current = options;
+      return ref(virtualizerMock);
+    },
   };
 });
 
@@ -129,19 +136,29 @@ describe('pages/media/[id].vue', () => {
     useInfiniteQueryReturnValue.isFetchingNextPage = isFetchingNextPageRef;
   });
 
-  it('renders with divider and hides media in TweetView panel', async () => {
+  it('stacks the details panel under the media below lg instead of hiding it', async () => {
     const wrapper = await mountSuspended(MediaIdPage, {
       global: { stubs },
       route: { params: { id: 'tw-123' } },
     });
 
-    // Divider class exists on main flex container
-    const container = wrapper.find('.divide-x');
-    expect(container.exists()).toBe(true);
+    const panel = wrapper.find('[data-cy="media-viewer-details"]');
+    expect(panel.exists()).toBe(true);
+    expect(panel.classes()).not.toContain('hidden');
+    expect(panel.classes()).toEqual(expect.arrayContaining(['w-full', 'lg:w-100']));
 
-    // Right panel renders TweetView with media=false
-    const tweetView = wrapper.find('.tweet-view-stub');
-    expect(tweetView.exists()).toBe(true);
+    const container = panel.element.parentElement!;
+    expect(Array.from(container.classList)).toEqual(
+      expect.arrayContaining([
+        'flex-col',
+        'divide-y',
+        'lg:flex-row',
+        'lg:divide-x',
+        'lg:divide-y-0',
+      ]),
+    );
+
+    expect(panel.find('.tweet-view-stub').exists()).toBe(true);
   });
 
   it('shows back button with translated aria-label', async () => {
@@ -160,15 +177,43 @@ describe('pages/media/[id].vue', () => {
     expect(items.length).toBeGreaterThan(0);
   });
 
-  it('calls router.back when back button clicked', async () => {
+  it('calls router.back when back button clicked with a previous page in history', async () => {
     const wrapper = await mountSuspended(MediaIdPage, {
       global: { stubs },
       route: { params: { id: 'tw-123' } },
     });
-    const backSpy = vi.spyOn(wrapper.vm.$router, 'back');
-    const btn = wrapper.find('button[aria-label]');
-    await btn.trigger('click');
-    expect(backSpy).toHaveBeenCalled();
+    const originalState = window.history.state;
+    const backSpy = vi.spyOn(wrapper.vm.$router, 'back').mockImplementation(() => undefined);
+    try {
+      window.history.replaceState({ ...originalState, back: '/home/for-you' }, '');
+      const btn = wrapper.find('button[aria-label]');
+      await btn.trigger('click');
+      expect(backSpy).toHaveBeenCalled();
+    } finally {
+      backSpy.mockRestore();
+      window.history.replaceState(originalState, '');
+    }
+  });
+
+  it('navigates home when back button clicked on a directly opened viewer', async () => {
+    const wrapper = await mountSuspended(MediaIdPage, {
+      global: { stubs },
+      route: { params: { id: 'tw-123' } },
+    });
+    const originalState = window.history.state;
+    const backSpy = vi.spyOn(wrapper.vm.$router, 'back').mockImplementation(() => undefined);
+    const pushSpy = vi.spyOn(wrapper.vm.$router, 'push').mockResolvedValue(undefined);
+    try {
+      window.history.replaceState({ ...originalState, back: null }, '');
+      const btn = wrapper.find('button[aria-label]');
+      await btn.trigger('click');
+      expect(pushSpy).toHaveBeenCalledWith('/home');
+      expect(backSpy).not.toHaveBeenCalled();
+    } finally {
+      backSpy.mockRestore();
+      pushSpy.mockRestore();
+      window.history.replaceState(originalState, '');
+    }
   });
 
   it('shows loading spinner while main tweet is loading', async () => {
@@ -498,5 +543,36 @@ describe('pages/media/[id].vue', () => {
     await flushPromises();
     await new Promise((resolve) => setTimeout(resolve, 120));
     // This simply ensures the watcher callback runs and covers the lines
+  });
+
+  it('recalculates the replies offset when the viewport is resized', async () => {
+    const wrapper = await mountSuspended(MediaIdPage, {
+      global: { stubs },
+      route: { params: { id: 'tw-123' } },
+    });
+    const replies = wrapper.find('[data-cy="media-viewer-replies"]');
+    expect(replies.exists()).toBe(true);
+
+    Object.defineProperty(replies.element, 'offsetTop', { configurable: true, value: 640 });
+    window.dispatchEvent(new Event('resize'));
+
+    expect(virtualizerOptions.current?.value.scrollMargin).toBe(640);
+  });
+
+  it('only reserves a trailing virtual row while more replies can be fetched', async () => {
+    useInfiniteQueryReturnValue.data.value = { pages: [{ data: [{ id: '1', content: 'a' }] }] };
+
+    await mountSuspended(MediaIdPage, {
+      global: { stubs },
+      route: { params: { id: 'tw-123' } },
+    });
+    expect(virtualizerOptions.current?.value.count).toBe(1);
+
+    hasNextPageRef.value = true;
+    await mountSuspended(MediaIdPage, {
+      global: { stubs },
+      route: { params: { id: 'tw-123' } },
+    });
+    expect(virtualizerOptions.current?.value.count).toBe(2);
   });
 });

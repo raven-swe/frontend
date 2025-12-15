@@ -18,6 +18,7 @@ import { isApiError, isApiValidationError } from '~/utils/errorUtils';
 import { showToaster } from '~/utils/showToaster';
 import { useQueryClient } from '@tanstack/vue-query';
 import { useWindowVirtualizer } from '@tanstack/vue-virtual';
+import { useEventListener } from '@vueuse/core';
 import MediaItemCompact from '~/components/tweet/MediaItemCompact.vue';
 import Carousel from '~/components/ui/carousel/Carousel.vue';
 import CarouselContent from '~/components/ui/carousel/CarouselContent.vue';
@@ -105,9 +106,16 @@ watch(
   { flush: 'post' },
 );
 
+useEventListener('resize', () => {
+  const el = parentRef.value;
+  if (el) {
+    parentOffsetRef.value = el.offsetTop;
+  }
+});
+
 const rowVirtualizerOptions = computed(() => {
   return {
-    count: hasNextPage ? tweets.value.length + 1 : tweets.value.length,
+    count: hasNextPage.value ? tweets.value.length + 1 : tweets.value.length,
     estimateSize: () => 120,
     overscan: 3,
     scrollMargin: parentOffsetRef.value,
@@ -160,7 +168,11 @@ onServerPrefetch(async () => {
 });
 
 function goBackToHome() {
-  router.back();
+  if (window.history.state?.back) {
+    router.back();
+  } else {
+    router.push('/home');
+  }
 }
 
 function handleReplied(tweet: Tweet) {
@@ -241,7 +253,10 @@ function handleReplied(tweet: Tweet) {
           </div>
 
           <div v-else>
-            <div v-if="tweetData" class="divide-border flex min-h-screen w-full divide-x">
+            <div
+              v-if="tweetData"
+              class="divide-border flex min-h-screen w-full flex-col divide-y lg:flex-row lg:divide-x lg:divide-y-0"
+            >
               <div class="flex min-h-screen flex-1 items-center justify-center pt-9 align-middle">
                 <Carousel class="h-full w-full">
                   <CarouselContent>
@@ -258,7 +273,7 @@ function handleReplied(tweet: Tweet) {
                 </Carousel>
               </div>
 
-              <div class="ms-auto min-h-screen w-100 overflow-y-auto">
+              <div class="w-full lg:min-h-screen lg:w-100" data-cy="media-viewer-details">
                 <div v-if="tweetData">
                   <TweetView :tweet="tweetData" :media="false" />
                 </div>
@@ -269,7 +284,7 @@ function handleReplied(tweet: Tweet) {
                   @posted="handleReplied"
                 />
 
-                <div ref="parentRef" class="border-border border-y">
+                <div ref="parentRef" class="border-border border-y" data-cy="media-viewer-replies">
                   <ClientOnly>
                     <div v-if="tweets">
                       <div
