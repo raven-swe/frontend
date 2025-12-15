@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="../cp/assets/images/light-raven.png" alt="Raven Logo" width="150" height="150">
+  <img src="https://cdn.raven.cmp27.space/light-raven.png" alt="Raven Logo" width="150" height="150">
 
 # Raven Web App
 
