@@ -17,7 +17,7 @@ const COLORS: ThemeColor[] = [
   { name: 'Green', value: '#2ec593' },
 ];
 
-const { mode, toggleTheme, primary, setPrimary } = useTheme();
+const { themeCookie, setTheme, primaryCookie, setPrimary } = useTheme();
 const { locale, setLocale } = useI18n();
 const arabicLocales = ['العربية', 'العربية الفصحى'];
 const englishLocales = ['English', 'English (US)'];
@@ -69,7 +69,7 @@ function applyPrimaryColor(color: string) {
           >
             <!-- Selected check -->
             <span
-              v-if="primary === color.value"
+              v-if="primaryCookie === color.value"
               class="absolute inset-0 flex items-center justify-center"
             >
               <Icon name="lucide:check" size="1.9rem" class="text-foreground font-extrabold" />
@@ -88,14 +88,23 @@ function applyPrimaryColor(color: string) {
           <!-- Default -->
           <button
             class="relative flex items-center justify-center gap-3 rounded-xl border bg-white p-4 font-medium text-black transition"
-            :class="mode === 'light' ? 'border-primary ring-primary ring-1' : 'border-border'"
-            @click="toggleTheme()"
+            :class="
+              themeCookie === 'light' ? 'border-primary ring-primary ring-1' : 'border-border'
+            "
+            @click="setTheme('light')"
           >
             <span
               class="flex h-6 w-6 items-center justify-center rounded-full border-2 text-black"
-              :class="mode === 'light' ? 'border-primary bg-primary' : 'border-muted-foreground'"
+              :class="
+                themeCookie === 'light' ? 'border-primary bg-primary' : 'border-muted-foreground'
+              "
             >
-              <Icon v-if="mode === 'light'" name="lucide:check" size="0.9rem" class="text-black" />
+              <Icon
+                v-if="themeCookie === 'light'"
+                name="lucide:check"
+                size="0.9rem"
+                class="text-black"
+              />
             </span>
             {{ $t('setting.display.default') }}
           </button>
@@ -103,15 +112,17 @@ function applyPrimaryColor(color: string) {
           <!-- Lights out -->
           <button
             class="relative flex items-center justify-center gap-3 rounded-xl border bg-black p-4 font-medium text-white transition"
-            :class="mode === 'dark' ? 'border-primary ring-primary ring-1' : 'border-border'"
-            @click="toggleTheme()"
+            :class="themeCookie === 'dark' ? 'border-primary ring-primary ring-1' : 'border-border'"
+            @click="setTheme('dark')"
           >
             <span
               class="flex h-6 w-6 items-center justify-center rounded-full border-2"
-              :class="mode === 'dark' ? 'border-primary bg-primary' : 'border-muted-foreground'"
+              :class="
+                themeCookie === 'dark' ? 'border-primary bg-primary' : 'border-muted-foreground'
+              "
             >
               <Icon
-                v-if="mode === 'dark'"
+                v-if="themeCookie === 'dark'"
                 name="lucide:check"
                 size="2.9rem"
                 class="font-extrabold text-white"

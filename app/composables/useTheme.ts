@@ -1,51 +1,30 @@
-import { ref, watchEffect, onMounted } from 'vue';
-
-const mode = ref<'light' | 'dark'>('light');
-const primary = ref<string>('#1d9bf0');
-
 export function useTheme() {
-  const toggleTheme = () => {
-    mode.value = mode.value === 'light' ? 'dark' : 'light';
-    if (import.meta.client) {
-      localStorage.setItem('theme', mode.value);
-    }
+  const themeCookie = useCookie('theme-mode', {
+    maxAge: 60 * 60 * 24 * 365, // 1 year
+    default: () => 'light',
+  });
+
+  const primaryCookie = useCookie('theme-primary', {
+    maxAge: 60 * 60 * 24 * 365,
+    default: () => '#1d9bf0',
+  });
+
+  const setTheme = (mode: 'light' | 'dark') => {
+    themeCookie.value = mode;
   };
 
   const setPrimary = (color: string) => {
-    primary.value = color;
-    if (import.meta.client) {
-      localStorage.setItem('theme-primary', color);
-    }
-    document.documentElement.style.setProperty('--primary', color);
+    primaryCookie.value = color;
   };
 
-  onMounted(() => {
-    if (import.meta.client) {
-      const saved = localStorage.getItem('theme');
-      if (saved === 'dark' || saved === 'light') {
-        mode.value = saved;
-      }
+  useHead(() => ({
+    htmlAttrs: {
+      class: themeCookie.value === 'dark' ? 'dark' : '',
+      style: {
+        '--primary': primaryCookie.value,
+      },
+    },
+  }));
 
-      const savedPrimary = localStorage.getItem('theme-primary');
-      if (savedPrimary) {
-        primary.value = savedPrimary;
-        document.documentElement.style.setProperty('--primary', savedPrimary);
-      }
-
-      const html = document.documentElement;
-      html.classList.toggle('dark', mode.value === 'dark');
-
-      watchEffect(() => {
-        html.classList.toggle('dark', mode.value === 'dark');
-      });
-    }
-  });
-
-  if (import.meta.client) {
-    watchEffect(() => {
-      document.documentElement.style.setProperty('--primary', primary.value);
-    });
-  }
-
-  return { mode, toggleTheme, primary, setPrimary };
+  return { themeCookie, setTheme, primaryCookie, setPrimary };
 }
