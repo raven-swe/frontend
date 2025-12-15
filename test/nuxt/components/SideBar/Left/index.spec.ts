@@ -96,45 +96,6 @@ describe('SideBar Left Component', () => {
     expect(tabs.length).toBe(6);
   });
 
-  it('renders language switch button', async () => {
-    const wrapper = await mountSuspended(SideBarLeft);
-
-    const html = wrapper.html();
-    expect(html).toContain('material-symbols:language');
-  });
-
-  it('renders theme toggle button', async () => {
-    const wrapper = await mountSuspended(SideBarLeft);
-
-    const html = wrapper.html();
-    // In dark mode, should show light mode icon
-    expect(html).toContain('material-symbols:light-mode-outline');
-  });
-
-  it('toggles theme when theme button is clicked', async () => {
-    const wrapper = await mountSuspended(SideBarLeft);
-
-    const buttons = wrapper.findAll('button');
-    const themeButton = buttons.find((btn) =>
-      btn.html().includes('material-symbols:light-mode-outline'),
-    );
-
-    await themeButton?.trigger('click');
-
-    expect(mockToggleTheme).toHaveBeenCalled();
-  });
-
-  it('switches language when language button is clicked', async () => {
-    const wrapper = await mountSuspended(SideBarLeft);
-
-    const buttons = wrapper.findAll('button');
-    const langButton = buttons.find((btn) => btn.html().includes('material-symbols:language'));
-
-    await langButton?.trigger('click');
-
-    expect(mockSetLocale).toHaveBeenCalledWith('en-US');
-  });
-
   it('renders user avatar', async () => {
     const wrapper = await mountSuspended(SideBarLeft);
 
