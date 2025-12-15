@@ -11,6 +11,11 @@ const selectedUsername = ref<string | null>(null);
 const open = defineModel<boolean>('open', { default: false });
 
 const { users, loading } = useSearchUsers(search);
+const userStore = useUserStore();
+const currentUsername = computed(() => userStore.user?.username);
+const filteredUsers = computed(() => {
+  return users.value?.filter((u) => u.username !== currentUsername.value) || [];
+});
 const router = useRouter();
 const { startConversation, isStarting } = useStartConversation();
 
@@ -69,7 +74,6 @@ async function onNewConversation() {
         <UiDialogDescription class="sr-only">
           {{ $t('dm.dialog.search-people') }}
         </UiDialogDescription>
-        <!-- Search input -->
         <div class="px-4 pt-3 pb-2">
           <label class="sr-only" :for="'dm-search'">{{ $t('dm.dialog.search-people') }}</label>
           <div class="bg-muted/20 flex items-center gap-2 rounded-xl px-3 py-2">
@@ -96,7 +100,7 @@ async function onNewConversation() {
 
         <div v-else>
           <div
-            v-for="u in users || []"
+            v-for="u in filteredUsers || []"
             :key="u.username"
             class="flex items-center gap-3 px-4 py-3"
             :class="{

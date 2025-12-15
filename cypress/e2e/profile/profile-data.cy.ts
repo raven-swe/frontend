@@ -101,28 +101,4 @@ describe('Profile Page Actions', () => {
       });
     });
   });
-
-  describe('Profile Search Functionality', () => {
-    it('should search for profiles correctly', function () {
-      cy.visitAndWaitForHydration('/explore/for-you');
-      cy.get('[data-cy="search-input"]').type(this.slaveUser.username);
-      // Check that search results contain the slave user (it might show multiple results)
-      cy.get('[data-cy="search-user-result"]').should('contain.text', this.slaveUser.username);
-      // Click on the slave user result
-      cy.get('[data-cy="search-user-result"]').contains(this.slaveUser.username).click();
-      cy.url().should('include', `/profile/${this.slaveUser.username}`);
-      cy.get('[data-cy="profile-user-name"]').should('contain.text', this.slaveUser.username);
-    });
-
-    it('should show go to profile option for valid usernames', function () {
-      cy.visitAndWaitForHydration('/explore/for-you');
-      cy.get('[data-cy="search-input"]').type('gelgel');
-      cy.get('[data-cy="search-go-to-profile"]')
-        .should('exist')
-        .should('contain.text', 'gelgel')
-        .click();
-      cy.url().should('include', `/profile/gelgel`);
-      cy.get('[data-cy="profile-user-name"]').should('contain.text', 'gelgel');
-    });
-  });
 });

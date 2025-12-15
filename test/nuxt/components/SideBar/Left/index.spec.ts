@@ -56,25 +56,8 @@ describe('SideBar Left Component', () => {
     expect(logoLink.exists()).toBe(true);
   });
 
-  it('switch to arabic on language button click', async () => {
+  it('renders user avatar', async () => {
     const wrapper = await mountSuspended(SideBarLeft);
-    const langButton = wrapper.find('[data-cy="language-switch-btn"]');
-
-    expect(langButton.exists()).toBe(true);
-
-    await langButton.trigger('click');
-    expect(useI18nMock.setLocale).toHaveBeenCalledWith('ar-EG');
-
-    await langButton.trigger('click');
-    expect(useI18nMock.setLocale).toHaveBeenCalledWith('en-US');
-  });
-
-  it('toggles theme on theme button click', async () => {
-    const wrapper = await mountSuspended(SideBarLeft);
-    const themeButton = wrapper.find('[data-cy="theme-switch-btn"]');
-
-    expect(themeButton.exists()).toBe(true);
-
     await themeButton.trigger('click');
     expect(useThemeMock.toggleTheme).toHaveBeenCalled();
   });

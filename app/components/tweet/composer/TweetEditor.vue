@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { showToaster } from '@/utils/showToaster';
+import { useDebounceFn } from '@vueuse/core';
+import { searchService } from '~/services/search/searchService';
+import type { CompactUser } from '~~/shared/types/user';
+import getCaretCoordinates from 'textarea-caret';
 import {
   MAX_IMAGE_SIZE_BYTES,
   MAX_IMAGE_SIZE_MB,
@@ -29,6 +33,13 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<Emits>();
 
 const textareaRef = ref<HTMLTextAreaElement | null>(null);
+const mentionResults = ref<CompactUser[] | null>(null);
+const mention = ref<string>('');
+const highlightedIndex = ref<number>(0);
+const isFocused = ref<boolean>(false);
+const dropdownPosition = ref({ top: 0, left: 0, bottom: 0, right: 0 });
+const showAbove = ref(false);
+const showRight = ref(false);
 
 const characterCount = computed(() => props.modelValue.length);
 const isOverLimit = computed(() => characterCount.value > props.maxLength);
@@ -76,11 +87,167 @@ const adjustHeight = () => {
   }
 };
 
+const updateDropdownPosition = () => {
+  if (!textareaRef.value) return;
+
+  const coords = getCaretCoordinates(textareaRef.value, textareaRef.value.selectionStart || 0);
+
+  const textareaRect = textareaRef.value.getBoundingClientRect();
+  const estimatedDropdownHeight = 300; // Approximate max height of dropdown
+  const estimatedDropdownWidth = 150;
+  const spaceBelow = window.innerHeight - (textareaRect.top + coords.top + coords.height);
+  const spaceAbove = textareaRect.top + coords.top;
+  const spaceRight = window.innerWidth - (textareaRect.left + coords.left);
+  const spaceLeft = textareaRect.left + coords.left;
+
+  // Show above if not enough space below
+  showAbove.value = spaceBelow < estimatedDropdownHeight && spaceAbove > spaceBelow;
+
+  // Show on left if not enough space on right
+  showRight.value = spaceRight < estimatedDropdownWidth && spaceLeft > spaceRight;
+
+  dropdownPosition.value = {
+    top: coords.top + coords.height,
+    left: coords.left,
+    bottom: coords.top,
+    right: window.innerWidth - textareaRect.left - coords.left,
+  };
+};
+
 const handleInput = (event: Event) => {
   adjustHeight();
   const target = event.target as HTMLTextAreaElement;
-  emit('update:modelValue', target.value);
+  const newValue = target.value;
+  const cursorPosition = target.selectionStart || 0;
+
+  emit('update:modelValue', newValue);
+
+  const textBeforeCursor = newValue.slice(0, cursorPosition);
+  const textAfterCursor = newValue.slice(cursorPosition);
+
+  // Primary case: we're actively typing or cursor is inside a potential mention ending with @word
+  const activeMentionMatch = textBeforeCursor.match(/@(\w*)$/);
+  const textAfter = textAfterCursor.match(/^(\w*)/)?.[1] ?? '';
+
+  if (activeMentionMatch) {
+    mention.value = activeMentionMatch[1] + textAfter;
+    debouncedMentions(mention.value);
+    updateDropdownPosition();
+    return;
+  }
+
+  // Fallback case: cursor is inside an existing completed mention like "Hello @grok how are you" with cursor on "rok"
+  const leftPart = textBeforeCursor.match(/@(\w+)$/);
+  const rightPart = textAfterCursor.match(/^(\w*)/)?.[1] ?? '';
+
+  if (leftPart && rightPart.length > 0) {
+    mention.value = leftPart[1] + rightPart;
+    debouncedMentions(mention.value);
+    updateDropdownPosition();
+    return;
+  }
+
+  // Not in a mention anymore
+  if (mention.value) {
+    mention.value = '';
+    mentionResults.value = null;
+  }
 };
+
+watch(mentionResults, (newResults) => {
+  if (newResults && newResults.length > 0) {
+    highlightedIndex.value = 0;
+  } else {
+    highlightedIndex.value = -1;
+  }
+});
+
+watch(highlightedIndex, () => {
+  if (mentionResults.value && mentionResults.value.length > 0) {
+    nextTick(() => {
+      const listItems = document.querySelectorAll('.mention-items');
+      const activeItem = listItems[highlightedIndex.value] as HTMLElement;
+      if (activeItem) {
+        activeItem.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'nearest',
+        });
+      }
+    });
+  }
+});
+
+const handleKeydown = (e: KeyboardEvent) => {
+  if (!mentionResults.value || mentionResults.value.length === 0) return;
+
+  const key = e.key;
+
+  if (key === 'ArrowDown') {
+    e.preventDefault();
+    highlightedIndex.value = (highlightedIndex.value + 1) % mentionResults.value.length;
+  } else if (key === 'ArrowUp') {
+    e.preventDefault();
+    highlightedIndex.value =
+      (highlightedIndex.value - 1 + mentionResults.value.length) % mentionResults.value.length;
+  } else if (key === 'Enter') {
+    if (highlightedIndex.value >= 0) {
+      e.preventDefault();
+      selectUser(mentionResults.value[highlightedIndex.value]);
+    }
+  }
+};
+
+const selectUser = (user: CompactUser) => {
+  if (!textareaRef.value) return;
+
+  const textarea = textareaRef.value;
+  const currentText = props.modelValue;
+  const cursorPos = textarea.selectionStart || 0;
+
+  const textBeforeCursor = currentText.slice(0, cursorPos);
+  const textAfterCursor = currentText.slice(cursorPos);
+
+  // Detect the current mention being edited (left and right parts around cursor)
+  const leftMatch = textBeforeCursor.match(/@(\w*)$/); // part before cursor after @
+  const rightMatch = textAfterCursor.match(/^(\w*)/); // part after cursor
+
+  let startIndex: number;
+  let endIndex: number;
+
+  if (leftMatch) {
+    // There is text after @ before the cursor → we are inside or at end of a mention
+    startIndex = textBeforeCursor.lastIndexOf('@');
+    const usernameSoFar = leftMatch[1] + (rightMatch?.[1] ?? '');
+    endIndex = startIndex + 1 + usernameSoFar.length; // +1 for the @
+  } else {
+    // Fallback — should not happen if dropdown is open
+    startIndex = cursorPos;
+    endIndex = cursorPos;
+  }
+
+  // Replace the entire current mention with the selected one + space
+  const newText =
+    currentText.slice(0, startIndex) + '@' + user.username + ' ' + currentText.slice(endIndex);
+
+  emit('update:modelValue', newText);
+
+  closeMentionDropdown();
+
+  // Place cursor after the inserted username and space
+  nextTick(() => {
+    textarea.focus();
+    const newCursorPos = startIndex + user.username.length + 2; // +1 for @, +1 for space
+    textarea.setSelectionRange(newCursorPos, newCursorPos);
+  });
+};
+
+const closeMentionDropdown = () => {
+  mentionResults.value = null;
+  mention.value = '';
+  highlightedIndex.value = -1;
+};
+
 const allowedTypes = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_VIDEO_TYPES];
 const handlePaste = (e: ClipboardEvent) => {
   const items = e.clipboardData?.items;
@@ -150,6 +317,20 @@ defineExpose({
   isOverLimit: () => isOverLimit.value,
   characterCount: () => characterCount.value,
 });
+
+const debouncedMentions = useDebounceFn(async (mention) => {
+  if (!mention.trim()) {
+    mentionResults.value = null;
+    return;
+  }
+  try {
+    const results = await searchService.getMentionSuggestions(mention);
+    mentionResults.value = results.data;
+  } catch (error) {
+    console.error('Mention search error:', error);
+    mentionResults.value = null;
+  }
+}, 300);
 </script>
 
 <template>
@@ -164,6 +345,9 @@ defineExpose({
         rows="1"
         data-cy="tweet-composer-textarea"
         @input="handleInput"
+        @keydown="handleKeydown"
+        @focus="isFocused = true"
+        @blur="isFocused = false"
       />
 
       <!-- Visible content with styling -->
@@ -182,5 +366,32 @@ defineExpose({
       </div>
     </div>
     <slot name="reposted-tweet" />
+    <Popover :open="!!(mentionResults && mentionResults.length > 0 && isFocused)">
+      <PopoverTrigger as-child>
+        <div class="hidden" />
+      </PopoverTrigger>
+      <PopoverContent
+        :style="{
+          position: 'absolute',
+          top: showAbove ? 'auto' : `${dropdownPosition.top + 20}px`,
+          bottom: showAbove ? `calc(100% - ${dropdownPosition.bottom}px)` : 'auto',
+          left: showRight ? 'auto' : `${dropdownPosition.left}px`,
+          right: showRight ? `${dropdownPosition.right}px` : 'auto',
+        }"
+        class="w-90vm z-50 p-0"
+        :side-offset="0"
+        align="start"
+      >
+        <UiSearchList :max-height="'50vh'" class="border-none">
+          <div
+            v-for="(user, index) in mentionResults"
+            :key="user.username"
+            :class="['mention-items', highlightedIndex === index ? 'bg-accent' : '']"
+          >
+            <SearchUserCard :user="user" @click="selectUser(user)" />
+          </div>
+        </UiSearchList>
+      </PopoverContent>
+    </Popover>
   </div>
 </template>

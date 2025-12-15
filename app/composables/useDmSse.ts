@@ -137,32 +137,91 @@ export function useDmSse(options: UseDmSseOptions = {}) {
         }
       });
 
+      es.addEventListener('notifications.delete', (evt: MessageEvent) => {
+        console.log('Received notifications.delete event:', evt.data);
+        // invalidate notifications queries to refetch immediatly and update list
+        queryClient.invalidateQueries({ queryKey: ['notifications-main'] });
+      });
+
+      // negative updates: unlike/unretweet/unfollow
+      es.addEventListener('notifications.update', () => {
+        console.log('Received notifications.update event:');
+        // invalidate notifications queries to refetch immediatly and update list
+        queryClient.invalidateQueries({ queryKey: ['notifications-main'] });
+      });
+
       es.addEventListener('notifications.new', (evt: MessageEvent) => {
         try {
           const notif = JSON.parse(evt.data) as Notification;
           lastNotification.value = notif;
+          // update a notification and not insert a new one if it already exists here
           queryClient.setQueryData(['notifications-main'], (oldData: unknown) => {
             if (!oldData || typeof oldData !== 'object') return oldData;
 
             const od = oldData as {
-              pages?: Array<{ data?: unknown[] }>;
+              pages?: Array<{ data?: Notification[] }>;
               [k: string]: unknown;
             };
 
-            const first = od.pages?.[0];
-            if (!first) return oldData;
+            const pages = (od.pages ?? []).map((p) => ({
+              ...(p as object),
+              data: (p as { data?: Notification[] }).data ?? [],
+            }));
 
-            const firstTyped = first as { data?: Notification[] };
+            // Try to find existing notification by id across all pages
+            let foundPageIndex = -1;
+            let foundItemIndex = -1;
+            for (let i = 0; i < pages.length; i++) {
+              const data = pages[i]?.data as Notification[];
+              const idx = data.findIndex((n) => n.id === notif.id);
+              if (idx !== -1) {
+                foundPageIndex = i;
+                foundItemIndex = idx;
+                break;
+              }
+            }
+
+            // Clone pages for immutable update
+            const newPages = pages.map((p) => ({ ...p, data: [...(p.data ?? [])] }));
+
+            if (foundPageIndex !== -1 && foundItemIndex !== -1) {
+              // Merge update with existing item
+              const existing = newPages[foundPageIndex]?.data[foundItemIndex];
+              const merged = { ...existing, ...notif };
+
+              // Remove the existing item from its original location
+              newPages[foundPageIndex]?.data.splice(foundItemIndex, 1);
+
+              // Ensure we don't create duplicates: remove any existing with same id from first page
+              if (newPages.length > 0 && newPages[0]?.data) {
+                newPages[0].data = newPages[0]?.data.filter((n) => n.id !== merged.id);
+                // Move merged item to very top of the first page
+                newPages[0]?.data.unshift(merged);
+              } else {
+                // No pages exist; create the first page with merged item
+                newPages.unshift({ data: [merged] });
+              }
+
+              return {
+                ...od,
+                pages: newPages,
+              };
+            }
+
+            // Not found: insert into first page (create pages if none)
+            if (newPages.length === 0) {
+              return {
+                ...od,
+                pages: [{ data: [notif] }],
+              };
+            }
+
+            // Insert new notification at top of first page
+            if (newPages[0]?.data) newPages[0].data = [notif, ...(newPages[0]?.data ?? [])];
 
             return {
               ...od,
-              pages: [
-                {
-                  ...firstTyped,
-                  data: [notif, ...(firstTyped.data ?? [])],
-                },
-                ...(od.pages?.slice(1) ?? []),
-              ],
+              pages: newPages,
             };
           });
           // console.log('Received notifications.new event:', notif);

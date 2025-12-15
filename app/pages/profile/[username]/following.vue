@@ -6,10 +6,9 @@ definePageMeta({
   layout: 'follower-following',
 });
 const router = useRouter();
-const username = computed(() => {
-  const val = router.currentRoute.value.params.username;
-  return typeof val === 'string' ? val.toLowerCase() : null;
-});
+const username = computed(
+  () => router.currentRoute.value.params.username?.toString().toLowerCase() ?? null,
+);
 </script>
 
 <template>

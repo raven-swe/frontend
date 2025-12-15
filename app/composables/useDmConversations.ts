@@ -101,8 +101,10 @@ export function useDmConversations() {
     const list = [...allConversations.value];
 
     list.sort((a, b) => {
-      const aTime = a.lastMessage?.sentAt ? new Date(a.lastMessage.sentAt).getTime() : 0;
-      const bTime = b.lastMessage?.sentAt ? new Date(b.lastMessage.sentAt).getTime() : 0;
+      const aTime = a.lastMessage?.sentAt ? new Date(a.lastMessage.sentAt).getTime() : Infinity;
+
+      const bTime = b.lastMessage?.sentAt ? new Date(b.lastMessage.sentAt).getTime() : Infinity;
+
       return bTime - aTime;
     });
 

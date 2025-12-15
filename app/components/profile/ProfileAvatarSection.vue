@@ -15,13 +15,9 @@ const isBlocked = computed(() => user?.value.relationship.blocking || false);
 const relationship = computed(() => user?.value.relationship);
 const isAvatarModalOpen = ref(false);
 
-const { mutate: muteUser } = useMuteMutation();
 const { mutate: blockUser } = useBlockMutation();
 const { mutate: followUser } = useFollowMutation();
 
-const handleMute = (action: 'mute' | 'unmute') => {
-  muteUser({ action, username: user?.value.username || '' });
-};
 const handleBlock = (action: 'block' | 'unblock') => {
   blockUser({ action, username: user?.value.username || '' });
 };
@@ -55,10 +51,7 @@ const handleFollow = (action: 'follow' | 'unfollow') => {
       <UserActionDropdown
         :is-muted="isMuted"
         :is-blocked="isBlocked"
-        @mute="() => handleMute('mute')"
-        @unmute="() => handleMute('unmute')"
-        @block="() => handleBlock('block')"
-        @unblock="() => handleBlock('unblock')"
+        :username="user?.username || ''"
       >
         <UiButton
           data-test="profile-actions-trigger"

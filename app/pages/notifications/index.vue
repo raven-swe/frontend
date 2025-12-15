@@ -2,6 +2,7 @@
 import { Like, Follow, Repost, Reply, QuoteMention } from '~/components/notifications';
 import { useNotificationsList } from '~/composables/useNotificationsList';
 import type { Notification } from '~~/shared/types/notifications';
+import { watch } from 'vue';
 
 definePageMeta({
   layout: 'notifications',
@@ -38,7 +39,8 @@ const {
   isFetchingNextPage,
   isLoading,
   markAllSeen,
-  getPrimaryActor,
+  getActors,
+  getTotalActorsCount,
 } = useNotificationsList({
   queryKey: ['notifications-main'],
   filter: null,
@@ -49,14 +51,18 @@ const {
 
 const { mutate: followUser } = useFollowMutation();
 
-onMounted(() => {
-  const hasUnseen = notifications.value.some((n) => !n.isSeen);
-  if (hasUnseen) {
-    setTimeout(() => {}, 500);
-    markAllSeen();
-    unseenNotificationsCount.value = 0;
-  }
-});
+watch(
+  () => notifications.value.some((n) => !n.isSeen),
+  (hasUnseen) => {
+    if (hasUnseen) {
+      setTimeout(() => {
+        markAllSeen();
+        unseenNotificationsCount.value = 0;
+      }, 600);
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
@@ -64,6 +70,7 @@ onMounted(() => {
     <ClientOnly>
       <div v-if="notifications">
         <div
+          data-testid="notifications-list"
           :style="{
             height: `${totalSize}px`,
             width: '100%',
@@ -89,23 +96,14 @@ onMounted(() => {
                 :is="componentForType(notifications[virtualRow.index]!.type)"
                 v-if="notifications[virtualRow.index]"
                 :timestamp="notifications[virtualRow.index]!.latestEventAt ?? ''"
-                :actor="getPrimaryActor(notifications[virtualRow.index]!.actorSummary)"
+                :actors="getActors(notifications[virtualRow.index]!.actorSummary)"
+                :total-actors-count="
+                  getTotalActorsCount(notifications[virtualRow.index]!.actorSummary)
+                "
                 :is-seen="notifications[virtualRow.index]!.isSeen"
                 :tweet="notifications[virtualRow.index]!.tweetSummary?.primaryTweet"
-                @follow="
-                  followUser({
-                    username: getPrimaryActor(notifications[virtualRow.index]!.actorSummary)
-                      .username,
-                    action: 'follow',
-                  })
-                "
-                @unfollow="
-                  followUser({
-                    username: getPrimaryActor(notifications[virtualRow.index]!.actorSummary)
-                      .username,
-                    action: 'unfollow',
-                  })
-                "
+                @follow="(username: string) => followUser({ username, action: 'follow' })"
+                @unfollow="(username: string) => followUser({ username, action: 'unfollow' })"
               />
             </div>
           </div>

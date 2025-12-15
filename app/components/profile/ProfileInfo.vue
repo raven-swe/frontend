@@ -64,7 +64,7 @@ const modifiedMutualUsers = computed(() => {
           :href="userProfile?.websiteUrl"
           target="_blank"
           rel="noopener noreferrer"
-          class="text-brand-blue me-2 flex items-center gap-1 hover:underline"
+          class="text-primary me-2 flex items-center gap-1 hover:underline"
           data-cy="profile-website-url"
         >
           <Icon class="text-muted-foreground" name="ic:sharp-link" size="18" />

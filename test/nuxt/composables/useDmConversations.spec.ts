@@ -294,7 +294,7 @@ describe('useDmConversations', () => {
       } as any);
 
       const { conversations } = useDmConversations();
-      expect(conversations.value[0].id).toBe('c2');
+      expect(conversations.value[0].id).toBe('c1');
     });
   });
 });

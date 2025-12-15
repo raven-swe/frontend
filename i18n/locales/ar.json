@@ -315,11 +315,12 @@
       "mentions": "المنشنات"
     },
     "no-notifications": "لا توجد إشعارات بعد",
+    "no-mentions": "لا توجد منشنات بعد",
     "message": {
-      "follow": "بدأ بمتابعتك",
-      "like": " أعجب بمنشورك",
-      "reply": "رد على منشورك",
-      "repost": "أعاد نشر منشورك"
+      "follow": "{user1} بدأ بمتابعتك | {user1} و {user2} بدآ بمتابعتك | {user1}، {user2}، و {user3} بدأوا بمتابعتك | {user1}، {user2}، و {others} آخرون بدأوا بمتابعتك",
+      "like": "{user1} أعجب بمنشورك | {user1} و {user2} أعجبا بمنشورك | {user1}، {user2}، و {user3} أعجبوا بمنشورك | {user1}، {user2}، {user3} و {others} آخرون أعجبوا بمنشورك",
+      "reply": "{user1} رد على منشورك",
+      "repost": "{user1} أعاد نشر منشورك | {user1} و {user2} أعادا نشر منشورك | {user1}، {user2}، و {user3} أعادوا نشر منشورك | {user1}، {user2}، و {others} آخرون أعادوا نشر منشورك"
     }
   },
   "ui": {
@@ -351,6 +352,7 @@
     "following": "متابع",
     "follow-back": "متابعة متبادلة",
     "follows-you": "يتابعك",
+    "you-follow-each-other": "تتابعون بعضكم البعض",
     "mute": "كتم",
     "block": "حظر",
     "unmute": "إلغاء الكتم",
@@ -504,6 +506,16 @@
   },
   "setting": {
     "settings": "الإعدادات",
+    "display": {
+      "title": "العرض واللغة",
+      "description": "قم بتخصيص مظهر Raven ليناسب تفضيلاتك.",
+      "color": "لون الموضوع",
+      "theme": "الوضع",
+      "background": "خلفية",
+      "language": "اللغة",
+      "default": "افتراضي النظام",
+      "lights-out": "إطفاء الأنوار"
+    },
     "change-password-subtitle": "قم بتغيير كلمة المرور الخاصة بك في أي وقت",
     "change-password": "تغيير كلمة المرور",
     "email": "البريد الإلكتروني",

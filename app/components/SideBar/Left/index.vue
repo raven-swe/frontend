@@ -2,15 +2,12 @@
 import { loginService } from '~/services/auth/loginService';
 import { useQueryClient } from '@tanstack/vue-query';
 import { ref } from 'vue';
-import { useTheme } from '~/composables/useTheme';
 import Avatar from '~/components/ui/Avatar.vue';
 import PostTweetDialog from '~/components/tweet/composer/PostTweetDialog.vue';
 
 const dmUnseenCount = inject<Ref<number>>('dmUnseenCount', ref(0));
 const notificationUnseenCount = inject<Ref<number>>('unseenNotificationsCount', ref(0));
 
-const { locale, setLocale } = useI18n();
-const { mode, toggleTheme } = useTheme();
 const showPostDialog = ref(false);
 
 const userStore = useUserStore();
@@ -20,18 +17,8 @@ const handleLogout = async () => {
   await loginService.logout();
   queryClient.clear();
 };
-
-const lang = ref(locale.value);
-
-const switchLanguage = () => {
-  if (lang.value === 'en-US') {
-    lang.value = 'ar-EG';
-  } else {
-    lang.value = 'en-US';
-  }
-  setLocale(lang.value);
-};
 </script>
+
 <template>
   <div class="flex h-screen flex-col items-start gap-2 px-2 pt-1">
     <NuxtLink to="/" class="size-12">
@@ -78,31 +65,6 @@ const switchLanguage = () => {
         >
           <Icon name="mingcute:quill-pen-ai-line" size="1.6rem" class="shrink-0" />
           <p class="mx-6 hidden text-xl font-extrabold xl:block">{{ $t('ui.post') }}</p>
-        </UiButton>
-        <UiButton
-          variant="ghost-default"
-          size="icon-lg"
-          class="size-12.5"
-          data-cy="language-switch-btn"
-          @click="switchLanguage"
-        >
-          <Icon name="material-symbols:language" size="24" />
-        </UiButton>
-        <UiButton
-          variant="ghost-default"
-          size="icon-lg"
-          class="size-12.5"
-          data-cy="theme-switch-btn"
-          @click="toggleTheme"
-        >
-          <Icon
-            :name="
-              mode === 'dark'
-                ? 'material-symbols:light-mode-outline'
-                : 'material-symbols:nightlight'
-            "
-            size="24"
-          />
         </UiButton>
       </div>
     </div>
