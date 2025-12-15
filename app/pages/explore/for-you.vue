@@ -66,6 +66,7 @@ onServerPrefetch(async () => {
       </template>
       <!-- Tweets Section -->
       <VirtualInfiniteScroller
+        data-cy="explore-for-you-tweets"
         :items="tweets"
         :get-key="getItemKey"
         :has-next-page="hasNextPage"

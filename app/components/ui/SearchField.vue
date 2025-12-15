@@ -200,6 +200,7 @@ onMounted(() => {
               <NuxtLink
                 :to="`/search/top?q=${encodeURIComponent(searchQuery)}`"
                 class="hover:bg-accent flex items-center transition-colors"
+                data-cy="search-search-for-text"
                 @click="saveInHistory({ type: 'hashtag', content: searchQuery })"
               >
                 <p class="text-foreground w-full p-4 break-words">
