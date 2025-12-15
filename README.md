@@ -207,22 +207,18 @@ A modern, responsive web application for the Raven social media platform built w
 
 ## Scripts
 
-| Command              | Description               |
-| -------------------- | ------------------------- |
-| `pnpm dev`           | Start development server  |
-| `pnpm build`         | Build for production      |
-| `pnpm start`         | Start production server   |
-| `pnpm generate`      | Generate static site      |
-| `pnpm preview`       | Preview production build  |
-| `pnpm lint`          | Run ESLint with auto-fix  |
-| `pnpm lint:check`    | Run ESLint without fix    |
-| `pnpm format`        | Format code with Prettier |
-| `pnpm format:check`  | Check code formatting     |
-| `pnpm test`          | Run unit tests            |
-| `pnpm test:cov`      | Run tests with coverage   |
-| `pnpm test:e2e`      | Run Cypress E2E tests     |
-| `pnpm test:e2e:open` | Open Cypress test runner  |
-| `pnpm mock:gen`      | Generate mock data        |
+| Command              | Description              |
+| -------------------- | ------------------------ |
+| `pnpm dev`           | Start development server |
+| `pnpm build`         | Build for production     |
+| `pnpm start`         | Start production server  |
+| `pnpm generate`      | Generate static site     |
+| `pnpm preview`       | Preview production build |
+| `pnpm test`          | Run unit tests           |
+| `pnpm test:cov`      | Run tests with coverage  |
+| `pnpm test:e2e`      | Run Cypress E2E tests    |
+| `pnpm test:e2e:open` | Open Cypress test runner |
+| `pnpm mock:gen`      | Generate mock data       |
 
 ## Docker
 
