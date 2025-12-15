@@ -14,4 +14,14 @@ export const settingSections = [
     route: '/settings/display',
     cy: 'display-settings-btn',
   },
+  {
+    title: 'legal.terms.title',
+    route: '/terms-of-service',
+    cy: 'terms-of-service-btn',
+  },
+  {
+    title: 'legal.privacy.title',
+    route: '/privacy-policy',
+    cy: 'privacy-policy-btn',
+  },
 ];
