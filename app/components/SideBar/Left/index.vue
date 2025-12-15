@@ -69,35 +69,42 @@ const switchLanguage = () => {
         :tab="{ label: 'settings', icon: 'settings', route: '/settings' }"
         data-cy="sidebar-settings-btn"
       ></SideBarLeftTab>
-      <UiButton class="mx-2 xl:w-auto" variant="default" size="lg" @click="showPostDialog = true">
-        <div class="relative flex h-8 w-8 items-center justify-center">
-          <Icon name="mingcute:quill-pen-ai-line" size="28" />
-        </div>
-        <p class="mx-6 hidden text-xl font-extrabold xl:block">{{ $t('ui.post') }}</p>
-      </UiButton>
-      <UiButton
-        variant="ghost-default"
-        size="icon-lg"
-        class="size-12.5"
-        data-cy="language-switch-btn"
-        @click="switchLanguage"
-      >
-        <Icon name="material-symbols:language" size="24" />
-      </UiButton>
-      <UiButton
-        variant="ghost-default"
-        size="icon-lg"
-        class="size-12.5"
-        data-cy="theme-switch-btn"
-        @click="toggleTheme"
-      >
-        <Icon
-          :name="
-            mode === 'dark' ? 'material-symbols:light-mode-outline' : 'material-symbols:nightlight'
-          "
-          size="24"
-        />
-      </UiButton>
+      <div class="flex w-full flex-col items-start gap-1">
+        <UiButton
+          variant="default"
+          data-cy="sidebar-post-btn"
+          class="h-12.5 w-12.5 shrink-0 transition-[width] xl:w-auto"
+          @click="showPostDialog = true"
+        >
+          <Icon name="mingcute:quill-pen-ai-line" size="1.6rem" class="shrink-0" />
+          <p class="mx-6 hidden text-xl font-extrabold xl:block">{{ $t('ui.post') }}</p>
+        </UiButton>
+        <UiButton
+          variant="ghost-default"
+          size="icon-lg"
+          class="size-12.5"
+          data-cy="language-switch-btn"
+          @click="switchLanguage"
+        >
+          <Icon name="material-symbols:language" size="24" />
+        </UiButton>
+        <UiButton
+          variant="ghost-default"
+          size="icon-lg"
+          class="size-12.5"
+          data-cy="theme-switch-btn"
+          @click="toggleTheme"
+        >
+          <Icon
+            :name="
+              mode === 'dark'
+                ? 'material-symbols:light-mode-outline'
+                : 'material-symbols:nightlight'
+            "
+            size="24"
+          />
+        </UiButton>
+      </div>
     </div>
     <div class="flex w-full flex-grow pb-2">
       <UiAlertDialog>

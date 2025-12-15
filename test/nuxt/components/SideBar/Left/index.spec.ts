@@ -131,4 +131,28 @@ describe('SideBar Left Component', () => {
     const themeIcon = wrapper.find('[data-cy="theme-switch-btn"] [data-test="theme-icon"]');
     expect(themeIcon.attributes('name')).toBe('material-symbols:light-mode-outline');
   });
+
+  it('render post tweet button', async () => {
+    const wrapper = await mountSuspended(SideBarLeft, {
+      global: {
+        stubs: {
+          PostTweetDialog: {
+            template: '<div data-test="post-tweet-dialog"></div>',
+          },
+        },
+      },
+    });
+    const postButton = wrapper.find('[data-cy="sidebar-post-btn"]');
+    expect(postButton.exists()).toBe(true);
+    expect(postButton.text()).toContain('Post');
+
+    const postDialog = wrapper.find('[data-test="post-tweet-dialog"]');
+    expect(postDialog.exists()).toBe(true);
+    expect(postDialog.attributes('open')).toBe('false');
+
+    await postButton.trigger('click');
+    await wrapper.vm.$nextTick();
+
+    expect(postDialog.attributes('open')).toBe('true');
+  });
 });
