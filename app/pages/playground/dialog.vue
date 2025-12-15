@@ -24,7 +24,7 @@
               {{ $t('playground.dialog.description') }}
             </UiDialogDescription>
           </UiDialogHeader>
-          <div class="mx-8 flex-grow">{{ $t('playground.dialog.content') }}</div>
+          <div class="mx-8 grow">{{ $t('playground.dialog.content') }}</div>
           <UiDialogFooter>
             <UiButton class="w-100" size="xl"> {{ $t('ui.next') }} </UiButton>
             <UiButton variant="outline" class="w-100" size="xl">

@@ -18,7 +18,7 @@ watch(
   () => props.tab.badgeCount,
   (newCount, oldCount) => {
     if (oldCount === undefined || newCount === undefined) return;
-    if (newCount > oldCount) {
+    if (newCount > oldCount && props.tab.route.includes('notifications')) {
       play();
     }
   },
