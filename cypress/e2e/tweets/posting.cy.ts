@@ -1,5 +1,5 @@
-describe('Tweeting Flow', { testIsolation: false }, function () {
-  before(function () {
+describe('Tweeting Flow', function () {
+  beforeEach(function () {
     cy.clearAllCookies();
     cy.clearAllLocalStorage();
     cy.clearAllSessionStorage();
@@ -20,6 +20,23 @@ describe('Tweeting Flow', { testIsolation: false }, function () {
       cy.get('[data-cy="tweet-content"]').first().should('contain.text', tweetContent);
       cy.contains('Tweet posted successfully').should('be.visible');
     });
+
+    it('should open tweet composer from sidebar button', function () {
+      cy.get('button[data-cy="open-post-tweet-dialog-btn"]').click();
+      cy.get('div[data-cy="dialog-content-body"]')
+        .should('be.visible')
+        .within(() => {
+          cy.get('textarea[data-cy="tweet-composer-textarea"]').should('exist');
+          const tweetContent = 'This is a test tweet from sidebar button!';
+          cy.get('textarea[data-cy="tweet-composer-textarea"]').type(tweetContent);
+          cy.get('button[data-cy="tweet-composer-post-button"]').should('not.be.disabled').click();
+        });
+      cy.get('[data-cy="tweet-content"]')
+        .first()
+        .should('contain.text', 'This is a test tweet from sidebar button!');
+      cy.contains('Tweet posted successfully').should('be.visible');
+    });
+
     it('should post a tweet with hashtags and mentions', function () {
       const tweetContent = 'Hello @gelgel! Check out #ThisTweet';
       cy.get('textarea[data-cy="tweet-composer-textarea"]').clear().type(tweetContent);

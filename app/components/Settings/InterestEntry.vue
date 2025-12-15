@@ -17,7 +17,7 @@ const translatedInterest = (interest: Interest) => {
 </script>
 
 <template>
-  <div class="p-4">
+  <div class="p-4" data-cy="interest-entry">
     <label class="group flex cursor-pointer flex-row items-center justify-between">
       <p class="text-md select-none">
         {{ translatedInterest(props.interest) }}
@@ -33,6 +33,7 @@ const translatedInterest = (interest: Interest) => {
         <UiCheckbox
           :model-value="props.isActive"
           :label="$t(`profile.account-setup.interests.${props.interest.code}`)"
+          data-cy="interest-checkbox"
           @update:model-value="$emit('toggle-interest')"
         />
       </div>

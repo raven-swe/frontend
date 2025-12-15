@@ -54,6 +54,7 @@ const {
         variant="default"
         type="submit"
         :disabled="isLoading || !selectedOne || isSubmitting"
+        data-cy="save-interests-button"
       >
         {{ $t('ui.save') }}
       </UiButton>

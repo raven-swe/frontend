@@ -116,7 +116,10 @@ function handleAiSummary() {
       </div>
     </div>
     <div class="border-b-border border-b-1">
-      <p class="pt-2 text-lg leading-relaxed break-words whitespace-pre-wrap">
+      <p
+        class="pt-2 text-lg leading-relaxed break-words whitespace-pre-wrap"
+        data-cy="tweet-view-content"
+      >
         <ContentEntitiesRenderer :content="tweet.content" :entities="tweet.entities" />
       </p>
       <div v-if="showMedia">

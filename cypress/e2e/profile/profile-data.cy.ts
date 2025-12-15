@@ -19,7 +19,6 @@ describe('Profile Page Actions', () => {
         'contain.text',
         this.masterUser.displayName,
       );
-      // Additional checks for tweets, likes, replies, media can be added here
     });
 
     it('should show correct following/followers count', function () {
