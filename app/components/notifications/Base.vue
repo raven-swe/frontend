@@ -47,7 +47,7 @@ const message = computed(() => {
     }
   });
 
-  return $t(props.messageKey, props.messagePluralIndex || 0, params);
+  return $t(props.messageKey, props.messagePluralIndex ?? 0, params);
 });
 
 // Parse message to identify user placeholders
