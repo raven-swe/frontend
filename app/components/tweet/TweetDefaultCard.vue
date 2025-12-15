@@ -38,9 +38,6 @@ function handleTweetClick() {
   router.push(`/profile/${tweet.value?.author.username}/status/${tweet.value?.id}`);
 }
 
-const { mutate: followUser } = useFollowMutation();
-const { mutate: blockUser } = useBlockMutation();
-
 const onReplySuccess = () => {};
 </script>
 
@@ -73,13 +70,7 @@ const onReplySuccess = () => {};
           'bg-thread-foreground': isParent,
         }"
       ></div>
-      <UserHoverCard
-        :username="tweet.author.username"
-        @follow="followUser({ username: tweet.author.username, action: 'follow' })"
-        @block="blockUser({ username: tweet.author.username, action: 'block' })"
-        @unblock="blockUser({ username: tweet.author.username, action: 'unblock' })"
-        @unfollow="followUser({ username: tweet.author.username, action: 'unfollow' })"
-      >
+      <UserHoverCard :username="tweet.author.username">
         <NuxtLink :to="`/profile/${tweet.author.username}`" @click.stop>
           <Avatar
             :img="tweet.author.avatarUrl || '/default_profile.png'"
@@ -98,13 +89,7 @@ const onReplySuccess = () => {};
         <div
           class="flex w-full items-center gap-x-1 overflow-hidden pe-12 text-sm whitespace-nowrap"
         >
-          <UserHoverCard
-            :username="tweet.author.username"
-            @follow="followUser({ username: tweet.author.username, action: 'follow' })"
-            @block="blockUser({ username: tweet.author.username, action: 'block' })"
-            @unblock="blockUser({ username: tweet.author.username, action: 'unblock' })"
-            @unfollow="followUser({ username: tweet.author.username, action: 'unfollow' })"
-          >
+          <UserHoverCard :username="tweet.author.username">
             <NuxtLink
               :to="`/profile/${tweet.author.username}`"
               class="cursor-pointer truncate overflow-hidden hover:underline"
@@ -113,13 +98,7 @@ const onReplySuccess = () => {};
               {{ tweet.author.displayName }}
             </NuxtLink>
           </UserHoverCard>
-          <UserHoverCard
-            :username="tweet.author.username"
-            @follow="followUser({ username: tweet.author.username, action: 'follow' })"
-            @block="blockUser({ username: tweet.author.username, action: 'block' })"
-            @unblock="blockUser({ username: tweet.author.username, action: 'unblock' })"
-            @unfollow="followUser({ username: tweet.author.username, action: 'unfollow' })"
-          >
+          <UserHoverCard :username="tweet.author.username">
             <NuxtLink
               :to="`/profile/${tweet.author.username}`"
               class="text-muted-foreground cursor-pointer truncate overflow-hidden"
@@ -172,16 +151,7 @@ const onReplySuccess = () => {};
         <p>
           {{ $t('tweet.replying-to') }}
         </p>
-        <UserHoverCard
-          v-if="tweet.replyToTweet"
-          :username="tweet.replyToTweet.author.username"
-          @follow="followUser({ username: tweet.replyToTweet.author.username, action: 'follow' })"
-          @block="blockUser({ username: tweet.replyToTweet.author.username, action: 'block' })"
-          @unblock="blockUser({ username: tweet.replyToTweet.author.username, action: 'unblock' })"
-          @unfollow="
-            followUser({ username: tweet.replyToTweet.author.username, action: 'unfollow' })
-          "
-        >
+        <UserHoverCard v-if="tweet.replyToTweet" :username="tweet.replyToTweet.author.username">
           <NuxtLink :to="`/profile/${tweet.replyToTweet.author.username}`" @click.stop>
             <span class="text-primary cursor-pointer hover:underline">{{
               '@' + tweet.replyToTweet.author.username

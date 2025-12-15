@@ -11,17 +11,15 @@ interface Props {
   tweet: TweetWithParents;
   media?: boolean;
 }
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  media: true,
+});
+
 const userStore = useUserStore();
-const originalUsername = ref<string>(userStore.user?.username || '');
+const originalUsername = computed(() => userStore.user?.username ?? '');
 const showMedia = computed(() => props.media ?? true);
 
 const aiSummaryRef = ref<InstanceType<typeof AiSummary> | null>(null);
-
-const { mutate: followUser } = useFollowMutation();
-const { mutate: blockUser } = useBlockMutation();
-
-const onReplySuccess = (_tweet: Tweet) => {};
 
 function handleAiSummary() {
   aiSummaryRef.value?.handleAiSummary?.();
@@ -55,13 +53,7 @@ function handleAiSummary() {
               'bg-thread-foreground': tweet.rootTweet,
             }"
           ></div>
-          <UserHoverCard
-            :username="props.tweet.author.username"
-            @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
-            @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
-            @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
-            @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
-          >
+          <UserHoverCard :username="props.tweet.author.username">
             <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
               <Avatar
                 :img="tweet.author.avatarUrl || '/default_profile.png'"
@@ -74,13 +66,7 @@ function handleAiSummary() {
         </div>
         <div class="flex w-full items-start justify-between overflow-hidden">
           <div class="flex h-full flex-col justify-end overflow-hidden">
-            <UserHoverCard
-              :username="props.tweet.author.username"
-              @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
-              @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
-              @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
-              @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
-            >
+            <UserHoverCard :username="props.tweet.author.username">
               <NuxtLink
                 :to="`/profile/${props.tweet.author.username}`"
                 class="cursor-pointer truncate pe-12 leading-tight hover:underline"
@@ -90,13 +76,7 @@ function handleAiSummary() {
                 {{ tweet.author.displayName }}
               </NuxtLink>
             </UserHoverCard>
-            <UserHoverCard
-              :username="props.tweet.author.username"
-              @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
-              @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
-              @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
-              @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
-            >
+            <UserHoverCard :username="props.tweet.author.username">
               <NuxtLink
                 :to="`/profile/${props.tweet.author.username}`"
                 class="text-muted-foreground truncate pe-12 leading-tight"
@@ -158,6 +138,6 @@ function handleAiSummary() {
       </div>
     </div>
 
-    <TweetActionButtons :tweet="tweet" @reply-success="onReplySuccess" />
+    <TweetActionButtons :tweet="tweet" />
   </article>
 </template>

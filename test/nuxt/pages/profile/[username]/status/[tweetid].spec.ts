@@ -5,6 +5,7 @@ import en from '@@/i18n/locales/en.json';
 import type { ComponentMountingOptions } from '@vue/test-utils';
 import type TweetIdPage from '@/pages/profile/[username]/status/[tweetid]/index.vue';
 import TweetView from '~/components/tweet/TweetView.vue';
+import { ref } from 'vue';
 
 const i18n = createI18n({ locale: 'en', messages: { en } });
 
@@ -301,17 +302,14 @@ const createWrapper = async ({
 
 describe('/pages/profile/[username]/status/[tweetid].vue', () => {
   beforeEach(() => {
-    vi.doMock('@tanstack/vue-query', async (importActual) => {
-      const actual = await importActual<typeof import('@tanstack/vue-query')>();
-      return {
-        ...actual,
-        useQuery: () => ({
-          data: mockTweetWithParent,
-          isLoading: false,
-          isError: false,
-        }),
-      };
-    });
+    vi.doMock('~/composables/tweet/useTweet', () => ({
+      useTweetWithParents: vi.fn(() => ({
+        data: ref(mockTweetWithParent),
+        isPending: ref(false),
+        error: ref(null),
+        suspense: vi.fn(),
+      })),
+    }));
   });
 
   it('renders tweetView', async () => {

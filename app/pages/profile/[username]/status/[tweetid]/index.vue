@@ -165,7 +165,7 @@ onServerPrefetch(async () => {
           :has-next-page="hasNextPage"
           :is-fetching-next-page="isFetchingNextPage"
           :fetch-next-page="fetchNextPage"
-          :get-key="(tweet, idx, key) => tweet.id ?? key"
+          :get-key="(tweet, idx, key) => tweet?.id ?? key"
           data-cy="tweet-replies"
         >
           <template #item="{ item: tweet }">
