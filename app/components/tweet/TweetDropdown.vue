@@ -4,10 +4,16 @@ import { deleteTweet } from '~/services/tweet/actionButtonsService';
 import { showToaster } from '~/utils/showToaster';
 import type { Tweet } from '~~/shared/types/tweets';
 
-const props = defineProps<{
-  tweet: Tweet;
-  username: string;
-}>();
+const props = withDefaults(
+  defineProps<{
+    tweet: Tweet;
+    username: string;
+    tweetView?: boolean;
+  }>(),
+  {
+    tweetView: false,
+  },
+);
 
 const queryClient = useQueryClient();
 
@@ -30,6 +36,8 @@ function removeTweetFromInfiniteData(
   };
 }
 
+const router = useRouter();
+
 async function handleDelete() {
   try {
     await deleteTweet(props.tweet.id);
@@ -49,6 +57,10 @@ async function handleDelete() {
         removeTweetFromInfiniteData(oldData, props.tweet.id),
       );
     });
+    if (props.tweetView) {
+      await router.back();
+      return;
+    }
   } catch {
     showToaster('error', $t('tweet.delete-error'));
   }
