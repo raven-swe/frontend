@@ -159,7 +159,20 @@
   "explore": {
     "for-you": {
       "tab": "لك",
-      "posts-for-you": "المنشورات لك"
+      "posts-for-you": "المنشورات لك",
+      "categoreies": {
+        "culture": "الثقافة",
+        "finance": "المالية",
+        "medical": "الطبية",
+        "politics": "السياسة",
+        "sports": "الرياضة",
+        "tech": "التكنولوجيا",
+        "entertainment": "الترفيه",
+        "general": "عام",
+        "food": "الطعام",
+        "learning": "التعلم",
+        "travel": "السفر"
+      }
     },
     "trending": {
       "tab": "رائج"

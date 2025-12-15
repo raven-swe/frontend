@@ -146,7 +146,9 @@ watch(
     </div>
 
     <div v-for="categoryData in categorizedTweets" :key="categoryData.category">
-      <h1 class="ps-4 pt-2 pb-3 text-2xl font-extrabold">{{ categoryData.category }}</h1>
+      <h1 class="ps-4 pt-2 pb-3 text-2xl font-extrabold">
+        {{ $t('explore.for-you.categoreies.' + categoryData.category) }}
+      </h1>
       <TweetDefaultCard v-for="tweet in categoryData.tweets" :key="tweet.id" :tweet="tweet" />
     </div>
 

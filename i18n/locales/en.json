@@ -194,7 +194,20 @@
   "explore": {
     "for-you": {
       "tab": "For You",
-      "posts-for-you": "Posts for you"
+      "posts-for-you": "Posts for you",
+      "categoreies": {
+        "culture": "Culture",
+        "finance": "Finance",
+        "medical": "Medical",
+        "politics": "Politics",
+        "sports": "Sports",
+        "tech": "Technology",
+        "entertainment": "Entertainment",
+        "general": "General",
+        "food": "Food",
+        "learning": "Learning",
+        "travel": "Travel"
+      }
     },
     "trending": {
       "tab": "Trending"
