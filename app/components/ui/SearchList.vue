@@ -18,7 +18,7 @@ const placeholderText = computed(
 
 <template>
   <div
-    class="shadow-accent bg-background mt-0 overflow-y-auto rounded-lg border border-1 shadow-lg"
+    class="shadow-accent bg-background mt-0 overflow-y-auto rounded-lg border border-1 shadow-md"
     :style="{ maxHeight: props.maxHeight }"
     @mousedown.prevent
   >

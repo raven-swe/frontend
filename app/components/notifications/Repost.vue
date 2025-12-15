@@ -29,7 +29,7 @@ const displayActors = computed(() => props.actors.slice(0, 3));
 
 const messageParams = computed(() => ({
   named: {
-    count: Math.max(props.totalActorsCount - 2, 0),
+    others: Math.max(props.totalActorsCount - 3, 0),
     user1: displayActors.value[0]?.username,
     user2: displayActors.value[1]?.username,
     user3: displayActors.value[2]?.username,
