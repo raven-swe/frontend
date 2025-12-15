@@ -96,18 +96,8 @@ onMounted(() => {
                 "
                 :is-seen="notifications[virtualRow.index]!.isSeen"
                 :tweet="notifications[virtualRow.index]!.tweetSummary?.primaryTweet"
-                @follow="
-                  followUser({
-                    username: 'temp', // figure out how to get username
-                    action: 'follow',
-                  })
-                "
-                @unfollow="
-                  followUser({
-                    username: 'temp', // figure out how to get username
-                    action: 'unfollow',
-                  })
-                "
+                @follow="(username: string) => followUser({ username, action: 'follow' })"
+                @unfollow="(username: string) => followUser({ username, action: 'unfollow' })"
               />
             </div>
           </div>

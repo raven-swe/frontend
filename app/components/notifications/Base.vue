@@ -93,7 +93,7 @@ const messageParts = computed((): MessagePart[] => {
 });
 
 defineEmits<{
-  (e: 'follow' | 'unfollow' | 'unblock'): void;
+  (e: 'follow' | 'unfollow', username: string): void;
 }>();
 </script>
 
@@ -120,9 +120,8 @@ defineEmits<{
                   v-for="(actor, i) in displayActorsForAvatars"
                   :key="actor.username"
                   :username="actor.username"
-                  @follow="$emit('follow')"
-                  @unfollow="$emit('unfollow')"
-                  @unblock="$emit('unblock')"
+                  @follow="$emit('follow', actor.username)"
+                  @unfollow="$emit('unfollow', actor.username)"
                 >
                   <UiAvatar
                     :img="actor.avatarUrl"
@@ -146,9 +145,8 @@ defineEmits<{
                 <UserHoverCard
                   v-else-if="part.type === 'user'"
                   :username="part.actor.username"
-                  @follow="$emit('follow')"
-                  @unfollow="$emit('unfollow')"
-                  @unblock="$emit('unblock')"
+                  @follow="$emit('follow', part.actor.username)"
+                  @unfollow="$emit('unfollow', part.actor.username)"
                 >
                   <NuxtLink
                     :to="`/profile/${part.actor.username}`"
