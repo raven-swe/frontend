@@ -57,6 +57,26 @@ const createWrapper = async () => {
   return wrapper;
 };
 
+const useProfileMutationMock = vi.hoisted(() => ({
+  followMutation: {
+    mutate: vi.fn(),
+  },
+  muteMutation: {
+    mutate: vi.fn(),
+  },
+  blockMutation: {
+    mutate: vi.fn(),
+  },
+}));
+
+vi.mock('~/composables/useProfileMutation', () => {
+  return {
+    useFollowMutation: () => useProfileMutationMock.followMutation,
+    useMuteMutation: () => useProfileMutationMock.muteMutation,
+    useBlockMutation: () => useProfileMutationMock.blockMutation,
+  };
+});
+
 describe('UserMetadata', () => {
   beforeEach(() => {
     vi.resetModules();
@@ -98,32 +118,40 @@ describe('UserMetadata', () => {
     expect(button.text()).toContain('Following');
   });
 
-  it('emits follow event when follow button is clicked', async () => {
+  it('follow user when follow button is clicked', async () => {
     userRef.value.relationship.following = false;
     const wrapper = await createWrapper();
 
     const button = wrapper.find('button');
     await button.trigger('click');
-
-    expect(wrapper.emitted('follow')).toBeTruthy();
+    expect(useProfileMutationMock.followMutation.mutate).toHaveBeenCalledWith({
+      username: 'testuser',
+      action: 'follow',
+    });
   });
 
-  it('emits unfollow event when unfollow button is clicked', async () => {
+  it('unfollow user when unfollow button is clicked', async () => {
     userRef.value.relationship.following = true;
     const wrapper = await createWrapper();
 
     const button = wrapper.find('button');
     await button.trigger('click');
-    expect(wrapper.emitted('unfollow')).toBeTruthy();
+    expect(useProfileMutationMock.followMutation.mutate).toHaveBeenCalledWith({
+      username: 'testuser',
+      action: 'unfollow',
+    });
   });
 
-  it('emits unblock event when block button is clicked', async () => {
+  it('unblock user when block button is clicked', async () => {
     userRef.value.relationship.blocking = true;
     const wrapper = await createWrapper();
 
     const button = wrapper.find('button');
     await button.trigger('click');
-    expect(wrapper.emitted('unblock')).toBeTruthy();
+    expect(useProfileMutationMock.blockMutation.mutate).toHaveBeenCalledWith({
+      username: 'testuser',
+      action: 'unblock',
+    });
   });
 
   it('shows "Unfollow" on hover when user is followed', async () => {

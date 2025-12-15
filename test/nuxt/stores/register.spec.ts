@@ -1,18 +1,32 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { mockNuxtImport } from '@nuxt/test-utils/runtime';
-import { reactive } from 'vue';
+import { useRegisterStore } from '@/stores/register';
+import { FetchError } from 'ofetch';
 
 const { navigateToMock } = vi.hoisted(() => {
   return {
-    navigateToMock: vi.fn(() => {
-      return { value: 'mocked navigation' };
-    }),
+    navigateToMock: vi.fn(),
   };
 });
 
 mockNuxtImport('navigateTo', () => {
   return navigateToMock;
+});
+
+const registerationServiceMock = vi.hoisted(() => {
+  return {
+    start: vi.fn(),
+    verify: vi.fn(),
+    complete: vi.fn(),
+    resendOtp: vi.fn(),
+  };
+});
+
+vi.mock('@/services/auth/registerationService', () => {
+  return {
+    registerationService: registerationServiceMock,
+  };
 });
 
 describe('Register Store', () => {
@@ -23,7 +37,6 @@ describe('Register Store', () => {
   });
 
   it('has correct initial state', async () => {
-    const { useRegisterStore } = await import('@/stores/register');
     const store = useRegisterStore();
     expect(store.step).toBe(0);
     expect(store.open).toBe(false);
@@ -31,65 +44,59 @@ describe('Register Store', () => {
   });
 
   it('openDialog sets open to true', async () => {
-    const { useRegisterStore } = await import('@/stores/register');
     const store = useRegisterStore();
     store.openDialog();
     expect(store.open).toBe(true);
   });
 
   it('submitRegisterationInfo calls $fetch and updates step on success', async () => {
-    const registerationService = reactive({
-      start: vi.fn().mockResolvedValue({
-        data: { creationToken: 'test-token' },
-      }),
+    registerationServiceMock.start.mockResolvedValue({
+      data: { creationToken: 'ct-1' },
+      message: 'Registration started',
+      success: true,
     });
-    vi.doMock('@/services/auth/registerationService', () => ({
-      registerationService,
-    }));
 
-    const { useRegisterStore } = await import('@/stores/register');
     const store = useRegisterStore();
     const payload = { name: 'Alice', email: 'a@b.com', birthDate: '2000-01-01' };
 
     await store.submitRegisterationInfo(payload);
 
-    expect(registerationService.start).toHaveBeenCalledWith(payload);
+    expect(registerationServiceMock.start).toHaveBeenCalledWith(payload);
     expect(store.step).toBe(1);
     expect(store.registerationInfo).toEqual(payload);
   });
 
   it('submitRegisterationInfo handles failure gracefully', async () => {
-    const registerationService = reactive({
-      start: vi.fn().mockRejectedValue({ message: 'Internal server error', success: false }),
+    registerationServiceMock.start.mockRejectedValue({
+      message: 'Internal server error',
+      success: false,
     });
-    vi.doMock('@/services/auth/registerationService', () => ({
-      registerationService,
-    }));
-    const { useRegisterStore } = await import('@/stores/register');
 
     const store = useRegisterStore();
+
     const payload = { name: 'Bob', email: 'b@c.com', birthDate: '2000-01-01' };
     await store.submitRegisterationInfo(payload);
 
     // expect that step
     expect(store.step).toBe(0);
-    expect(registerationService.start).toHaveBeenCalledWith(payload);
+    expect(registerationServiceMock.start).toHaveBeenCalledWith(payload);
   });
 
   it('submitOtp advances step on success and returns false on failure', async () => {
-    const registerationService = reactive({
-      verify: vi
-        .fn()
-        .mockResolvedValueOnce({
-          message: 'Verified',
+    registerationServiceMock.verify.mockImplementation((otp) => {
+      if (otp === '123456') {
+        return Promise.resolve({
+          data: { valid: true },
+          message: 'OTP verified',
           success: true,
-        })
-        .mockRejectedValueOnce({ message: 'Internal server error', success: false }),
+        });
+      } else {
+        return Promise.reject({
+          message: 'Invalid OTP',
+          success: false,
+        });
+      }
     });
-    vi.doMock('@/services/auth/registerationService', () => ({
-      registerationService,
-    }));
-    const { useRegisterStore } = await import('@/stores/register');
 
     const store = useRegisterStore();
     store.creationToken = 'ct-1';
@@ -105,14 +112,11 @@ describe('Register Store', () => {
   });
 
   it('submitPassword calls $fetch and navigates on success', async () => {
-    const registerationService = reactive({
-      complete: vi.fn().mockResolvedValueOnce({ message: 'Registration complete', success: true }),
+    registerationServiceMock.complete.mockResolvedValue({
+      data: { registered: true },
+      message: 'Registration complete',
+      success: true,
     });
-    vi.doMock('@/services/auth/registerationService', () => ({
-      registerationService,
-    }));
-
-    const { useRegisterStore } = await import('@/stores/register');
 
     const store = useRegisterStore();
     store.creationToken = 'ct-final';
@@ -123,7 +127,6 @@ describe('Register Store', () => {
   });
 
   it('previousStep decrements step but not below 0', async () => {
-    const { useRegisterStore } = await import('@/stores/register');
     const store = useRegisterStore();
     store.step = 2;
     store.previousStep();
@@ -135,7 +138,6 @@ describe('Register Store', () => {
   });
 
   it('resetInitialData resets store state', async () => {
-    const { useRegisterStore } = await import('@/stores/register');
     const store = useRegisterStore();
     store.step = 2;
     store.registerationInfo = {
@@ -156,17 +158,14 @@ describe('Register Store', () => {
   });
 
   it('call resendOtp handles errors gracefully', async () => {
-    const registerationService = reactive({
-      start: vi.fn().mockResolvedValue({
-        data: { creationToken: 'test-token' },
-      }),
-      resendOtp: vi
-        .fn()
-        .mockRejectedValueOnce({ message: 'Internal server error', success: false }),
+    registerationServiceMock.start.mockResolvedValue({
+      data: { creationToken: 'test-token' },
     });
-    vi.doMock('@/services/auth/registerationService', () => ({
-      registerationService,
-    }));
+    registerationServiceMock.resendOtp.mockResolvedValue({
+      message: 'Internal server error',
+      success: false,
+    });
+
     const { useRegisterStore } = await import('@/stores/register');
 
     const store = useRegisterStore();
@@ -178,6 +177,111 @@ describe('Register Store', () => {
 
     await store.resendOtp();
 
-    expect(registerationService.resendOtp).toHaveBeenCalledWith('test-token');
+    expect(registerationServiceMock.resendOtp).toHaveBeenCalledWith('test-token');
+  });
+
+  it('handle rate limiting in resendOtp', async () => {
+    registerationServiceMock.start.mockResolvedValue({
+      data: { creationToken: 'test-token' },
+    });
+
+    const mockError = new FetchError('Too Many Requests');
+    mockError.status = 429;
+    mockError.data = {
+      data: {
+        message: 'Too many requests',
+        error: {
+          retryAfter: 30,
+        },
+      },
+    };
+
+    registerationServiceMock.resendOtp.mockRejectedValue(mockError);
+
+    const store = useRegisterStore();
+    await store.submitRegisterationInfo({
+      name: 'jane',
+      email: 'jane@example.com',
+      birthDate: '2000-01-01',
+    });
+
+    const retryAfter = await store.resendOtp();
+
+    expect(registerationServiceMock.resendOtp).toHaveBeenCalledWith('test-token');
+    expect(retryAfter).toBe(30);
+  });
+
+  it('resendOtp handles non-rate limit errors gracefully', async () => {
+    registerationServiceMock.start.mockResolvedValue({
+      data: { creationToken: 'test-token' },
+    });
+
+    const mockError = new FetchError('Some other error');
+    mockError.status = 500;
+
+    registerationServiceMock.resendOtp.mockRejectedValue(mockError);
+
+    const store = useRegisterStore();
+    await store.submitRegisterationInfo({
+      name: 'jane',
+      email: 'jane@example.com',
+      birthDate: '2000-01-01',
+    });
+
+    const retryAfter = await store.resendOtp();
+
+    expect(registerationServiceMock.resendOtp).toHaveBeenCalledWith('test-token');
+    expect(retryAfter).toBeUndefined();
+  });
+
+  it('handle non api errors in resendOtp', async () => {
+    registerationServiceMock.start.mockResolvedValue({
+      data: { creationToken: 'test-token' },
+    });
+
+    registerationServiceMock.resendOtp.mockRejectedValue(new Error('Network error'));
+
+    const store = useRegisterStore();
+    await store.submitRegisterationInfo({
+      name: 'jane',
+      email: 'jane@example.com',
+      birthDate: '2000-01-01',
+    });
+
+    const retryAfter = await store.resendOtp();
+
+    expect(registerationServiceMock.resendOtp).toHaveBeenCalledWith('test-token');
+    expect(retryAfter).toBeUndefined();
+  });
+
+  it('handle no retryAfter in rate limit error in resendOtp', async () => {
+    registerationServiceMock.start.mockResolvedValue({
+      data: { creationToken: 'test-token' },
+    });
+
+    const mockError = new FetchError('Too Many Requests');
+    mockError.status = 429;
+    mockError.data = {
+      data: {
+        message: 'Too many requests',
+        error: {
+          // no retryAfter
+        },
+      },
+    };
+
+    registerationServiceMock.resendOtp.mockRejectedValue(mockError);
+
+    const store = useRegisterStore();
+    await store.submitRegisterationInfo({
+      name: 'jane',
+      email: 'jane@example.com',
+      birthDate: '2000-01-01',
+    });
+
+    const retryAfter = await store.resendOtp();
+
+    expect(registerationServiceMock.resendOtp).toHaveBeenCalledWith('test-token');
+    expect(retryAfter).toBeUndefined();
   });
 });

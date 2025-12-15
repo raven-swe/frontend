@@ -22,4 +22,28 @@ function isApiValidationError(
   return error instanceof FetchError && error.data.statusCode === 422;
 }
 
-export { backendValidationToFormErrors, isApiError, isApiValidationError };
+const withApiValidationErrorHandling = async <T>(
+  apiCall: () => Promise<T>,
+  fallbackMessage?: string,
+) => {
+  try {
+    return await apiCall();
+  } catch (error) {
+    if (isApiValidationError(error)) {
+      const errors = error.data?.data?.error.errors;
+      return errors;
+    } else if (isApiError(error)) {
+      const apiError = error.data?.data;
+      showToaster('error', apiError?.message || fallbackMessage || 'An error occurred');
+    } else {
+      showToaster('error', fallbackMessage || 'An error occurred');
+    }
+  }
+};
+
+export {
+  backendValidationToFormErrors,
+  isApiError,
+  isApiValidationError,
+  withApiValidationErrorHandling,
+};

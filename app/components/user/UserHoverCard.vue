@@ -4,10 +4,6 @@ import UserMetadata from '@/components/user/UserMetadata.vue';
 defineProps<{
   username: string;
 }>();
-
-defineEmits<{
-  (e: 'follow' | 'unfollow' | 'unblock'): void;
-}>();
 </script>
 
 <template>
@@ -16,12 +12,7 @@ defineEmits<{
       <slot />
     </UiHoverCardTrigger>
     <UiHoverCardContent>
-      <UserMetadata
-        :username="username"
-        @follow="$emit('follow')"
-        @unfollow="$emit('unfollow')"
-        @unblock="$emit('unblock')"
-      />
+      <UserMetadata :username="username" />
     </UiHoverCardContent>
   </UiHoverCard>
 </template>
