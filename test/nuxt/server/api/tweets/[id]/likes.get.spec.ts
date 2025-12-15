@@ -2,23 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createMockH3Event } from '~~/test/mocks/h3-event';
 import { useH3TestUtils } from '~~/test/mocks/h3-test-utils';
 import { createError } from '#app';
-import type { ContentEntities } from '#shared/types/entity';
 import type { CompactUser } from '#shared/types/user';
 import tweetLikesGetHandler from '~~/server/api/tweets/[id]/likes.get';
-
-type LikeUser = {
-  username: string;
-  displayName: string;
-  avatarUrl: string;
-  isFollowing?: boolean;
-  isFollower?: boolean;
-  isBlocked?: boolean;
-  isMuted?: boolean;
-  bio?: {
-    text?: string;
-    bioEntities?: ContentEntities | null;
-  };
-};
 
 useH3TestUtils();
 
@@ -37,16 +22,17 @@ describe('GET /api/tweets/[id]/likes', () => {
           username: 'janedoe',
           displayName: 'Jane Doe',
           avatarUrl: 'http://example.com/avatar.jpg',
-          isFollowing: false,
-          isFollower: false,
-          isBlocked: false,
-          isMuted: false,
-          bio: {
-            text: 'Hello, I am Jane!',
-            bioEntities: null,
+          relationship: {
+            blocking: false,
+            blockedBy: false,
+            muted: false,
+            following: false,
+            follower: false,
           },
+          bio: 'Hello, I am Jane!',
+          bioEntities: null,
         },
-      ] as LikeUser[],
+      ] as CompactUser[],
     };
     mockServerApiFetch.mockResolvedValueOnce(mockResponse);
 
