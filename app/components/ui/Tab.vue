@@ -1,7 +1,7 @@
 <template>
   <NuxtLink
     :to="route"
-    class="hover:bg-foreground/10 relative flex h-[53px] cursor-pointer items-center justify-center px-4 text-[15px] transition-colors"
+    class="hover:bg-foreground/10 relative flex h-[53px] cursor-pointer items-center justify-center px-4 text-[15px] whitespace-nowrap transition-colors"
     :class="[isActive ? 'text-foreground font-bold' : 'text-muted-foreground font-medium']"
     aria-role="tab"
   >

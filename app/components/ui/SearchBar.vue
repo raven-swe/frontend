@@ -84,9 +84,8 @@ function handleSubmit() {
     >
       <Icon
         v-if="modelValue"
-        size="1.2rem"
+        size="1rem"
         name="zondicons:close-solid"
-        class="text-foreground cursor-pointer"
         @mousedown.prevent="clearInput"
       />
     </UiButton>
