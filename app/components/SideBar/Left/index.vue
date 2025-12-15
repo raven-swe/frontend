@@ -33,13 +33,11 @@ const switchLanguage = () => {
 };
 </script>
 <template>
-  <div class="flex h-screen flex-col items-center xl:items-start">
-    <div class="my-2 w-min p-2 hover:rounded-full">
-      <NuxtLink to="/">
-        <LogoRaven class="h-14 w-14" />
-      </NuxtLink>
-    </div>
-    <div class="mt-2 flex flex-col items-center space-y-3 xl:items-start">
+  <div class="flex h-screen flex-col items-start gap-2 px-2 pt-1">
+    <NuxtLink to="/" class="size-12">
+      <LogoRaven />
+    </NuxtLink>
+    <div class="flex w-full flex-col items-center gap-2 xl:items-start">
       <SideBarLeftTab :tab="{ label: 'home', icon: 'home', route: '/home' }"></SideBarLeftTab>
       <SideBarLeftTab
         :tab="{ label: 'explore', icon: 'search', route: '/explore' }"
@@ -71,10 +69,10 @@ const switchLanguage = () => {
         :tab="{ label: 'settings', icon: 'settings', route: '/settings' }"
         data-cy="sidebar-settings-btn"
       ></SideBarLeftTab>
-      <UiButton variant="ghost-default" size="icon-xl" @click="switchLanguage">
+      <UiButton variant="ghost-default" size="icon-lg" class="size-12.5" @click="switchLanguage">
         <Icon name="material-symbols:language" size="24" />
       </UiButton>
-      <UiButton variant="ghost-default" size="icon-xl" @click="toggleTheme">
+      <UiButton variant="ghost-default" size="icon-lg" class="size-12.5" @click="toggleTheme">
         <Icon
           :name="
             mode === 'dark' ? 'material-symbols:light-mode-outline' : 'material-symbols:nightlight'
@@ -83,29 +81,28 @@ const switchLanguage = () => {
         />
       </UiButton>
     </div>
-    <div class="flex w-full flex-grow p-2 pb-4">
+    <div class="flex w-full flex-grow pb-2">
       <UiAlertDialog>
         <UiDropdownMenu>
           <UiDropdownMenuTrigger as-child>
             <UiButton
               variant="ghost-default"
-              size="2xl"
-              class="mx-auto mt-auto overflow-hidden xl:w-full"
+              class="mx-auto mt-auto flex !size-12.5 h-fit w-full items-center justify-center gap-0 overflow-hidden p-0 xl:!h-auto xl:!w-full xl:gap-2 xl:!p-3"
               data-cy="logout-btn-trigger"
             >
-              <div class="flex w-full items-center gap-3">
-                <Avatar
-                  :img="userStore.user?.avatarUrl || ''"
-                  :alt="userStore.user?.displayName || 'User Avatar'"
-                  size="sm"
-                />
-                <div class="hidden flex-col overflow-hidden text-start xl:flex">
+              <Avatar
+                :img="userStore.user?.avatarUrl || ''"
+                :alt="userStore.user?.displayName || 'User Avatar'"
+                size="sm"
+              />
+              <div class="hidden w-full items-center gap-3 xl:flex">
+                <div class="flex flex-col overflow-hidden text-start">
                   <p class="truncate">{{ userStore.user?.displayName || 'User' }}</p>
                   <p class="text-muted-foreground text-sm">
                     {{ '@' + (userStore.user?.username || 'username') }}
                   </p>
                 </div>
-                <div class="ms-auto hidden xl:flex">
+                <div class="ms-auto flex">
                   <Icon name="lucide:more-horizontal" class="pe-2" />
                 </div>
               </div>
