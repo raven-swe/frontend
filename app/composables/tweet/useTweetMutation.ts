@@ -100,12 +100,12 @@ export function useTweetMutation<ActionType extends Actions, Q = void>({
 }
 
 export function useTweetLikeMutation() {
-  return useTweetMutation<'like' | 'unlike'>({
+  return useTweetMutation<'like' | 'unlike', { success: boolean; message: string }>({
     mutationFn: async ({ tweetId, action }) => {
       if (action === 'like') {
-        await likeTweet(tweetId);
+        return await likeTweet(tweetId);
       } else {
-        await unLikeTweet(tweetId);
+        return await unLikeTweet(tweetId);
       }
     },
     optimisticUpdateFn: (tweet: Tweet | TweetWithParents, action) => {
@@ -122,12 +122,12 @@ export function useTweetLikeMutation() {
 }
 
 export function useTweetRetweetMutation() {
-  return useTweetMutation<'retweet' | 'undo-retweet'>({
+  return useTweetMutation<'retweet' | 'undo-retweet', { success: boolean; message: string }>({
     mutationFn: async ({ tweetId, action }) => {
       if (action === 'retweet') {
-        await retweetTweet(tweetId);
+        return await retweetTweet(tweetId);
       } else {
-        await undoRetweetTweet(tweetId);
+        return await undoRetweetTweet(tweetId);
       }
     },
     optimisticUpdateFn: (tweet: Tweet | TweetWithParents, action) => {
