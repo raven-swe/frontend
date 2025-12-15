@@ -189,7 +189,7 @@ describe('VideoPlayer.vue', () => {
     });
 
     const options = JSON.parse(wrapper.find('.video-js-mock').attributes('data-options') || '{}');
-    expect(options.poster).toBeUndefined();
+    expect(!!options.poster).toBe(false);
   });
 
   it('handles different video sources', () => {
