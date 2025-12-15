@@ -170,7 +170,7 @@ function applyPrimaryColor(color: string) {
             :aria-current="locale === 'ar-EG'"
             @click="setLocale('ar-EG')"
           >
-            <div class="flex items-center">
+            <div class="flex items-center gap-3 px-2">
               <span
                 v-if="locale === 'ar-EG'"
                 class="bg-primary flex h-8 w-8 items-center justify-center rounded-full text-white"
