@@ -157,7 +157,7 @@ onServerPrefetch(async () => {
           data-cy="tweet-replies"
         >
           <template #item="{ item: tweet }">
-            <TweetDefaultCard v-if="tweet" :tweet-id="tweet.id" />
+            <TweetDefaultCard v-if="tweet" :tweet-id="tweet.id" :show-replying-to="false" />
           </template>
         </CommonVirtualInfiniteScroller>
         <div
