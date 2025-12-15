@@ -94,6 +94,7 @@ export function useDmSse(options: UseDmSseOptions = {}) {
       es.addEventListener('dm.unseen_conversations_count', (evt: MessageEvent) => {
         try {
           const data = JSON.parse(evt.data) as DmSseEventMap['dm.unseen_conversations_count'];
+
           unseenCount.value = data.count;
           // console.log('Received unseen_conversations_count event:', data);
         } catch {

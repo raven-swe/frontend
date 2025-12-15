@@ -37,13 +37,34 @@ export interface DmMessageSender {
   avatarUrl: string;
 }
 
+export interface DmMessageReactions {
+  sender: {
+    username: string;
+    displayName: string;
+    avatarUrl: string;
+    reaction: string;
+    reactedAt: string;
+  };
+  receiver: {
+    username: string;
+    displayName: string;
+    avatarUrl: string;
+    reaction: string;
+    reactedAt: string;
+  };
+}
 export interface DmMessage {
   id: string;
   content: string;
   entities: DmMessageEntities;
   mediaUrl?: string | null;
+  mediaType?: string | null;
+  height?: number | null;
+  width?: number | null;
+  altText?: string | null;
   createdAt: string;
   isMine: boolean;
+  reactions?: DmMessageReactions | null;
 }
 
 // WebSocket Types
@@ -54,6 +75,7 @@ export interface DmWsSendMessagePayload {
   conversationId: string;
   clientMessageId: string;
   body: string;
+  mediaId?: string;
 }
 
 export interface DmWsMarkSeenPayload {
@@ -102,6 +124,11 @@ export interface DmWsMessageReceived {
     body: string;
     createdAt: string;
   };
+  mediaUrl: string | null;
+  mediaType: string | null;
+  height: number | null;
+  width: number | null;
+  altText: string | null;
 }
 
 export interface DmWsMessageDeleted {
@@ -115,6 +142,7 @@ export interface DmWsConversationSeenUpdate {
   type: 'conversation_seen_update';
   conversationId: string;
   username: string;
+  performerUsername: string;
   lastSeenMessageId: string;
   seenAt: string;
 }

@@ -7,12 +7,21 @@ const props = defineProps<{
 }>();
 
 const userStore = useUserStore();
+const { t } = useI18n();
 
 const highlighted = computed(() => {
   const lastMessage = props.conversation.lastMessage;
   if (!lastMessage) return false;
   const isNotSender = lastMessage.senderUsername !== userStore.user?.username;
   return !lastMessage.seen && !props.isSelected && isNotSender;
+});
+
+const lastMessageText = computed(() => {
+  if (props.conversation?.isBlocking) return t('dm.cant-message');
+  const lastMessage = props.conversation.lastMessage;
+  if (!lastMessage) return t('dm.no-messages-yet');
+  if (!lastMessage.content) return t('dm.sent-photo');
+  return lastMessage.content;
 });
 </script>
 <template>
@@ -22,6 +31,7 @@ const highlighted = computed(() => {
       props.isSelected ? 'border-e-primary' : 'border-e-transparent',
       highlighted ? 'bg-foreground/5' : '',
     ]"
+    data-cy="dm-conversation-item"
   >
     <div class="flex-shrink-0">
       <NuxtImg
@@ -29,6 +39,7 @@ const highlighted = computed(() => {
         alt="Profile picture"
         class="z-20 size-13 rounded-full border-1 object-cover"
         loading="eager"
+        data-cy="dm-conversation-item-avatar"
       />
     </div>
     <div class="flex min-w-0 flex-col gap-0.5">
@@ -37,6 +48,7 @@ const highlighted = computed(() => {
           class="max-w-[110px] truncate"
           :class="highlighted ? 'text-primary font-bold' : 'font-bold'"
           :title="props.conversation.participant.displayName"
+          data-cy="dm-conversation-item-name"
         >
           {{ props.conversation.participant.displayName }}
         </span>
@@ -44,6 +56,7 @@ const highlighted = computed(() => {
           class="max-w-[100px] truncate"
           :class="highlighted ? 'text-primary' : 'text-muted-foreground'"
           :title="props.conversation.participant.username"
+          data-cy="dm-conversation-item-username"
         >
           {{ '@' + props.conversation.participant.username }}
         </span>
@@ -51,6 +64,7 @@ const highlighted = computed(() => {
           v-if="props.conversation.lastMessage?.sentAt"
           class="flex-shrink-0"
           :class="highlighted ? 'text-primary' : 'text-muted-foreground'"
+          data-cy="dm-conversation-item-timestamp"
         >
           {{ relativeTime(props.conversation.lastMessage.sentAt) }}
         </span>
@@ -59,8 +73,9 @@ const highlighted = computed(() => {
         <span
           class="block truncate"
           :class="highlighted ? 'text-primary font-bold' : 'text-muted-foreground'"
+          data-cy="dm-conversation-item-last-message"
         >
-          {{ props.conversation.lastMessage?.content || 'No messages yet' }}
+          {{ lastMessageText }}
         </span>
       </div>
     </div>

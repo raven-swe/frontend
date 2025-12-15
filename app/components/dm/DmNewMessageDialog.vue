@@ -14,10 +14,6 @@ const { users, loading } = useSearchUsers(search);
 const router = useRouter();
 const { startConversation, isStarting } = useStartConversation();
 
-watch(users, (newUsers) => {
-  console.warn('Users updated:', toRaw(newUsers));
-});
-
 const canProceed = computed(() => !!selectedUsername.value);
 
 function toggleSelect(username: string) {
@@ -53,7 +49,6 @@ async function onNewConversation() {
 </script>
 
 <template>
-  <!-- Root dialog controlled via v-model:open -->
   <UiDialog v-model:open="open">
     <UiDialogOverlay />
     <UiDialogContent class="w-full max-w-xl overflow-hidden p-0">
@@ -63,7 +58,11 @@ async function onNewConversation() {
             {{ $t('dm.dialog.new-message') }}
           </UiDialogTitle>
 
-          <UiButton :disabled="!canProceed || isStarting" @click="onNewConversation">
+          <UiButton
+            :disabled="!canProceed || isStarting"
+            data-cy="dm-dialog-next-button"
+            @click="onNewConversation"
+          >
             {{ $t('dm.dialog.next') }}
           </UiButton>
         </div>
@@ -81,12 +80,12 @@ async function onNewConversation() {
               type="text"
               :placeholder="$t('dm.dialog.search-people')"
               class="placeholder:text-muted-foreground/70 w-full bg-transparent outline-none"
+              data-cy="dm-search-input"
             />
           </div>
         </div>
       </UiDialogHeader>
 
-      <!-- List -->
       <div class="max-h-[60vh] overflow-y-auto">
         <div
           v-if="loading && search.trim().length > 0"
@@ -105,18 +104,32 @@ async function onNewConversation() {
               'hover:bg-muted/20 cursor-pointer': !isBlocked(u),
               'cursor-not-allowed opacity-50': isBlocked(u),
             }"
+            data-cy="dm-user-item"
             @click="handleUserClick(u)"
           >
             <UiAvatar size="sm" :img="u.avatarUrl" />
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-2">
-                <p class="truncate font-medium">{{ u.displayName }}</p>
-                <p class="text-muted-foreground truncate before:content-['@']">{{ u.username }}</p>
+                <p class="truncate font-medium" data-cy="dm-user-item-name">{{ u.displayName }}</p>
+                <p
+                  class="text-muted-foreground truncate before:content-['@']"
+                  data-cy="dm-user-item-username"
+                >
+                  {{ u.username }}
+                </p>
               </div>
-              <p v-if="isBlocked(u)" class="text-destructive mt-0.5 flex text-sm">
+              <p
+                v-if="isBlocked(u)"
+                class="text-destructive mt-0.5 flex text-sm"
+                data-cy="dm-user-item-blocked"
+              >
                 {{ $t('dm.dialog.cant-message') }}
               </p>
-              <p v-else-if="followStatus(u)" class="text-muted-foreground mt-0.5 flex text-sm">
+              <p
+                v-else-if="followStatus(u)"
+                class="text-muted-foreground mt-0.5 flex text-sm"
+                data-cy="dm-user-item-follow-status"
+              >
                 <Icon name="ic:sharp-person" size="18" class="text-muted-foreground" />
                 {{ followStatus(u) }}
               </p>

@@ -4,12 +4,14 @@ import { useQueryClient } from '@tanstack/vue-query';
 import { ref } from 'vue';
 import { useTheme } from '~/composables/useTheme';
 import Avatar from '~/components/ui/Avatar.vue';
+import PostTweetDialog from '~/components/tweet/composer/PostTweetDialog.vue';
 
 const dmUnseenCount = inject<Ref<number>>('dmUnseenCount', ref(0));
 const notificationUnseenCount = inject<Ref<number>>('unseenNotificationsCount', ref(0));
 
 const { locale, setLocale } = useI18n();
 const { mode, toggleTheme } = useTheme();
+const showPostDialog = ref(false);
 
 const userStore = useUserStore();
 const queryClient = useQueryClient();
@@ -67,6 +69,12 @@ const switchLanguage = () => {
         :tab="{ label: 'settings', icon: 'settings', route: '/settings' }"
         data-cy="sidebar-settings-btn"
       ></SideBarLeftTab>
+      <UiButton class="mx-2 xl:w-auto" variant="default" size="lg" @click="showPostDialog = true">
+        <div class="relative flex h-8 w-8 items-center justify-center">
+          <Icon name="mingcute:quill-pen-ai-line" size="28" />
+        </div>
+        <p class="mx-6 hidden text-xl font-extrabold xl:block">{{ $t('ui.post') }}</p>
+      </UiButton>
       <UiButton
         variant="ghost-default"
         size="icon-lg"
@@ -147,5 +155,6 @@ const switchLanguage = () => {
         </UiAlertDialogContent>
       </UiAlertDialog>
     </div>
+    <PostTweetDialog v-model:open="showPostDialog" />
   </div>
 </template>

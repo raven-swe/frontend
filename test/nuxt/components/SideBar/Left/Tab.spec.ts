@@ -26,6 +26,10 @@ mockNuxtImport('useRouter', () => {
 });
 
 describe('SideBar Left Tab Component', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   const mockTab = {
     label: 'home',
     route: '/home',

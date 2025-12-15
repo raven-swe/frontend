@@ -9,7 +9,12 @@ function openNewMessage() {
 <template>
   <div class="bg-background flex items-center justify-between p-4">
     <h1 class="text-xl font-bold">{{ $t('dm.header-title') }}</h1>
-    <UiButton variant="outline" class="flex space-x-4" @click="openNewMessage">
+    <UiButton
+      variant="outline"
+      class="flex space-x-4"
+      data-cy="new-dm-button"
+      @click="openNewMessage"
+    >
       <Icon name="ic:twotone-attach-email" size="20" />
     </UiButton>
     <DmNewMessageDialog v-model:open="showNewMessage" />
