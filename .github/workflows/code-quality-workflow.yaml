@@ -13,16 +13,16 @@ jobs:
   style-quality:
     if: github.event.pull_request.draft == false
     name: Code Style & Quality
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Corepack
-        run: corepack enable
-
       - name: Set up pnpm
         run: corepack prepare pnpm@latest --activate
+
+      - name: Add pnpm to PATH
+        run: echo "/home/btngana/.local/share/pnpm" >> $GITHUB_PATH
 
       - uses: actions/setup-node@v4
         with:

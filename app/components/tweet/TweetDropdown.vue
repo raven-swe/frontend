@@ -7,7 +7,7 @@ const props = defineProps<{
   username: string;
 }>();
 
-const deleteMutation = useTweetDeleteMutation();
+const { mutate: deleteTweet } = useTweetDeleteMutation();
 </script>
 <template>
   <UiAlertDialog>
@@ -20,13 +20,17 @@ const deleteMutation = useTweetDeleteMutation();
           <NuxtLink
             :to="`/profile/${props.tweet.author.username}/status/${props.tweet.id}/likes`"
             class="ltr:flex-row rtl:flex-row-reverse"
+            data-cy="tweet-dropdown-likes-link"
           >
             <Icon name="ion:stats-chart" />{{ $t('tweet.engagement.label') }}
           </NuxtLink>
         </UiDropdownMenuItem>
         <UiDropdownMenuItem as-child @select.prevent>
           <UiAlertDialogTrigger as-child class="text-destructive ltr:flex-row rtl:flex-row-reverse">
-            <div v-if="props.username === props.tweet.author.username">
+            <div
+              v-if="props.username === props.tweet.author.username"
+              data-cy="tweet-dropdown-delete-item"
+            >
               <Icon name="mi:delete" />
               <p>{{ $t('tweet.delete-tweet') }}</p>
             </div>
@@ -45,11 +49,14 @@ const deleteMutation = useTweetDeleteMutation();
       <UiAlertDialogFooter>
         <UiAlertDialogAction
           class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-          @click="deleteMutation.mutate({ tweetId: props.tweet.id })"
+          data-cy="tweet-delete-confirm-button"
+          @click="deleteTweet({ tweetId: props.tweet.id })"
         >
           {{ $t('ui.delete') }}
         </UiAlertDialogAction>
-        <UiAlertDialogCancel>{{ $t('ui.cancel') }}</UiAlertDialogCancel>
+        <UiAlertDialogCancel data-cy="tweet-delete-cancel-button">{{
+          $t('ui.cancel')
+        }}</UiAlertDialogCancel>
       </UiAlertDialogFooter>
     </UiAlertDialogContent>
   </UiAlertDialog>

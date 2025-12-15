@@ -25,7 +25,9 @@ export type MediaType = 'image' | 'video' | 'gif';
 
 export type MediaItem = {
   id: string;
-  file: File;
+  file?: File;
   url: string;
   type: MediaType;
+  altText?: string;
+  tenorId?: string; // for GIFs
 };

@@ -330,4 +330,195 @@ describe('useDmSocketIO', () => {
 
     expect(result.attemptedUrl.value).toContain('token=mock-token');
   });
+
+  it('typingStart emits typing_start event', async () => {
+    const { useDmSocketIO } = await import('@/composables/useDmSocketIO');
+    const result = useDmSocketIO();
+
+    result.connect();
+    result.typingStart('conv-123');
+
+    expect(mockSocket.emit).toHaveBeenCalledWith('typing_start', {
+      conversationId: 'conv-123',
+    });
+  });
+
+  it('typingStop emits typing_stop event', async () => {
+    const { useDmSocketIO } = await import('@/composables/useDmSocketIO');
+    const result = useDmSocketIO();
+
+    result.connect();
+    result.typingStop('conv-123');
+
+    expect(mockSocket.emit).toHaveBeenCalledWith('typing_stop', {
+      conversationId: 'conv-123',
+    });
+  });
+
+  it('sendReaction emits send_reaction event', async () => {
+    const { useDmSocketIO } = await import('@/composables/useDmSocketIO');
+    const result = useDmSocketIO();
+
+    result.connect();
+    result.sendReaction('conv-123', 'msg-456', '❤️');
+
+    expect(mockSocket.emit).toHaveBeenCalledWith('send_reaction', {
+      conversationId: 'conv-123',
+      messageId: 'msg-456',
+      reaction: '❤️',
+    });
+  });
+
+  it('onSeenUpdate registers callback', async () => {
+    const { useDmSocketIO } = await import('@/composables/useDmSocketIO');
+    const result = useDmSocketIO();
+    const callback = vi.fn();
+
+    result.onSeenUpdate(callback);
+    result.connect();
+
+    // Trigger conversation_seen_update
+    if (eventHandlers['conversation_seen_update'] && eventHandlers['conversation_seen_update'][0]) {
+      eventHandlers['conversation_seen_update'][0]({
+        conversationId: 'conv-123',
+        lastSeenMessageId: 'msg-456',
+      });
+    }
+
+    expect(callback).toHaveBeenCalledWith({
+      conversationId: 'conv-123',
+      lastSeenMessageId: 'msg-456',
+    });
+  });
+
+  it('onUserTyping registers callback', async () => {
+    const { useDmSocketIO } = await import('@/composables/useDmSocketIO');
+    const result = useDmSocketIO();
+    const callback = vi.fn();
+
+    result.onUserTyping(callback);
+    result.connect();
+
+    // Trigger user_typing
+    if (eventHandlers['user_typing'] && eventHandlers['user_typing'][0]) {
+      eventHandlers['user_typing'][0]({
+        conversationId: 'conv-123',
+        username: 'testuser',
+      });
+    }
+
+    expect(callback).toHaveBeenCalledWith({
+      conversationId: 'conv-123',
+      username: 'testuser',
+    });
+  });
+
+  it('onUserTypingStop registers callback', async () => {
+    const { useDmSocketIO } = await import('@/composables/useDmSocketIO');
+    const result = useDmSocketIO();
+    const callback = vi.fn();
+
+    result.onUserTypingStop(callback);
+    result.connect();
+
+    // Trigger user_typing_stop
+    if (eventHandlers['user_typing_stop'] && eventHandlers['user_typing_stop'][0]) {
+      eventHandlers['user_typing_stop'][0]({
+        conversationId: 'conv-123',
+        username: 'testuser',
+      });
+    }
+
+    expect(callback).toHaveBeenCalledWith({
+      conversationId: 'conv-123',
+      username: 'testuser',
+    });
+  });
+
+  it('onReactionReceived registers callback', async () => {
+    const { useDmSocketIO } = await import('@/composables/useDmSocketIO');
+    const result = useDmSocketIO();
+    const callback = vi.fn();
+
+    result.onReactionReceived(callback);
+    result.connect();
+
+    // Trigger reaction_received
+    if (eventHandlers['reaction_received'] && eventHandlers['reaction_received'][0]) {
+      eventHandlers['reaction_received'][0]({
+        conversationId: 'conv-123',
+        messageId: 'msg-456',
+        reaction: '❤️',
+        username: 'testuser',
+      });
+    }
+
+    expect(callback).toHaveBeenCalledWith({
+      conversationId: 'conv-123',
+      messageId: 'msg-456',
+      reaction: '❤️',
+      username: 'testuser',
+    });
+  });
+
+  it('sendMessage includes mediaId when provided', async () => {
+    const { useDmSocketIO } = await import('@/composables/useDmSocketIO');
+    const result = useDmSocketIO();
+
+    result.connect();
+    result.sendMessage('conv-123', 'Hello with image', 'media-789');
+
+    expect(mockSocket.emit).toHaveBeenCalledWith(
+      'send_message',
+      expect.objectContaining({
+        conversationId: 'conv-123',
+        body: 'Hello with image',
+        mediaId: 'media-789',
+        clientMessageId: expect.any(String),
+      }),
+    );
+  });
+
+  it('disconnect when socket is null does nothing', async () => {
+    const { useDmSocketIO } = await import('@/composables/useDmSocketIO');
+    const result = useDmSocketIO();
+
+    // Disconnect without connecting first
+    result.disconnect();
+
+    expect(mockSocket.disconnect).not.toHaveBeenCalled();
+  });
+
+  it('handles message with media properties', async () => {
+    const { useDmSocketIO } = await import('@/composables/useDmSocketIO');
+    const result = useDmSocketIO();
+    const callback = vi.fn();
+
+    result.onMessage(callback);
+    result.connect();
+
+    // Trigger message_received with media
+    if (eventHandlers['message_received'] && eventHandlers['message_received'][0]) {
+      eventHandlers['message_received'][0]({
+        message: {
+          id: 'msg-1',
+          body: 'Check this out',
+          createdAt: '2024-01-01T00:00:00Z',
+          sender: { username: 'other_user' },
+          mediaUrl: 'https://example.com/image.jpg',
+          type: 'image',
+          height: 600,
+          width: 800,
+          altText: 'An image',
+        },
+      });
+    }
+
+    expect(callback).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'msg-1',
+        mediaUrl: 'https://example.com/image.jpg',
+      }),
+    );
+  });
 });

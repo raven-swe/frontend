@@ -151,7 +151,7 @@ describe('Explore for-you.vue', () => {
     expect(homeServiceMock.getHomeTab).toHaveBeenCalledWith({ limit: 10, cursor: null }, 'for-you');
   });
 
-  it('displays top 5 trending hashtags', async () => {
+  it('displays top 6 trending hashtags', async () => {
     const hashtags = Array.from({ length: 10 }, (_, i) => ({
       hashtag: `tag${i}`,
       tweetCount: 1000 - i * 100,
@@ -176,7 +176,7 @@ describe('Explore for-you.vue', () => {
     await new Promise((resolve) => setTimeout(resolve, 50));
 
     const hashtagComponents = wrapper.findAllComponents({ name: 'Hashtag' });
-    expect(hashtagComponents.length).toBe(5); // Only top 5
+    expect(hashtagComponents.length).toBe(6); // Only top 6
   });
 
   it('displays categorized tweets', async () => {

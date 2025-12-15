@@ -119,8 +119,16 @@ export function useProfileMutation<ActionType extends Actions, Q = void>({
 
     // Invalidate queries on finishing request
     // To sync up with the backend
-    onSettled: (_data, _err, { username }, mutationResult, { client }) => {
+    onSettled: (_data, _err, { username, action }, mutationResult, { client }) => {
       const loweredUsername = username.toLowerCase();
+
+      // Always invalidate dm-conversations cache when blocking/unblocking a user
+      if (action === 'block' || action === 'unblock') {
+        client.invalidateQueries({
+          queryKey: ['dm-conversations'],
+        });
+      }
+
       const stillRunning = client.isMutating({
         mutationKey: ['profile-interaction'],
       });

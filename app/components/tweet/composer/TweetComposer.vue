@@ -39,6 +39,7 @@ const {
   handlePost,
   handleAddMedia,
   handleRemoveMedia,
+  handleAddGif,
 } = useTweetComposer(tweetContent, media, replyToRef, quoteToRef);
 
 const emit = defineEmits<{
@@ -53,9 +54,14 @@ const handlePostWrapper = async () => {
   queryClient.setQueryData<Tweet>(['tweet', newTweet.id], newTweet);
   emit('posted', newTweet);
   // Cleanup
-  media.value.forEach((item) => URL.revokeObjectURL(item.url));
+  media.value.forEach((item: MediaItem) => URL.revokeObjectURL(item.url));
   tweetContent.value = '';
   media.value = [];
+  tweetEditorRef.value?.resetHeight();
+};
+
+const handleInsertEmoji = (emoji: string) => {
+  tweetContent.value += emoji;
   tweetEditorRef.value?.resetHeight();
 };
 </script>
@@ -63,7 +69,7 @@ const handlePostWrapper = async () => {
 <template>
   <div class="bg-background relative max-w-[598px] p-4 pb-15">
     <div class="mb-3 flex gap-3">
-      <div class="flex-shrink-0">
+      <div class="shrink-0">
         <Avatar
           :img="userStore.user?.avatarUrl"
           :alt="$t('tweet.composer.profile-alt', { name: userStore.user?.username || '' })"
@@ -107,6 +113,8 @@ const handlePostWrapper = async () => {
         :composer-type="type"
         @post="handlePostWrapper"
         @add-media="handleAddMedia"
+        @insert-emoji="handleInsertEmoji"
+        @insert-gif="handleAddGif"
       />
     </div>
   </div>

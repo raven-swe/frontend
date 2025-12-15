@@ -21,7 +21,7 @@ const props = withDefaults(defineProps<Props<T>>(), {
   estimateSize: 120,
   overscan: 2,
   scrollMargin: 0,
-  getKey: (item: T | undefined, index: number, key?: VirtualItem['key']) => key ?? index,
+  getKey: (item: T | undefined, index: number, key: VirtualItem['key']) => key,
 });
 
 // Refs for container offset

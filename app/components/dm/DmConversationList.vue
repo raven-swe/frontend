@@ -74,19 +74,24 @@ watch(
           transform: `translateY(${virtualRow.start}px)`,
         }"
       >
-        <!-- Loading indicator for next page -->
         <template v-if="virtualRow.index > conversations.length - 1">
           <div class="flex items-center justify-center p-4">
             <UiSpinner v-if="hasNextPage" size="1.25rem" />
           </div>
         </template>
-        <!-- Conversation item -->
         <template v-else-if="conversations[virtualRow.index]">
           <DmConversationItem
             :conversation="conversations[virtualRow.index]!"
             :is-selected="selectedId === conversations[virtualRow.index]!.id"
-            class="hover:bg-foreground/5 cursor-pointer"
-            @click="emit('select', conversations[virtualRow.index]!.id)"
+            :class="[
+              conversations[virtualRow.index]!.isBlocking
+                ? 'cursor-not-allowed opacity-50'
+                : 'hover:bg-foreground/5 cursor-pointer',
+            ]"
+            @click="
+              !conversations[virtualRow.index]?.isBlocking &&
+              emit('select', conversations[virtualRow.index]!.id)
+            "
           />
         </template>
       </div>

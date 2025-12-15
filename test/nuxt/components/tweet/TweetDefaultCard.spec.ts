@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
 import { VueQueryPlugin } from '@tanstack/vue-query';
@@ -19,14 +19,37 @@ const i18n = createI18n({
   },
 });
 
-vi.mock('~/composables/useProfileMutation', () => ({
-  useFollowMutation: () => ({
-    mutate: vi.fn(),
-  }),
-  useBlockMutation: () => ({
-    mutate: vi.fn(),
+const { mutateFollow, mutateBlock } = vi.hoisted(() => ({
+  mutateFollow: vi.fn(),
+  mutateBlock: vi.fn(),
+}));
+
+vi.mock('~/stores/user', () => ({
+  useUserStore: () => ({
+    user: { username: 'current_user' },
   }),
 }));
+
+vi.mock('~/composables/useProfileMutation', () => ({
+  useFollowMutation: () => ({
+    mutate: mutateFollow,
+  }),
+  useBlockMutation: () => ({
+    mutate: mutateBlock,
+  }),
+}));
+
+const setQueryDataMock = vi.hoisted(() => vi.fn());
+
+vi.mock('@tanstack/vue-query', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@tanstack/vue-query')>();
+  return {
+    ...actual,
+    useQueryClient: () => ({
+      setQueryData: setQueryDataMock,
+    }),
+  };
+});
 
 const routerMock = vi.hoisted(() => {
   return {
@@ -44,6 +67,8 @@ mockNuxtImport('useI18n', () => {
   });
 });
 
+const handleAiSummaryMock = vi.fn();
+
 // Stub components for faster tests
 const stubs = {
   NuxtLink: {
@@ -56,6 +81,22 @@ const stubs = {
   Avatar: Avatar,
   TweetMedia: TweetMedia,
   TweetActionButtons: TweetActionButtons,
+  AiSummary: {
+    template: '<div class="ai-summary-stub"></div>',
+    methods: {
+      handleAiSummary: handleAiSummaryMock,
+    },
+  },
+  UserHoverCard: {
+    name: 'UserHoverCard',
+    template: '<div><slot /></div>',
+    props: ['username'],
+    emits: ['follow', 'block', 'unblock', 'unfollow'],
+  },
+  TweetDropdown: {
+    template: '<div><slot /></div>',
+    props: ['tweet', 'username'],
+  },
 };
 
 const globalConfig = {
@@ -91,6 +132,10 @@ function makeTweet(overrides: Partial<Tweet> = {}): Tweet {
 }
 
 describe('TweetDefaultCard.vue', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('renders header: avatar, display name, @username and relative time', async () => {
     const tweet = makeTweet();
     const wrapper = mount(TweetDefaultCard, {
@@ -468,5 +513,189 @@ describe('TweetDefaultCard.vue', () => {
     expect(routerMock.push).toHaveBeenCalledWith(
       `/profile/${tweet.author.username}/status/${tweet.id}`,
     );
+  });
+
+  it('handles reply-success: increments replyCount and updates query cache if replying to same tweet', async () => {
+    const tweet = makeTweet({ id: 'parent-1', replyCount: 5 });
+    const wrapper = mount(TweetDefaultCard, {
+      props: { tweet },
+      global: globalConfig,
+    });
+
+    const actions = wrapper.findComponent(TweetActionButtons);
+    const replyTweet = makeTweet({ id: 'reply-1', replyToTweetId: 'parent-1' });
+
+    const oldData = {
+      pages: [
+        {
+          data: [makeTweet({ id: 'existing-reply' })],
+          meta: {},
+        },
+      ],
+      pageParams: [null],
+    };
+
+    setQueryDataMock.mockImplementation((key, updater) => {
+      if (typeof updater === 'function') {
+        return updater(oldData);
+      }
+      return updater;
+    });
+
+    actions.vm.$emit('reply-success', replyTweet);
+    await nextTick();
+
+    const updated = actions.props('tweet') as Tweet;
+    expect(updated.replyCount).toBe(6);
+
+    expect(setQueryDataMock).toHaveBeenCalledWith(
+      ['tweet-replies', 'parent-1'],
+      expect.any(Function),
+    );
+  });
+
+  it('does not update query cache on reply-success if reply is not to this tweet', async () => {
+    const tweet = makeTweet({ id: 'parent-1' });
+    const wrapper = mount(TweetDefaultCard, {
+      props: { tweet },
+      global: globalConfig,
+    });
+
+    const actions = wrapper.findComponent(TweetActionButtons);
+    const replyTweet = makeTweet({ id: 'reply-1', replyToTweetId: 'other-tweet' });
+
+    actions.vm.$emit('reply-success', replyTweet);
+    await nextTick();
+
+    expect(setQueryDataMock).not.toHaveBeenCalled();
+  });
+
+  it('triggers AI summary when button is clicked', async () => {
+    const tweet = makeTweet();
+    const wrapper = mount(TweetDefaultCard, {
+      props: { tweet },
+      global: globalConfig,
+    });
+
+    const buttons = wrapper.findAll('button');
+    const aiBtn = buttons.find((b) => b.html().includes('vscode-icons:file-type-gemini'));
+
+    expect(aiBtn?.exists()).toBe(true);
+    await aiBtn?.trigger('click');
+
+    expect(handleAiSummaryMock).toHaveBeenCalled();
+  });
+
+  it('emits user mutations from all Author UserHoverCard instances (Avatar, Name, Handle)', async () => {
+    const tweet = makeTweet();
+    const wrapper = mount(TweetDefaultCard, {
+      props: { tweet },
+      global: globalConfig,
+    });
+
+    const hoverCards = wrapper.findAllComponents({ name: 'UserHoverCard' });
+    // Expect at least 3 cards for the author (Avatar, DisplayName, Username)
+    expect(hoverCards.length).toBeGreaterThanOrEqual(3);
+
+    for (const card of hoverCards) {
+      if (card.props('username') === tweet.author.username) {
+        card.vm.$emit('follow');
+        expect(mutateFollow).toHaveBeenLastCalledWith({
+          username: tweet.author.username,
+          action: 'follow',
+        });
+
+        card.vm.$emit('block');
+        expect(mutateBlock).toHaveBeenLastCalledWith({
+          username: tweet.author.username,
+          action: 'block',
+        });
+
+        card.vm.$emit('unblock');
+        expect(mutateBlock).toHaveBeenLastCalledWith({
+          username: tweet.author.username,
+          action: 'unblock',
+        });
+
+        card.vm.$emit('unfollow');
+        expect(mutateFollow).toHaveBeenLastCalledWith({
+          username: tweet.author.username,
+          action: 'unfollow',
+        });
+      }
+    }
+  });
+
+  it('emits user mutations from ReplyingTo UserHoverCard', async () => {
+    const parent = makeTweet({ author: { ...makeTweet().author, username: 'parent_user' } });
+    const tweet = makeTweet({ replyToTweet: parent });
+    const wrapper = mount(TweetDefaultCard, {
+      props: { tweet },
+      global: globalConfig,
+    });
+
+    const hoverCards = wrapper.findAllComponents({ name: 'UserHoverCard' });
+    const replyCard = hoverCards.find((c) => c.props('username') === 'parent_user');
+    expect(replyCard).toBeDefined();
+
+    if (replyCard) {
+      replyCard.vm.$emit('follow');
+      expect(mutateFollow).toHaveBeenLastCalledWith({ username: 'parent_user', action: 'follow' });
+
+      replyCard.vm.$emit('block');
+      expect(mutateBlock).toHaveBeenLastCalledWith({ username: 'parent_user', action: 'block' });
+
+      replyCard.vm.$emit('unblock');
+      expect(mutateBlock).toHaveBeenLastCalledWith({ username: 'parent_user', action: 'unblock' });
+
+      replyCard.vm.$emit('unfollow');
+      expect(mutateFollow).toHaveBeenLastCalledWith({
+        username: 'parent_user',
+        action: 'unfollow',
+      });
+    }
+  });
+
+  it('renders "Retweeted by" header correctly', async () => {
+    const tweet = makeTweet({
+      repostedBy: {
+        username: 'retweeter',
+        displayName: 'Retweeter',
+      },
+    });
+    const wrapper = mount(TweetDefaultCard, {
+      props: { tweet },
+      global: globalConfig,
+    });
+
+    expect(wrapper.text()).toContain('Retweeter');
+    expect(wrapper.text()).toContain('Reposted');
+  });
+
+  it('renders "Retweeted by you" when reposted by current user', async () => {
+    const tweet = makeTweet({
+      repostedBy: {
+        username: 'current_user',
+        displayName: 'Me',
+      },
+    });
+    const wrapper = mount(TweetDefaultCard, {
+      props: { tweet },
+      global: globalConfig,
+    });
+
+    expect(wrapper.text()).toContain('You Reposted');
+  });
+
+  it('renders "Replying to" header', async () => {
+    const parent = makeTweet({ author: { ...makeTweet().author, username: 'parent_user' } });
+    const tweet = makeTweet({ replyToTweet: parent });
+    const wrapper = mount(TweetDefaultCard, {
+      props: { tweet },
+      global: globalConfig,
+    });
+
+    expect(wrapper.text()).toContain('Replying to');
+    expect(wrapper.text()).toContain('@parent_user');
   });
 });

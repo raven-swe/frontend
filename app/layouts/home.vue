@@ -1,9 +1,18 @@
 <script lang="ts" setup>
 import Tabs from '@/components/ui/Tabs.vue';
 import Tab from '@/components/ui/Tab.vue';
-import { prependTweetToInfiniteLists } from '~/composables/tweet/updateTweetList';
+import AccountSetup from '@/components/profile/account-setup/index.vue';
 import { tweetKeys } from '~/constants/query-keys';
 import { useQueryClient } from '@tanstack/vue-query';
+import { prependTweetToInfiniteLists } from '~/composables/tweet/updateTweetList';
+
+const { start, isOpen } = useAccountSetup();
+onMounted(() => {
+  if (sessionStorage.getItem('showAccountSetup') === 'true') {
+    start();
+    sessionStorage.removeItem('showAccountSetup');
+  }
+});
 
 const queryClient = useQueryClient();
 
@@ -21,6 +30,7 @@ function handlePosted(tweet: Tweet) {
 
 <template>
   <NuxtLayout name="default">
+    <AccountSetup v-if="isOpen" />
     <Tabs class="bg-background/65 sticky top-0 z-10 backdrop-blur-md">
       <Tab
         :label="$t('home.tabs.for-you')"

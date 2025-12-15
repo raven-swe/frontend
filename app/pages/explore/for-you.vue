@@ -15,7 +15,7 @@ const { data: trendingHashtags, suspense: hashtagsSuspense } = useQuery({
   queryKey: ['trending-hashtags'],
   queryFn: async () => {
     const response = await exploreService.getExploreTab('trending');
-    return response.data.slice(0, 5);
+    return response.data.slice(0, 6);
   },
 });
 

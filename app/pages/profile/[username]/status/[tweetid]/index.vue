@@ -152,7 +152,7 @@ onServerPrefetch(async () => {
     </ClientOnly>
 
     <div ref="main-tweet-cont" class="min-h-[calc(100vh_-_3.25rem)]">
-      <TweetView :tweet="tweetData" />
+      <TweetView :tweet="tweetData" :media="true" />
 
       <div class="border-b">
         <TweetComposer :reply-to-tweet-id="tweetid" type="reply" @posted="handleNewReply" />
@@ -166,6 +166,7 @@ onServerPrefetch(async () => {
           :is-fetching-next-page="isFetchingNextPage"
           :fetch-next-page="fetchNextPage"
           :get-key="(tweet, idx, key) => tweet.id ?? key"
+          data-cy="tweet-replies"
         >
           <template #item="{ item: tweet }">
             <TweetDefaultCard v-if="tweet" :tweet-id="tweet.id" />

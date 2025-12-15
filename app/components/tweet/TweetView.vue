@@ -6,17 +6,22 @@ import ContentEntitiesRenderer from '../ui/ContentEntitiesRenderer.vue';
 import { useUserStore } from '~/stores/user';
 import QuotedTweetCard from './QuotedTweetCard.vue';
 import AiSummary from './AiSummary.vue';
+import type { TweetWithParents } from '~~/shared/types/tweets';
 interface Props {
   tweet: TweetWithParents;
+  media?: boolean;
 }
 const props = defineProps<Props>();
 const userStore = useUserStore();
 const originalUsername = ref<string>(userStore.user?.username || '');
+const showMedia = computed(() => props.media ?? true);
 
 const aiSummaryRef = ref<InstanceType<typeof AiSummary> | null>(null);
 
 const { mutate: followUser } = useFollowMutation();
 const { mutate: blockUser } = useBlockMutation();
+
+const onReplySuccess = (_tweet: Tweet) => {};
 
 function handleAiSummary() {
   aiSummaryRef.value?.handleAiSummary?.();
@@ -79,6 +84,7 @@ function handleAiSummary() {
               <NuxtLink
                 :to="`/profile/${props.tweet.author.username}`"
                 class="cursor-pointer truncate pe-12 leading-tight hover:underline"
+                data-cy="tweet-view-display-name"
                 @click.stop
               >
                 {{ tweet.author.displayName }}
@@ -94,6 +100,7 @@ function handleAiSummary() {
               <NuxtLink
                 :to="`/profile/${props.tweet.author.username}`"
                 class="text-muted-foreground truncate pe-12 leading-tight"
+                data-cy="tweet-view-username"
                 @click.stop
               >
                 {{ '@' + tweet.author.username }}
@@ -104,9 +111,11 @@ function handleAiSummary() {
         <div class="relative">
           <div class="absolute end-0 top-1 flex translate-x-2.5 flex-row items-center">
             <UiButton
+              v-if="!(!tweet.content || tweet.content.trim().length === 0)"
               variant="ghost-default"
               size="icon-sm"
               class="text-muted-foreground"
+              data-cy="tweet-view-ai-summary-button"
               @click.stop="handleAiSummary"
             >
               <Icon name="vscode-icons:file-type-gemini" size="1.2rem" />
@@ -116,6 +125,7 @@ function handleAiSummary() {
                 variant="ghost-default"
                 size="icon-xs"
                 class="text-muted-foreground"
+                data-cy="tweet-view-dropdown-trigger"
                 @click.stop
               >
                 <Icon name="lucide:more-horizontal" />
@@ -129,7 +139,9 @@ function handleAiSummary() {
       <p class="pt-2 text-lg leading-relaxed break-words whitespace-pre-wrap">
         <ContentEntitiesRenderer :content="tweet.content" :entities="tweet.entities" />
       </p>
-      <TweetMedia :media="tweet.media" />
+      <div v-if="showMedia">
+        <TweetMedia :media="tweet.media" />
+      </div>
 
       <!-- Quoted Tweet -->
       <QuotedTweetCard v-if="tweet.quotedTweet" :tweet="tweet.quotedTweet" />
@@ -140,11 +152,12 @@ function handleAiSummary() {
           :title="formatDate(tweet.createdAt)"
           :datetime="tweet.createdAt"
           class="text-muted-foreground text-md"
+          data-cy="tweet-view-timestamp"
           >{{ formatDate(tweet.createdAt) }}</time
         >
       </div>
     </div>
 
-    <TweetActionButtons :tweet="tweet" />
+    <TweetActionButtons :tweet="tweet" @reply-success="onReplySuccess" />
   </article>
 </template>

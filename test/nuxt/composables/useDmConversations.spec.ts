@@ -1,220 +1,300 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref } from 'vue';
+import {
+  useDmConversations,
+  updateConversationLastMessage,
+  markConversationSeenInCache,
+} from '@/composables/useDmConversations';
+import { apiFetch } from '~/api';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/vue-query';
 
-// Mock dependencies
+// Mocks
+vi.mock('~/api', () => ({
+  apiFetch: vi.fn(),
+}));
+
 vi.mock('@tanstack/vue-query', () => ({
-  useInfiniteQuery: vi.fn(({ queryFn, getNextPageParam }) => {
-    // Store the functions so we can test them
-    (globalThis as Record<string, unknown>).__testQueryFn = queryFn;
-    (globalThis as Record<string, unknown>).__testGetNextPageParam = getNextPageParam;
-    return {
-      data: ref({ pages: [{ data: [{ id: 'conv-1' }, { id: 'conv-2' }] }] }),
+  useInfiniteQuery: vi.fn(),
+  useQueryClient: vi.fn(),
+}));
+
+describe('useDmConversations', () => {
+  const mockSetQueryData = vi.fn();
+  const mockGetQueryData = vi.fn();
+  const mockInvalidateQueries = vi.fn();
+  const mockQueryClient = {
+    setQueryData: mockSetQueryData,
+    getQueryData: mockGetQueryData,
+    invalidateQueries: mockInvalidateQueries,
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(useQueryClient).mockReturnValue(mockQueryClient as any);
+    vi.mocked(useInfiniteQuery).mockReturnValue({
+      data: ref(undefined),
       isPending: ref(false),
       error: ref(null),
       refetch: vi.fn(),
       fetchNextPage: vi.fn(),
       hasNextPage: ref(false),
       isFetchingNextPage: ref(false),
-    };
-  }),
-}));
-
-vi.mock('~/api', () => ({
-  apiFetch: vi.fn().mockResolvedValue({
-    data: [{ id: 'conv-1' }],
-    pagination: { hasNextPage: true, nextCursor: 'cursor-123' },
-  }),
-}));
-
-vi.mock('@/composables/useDmHighlight', () => ({
-  useDmHighlight: () => ({
-    highlightedIds: ref(new Set<string>()),
-    addHighlight: vi.fn(),
-    removeHighlight: vi.fn(),
-    isHighlighted: vi.fn(),
-  }),
-}));
-
-describe('useDmConversations', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+    } as any);
   });
 
-  it('should be defined', async () => {
-    const { useDmConversations } = await import('@/composables/useDmConversations');
-    expect(useDmConversations).toBeDefined();
+  describe('updateConversationLastMessage', () => {
+    it('updates the conversation last message in cache when conversation exists', () => {
+      const conversationId = 'conv-1';
+      const lastMessage = {
+        content: 'New message',
+        senderUsername: 'user1',
+        sentAt: '2024-01-01T10:00:00Z',
+        seen: false,
+      };
+
+      // Mock getQueryData to return existing cache with the conversation
+      const existingCache = {
+        pages: [
+          {
+            success: true,
+            data: [
+              { id: 'conv-1', lastMessage: null },
+              { id: 'conv-2', lastMessage: null },
+            ],
+          },
+        ],
+        pageParams: [],
+      };
+      mockGetQueryData.mockReturnValue(existingCache);
+
+      updateConversationLastMessage(mockQueryClient as any, conversationId, lastMessage);
+
+      expect(mockGetQueryData).toHaveBeenCalledWith(['dm-conversations']);
+      expect(mockSetQueryData).toHaveBeenCalledWith(['dm-conversations'], expect.any(Function));
+
+      // Verify implementation correctness
+      const updater = mockSetQueryData.mock?.calls?.[0]?.[1];
+      const oldData = {
+        pages: [
+          {
+            success: true,
+            data: [
+              { id: 'conv-1', lastMessage: null },
+              { id: 'conv-2', lastMessage: null },
+            ],
+          },
+        ],
+        pageParams: [],
+      };
+
+      const newData = updater(oldData);
+      const updatedConv = newData.pages[0].data.find((c: any) => c.id === 'conv-1');
+      expect(updatedConv.lastMessage).toEqual(lastMessage);
+
+      const otherConv = newData.pages[0].data.find((c: any) => c.id === 'conv-2');
+      expect(otherConv.lastMessage).toBeNull();
+    });
+
+    it('invalidates query when conversation does not exist in cache', () => {
+      // Mock getQueryData to return cache without the conversation
+      const existingCache = {
+        pages: [
+          {
+            success: true,
+            data: [{ id: 'conv-2', lastMessage: null }],
+          },
+        ],
+        pageParams: [],
+      };
+      mockGetQueryData.mockReturnValue(existingCache);
+
+      updateConversationLastMessage(mockQueryClient as any, 'conv-1', {
+        content: 'New message',
+        senderUsername: 'user1',
+        sentAt: '2024-01-01T10:00:00Z',
+        seen: false,
+      });
+
+      expect(mockGetQueryData).toHaveBeenCalledWith(['dm-conversations']);
+      expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['dm-conversations'] });
+      expect(mockSetQueryData).not.toHaveBeenCalled();
+    });
+
+    it('invalidates query when cache is empty', () => {
+      mockGetQueryData.mockReturnValue(undefined);
+
+      updateConversationLastMessage(mockQueryClient as any, 'conv-1', {
+        content: 'New message',
+        senderUsername: 'user1',
+        sentAt: '2024-01-01T10:00:00Z',
+        seen: false,
+      });
+
+      expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['dm-conversations'] });
+      expect(mockSetQueryData).not.toHaveBeenCalled();
+    });
   });
 
-  it('queryFn calls apiFetch with correct parameters', async () => {
-    const { apiFetch } = await import('~/api');
-    await import('@/composables/useDmConversations');
+  describe('markConversationSeenInCache', () => {
+    it('marks conversation as seen in cache', () => {
+      const conversationId = 'conv-1';
 
-    const queryFn = (globalThis as Record<string, unknown>).__testQueryFn as (params: {
-      pageParam?: string;
-    }) => Promise<unknown>;
-    if (queryFn) {
-      await queryFn({ pageParam: 'cursor-abc' });
+      mockSetQueryData.mockImplementation(() => {});
+      markConversationSeenInCache(mockQueryClient as any, conversationId);
+
+      expect(mockSetQueryData).toHaveBeenCalledWith(['dm-conversations'], expect.any(Function));
+
+      const updater = mockSetQueryData.mock?.calls?.[0]?.[1];
+      const oldData = {
+        pages: [
+          {
+            success: true,
+            data: [{ id: 'conv-1', lastMessage: { seen: false, content: 'hi' } }],
+          },
+        ],
+        pageParams: [],
+      };
+
+      const newData = updater(oldData);
+      const updatedConv = newData.pages[0].data[0];
+      expect(updatedConv.lastMessage.seen).toBe(true);
+    });
+
+    it('handles conversation with no lastMessage', () => {
+      const conversationId = 'conv-1';
+      mockSetQueryData.mockImplementation(() => {});
+      markConversationSeenInCache(mockQueryClient as any, conversationId);
+
+      const updater = mockSetQueryData.mock?.calls?.[0]?.[1];
+      const oldData = {
+        pages: [{ success: true, data: [{ id: 'conv-1', lastMessage: null }] }],
+      };
+
+      const newData = updater(oldData);
+      expect(newData.pages[0].data[0].lastMessage).toBeNull();
+    });
+  });
+
+  describe('useDmConversations', () => {
+    it('initializes useInfiniteQuery with correct options', () => {
+      useDmConversations();
+
+      expect(useInfiniteQuery).toHaveBeenCalledWith(
+        expect.objectContaining({
+          queryKey: ['dm-conversations'],
+          initialPageParam: undefined,
+        }),
+      );
+    });
+
+    it('queryFn calls apiFetch with correct params', async () => {
+      useDmConversations();
+      const options = vi.mocked(useInfiniteQuery).mock?.calls?.[0]?.[0] as any;
+      const queryFn = options.queryFn;
+
+      const mockResponse = { success: true, data: [] };
+      vi.mocked(apiFetch).mockResolvedValue(mockResponse);
+
+      const result = await queryFn({ pageParam: 'cursor-123' });
+
       expect(apiFetch).toHaveBeenCalledWith('/api/conversations', {
         method: 'GET',
-        query: { cursor: 'cursor-abc', limit: 20 },
+        query: {
+          cursor: 'cursor-123',
+          limit: 20,
+        },
       });
-    }
-  });
-
-  it('getNextPageParam returns nextCursor when hasNextPage is true', async () => {
-    await import('@/composables/useDmConversations');
-
-    const getNextPageParam = (globalThis as Record<string, unknown>)
-      .__testGetNextPageParam as (lastPage: {
-      pagination?: { hasNextPage: boolean; nextCursor: string | null };
-    }) => string | undefined;
-    if (getNextPageParam) {
-      const result = getNextPageParam({
-        pagination: { hasNextPage: true, nextCursor: 'cursor-123' },
-      });
-      expect(result).toBe('cursor-123');
-    }
-  });
-
-  it('getNextPageParam returns undefined when hasNextPage is false', async () => {
-    await import('@/composables/useDmConversations');
-
-    const getNextPageParam = (globalThis as Record<string, unknown>)
-      .__testGetNextPageParam as (lastPage: {
-      pagination?: { hasNextPage: boolean; nextCursor: string | null };
-    }) => string | undefined;
-    if (getNextPageParam) {
-      const result = getNextPageParam({
-        pagination: { hasNextPage: false, nextCursor: null },
-      });
-      expect(result).toBeUndefined();
-    }
-  });
-
-  it('allConversations returns empty array when data is null', async () => {
-    // Test the computed logic directly
-    const data = null;
-    const result = !data ? [] : [];
-    expect(result).toEqual([]);
-  });
-
-  it('allConversations flattens pages data correctly', async () => {
-    // Test the flatMap logic directly
-    const data = {
-      pages: [{ data: [{ id: '1' }, { id: '2' }] }, { data: [{ id: '3' }] }],
-    };
-    const result = data.pages.flatMap((page) => page.data);
-    expect(result).toEqual([{ id: '1' }, { id: '2' }, { id: '3' }]);
-  });
-
-  it('watch updates lastMessage on new message event', async () => {
-    const newMessage = {
-      messageId: 'msg-1',
-      conversationId: 'conv-1',
-      bodySnippet: 'New message',
-      sender: { username: 'user1' },
-      createdAt: '2024-01-01T00:00:00Z',
-    };
-
-    const conversations = [
-      {
-        id: 'conv-1',
-        lastMessage: null as { content: string; senderUsername: string; sentAt: string } | null,
-      },
-    ];
-
-    // Simulate watch effect
-    const conversation = conversations.find((c) => c.id === newMessage.conversationId);
-    if (conversation) {
-      conversation.lastMessage = {
-        content: newMessage.bodySnippet,
-        senderUsername: newMessage.sender.username,
-        sentAt: newMessage.createdAt,
-      };
-    }
-
-    expect(conversation?.lastMessage).toEqual({
-      content: 'New message',
-      senderUsername: 'user1',
-      sentAt: '2024-01-01T00:00:00Z',
-    });
-  });
-
-  it('sorting logic handles both conversations in movedToTopIds', async () => {
-    const movedToTopIds = new Set(['conv-1', 'conv-2']);
-    const a = { id: 'conv-1' };
-    const b = { id: 'conv-2' };
-
-    const aIsTop = movedToTopIds.has(a.id);
-    const bIsTop = movedToTopIds.has(b.id);
-
-    let sortResult = 0;
-    if (aIsTop && !bIsTop) sortResult = -1;
-    else if (!aIsTop && bIsTop) sortResult = 1;
-
-    expect(sortResult).toBe(0); // Both are top, so no change
-  });
-
-  it('sorting logic handles neither conversation in movedToTopIds', async () => {
-    const movedToTopIds = new Set<string>();
-    const a = { id: 'conv-1' };
-    const b = { id: 'conv-2' };
-
-    const aIsTop = movedToTopIds.has(a.id);
-    const bIsTop = movedToTopIds.has(b.id);
-
-    let sortResult = 0;
-    if (aIsTop && !bIsTop) sortResult = -1;
-    else if (!aIsTop && bIsTop) sortResult = 1;
-
-    expect(sortResult).toBe(0); // Neither is top
-  });
-
-  it('sorting with one in top returns correct order', async () => {
-    const movedToTopIds = new Set(['conv-2']);
-    const conversations = [{ id: 'conv-1' }, { id: 'conv-2' }, { id: 'conv-3' }];
-
-    const sorted = [...conversations].sort((a, b) => {
-      const aIsTop = movedToTopIds.has(a.id);
-      const bIsTop = movedToTopIds.has(b.id);
-
-      if (aIsTop && !bIsTop) return -1;
-      if (!aIsTop && bIsTop) return 1;
-      return 0;
+      expect(result).toBe(mockResponse);
     });
 
-    expect(sorted[0]!.id).toBe('conv-2');
-  });
+    it('getNextPageParam returns nextCursor if available', () => {
+      useDmConversations();
+      const options = vi.mocked(useInfiniteQuery).mock?.calls?.[0]?.[0] as any;
+      const getNextPageParam = options.getNextPageParam;
 
-  it('sortedConversations returns empty array when no conversations', async () => {
-    const allConversations: { id: string }[] = [];
-    const result = !allConversations.length ? [] : allConversations;
-    expect(result).toEqual([]);
-  });
-
-  it('highlightedIds watch adds to movedToTopIds', async () => {
-    const movedToTopIds = new Set<string>();
-    const newIds = new Set(['conv-1', 'conv-2']);
-
-    newIds.forEach((id) => {
-      movedToTopIds.add(id);
+      const lastPage = { pagination: { hasNextPage: true, nextCursor: 'next-123' } };
+      expect(getNextPageParam(lastPage)).toBe('next-123');
     });
 
-    expect(movedToTopIds.has('conv-1')).toBe(true);
-    expect(movedToTopIds.has('conv-2')).toBe(true);
-  });
+    it('getNextPageParam returns undefined if no next page', () => {
+      useDmConversations();
+      const options = vi.mocked(useInfiniteQuery).mock?.calls?.[0]?.[0] as any;
+      const getNextPageParam = options.getNextPageParam;
 
-  it('skips duplicate message processing', async () => {
-    const lastProcessedMessageId = 'msg-1';
-    const newMessageId = 'msg-1';
-    const shouldProcess = newMessageId !== lastProcessedMessageId;
-    expect(shouldProcess).toBe(false);
-  });
+      const lastPage = { pagination: { hasNextPage: false } };
+      expect(getNextPageParam(lastPage)).toBeUndefined();
+    });
 
-  it('processes new message when id differs', async () => {
-    const lastProcessedMessageId: string = 'msg-1';
-    const newMessageId: string = 'msg-2';
-    const shouldProcess = newMessageId !== lastProcessedMessageId;
-    expect(shouldProcess).toBe(true);
+    it('computes sortedConversations correctly', () => {
+      const dataRef = ref({
+        pages: [
+          {
+            data: [
+              { id: 'c1', lastMessage: { sentAt: '2023-01-01' } },
+              { id: 'c2', lastMessage: { sentAt: '2023-01-02' } }, // Newer
+            ],
+          },
+        ],
+      });
+
+      vi.mocked(useInfiniteQuery).mockReturnValue({
+        data: dataRef,
+        isPending: ref(false),
+        error: ref(null),
+        refetch: vi.fn(),
+        fetchNextPage: vi.fn(),
+        hasNextPage: ref(false),
+        isFetchingNextPage: ref(false),
+      } as any);
+
+      const { conversations } = useDmConversations();
+
+      expect(conversations.value).toHaveLength(2);
+      expect(conversations.value[0].id).toBe('c2');
+      expect(conversations.value[1].id).toBe('c1');
+    });
+
+    it('handles empty data in sortedConversations', () => {
+      vi.mocked(useInfiniteQuery).mockReturnValue({
+        data: ref(undefined), // null data
+        isPending: ref(false),
+        error: ref(null),
+        refetch: vi.fn(),
+        fetchNextPage: vi.fn(),
+        hasNextPage: ref(false),
+        isFetchingNextPage: ref(false),
+      } as any);
+
+      const { conversations } = useDmConversations();
+      expect(conversations.value).toEqual([]);
+    });
+
+    it('handles sorting with missing lastMessage/sentAt', () => {
+      const dataRef = ref({
+        pages: [
+          {
+            data: [
+              { id: 'c1', lastMessage: null },
+              { id: 'c2', lastMessage: { sentAt: '2023-01-02' } },
+              { id: 'c3', lastMessage: { sentAt: null } },
+            ],
+          },
+        ],
+      });
+
+      vi.mocked(useInfiniteQuery).mockReturnValue({
+        data: dataRef,
+        isPending: ref(false),
+        error: ref(null),
+        refetch: vi.fn(),
+        fetchNextPage: vi.fn(),
+        hasNextPage: ref(false),
+        isFetchingNextPage: ref(false),
+      } as any);
+
+      const { conversations } = useDmConversations();
+      expect(conversations.value[0].id).toBe('c1');
+    });
   });
 });
