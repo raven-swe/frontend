@@ -136,7 +136,7 @@ const handleEmojiSelect = (emoji: EmojiSelectEvent) => {
       <UiButton
         variant="tweet-icon-blue"
         :title="$t('tweet.composer.media')"
-        class="media-btn text-brand-blue"
+        class="media-btn text-primary"
         size="icon-md"
         :disabled="!canAddMedia"
         @click="handleMediaClick"
@@ -146,7 +146,7 @@ const handleEmojiSelect = (emoji: EmojiSelectEvent) => {
       <UiButton
         variant="tweet-icon-blue"
         :title="$t('tweet.composer.gif')"
-        class="text-brand-blue"
+        class="text-primary"
         size="icon-md"
         :disabled="!canAddMedia"
         @click="handleGifClick"
@@ -159,7 +159,7 @@ const handleEmojiSelect = (emoji: EmojiSelectEvent) => {
           <UiButton
             variant="tweet-icon-blue"
             :title="$t('tweet.composer.emoji')"
-            class="text-brand-blue"
+            class="text-primary"
             size="icon-md"
           >
             <Icon name="heroicons:face-smile" size="20" />

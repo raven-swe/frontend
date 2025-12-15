@@ -27,8 +27,15 @@ definePageMeta({ layout: 'settings' });
         :title="$t('setting.mute-and-block.title')"
         :subtitle="$t('setting.mute-and-block.description')"
         to="/settings/mute-and-block"
-        data-cy="mutes-blocks-settings-btn"
+        data-cy="mutes-and-blocks-settings-btn"
         icon="lucide:volume-off"
+      />
+      <SettingsItem
+        :title="$t('setting.content-you-see.title')"
+        :subtitle="$t('setting.content-you-see.description')"
+        to="/settings/content-you-see"
+        data-cy="content-you-see-settings-btn"
+        icon="lucide:newspaper"
       />
     </div>
   </div>

@@ -38,11 +38,10 @@ const deleteFromHistory = (event: Event) => {
 
       <UiButton
         variant="ghost-primary"
-        size="icon-xs"
-        class="absolute inset-2"
+        class="text-primary mb-2 flex-shrink-0 px-4 text-sm"
         @click.prevent.stop="deleteFromHistory"
       >
-        <Icon name="lucide:x" />
+        <Icon name="lucide:x" size="20" />
       </UiButton>
     </div>
   </NuxtLink>

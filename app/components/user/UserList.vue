@@ -45,9 +45,6 @@ const {
 });
 
 const users = computed(() => usersPaginated.value?.pages.flatMap((page) => page.data) || []);
-const { mutate: followUser } = useFollowMutation();
-const { mutate: blockUser } = useBlockMutation();
-const { mutate: muteUser } = useMuteMutation();
 
 //  Virtualization setup
 const parentRef = ref<HTMLElement | null>(null);
@@ -122,20 +119,6 @@ watchEffect(() => {
                 :user="users[virtualRow.index]!"
                 :show-dropdown="showDropdown"
                 :primary-action="primaryAction"
-                @follow="
-                  followUser({ username: users[virtualRow.index]!.username, action: 'follow' })
-                "
-                @unfollow="
-                  followUser({ username: users[virtualRow.index]!.username, action: 'unfollow' })
-                "
-                @block="blockUser({ username: users[virtualRow.index]!.username, action: 'block' })"
-                @mute="muteUser({ username: users[virtualRow.index]!.username, action: 'mute' })"
-                @unblock="
-                  blockUser({ username: users[virtualRow.index]!.username, action: 'unblock' })
-                "
-                @unmute="
-                  muteUser({ username: users[virtualRow.index]!.username, action: 'unmute' })
-                "
               />
             </div>
           </div>
@@ -150,7 +133,7 @@ watchEffect(() => {
     </ClientOnly>
     <div
       v-if="!isLoading && users.length === 0"
-      class="mx-auto my-10 max-w-90 px-8 text-start break-words"
+      class="wrap-break-words mx-auto my-10 max-w-90 px-8 text-start"
     >
       <h2 class="text-[2rem] leading-tight font-black">
         {{ emptyTitle }}

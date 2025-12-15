@@ -2,16 +2,12 @@
 import { loginService } from '~/services/auth/loginService';
 import { useQueryClient } from '@tanstack/vue-query';
 import { ref } from 'vue';
-import { useI18n } from '#imports';
-import { useTheme } from '~/composables/useTheme';
 import Avatar from '~/components/ui/Avatar.vue';
 import PostTweetDialog from '~/components/tweet/composer/PostTweetDialog.vue';
 
 const dmUnseenCount = inject<Ref<number>>('dmUnseenCount', ref(0));
 const notificationUnseenCount = inject<Ref<number>>('unseenNotificationsCount', ref(0));
 
-const { locale, setLocale } = useI18n();
-const { mode, toggleTheme } = useTheme();
 const showPostDialog = ref(false);
 
 const userStore = useUserStore();
@@ -19,21 +15,10 @@ const queryClient = useQueryClient();
 
 const handleLogout = async () => {
   await loginService.logout();
-  await queryClient.clear();
-};
-
-const lang = ref(locale.value);
-
-const switchLanguage = () => {
-  setLocale(lang.value);
-
-  if (lang.value === 'en-US') {
-    lang.value = 'ar-EG';
-  } else {
-    lang.value = 'en-US';
-  }
+  queryClient.clear();
 };
 </script>
+
 <template>
   <div class="flex h-screen flex-col items-center xl:items-start">
     <div class="my-2 w-min p-2 hover:rounded-full">
@@ -78,17 +63,6 @@ const switchLanguage = () => {
           <Icon name="mingcute:quill-pen-ai-line" size="28" />
         </div>
         <p class="mx-6 hidden text-xl font-extrabold xl:block">{{ $t('ui.post') }}</p>
-      </UiButton>
-      <UiButton variant="ghost-default" size="icon-xl" @click="switchLanguage">
-        <Icon name="material-symbols:language" size="24" />
-      </UiButton>
-      <UiButton variant="ghost-default" size="icon-xl" @click="toggleTheme">
-        <Icon
-          :name="
-            mode === 'dark' ? 'material-symbols:light-mode-outline' : 'material-symbols:nightlight'
-          "
-          size="24"
-        />
       </UiButton>
     </div>
     <div class="flex w-full flex-grow p-2 pb-4">

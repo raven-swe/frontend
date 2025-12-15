@@ -1,58 +1,27 @@
 <script lang="ts" setup>
-import { useQueryClient, type InfiniteData } from '@tanstack/vue-query';
-import { deleteTweet } from '~/services/tweet/actionButtonsService';
-import { showToaster } from '~/utils/showToaster';
+import { useTweetDeleteMutation } from '~/composables/tweet/useTweetMutation';
 import type { Tweet } from '~~/shared/types/tweets';
 
-const props = defineProps<{
-  tweet: Tweet;
-  username: string;
-}>();
+const props = withDefaults(
+  defineProps<{
+    tweet: Tweet;
+    username: string;
+    inTweetView?: boolean;
+  }>(),
+  {
+    inTweetView: false,
+  },
+);
 
-const queryClient = useQueryClient();
+const { mutate: deleteTweet } = useTweetDeleteMutation();
+const router = useRouter();
 
-interface TweetPage {
-  data: Tweet[];
-  [key: string]: unknown;
-}
-
-function removeTweetFromInfiniteData(
-  data: InfiniteData<TweetPage> | undefined,
-  tweetId: string,
-): InfiniteData<TweetPage> | undefined {
-  if (!data || !data.pages) return data;
-  return {
-    ...data,
-    pages: data.pages.map((page) => ({
-      ...page,
-      data: page.data.filter((t: Tweet) => t.id !== tweetId),
-    })),
-  };
-}
-
-async function handleDelete() {
-  try {
-    await deleteTweet(props.tweet.id);
-    showToaster('success', $t('tweet.delete-success'));
-
-    const queryKeys = [
-      ['for-you'],
-      ['following'],
-      ['profile', props.tweet.author.username, 'tweets'],
-      ['profile', props.tweet.author.username, 'tweets-replies'],
-      ['profile', props.tweet.author.username, 'tweets-media'],
-      ['profile', props.tweet.author.username, 'tweets-likes'],
-    ];
-
-    queryKeys.forEach((key) => {
-      queryClient.setQueriesData<InfiniteData<TweetPage>>({ queryKey: key }, (oldData) =>
-        removeTweetFromInfiniteData(oldData, props.tweet.id),
-      );
-    });
-  } catch {
-    showToaster('error', $t('tweet.delete-error'));
+const handleDeleteTweet = () => {
+  deleteTweet({ tweetId: props.tweet.id });
+  if (props.inTweetView) {
+    router.back();
   }
-}
+};
 </script>
 <template>
   <UiAlertDialog>
@@ -95,7 +64,7 @@ async function handleDelete() {
         <UiAlertDialogAction
           class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           data-cy="tweet-delete-confirm-button"
-          @click="handleDelete"
+          @click="handleDeleteTweet"
         >
           {{ $t('ui.delete') }}
         </UiAlertDialogAction>

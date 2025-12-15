@@ -57,7 +57,12 @@ watch(
         :rank="index"
       />
     </div>
-    <div v-else data-test="no-results" class="mx-auto my-10 max-w-90 px-8 text-start break-words">
+    <div
+      v-else
+      data-test="no-results"
+      class="mx-auto my-10 max-w-90 px-8 text-start break-words"
+      data-cy="no-trending-hashtags"
+    >
       <p class="text-[2rem] leading-tight font-black">{{ $t('explore.no-trending-hashtags') }}</p>
     </div>
   </div>

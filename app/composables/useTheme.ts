@@ -1,30 +1,30 @@
-import { ref, watchEffect, onMounted } from 'vue';
-
-const mode = ref<'light' | 'dark'>('light');
-
 export function useTheme() {
-  const toggleTheme = () => {
-    mode.value = mode.value === 'light' ? 'dark' : 'light';
-    if (import.meta.client) {
-      localStorage.setItem('theme', mode.value);
-    }
-  };
-
-  onMounted(() => {
-    if (import.meta.client) {
-      const saved = localStorage.getItem('theme');
-      if (saved === 'dark' || saved === 'light') {
-        mode.value = saved;
-      }
-
-      const html = document.documentElement;
-      html.classList.toggle('dark', mode.value === 'dark');
-
-      watchEffect(() => {
-        html.classList.toggle('dark', mode.value === 'dark');
-      });
-    }
+  const themeCookie = useCookie('theme-mode', {
+    maxAge: 60 * 60 * 24 * 365, // 1 year
+    default: () => 'light',
   });
 
-  return { mode, toggleTheme };
+  const primaryCookie = useCookie('theme-primary', {
+    maxAge: 60 * 60 * 24 * 365,
+    default: () => '#1d9bf0',
+  });
+
+  const setTheme = (mode: 'light' | 'dark') => {
+    themeCookie.value = mode;
+  };
+
+  const setPrimary = (color: string) => {
+    primaryCookie.value = color;
+  };
+
+  useHead(() => ({
+    htmlAttrs: {
+      class: themeCookie.value === 'dark' ? 'dark' : '',
+      style: {
+        '--primary': primaryCookie.value,
+      },
+    },
+  }));
+
+  return { themeCookie, setTheme, primaryCookie, setPrimary };
 }

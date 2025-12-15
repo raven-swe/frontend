@@ -80,12 +80,12 @@ describe('ReplyTweetDialog', () => {
 
     const card = wrapper.findComponent(TweetDefaultCard);
     expect(card.exists()).toBe(true);
-    expect(card.props('tweet')).toEqual(mockReplyTweet);
+    expect(card.props('tweetId')).toEqual(mockReplyTweet.id);
     expect(card.props('isRoot')).toBe(true);
     expect(card.props('noActions')).toBe(true);
   });
 
-  it('emits update:open=false and reply-success when a reply is posted', async () => {
+  it('emits update:open=false when a reply is posted', async () => {
     const wrapper = await mountSuspended(ReplyDialog, {
       props: {
         open: true,
@@ -98,10 +98,7 @@ describe('ReplyTweetDialog', () => {
 
     const composer = wrapper.findComponent(TweetComposer);
     const newReply = { id: 'new-reply' } as unknown as Tweet;
-    await composer.vm.$emit('posted', newReply);
-
-    expect(wrapper.emitted('reply-success')).toBeTruthy();
-    expect(wrapper.emitted('reply-success')?.[0]).toEqual([newReply]);
+    await composer.vm.$emit('post-success', newReply);
 
     expect(wrapper.emitted('update:open')).toBeTruthy();
     expect(wrapper.emitted('update:open')?.[0]).toEqual([false]);

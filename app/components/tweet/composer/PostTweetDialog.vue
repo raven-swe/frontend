@@ -22,7 +22,7 @@ const localOpen = computed({
 <template>
   <UiDialog v-model:open="localOpen">
     <UiDialogContent class="h-auto max-w-lg p-0" content-height="h-auto max-h-[95vh]">
-      <TweetComposer @posted="onPostSuccess"> </TweetComposer>
+      <TweetComposer @post-success="onPostSuccess" />
     </UiDialogContent>
   </UiDialog>
 </template>

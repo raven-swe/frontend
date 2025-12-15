@@ -152,6 +152,7 @@ describe('NotificationsMentionsPage', () => {
   });
 
   it('calls markAllSeen and clears unseenNotificationsCount when there are unseen items', async () => {
+    vi.useFakeTimers();
     const markAllSeen = vi.fn();
     const { useNotificationsList } = await import('~/composables/useNotificationsList');
     const testNotifications = [
@@ -183,8 +184,11 @@ describe('NotificationsMentionsPage', () => {
     // allow lifecycle to run
     await wrapper.vm.$nextTick();
 
+    vi.advanceTimersByTime(600);
+
     expect(markAllSeen).toHaveBeenCalled();
     expect(unseenRef.value).toBe(0);
+    vi.useRealTimers();
   });
 
   it('passes correct props to QuoteMention', async () => {

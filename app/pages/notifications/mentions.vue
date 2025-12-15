@@ -30,13 +30,18 @@ const {
 
 const { mutate: followUser } = useFollowMutation();
 
-onMounted(() => {
-  const hasUnseen = notifications.value.some((n) => !n.isSeen);
-  if (hasUnseen) {
-    markAllSeen();
-    unseenNotificationsCount.value = 0;
-  }
-});
+watch(
+  () => notifications.value.some((n) => !n.isSeen),
+  (hasUnseen) => {
+    if (hasUnseen) {
+      setTimeout(() => {
+        markAllSeen();
+        unseenNotificationsCount.value = 0;
+      }, 600);
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <template>

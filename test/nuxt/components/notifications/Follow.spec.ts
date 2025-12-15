@@ -1,33 +1,43 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { mountSuspended } from '@nuxt/test-utils/runtime';
-import { createI18n } from 'vue-i18n';
-import messages from '~~/i18n/locales/en.json' assert { type: 'json' };
-
 import Follow from '@/components/notifications/Follow.vue';
 
-const i18n = createI18n({
-  locale: 'en',
-  messages: {
-    en: messages,
-  },
-});
-
 const mockActor = { username: 'actor1', avatarUrl: '/actor.jpg' };
+
+const mockUser = {
+  username: 'currentUser',
+};
+
+vi.mock('@/stores/user', () => ({
+  useUserStore: () => ({
+    user: mockUser,
+  }),
+}));
 
 describe('notifications/Follow.vue', () => {
   it('passes correct props to NotificationsBase', async () => {
     const wrapper = await mountSuspended(Follow, {
       props: {
         timestamp: '2025-02-02T00:00:00Z',
-        actor: mockActor,
+        actors: [mockActor],
+        totalActorsCount: 1,
         isSeen: false,
       },
       global: {
-        plugins: [i18n],
         stubs: {
           NotificationsBase: {
             name: 'NotificationsBase',
-            props: ['type', 'message', 'timestamp', 'icon', 'actor', 'linkTo', 'isSeen'],
+            props: [
+              'messageKey',
+              'messagePluralIndex',
+              'messageParams',
+              'displayActors',
+              'timestamp',
+              'icon',
+              'actors',
+              'linkTo',
+              'isSeen',
+            ],
             template: '<div />',
           },
         },
@@ -38,27 +48,39 @@ describe('notifications/Follow.vue', () => {
     expect(nb.exists()).toBe(true);
 
     const nbProps = nb.props();
-    const expectedMessage = i18n.global.t('notifications.message.follow') as string;
-    expect(nbProps.type).toBe('FOLLOW');
-    expect(nbProps.message).toBe(expectedMessage);
+    expect(nbProps.messageKey).toBe('notifications.message.follow');
     expect(nbProps.timestamp).toBe('2025-02-02T00:00:00Z');
     expect(nbProps.icon).toBeDefined();
     expect(nbProps.icon.name).toBe('lucide:user-plus');
     expect(nbProps.icon.color).toBe('text-brand-blue');
-    expect(nbProps.actor).toEqual(mockActor);
-    expect(nbProps.linkTo).toBe(`/profile/${mockActor.username}`);
+    expect(nbProps.actors).toEqual([mockActor]);
+    expect(nbProps.linkTo).toBe(`/profile/${mockUser.username}/followers`);
     expect(nbProps.isSeen).toBe(false);
   });
 
   it('forwards isSeen=true to NotificationsBase', async () => {
     const wrapper = await mountSuspended(Follow, {
-      props: { timestamp: 't', actor: mockActor, isSeen: true },
+      props: {
+        timestamp: 't',
+        actors: [mockActor],
+        totalActorsCount: 1,
+        isSeen: true,
+      },
       global: {
-        plugins: [i18n],
         stubs: {
           NotificationsBase: {
             name: 'NotificationsBase',
-            props: ['type', 'message', 'timestamp', 'icon', 'actor', 'linkTo', 'isSeen'],
+            props: [
+              'messageKey',
+              'messagePluralIndex',
+              'messageParams',
+              'displayActors',
+              'timestamp',
+              'icon',
+              'actors',
+              'linkTo',
+              'isSeen',
+            ],
             template: '<div />',
           },
         },

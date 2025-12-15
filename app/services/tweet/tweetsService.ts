@@ -14,13 +14,24 @@ export const tweetsService = {
     return await apiFetch(`/api/tweets/${tweetId}`);
   },
 
-  async replies(tweetId: string, timeline: timelineSchema) {
-    return await apiFetch(`/api/tweets/${tweetId}/replies`, {
+  replies: async ({
+    tweetid,
+    cursor,
+    limit,
+    signal,
+  }: {
+    tweetid: string;
+    cursor: string | null;
+    limit?: number;
+    signal?: AbortSignal;
+  }) => {
+    return await apiFetch(`/api/tweets/${tweetid}/replies`, {
       method: 'GET',
       query: {
-        limit: timeline.limit,
-        cursor: timeline.cursor ?? undefined,
+        cursor,
+        limit: (limit ?? DEFAULT_PAGE_SIZE).toString(),
       },
+      signal,
     });
   },
 

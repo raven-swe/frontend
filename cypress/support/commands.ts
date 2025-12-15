@@ -258,6 +258,23 @@ Cypress.Commands.add(
   },
 );
 
+Cypress.Commands.add('changeUsername', (newUsername: string, useSlave = false) => {
+  const tokenCookie = useSlave ? 'external_access_token' : 'access_token';
+  cy.getCookie(tokenCookie).then((cookie) => {
+    cy.request({
+      method: 'PATCH',
+      url: `${Cypress.env('API_URL')}/me/settings/username`,
+      headers: {
+        Authorization: `Bearer ${cookie?.value}`,
+      },
+      body: {
+        newUsername: newUsername,
+      },
+    }).as('changeUsernameRequest');
+    cy.get('@changeUsernameRequest').its('status').should('be.oneOf', [200, 201]);
+  });
+});
+
 //
 // -- This is a parent command --
 // Cypress.Commands.add('login', (email, password) => { ... })

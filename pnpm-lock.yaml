@@ -83,6 +83,9 @@ importers:
       tailwindcss:
         specifier: ^4.1.14
         version: 4.1.14
+      textarea-caret:
+        specifier: ^3.1.0
+        version: 3.1.0
       tw-animate-css:
         specifier: ^1.4.0
         version: 1.4.0
@@ -6037,6 +6040,9 @@ packages:
 
   text-decoder@1.2.3:
     resolution: {integrity: sha512-3/o9z3X0X0fTupwsYvR03pJ/DjWuqqrfwBgTQzdWDiQSm9KitAyz/9WqsT2JQW7KV2m+bC2ol/zqpW37NHxLaA==}
+
+  textarea-caret@3.1.0:
+    resolution: {integrity: sha512-cXAvzO9pP5CGa6NKx0WYHl+8CHKZs8byMkt3PCJBCmq2a34YA9pO1NrQET5pzeqnBjBdToF5No4rrmkDUgQC2Q==}
 
   throttleit@1.0.1:
     resolution: {integrity: sha512-vDZpf9Chs9mAdfY046mcPt8fg5QSZr37hEH4TXYBnDF+izxgrbRGUAAaBvIk/fJm9aOFCGFd1EsNg5AZCbnQCQ==}
@@ -13393,6 +13399,8 @@ snapshots:
       b4a: 1.7.3
     transitivePeerDependencies:
       - react-native-b4a
+
+  textarea-caret@3.1.0: {}
 
   throttleit@1.0.1: {}
 
