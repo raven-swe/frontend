@@ -130,7 +130,7 @@ describe('Search latest.vue', () => {
       },
     });
 
-    const heading = wrapper.find('p.text-\\[2rem\\]');
+    const heading = wrapper.find('h2.text-\\[2rem\\]');
     expect(heading.exists()).toBe(true);
     expect(heading.text()).toContain('test');
   });
@@ -153,7 +153,7 @@ describe('Search latest.vue', () => {
     expect(calls[0]?.[0]).toMatchObject({
       query: 'javascript',
       tab: 'latest',
-      pagination: { limit: 10, cursor: null },
+      pagination: { cursor: null },
     });
   });
 
