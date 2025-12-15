@@ -356,10 +356,10 @@
     "no-notifications": "No notifications yet",
     "no-mentions": "No mentions yet",
     "message": {
-      "follow": "{user1} started following you | {user1} and {user2} started following you | {user1}, {user2}, and {user3} started following you | {user1}, {user2}, and {count} others started following you",
-      "like": "{user1} liked your post | {user1} and {user2} liked your post | {user1}, {user2}, and {user3} liked your post | {user1}, {user2}, {user3} and {count} others liked your post",
+      "follow": "{user1} started following you | {user1} and {user2} started following you | {user1}, {user2}, and {user3} started following you | {user1}, {user2}, and {others} others started following you",
+      "like": "{user1} liked your post | {user1} and {user2} liked your post | {user1}, {user2}, and {user3} liked your post | {user1}, {user2}, {user3} and {others} others liked your post",
       "reply": "{user1} replied to your post",
-      "repost": "{user1} reposted your post | {user1} and {user2} reposted your post | {user1}, {user2}, and {user3} reposted your post | {user1}, {user2}, and {count} others reposted your post"
+      "repost": "{user1} reposted your post | {user1} and {user2} reposted your post | {user1}, {user2}, and {user3} reposted your post | {user1}, {user2}, and {others} others reposted your post"
     }
   },
   "ui": {
