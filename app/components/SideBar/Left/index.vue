@@ -20,13 +20,11 @@ const handleLogout = async () => {
 </script>
 
 <template>
-  <div class="flex h-screen flex-col items-center xl:items-start">
-    <div class="my-2 w-min p-2 hover:rounded-full">
-      <NuxtLink to="/">
-        <LogoRaven class="h-14 w-14" />
-      </NuxtLink>
-    </div>
-    <div class="mt-2 flex flex-col items-center space-y-3 xl:items-start">
+  <div class="flex h-screen flex-col items-start gap-2 px-2 pt-1">
+    <NuxtLink to="/" class="size-12">
+      <LogoRaven />
+    </NuxtLink>
+    <div class="flex w-full flex-col items-center xl:items-start">
       <SideBarLeftTab :tab="{ label: 'home', icon: 'home', route: '/home' }"></SideBarLeftTab>
       <SideBarLeftTab
         :tab="{ label: 'explore', icon: 'search', route: '/explore' }"
@@ -58,36 +56,42 @@ const handleLogout = async () => {
         :tab="{ label: 'settings', icon: 'settings', route: '/settings' }"
         data-cy="sidebar-settings-btn"
       ></SideBarLeftTab>
-      <UiButton class="mx-2 xl:w-auto" variant="default" size="lg" @click="showPostDialog = true">
-        <div class="relative flex h-8 w-8 items-center justify-center">
-          <Icon name="mingcute:quill-pen-ai-line" size="28" />
-        </div>
-        <p class="mx-6 hidden text-xl font-extrabold xl:block">{{ $t('ui.post') }}</p>
-      </UiButton>
+      <div class="w-full xl:pe-8">
+        <UiButton
+          variant="default"
+          data-cy="sidebar-post-btn"
+          class="my-2 h-12.5 w-12.5 shrink-0 transition-[width] xl:w-full"
+          @click="showPostDialog = true"
+        >
+          <p class="flex xl:hidden">
+            <Icon name="mingcute:quill-pen-ai-line" size="1.6rem" class="shrink-0" />
+          </p>
+          <p class="mx-6 hidden text-xl font-extrabold xl:block">{{ $t('ui.post') }}</p>
+        </UiButton>
+      </div>
     </div>
-    <div class="flex w-full flex-grow p-2 pb-4">
+    <div class="flex w-full flex-grow pb-2">
       <UiAlertDialog>
         <UiDropdownMenu>
           <UiDropdownMenuTrigger as-child>
             <UiButton
               variant="ghost-default"
-              size="2xl"
-              class="mx-auto mt-auto overflow-hidden xl:w-full"
+              class="mx-auto mt-auto flex !size-12.5 h-fit w-full items-center justify-center gap-0 overflow-hidden p-0 xl:!h-auto xl:!w-full xl:gap-2 xl:!p-3"
               data-cy="logout-btn-trigger"
             >
-              <div class="flex w-full items-center gap-3">
-                <Avatar
-                  :img="userStore.user?.avatarUrl || ''"
-                  :alt="userStore.user?.displayName || 'User Avatar'"
-                  size="sm"
-                />
-                <div class="hidden flex-col overflow-hidden text-start xl:flex">
+              <Avatar
+                :img="userStore.user?.avatarUrl || ''"
+                :alt="userStore.user?.displayName || 'User Avatar'"
+                size="sm"
+              />
+              <div class="hidden w-full items-center gap-3 xl:flex">
+                <div class="flex flex-col overflow-hidden text-start">
                   <p class="truncate">{{ userStore.user?.displayName || 'User' }}</p>
                   <p class="text-muted-foreground text-sm">
                     {{ '@' + (userStore.user?.username || 'username') }}
                   </p>
                 </div>
-                <div class="ms-auto hidden xl:flex">
+                <div class="ms-auto flex">
                   <Icon name="lucide:more-horizontal" class="pe-2" />
                 </div>
               </div>
@@ -104,7 +108,7 @@ const handleLogout = async () => {
 
         <UiAlertDialogContent>
           <UiAlertDialogHeader>
-            <UiAlertDialogTitle>
+            <UiAlertDialogTitle data-test="logout-dialog-title">
               {{ $t('ui.logout.title') }}
             </UiAlertDialogTitle>
             <UiAlertDialogDescription>

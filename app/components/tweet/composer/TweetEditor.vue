@@ -198,7 +198,7 @@ const handleKeydown = (e: KeyboardEvent) => {
   }
 };
 
-const selectUser = (user: CompactUser) => {
+const selectUser = (user: CompactUser | undefined) => {
   if (!textareaRef.value) return;
 
   const textarea = textareaRef.value;
@@ -228,7 +228,7 @@ const selectUser = (user: CompactUser) => {
 
   // Replace the entire current mention with the selected one + space
   const newText =
-    currentText.slice(0, startIndex) + '@' + user.username + ' ' + currentText.slice(endIndex);
+    currentText.slice(0, startIndex) + '@' + user?.username + ' ' + currentText.slice(endIndex);
 
   emit('update:modelValue', newText);
 
@@ -237,7 +237,7 @@ const selectUser = (user: CompactUser) => {
   // Place cursor after the inserted username and space
   nextTick(() => {
     textarea.focus();
-    const newCursorPos = startIndex + user.username.length + 2; // +1 for @, +1 for space
+    const newCursorPos = startIndex + (user?.username?.length ?? 0) + 2; // +1 for @, +1 for space
     textarea.setSelectionRange(newCursorPos, newCursorPos);
   });
 };
@@ -366,11 +366,11 @@ const debouncedMentions = useDebounceFn(async (mention) => {
       </div>
     </div>
     <slot name="reposted-tweet" />
-    <Popover :open="!!(mentionResults && mentionResults.length > 0 && isFocused)">
-      <PopoverTrigger as-child>
+    <UiPopover :open="!!(mentionResults && mentionResults.length > 0 && isFocused)">
+      <UiPopoverTrigger as-child>
         <div class="hidden" />
-      </PopoverTrigger>
-      <PopoverContent
+      </UiPopoverTrigger>
+      <UiPopoverContent
         :style="{
           position: 'absolute',
           top: showAbove ? 'auto' : `${dropdownPosition.top + 20}px`,
@@ -391,7 +391,7 @@ const debouncedMentions = useDebounceFn(async (mention) => {
             <SearchUserCard :user="user" @click="selectUser(user)" />
           </div>
         </UiSearchList>
-      </PopoverContent>
-    </Popover>
+      </UiPopoverContent>
+    </UiPopover>
   </div>
 </template>

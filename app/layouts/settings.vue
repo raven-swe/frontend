@@ -12,29 +12,33 @@ const isSettingsRoot = computed(() => {
   return path.endsWith('settings/') || path.endsWith('settings');
 });
 </script>
-
 <template>
-  <div class="bg-background flex min-h-screen justify-center overflow-hidden">
-    <div class="flex w-full max-w-7xl sm:justify-center">
+  <div class="bg-background flex min-h-screen justify-center">
+    <div class="bg-background flex min-h-screen w-full max-w-7xl justify-center">
       <!-- Left sidebar -->
-      <div class="w-16 flex-shrink-0 sm:w-16 md:w-24 xl:w-[306px]">
+      <div class="w-16.5 flex-shrink-0 duration-100 xl:w-70" data-cy="left-sidebar">
         <div class="sticky top-0">
           <SideBarLeft />
         </div>
       </div>
 
-      <!-- settings Section -->
+      <!-- Main content -->
       <div
-        class="h-full w-150 border-x lg:block lg:w-80 xl:w-96 2xl:w-112"
+        class="midd:!w-96 h-full w-150 border-x lg:block lg:w-80"
         :class="{ hidden: !isSettingsRoot }"
       >
         <SettingsSection />
       </div>
 
-      <!-- Setting content -->
       <div class="h-full w-150 border-x lg:block" :class="{ hidden: isSettingsRoot }">
-        <slot v-if="viewportIsLarge || !isSettingsRoot" />
+        <NuxtPage v-if="viewportIsLarge || !isSettingsRoot" />
       </div>
     </div>
   </div>
 </template>
+
+<style>
+body {
+  overflow-y: scroll;
+}
+</style>

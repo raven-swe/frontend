@@ -59,13 +59,13 @@ function handleSubmit() {
       isFocused ? 'border-primary shadow-accent shadow-md' : '',
     ]"
   >
-    <Icon size="1.3rem" name="ic:outline-search" class="text-muted-foreground" />
+    <Icon size="1.3rem" name="ic:outline-search" class="text-muted-foreground shrink-0" />
     <input
       ref="inputRef"
       :value="modelValue || ''"
       type="text"
       :placeholder="placeholderText"
-      class="flex-1 border-none bg-transparent outline-none"
+      class="w-full flex-1 border-none bg-transparent outline-none"
       data-cy="search-input"
       @input="handleInput"
       @focus="handleFocus"
@@ -77,6 +77,7 @@ function handleSubmit() {
       variant="ghost-default"
       size="icon-xs"
       data-cy="search-clear-button"
+      class="h-5 w-5"
       @click="
         emit('update:modelValue', '');
         isFocused = true;

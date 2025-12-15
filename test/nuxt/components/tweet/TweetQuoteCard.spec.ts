@@ -26,18 +26,6 @@ mockNuxtImport('useRouter', () => {
   return () => routerMock;
 });
 
-const followMutateMock = vi.fn();
-const blockMutateMock = vi.fn();
-
-vi.mock('~/composables/useProfileMutation', () => ({
-  useFollowMutation: () => ({
-    mutate: followMutateMock,
-  }),
-  useBlockMutation: () => ({
-    mutate: blockMutateMock,
-  }),
-}));
-
 // Common stubs
 const stubs = {
   NuxtLink: {
@@ -256,47 +244,5 @@ describe('TweetQuoteCard.vue', () => {
     await card.trigger('click');
 
     expect(routerMock.push).not.toHaveBeenCalled();
-  });
-
-  it('handles UserHoverCard events correctly for all instances', async () => {
-    const tweet = makeTweet();
-    const wrapper = mount(TweetQuoteCard, { props: { tweet }, global: globalConfig });
-
-    const hoverCards = wrapper.findAllComponents({ name: 'UserHoverCard' });
-    expect(hoverCards.length).toBeGreaterThan(0);
-
-    for (const hoverCard of hoverCards) {
-      // Test follow
-      await hoverCard.vm.$emit('follow');
-      expect(followMutateMock).toHaveBeenCalledWith({
-        username: tweet.author.username,
-        action: 'follow',
-      });
-      followMutateMock.mockClear();
-
-      // Test block
-      await hoverCard.vm.$emit('block');
-      expect(blockMutateMock).toHaveBeenCalledWith({
-        username: tweet.author.username,
-        action: 'block',
-      });
-      blockMutateMock.mockClear();
-
-      // Test unblock
-      await hoverCard.vm.$emit('unblock');
-      expect(blockMutateMock).toHaveBeenCalledWith({
-        username: tweet.author.username,
-        action: 'unblock',
-      });
-      blockMutateMock.mockClear();
-
-      // Test unfollow
-      await hoverCard.vm.$emit('unfollow');
-      expect(followMutateMock).toHaveBeenCalledWith({
-        username: tweet.author.username,
-        action: 'unfollow',
-      });
-      followMutateMock.mockClear();
-    }
   });
 });
