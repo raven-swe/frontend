@@ -32,23 +32,21 @@ const handleFollow = (action: 'follow' | 'unfollow') => {
 </script>
 <template>
   <div class="mx-4 -mt-16 flex items-center justify-between gap-4">
-    <div>
-      <UiAvatar
-        :img="user?.avatarUrl || ''"
-        alt="Profile picture"
-        size="xl"
-        data-cy="profile-avatar"
-        loading="eager"
-        class="outline-background outline-4"
-        data-testid="profile-avatar"
-        @click="isAvatarModalOpen = true"
-      />
-      <AvatarModal
-        v-if="isAvatarModalOpen"
-        :avatar-img="user?.avatarUrl"
-        @close="isAvatarModalOpen = false"
-      />
-    </div>
+    <UiAvatar
+      :img="user?.avatarUrl || ''"
+      alt="Profile picture"
+      size="xl"
+      data-cy="profile-avatar"
+      loading="eager"
+      class="outline-background outline-4"
+      data-testid="profile-avatar"
+      @click="isAvatarModalOpen = true"
+    />
+    <AvatarModal
+      v-if="isAvatarModalOpen"
+      :avatar-img="user?.avatarUrl"
+      @close="isAvatarModalOpen = false"
+    />
     <div
       v-if="!isCurrentUser"
       class="mt-15 flex items-center gap-2"

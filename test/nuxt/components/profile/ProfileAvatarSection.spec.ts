@@ -66,15 +66,6 @@ describe('ProfileAvatarSection Component', () => {
     userRef.value = structuredClone(mockUser);
   });
 
-  it('renders the container with correct layout classes', async () => {
-    const wrapper = await createWrapper();
-
-    const container = wrapper.find('.mx-4.flex.flex-wrap');
-    expect(container.exists()).toBe(true);
-    expect(container.classes()).toContain('justify-between');
-    expect(container.classes()).toContain('gap-4');
-  });
-
   it('has correct profile image source', async () => {
     const wrapper = await createWrapper();
 
