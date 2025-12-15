@@ -31,7 +31,7 @@ const handleFollow = (action: 'follow' | 'unfollow') => {
 };
 </script>
 <template>
-  <div class="mx-4 flex flex-wrap items-center justify-between gap-4">
+  <div class="mx-4 -mt-16 flex items-center justify-between gap-4">
     <div>
       <UiAvatar
         :img="user?.avatarUrl || ''"

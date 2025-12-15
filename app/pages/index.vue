@@ -32,7 +32,7 @@ const switchLanguage = () => {
 </script>
 
 <template>
-  <div class="bg-background flex h-screen w-screen flex-col">
+  <div class="bg-background flex h-screen w-screen flex-col overflow-hidden">
     <UiButton class="fixed start-5 top-5" size="icon-lg" @click="switchLanguage()">
       <Icon size="1.2rem" name="material-symbols:language" />
     </UiButton>
