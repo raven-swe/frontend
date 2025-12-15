@@ -6,7 +6,7 @@ import { settingSections } from '~/constants/settings-section';
     <h2 class="px-4 py-3 text-2xl font-bold">
       {{ $t('setting.settings') }}
     </h2>
-    <div class="mt-10 flex flex-col">
+    <div class="mt-3 flex flex-col">
       <NuxtLink
         v-for="settingSetion in settingSections"
         :key="settingSetion.route"
@@ -16,7 +16,7 @@ import { settingSections } from '~/constants/settings-section';
         active-class="border-e-primary bg-accent"
       >
         <div class="flex flex-col">
-          <span class="text-lg leading-tight font-medium">{{ $t(settingSetion.title) }}</span>
+          <span class="text-lg leading-tight">{{ $t(settingSetion.title) }}</span>
         </div>
         <Icon :name="$t('setting.item-icon')" size="1.2rem" class="text-muted-foreground" />
       </NuxtLink>

@@ -88,7 +88,7 @@ describe('ProfileInfo', () => {
     const displayName = wrapper.find('h2');
     expect(displayName.exists()).toBe(true);
     expect(displayName.text()).toBe('Test User');
-    expect(displayName.classes()).toContain('text-2xl');
+    expect(displayName.classes()).toContain('text-xl');
     expect(displayName.classes()).toContain('font-bold');
 
     const username = wrapper.find('p.text-md');

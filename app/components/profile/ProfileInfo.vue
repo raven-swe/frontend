@@ -31,7 +31,7 @@ const modifiedMutualUsers = computed(() => {
   <div class="my-2 flex flex-col" data-cy="profile-info">
     <div class="px-4">
       <h2
-        class="text-foreground wrap-break-words line-clamp-2 pb-0 text-2xl font-bold"
+        class="text-foreground wrap-break-words line-clamp-2 pb-0 text-xl font-bold"
         data-cy="profile-display-name"
       >
         {{ userProfile?.displayName }}

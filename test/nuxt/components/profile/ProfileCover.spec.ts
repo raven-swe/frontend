@@ -37,7 +37,7 @@ describe('ProfileCover Component', () => {
 
     const coverImage = wrapper.find('img');
     const classes = coverImage.classes();
-    expect(classes).toContain('h-48');
+    expect(classes).toContain('aspect-[3/1]');
     expect(classes).toContain('w-full');
     expect(classes).toContain('object-cover');
   });

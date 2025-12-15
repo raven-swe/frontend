@@ -144,13 +144,13 @@ onMounted(() => {
   <div class="relative flex w-full items-center gap-2 px-2 pt-2">
     <UiButton
       v-if="props.showBackOnFocus && isFocused"
-      variant="icon"
-      size="icon"
+      variant="ghost-default"
+      size="icon-lg"
       @click="isFocused = false"
     >
-      <Icon class="mx-3" :name="$t('icons.back-button-icon')" size="1.3rem" />
+      <Icon :name="$t('icons.back-button-icon')" size="1.3rem" />
     </UiButton>
-    <div class="relative flex-1">
+    <div class="relative w-full flex-1">
       <UiSearchBar
         v-model="searchQuery"
         v-model:is-focused="isFocused"

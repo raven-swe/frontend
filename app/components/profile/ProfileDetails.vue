@@ -6,7 +6,7 @@ const userProfile = inject<ComputedRef<User>>('user-data');
 <template>
   <div>
     <ProfileCover :cover-img="userProfile?.bannerUrl ?? ''" />
-    <ProfileAvatarSection class="-mt-16" />
+    <ProfileAvatarSection />
     <ProfileInfo />
   </div>
 </template>
