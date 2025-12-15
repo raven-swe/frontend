@@ -183,3 +183,32 @@ export function useCategorizedTweet() {
     structuralSharing: false,
   });
 }
+
+export function useTweetQuotes(tweetId: MaybeRefOrGetter<string | undefined>) {
+  const queryClient = useQueryClient();
+  return useInfiniteQuery({
+    enabled: computed(() => !!toValue(tweetId)),
+    queryKey: computed(() => tweetKeys.quoteList(toValue(tweetId) ?? '')),
+    initialPageParam: null as string | null,
+    queryFn: async ({ pageParam = null, signal }) => {
+      const tweetIdVal = toValue(tweetId);
+      if (!tweetIdVal) throw new Error('Tweet ID is undefined');
+      const res = await tweetsService.quotes({
+        tweetid: tweetIdVal,
+        cursor: pageParam,
+        signal,
+      });
+
+      // Update the tweet cache
+      updateCacheWithTweets(res.data, queryClient);
+      const ids = mapTweetsToIds(res.data);
+      return {
+        ...res,
+        data: ids,
+      };
+    },
+    getNextPageParam: (lastPage) =>
+      lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined,
+    structuralSharing: false,
+  });
+}
