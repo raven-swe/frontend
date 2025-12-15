@@ -9,7 +9,7 @@ useMyProfileQuery();
     <div class="bg-background flex min-h-screen w-full max-w-7xl justify-center">
       <!-- Left sidebar -->
       <div class="w-16.5 flex-shrink-0 duration-100 xl:w-70" data-cy="left-sidebar">
-        <div class="top-0 sm:sticky">
+        <div class="sticky top-0">
           <SideBarLeft />
         </div>
       </div>
