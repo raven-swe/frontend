@@ -38,11 +38,11 @@ const deleteFromHistory = (event: Event) => {
 
       <UiButton
         variant="ghost-primary"
-        size="icon-xs"
-        class="absolute inset-2"
+        size="icon-md"
+        class="text-primary"
         @click.prevent.stop="deleteFromHistory"
       >
-        <Icon name="lucide:x" />
+        <Icon name="lucide:x" size="1rem" />
       </UiButton>
     </div>
   </NuxtLink>
@@ -61,10 +61,11 @@ const deleteFromHistory = (event: Event) => {
       </div>
       <UiButton
         variant="ghost-primary"
-        class="text-primary mb-2 flex-shrink-0 px-4 text-sm"
+        size="icon-md"
+        class="text-primary"
         @click.prevent.stop="deleteFromHistory"
       >
-        <Icon name="lucide:x" size="20" />
+        <Icon name="lucide:x" size="1rem" />
       </UiButton>
     </div>
   </NuxtLink>
