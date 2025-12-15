@@ -504,6 +504,16 @@
   },
   "setting": {
     "settings": "الإعدادات",
+    "display": {
+      "title": "إعدادات العرض",
+      "description": "قم بتخصيص مظهر Raven ليناسب تفضيلاتك.",
+      "color": "لون الموضوع",
+      "theme": "الوضع",
+      "background": "خلفية",
+      "language": "اللغة",
+      "default": "افتراضي النظام",
+      "lights-out": "إطفاء الأنوار"
+    },
     "change-password-subtitle": "قم بتغيير كلمة المرور الخاصة بك في أي وقت",
     "change-password": "تغيير كلمة المرور",
     "email": "البريد الإلكتروني",

@@ -564,6 +564,15 @@
       "title": "Privacy and safety",
       "description": "Manage what information you see and share on Raven."
     },
+    "display": {
+      "title": "Display",
+      "description": "Adjust the font languae, color, and background of your Raven experience.",
+      "color": "Color",
+      "background": "Background",
+      "language": "Language",
+      "default": "Default",
+      "lights-out": "Lights out"
+    },
     "mute-and-block": {
       "title": "Mute and block",
       "description": "Manage your muted and blocked accounts."

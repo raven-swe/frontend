@@ -1,6 +1,7 @@
 import { ref, watchEffect, onMounted } from 'vue';
 
 const mode = ref<'light' | 'dark'>('light');
+const primary = ref<string>('#1d9bf0');
 
 export function useTheme() {
   const toggleTheme = () => {
@@ -10,11 +11,25 @@ export function useTheme() {
     }
   };
 
+  const setPrimary = (color: string) => {
+    primary.value = color;
+    if (import.meta.client) {
+      localStorage.setItem('theme-primary', color);
+    }
+    document.documentElement.style.setProperty('--primary', color);
+  };
+
   onMounted(() => {
     if (import.meta.client) {
       const saved = localStorage.getItem('theme');
       if (saved === 'dark' || saved === 'light') {
         mode.value = saved;
+      }
+
+      const savedPrimary = localStorage.getItem('theme-primary');
+      if (savedPrimary) {
+        primary.value = savedPrimary;
+        document.documentElement.style.setProperty('--primary', savedPrimary);
       }
 
       const html = document.documentElement;
@@ -26,5 +41,11 @@ export function useTheme() {
     }
   });
 
-  return { mode, toggleTheme };
+  if (import.meta.client) {
+    watchEffect(() => {
+      document.documentElement.style.setProperty('--primary', primary.value);
+    });
+  }
+
+  return { mode, toggleTheme, primary, setPrimary };
 }
