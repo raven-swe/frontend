@@ -133,7 +133,7 @@ describe('ProfileInfo', () => {
       },
     });
 
-    const link = wrapper.find('a.text-brand-blue');
+    const link = wrapper.find('a.text-primary');
     expect(link.exists()).toBe(true);
     expect(link.attributes('href')).toBe('https://averylongwebsiteurl.com/some/really/long/path');
     expect(link.attributes('target')).toBe('_blank');
@@ -155,7 +155,7 @@ describe('ProfileInfo', () => {
       },
     });
 
-    const link = wrapper.find('a.text-brand-blue');
+    const link = wrapper.find('a.text-primary');
     expect(link.exists()).toBe(true);
     expect(link.text()).toContain('example.com');
     expect(link.text()).not.toContain('...');
