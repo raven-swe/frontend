@@ -14,6 +14,7 @@ export const tweetKeys = {
     [...tweetKeys.all, 'search', query, tab, filter, excludeMuteBlock] as const, // ['tweets','search',query,tab,filter,people]
 
   replyList: (tweetId: string) => [...tweetKeys.all, 'replies', tweetId] as const, // ['tweets','replies',tweetId]
+  quoteList: (tweetId: string) => [...tweetKeys.all, 'quotes', tweetId] as const, // ['tweets','quotes',tweetId]
 
   profileTab: (username: string, tab: 'tweets' | 'replies' | 'likes' | 'media') =>
     [...tweetKeys.all, 'profile', username, tab] as const, // ['tweets','profile',username,tab]

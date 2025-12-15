@@ -5,10 +5,9 @@ import TweetEditor from './TweetEditor.vue';
 import Toolbar from './Toolbar.vue';
 import MediaSlideshow from './MediaSlideshow.vue';
 import type { MediaItem } from '~~/shared/types/shared';
-import type { Tweet } from '~~/shared/types/tweets';
 import Avatar from '~/components/ui/Avatar.vue';
 import { useTweetComposer } from '~/composables/useTweetComposer';
-import { useQueryClient } from '@tanstack/vue-query';
+import { usePostTweet } from '~/composables/tweet/usePostTweet';
 
 interface Props {
   replyToTweetId?: string | null;
@@ -42,17 +41,17 @@ const {
   handleAddGif,
 } = useTweetComposer(tweetContent, media, replyToRef, quoteToRef);
 
+const { postTweet } = usePostTweet();
+
 const emit = defineEmits<{
-  (e: 'posted', tweet: Tweet): void;
+  (event: 'post-success'): void;
 }>();
-const queryClient = useQueryClient();
 
 const handlePostWrapper = async () => {
   const newTweet = await handlePost();
   if (!newTweet) return;
-
-  queryClient.setQueryData<Tweet>(['tweet', newTweet.id], newTweet);
-  emit('posted', newTweet);
+  postTweet(newTweet, replyToRef.value, quoteToRef.value);
+  emit('post-success'); // to close reply/post/quote dialog
   // Cleanup
   media.value.forEach((item: MediaItem) => URL.revokeObjectURL(item.url));
   tweetContent.value = '';

@@ -9,9 +9,6 @@ import {
   useTweetLikeMutation,
   useTweetRetweetMutation,
 } from '~/composables/tweet/useTweetMutation';
-import { prependTweetToInfiniteLists } from '~/composables/tweet/updateTweetList';
-import { tweetKeys } from '~/constants/query-keys';
-import { useQueryClient } from '@tanstack/vue-query';
 import ReplyTweetDialog from './composer/ReplyTweetDialog.vue';
 
 interface Props {
@@ -19,10 +16,6 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-
-const emit = defineEmits<{
-  (e: 'reply-success', tweet: Tweet): void;
-}>();
 
 const showQuoteDialog = ref(false);
 const showReplyDialog = ref(false);
@@ -45,24 +38,32 @@ const handleUndoRetweet = () => {
   retweet({ tweetId: props.tweet.id, action: 'undo-retweet' });
 };
 
-const queryClient = useQueryClient();
-
-const handleQuote = (data: Tweet) => {
-  prependTweetToInfiniteLists(
-    queryClient,
-    [tweetKeys.profileTab(data.author.username, 'tweets')],
-    data,
-  );
+const copyLink = async (link: string) => {
+  await navigator.clipboard.writeText(link);
+  showToaster('success', 'Link copied to clipboard');
 };
 
 const handleShare = async () => {
+  const link = buildTweetLink(props.tweet.author.username, props.tweet.id);
+
   try {
-    const link = buildTweetLink(props.tweet.author.username, props.tweet.id);
-    await navigator.clipboard.writeText(link);
-    showToaster('success', 'Link copied to clipboard');
+    if (navigator.share) {
+      await navigator.share({ title: 'Check out this tweet', url: link });
+      showToaster('success', 'Shared successfully');
+      return;
+    }
+
+    await copyLink(link);
   } catch (err) {
-    console.error('share copy failed', err);
-    showToaster('error', 'Failed to copy link');
+    // User cancelled share UI then do nothing
+    if ((err as DOMException)?.name === 'AbortError') return; // common for share cancel [web:21]
+
+    // Share failed or clipboard failed try clipboard as fallback
+    try {
+      await copyLink(link);
+    } catch {
+      showToaster('error', 'Failed to share or copy link');
+    }
   }
 };
 </script>
@@ -170,15 +171,7 @@ const handleShare = async () => {
     </Button>
 
     <!-- Place dialog outside dropdown structure -->
-    <QuoteTweetDialog
-      v-model:open="showQuoteDialog"
-      :quote-to-tweet="props.tweet"
-      @quote-success="handleQuote"
-    />
-    <ReplyTweetDialog
-      v-model:open="showReplyDialog"
-      :reply-tweet="props.tweet"
-      @reply-success="(tweet) => emit('reply-success', tweet)"
-    />
+    <QuoteTweetDialog v-model:open="showQuoteDialog" :quote-to-tweet="props.tweet" />
+    <ReplyTweetDialog v-model:open="showReplyDialog" :reply-tweet="props.tweet" />
   </div>
 </template>

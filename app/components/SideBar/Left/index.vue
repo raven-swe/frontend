@@ -19,7 +19,7 @@ const queryClient = useQueryClient();
 
 const handleLogout = async () => {
   await loginService.logout();
-  await queryClient.clear();
+  queryClient.clear();
 };
 
 const lang = ref(locale.value);

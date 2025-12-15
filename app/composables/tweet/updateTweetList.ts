@@ -2,7 +2,6 @@
 import type { InfiniteData, QueryClient } from '@tanstack/vue-query';
 import type { Tweet, TweetListItem } from '~~/shared/types/tweets';
 import type { ApiSuccessResponse } from '~~/shared/types/api';
-import { tweetKeys } from '~/constants/query-keys';
 
 type ListKey = readonly unknown[];
 
@@ -40,7 +39,6 @@ export function prependTweetToInfiniteLists(
   reposterId: string | null = null,
 ) {
   // seed canonical once
-  queryClient.setQueryData(tweetKeys.entity(tweet.id), tweet);
 
   const keys = Array.isArray(listKeys) ? listKeys : [listKeys];
   keys.forEach((key) => prependToOneList(queryClient, key, tweet, reposterId));
