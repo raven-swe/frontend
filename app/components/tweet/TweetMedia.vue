@@ -20,6 +20,7 @@ const compact = computed(() => !!props.compact);
         'max-h-125': !compact,
         'grid-cols-2': media.length >= 2,
         'grid-rows-2': media.length > 2,
+        '[&>*:first-child]:row-span-2': media.length === 3,
       }"
     >
       <template v-for="m in media" :key="m.id || m.url">
@@ -28,20 +29,9 @@ const compact = computed(() => !!props.compact);
           :to="`/media/${props.tweetId}`"
           class="block h-full w-full"
         >
-          <MediaItem
-            :media="m"
-            :compact="compact"
-            :rounded="false"
-            :class="{ 'first:row-span-2': media.length === 3 }"
-          />
+          <MediaItem :media="m" :compact="compact" :rounded="false" />
         </NuxtLink>
-        <MediaItem
-          v-else
-          :media="m"
-          :compact="compact"
-          :rounded="false"
-          :class="{ 'first:row-span-2': media.length === 3 }"
-        />
+        <MediaItem v-else :media="m" :compact="compact" :rounded="false" />
       </template>
     </div>
   </div>

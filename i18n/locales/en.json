@@ -449,6 +449,9 @@
       "ISLENGTH": "OTP must be exactly 6 digits",
       "IS_EMPTY": "Please enter your OTP code"
     },
+    "identifier": {
+      "USER_NOT_FOUND": "No account found with that email or username"
+    },
     "name": {
       "CONTAINSLETTER": "What's your name?",
       "NOT_A_STRING": "What's your name?",
