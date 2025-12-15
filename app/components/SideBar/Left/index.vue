@@ -2,7 +2,6 @@
 import { loginService } from '~/services/auth/loginService';
 import { useQueryClient } from '@tanstack/vue-query';
 import { ref } from 'vue';
-import { useI18n } from '#imports';
 import { useTheme } from '~/composables/useTheme';
 import Avatar from '~/components/ui/Avatar.vue';
 
@@ -17,19 +16,18 @@ const queryClient = useQueryClient();
 
 const handleLogout = async () => {
   await loginService.logout();
-  await queryClient.clear();
+  queryClient.clear();
 };
 
 const lang = ref(locale.value);
 
 const switchLanguage = () => {
-  setLocale(lang.value);
-
   if (lang.value === 'en-US') {
     lang.value = 'ar-EG';
   } else {
     lang.value = 'en-US';
   }
+  setLocale(lang.value);
 };
 </script>
 <template>
@@ -69,10 +67,22 @@ const switchLanguage = () => {
         :tab="{ label: 'settings', icon: 'settings', route: '/settings' }"
         data-cy="sidebar-settings-btn"
       ></SideBarLeftTab>
-      <UiButton variant="ghost-default" size="icon-lg" class="size-12.5" @click="switchLanguage">
+      <UiButton
+        variant="ghost-default"
+        size="icon-lg"
+        class="size-12.5"
+        data-cy="language-switch-btn"
+        @click="switchLanguage"
+      >
         <Icon name="material-symbols:language" size="24" />
       </UiButton>
-      <UiButton variant="ghost-default" size="icon-lg" class="size-12.5" @click="toggleTheme">
+      <UiButton
+        variant="ghost-default"
+        size="icon-lg"
+        class="size-12.5"
+        data-cy="theme-switch-btn"
+        @click="toggleTheme"
+      >
         <Icon
           :name="
             mode === 'dark' ? 'material-symbols:light-mode-outline' : 'material-symbols:nightlight'
@@ -119,7 +129,7 @@ const switchLanguage = () => {
 
         <UiAlertDialogContent>
           <UiAlertDialogHeader>
-            <UiAlertDialogTitle>
+            <UiAlertDialogTitle data-test="logout-dialog-title">
               {{ $t('ui.logout.title') }}
             </UiAlertDialogTitle>
             <UiAlertDialogDescription>
