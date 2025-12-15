@@ -565,7 +565,7 @@
       "description": "Manage what information you see and share on Raven."
     },
     "display": {
-      "title": "Display",
+      "title": "Display and Language",
       "description": "Adjust the font languae, color, and background of your Raven experience.",
       "color": "Color",
       "background": "Background",
