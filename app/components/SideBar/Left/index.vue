@@ -58,7 +58,13 @@ const handleLogout = async () => {
         :tab="{ label: 'settings', icon: 'settings', route: '/settings' }"
         data-cy="sidebar-settings-btn"
       ></SideBarLeftTab>
-      <UiButton class="mx-2 xl:w-auto" variant="default" size="lg" @click="showPostDialog = true">
+      <UiButton
+        class="mx-2 xl:w-auto"
+        variant="default"
+        size="lg"
+        data-cy="open-post-tweet-dialog-btn"
+        @click="showPostDialog = true"
+      >
         <div class="relative flex h-8 w-8 items-center justify-center">
           <Icon name="mingcute:quill-pen-ai-line" size="28" />
         </div>
@@ -87,7 +93,7 @@ const handleLogout = async () => {
                     {{ '@' + (userStore.user?.username || 'username') }}
                   </p>
                 </div>
-                <div class="ms-auto hidden xl:flex">
+                <div class="ms-auto hidden xl:flex" data-cy="user-actions-button">
                   <Icon name="lucide:more-horizontal" class="pe-2" />
                 </div>
               </div>
