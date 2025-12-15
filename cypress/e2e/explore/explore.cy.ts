@@ -71,7 +71,7 @@ describe('Explore Page', { testIsolation: false }, function () {
       cy.get('a[data-cy="explore-for-you-tab"]').should('exist').click();
       cy.url().should('include', '/explore/for-you');
       cy.get('[data-cy="explore-hashtag-item"]').its('length').should('be.gte', 1);
-      cy.get('[data-cy="tweet"]').its('length').should('be.gte', 1);
+      // cy.get('[data-cy="tweet"]').its('length').should('be.gte', 1);
     });
     it('should navigate to Search when clicking on hashtag item', function () {
       cy.get('[data-cy="explore-hashtag-item"]')

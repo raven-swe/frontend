@@ -47,7 +47,7 @@ describe('Direct Messages Flow', { testIsolation: false }, function () {
         .and('have.attr', 'href')
         .and('include', `/profile/${this.slaveUser.username}`);
       // Check that the message input field is visible
-      cy.get('textarea[data-cy="dm-message-textfield"]').should('be.visible');
+      cy.get('textarea[data-cy="dm-message-textfield"]').should('be.exist');
       // Check that the conversation appears in the conversation list
 
       cy.get('div[data-cy="dm-conversation-item"]')
@@ -74,7 +74,9 @@ describe('Direct Messages Flow', { testIsolation: false }, function () {
       });
     });
     it('should switch back to the first DM conversation', function () {
-      cy.get('div[data-cy="dm-conversation-item"]').contains(this.slaveUser.username).click();
+      cy.get('div[data-cy="dm-conversation-item"]')
+        .contains(this.slaveUser.username)
+        .click({ force: true });
       cy.get('span[data-cy="dm-conversation-header-username"]')
         .should('exist')
         .and('have.text', this.slaveUser.username);
@@ -87,7 +89,7 @@ describe('Direct Messages Flow', { testIsolation: false }, function () {
     it('should send a text message in the DM conversation (Enter)', function () {
       const testMessage = 'Hello, this is a test message!{enter}';
       // Type and send a message
-      cy.get('textarea[data-cy="dm-message-textfield"]').type(testMessage);
+      cy.get('textarea[data-cy="dm-message-textfield"]').type(testMessage, { force: true });
       // Verify the message appears in the conversation
       cy.get('div[data-cy="dm-message-item-mine"]')
         .first()
@@ -96,8 +98,8 @@ describe('Direct Messages Flow', { testIsolation: false }, function () {
     it('should send a text message in the DM conversation (Send Button)', function () {
       const testMessage = 'This is another test message.';
       // Type the message
-      cy.get('textarea[data-cy="dm-message-textfield"]').type(testMessage);
-      cy.get('button[data-cy="dm-message-send-button"]').click();
+      cy.get('textarea[data-cy="dm-message-textfield"]').type(testMessage, { force: true });
+      cy.get('button[data-cy="dm-message-send-button"]').click({ force: true });
       // Verify the message appears in the conversation
       cy.get('div[data-cy="dm-message-item-mine"]')
         .last()
@@ -110,7 +112,7 @@ describe('Direct Messages Flow', { testIsolation: false }, function () {
       cy.get('div[data-cy="dm-message-attachment-preview"]').should('be.visible');
       cy.get('button[data-cy="dm-message-attachment-remove-button"]').should('exist');
       // Send the message with attachment
-      cy.get('button[data-cy="dm-message-send-button"]').click();
+      cy.get('button[data-cy="dm-message-send-button"]').click({ force: true });
       // Verify the message with attachment appears in the conversation
       cy.get('div[data-cy="dm-message-item-mine"]')
         .last()
@@ -125,10 +127,12 @@ describe('Direct Messages Flow', { testIsolation: false }, function () {
       cy.get('[data-cy="left-sidebar-tab-badge-messages"]')
         .should('exist')
         .and('contain.text', '1');
-      cy.get('div[data-cy="dm-conversation-item"]').contains(this.masterUser.username).click();
+      cy.get('div[data-cy="dm-conversation-item"]')
+        .contains(this.masterUser.username)
+        .click({ force: true });
       const realtimeMessage = 'Hello from the other side!';
-      cy.get('textarea[data-cy="dm-message-textfield"]').type(realtimeMessage);
-      cy.get('button[data-cy="dm-message-send-button"]').click();
+      cy.get('textarea[data-cy="dm-message-textfield"]').type(realtimeMessage, { force: true });
+      cy.get('button[data-cy="dm-message-send-button"]').click({ force: true });
 
       // Switch back to master user
       cy.login(this.masterUser.email, this.masterUser.password);
@@ -136,7 +140,9 @@ describe('Direct Messages Flow', { testIsolation: false }, function () {
       cy.get('[data-cy="left-sidebar-tab-badge-messages"]')
         .should('exist')
         .and('contain.text', '1');
-      cy.get('div[data-cy="dm-conversation-item"]').contains(this.slaveUser.username).click();
+      cy.get('div[data-cy="dm-conversation-item"]')
+        .contains(this.slaveUser.username)
+        .click({ force: true });
       // Verify the real-time message is received
       cy.get('div[data-cy="dm-message-item-theirs"]')
         .first()

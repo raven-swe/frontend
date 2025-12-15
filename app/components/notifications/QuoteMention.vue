@@ -11,5 +11,5 @@ const props = defineProps<{
 and possible future ui updates 
 -->
 <template>
-  <TweetDefaultCard :tweet="props.tweet" />
+  <TweetDefaultCard :tweet-id="props.tweet.id" />
 </template>
