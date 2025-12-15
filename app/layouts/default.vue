@@ -28,7 +28,7 @@ useMyProfileQuery();
 </template>
 
 <style>
-html {
+body {
   overflow-y: scroll;
 }
 </style>

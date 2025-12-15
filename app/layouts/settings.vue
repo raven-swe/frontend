@@ -38,7 +38,7 @@ const isSettingsRoot = computed(() => {
 </template>
 
 <style>
-html {
+body {
   overflow-y: scroll;
 }
 </style>
