@@ -57,7 +57,7 @@ const handleLogout = async () => {
         data-cy="sidebar-settings-btn"
       ></SideBarLeftTab>
       <UiButton
-        class="mx-2 xl:w-auto"
+        class="mx-2 h-12.5 w-12.5 xl:w-auto"
         variant="default"
         size="lg"
         data-cy="open-post-tweet-dialog-btn"
