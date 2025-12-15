@@ -9,11 +9,13 @@ interface Props<T> {
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
   fetchNextPage: () => void;
+  valuesToWatch?: unknown[];
   getKey?: (
     item: T | undefined,
     index: number,
     key: VirtualItem['key'],
   ) => string | number | VirtualItem['key'];
+  dataCy?: string;
 }
 
 const props = withDefaults(defineProps<Props<T>>(), {
@@ -62,10 +64,19 @@ watchEffect(() => {
     props.fetchNextPage();
   }
 });
+
+watch(
+  () => props.valuesToWatch,
+  async () => {
+    await nextTick(() => {
+      parentOffsetRef.value = parentRef.value?.offsetTop ?? 0;
+    });
+  },
+);
 </script>
 
 <template>
-  <div ref="parentRef">
+  <div ref="parentRef" :data-cy="props.dataCy">
     <div
       :style="{
         height: `${totalSize}px`,
@@ -87,7 +98,7 @@ watchEffect(() => {
         <div
           v-for="virtualRow in virtualRows"
           :key="
-            String(props.getKey(props.items[virtualRow.index]!, virtualRow.index, virtualRow.key))
+            String(props.getKey(props.items[virtualRow.index], virtualRow.index, virtualRow.key))
           "
           :ref="measureElement"
           :data-index="virtualRow.index"

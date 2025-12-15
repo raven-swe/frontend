@@ -95,9 +95,8 @@ describe('QuoteDialog', () => {
     });
 
     const composer = wrapper.findComponent(TweetComposer);
-    await composer.vm.$emit('posted', { id: 'new-tweet' });
+    await composer.vm.$emit('post-success', { id: 'new-tweet' });
 
-    expect(wrapper.emitted('quote-success')).toBeTruthy();
     expect(wrapper.emitted('update:open')).toBeTruthy();
     expect(wrapper.emitted('update:open')?.[0]).toEqual([false]);
   });

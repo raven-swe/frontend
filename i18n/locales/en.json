@@ -58,7 +58,7 @@
       "title": "Search Filters",
       "people": {
         "title": "People",
-        "any-one": "From any one",
+        "any-one": "From anyone",
         "you-follow": "people you follow"
       }
     },
@@ -271,7 +271,9 @@
     "auth": {
       "signin": "Sign in",
       "signup": "Create account",
-      "signup-info": "By signing up, you agree to the Terms of Service and Privacy Policy, including Cookie Use.",
+      "signup-info-prefix": "By signing up, you agree to the",
+      "signup-info-and": "and",
+      "signup-info-suffix": ", including Cookie Use.",
       "google-signup": "Sign up with Google",
       "github-signup": "Sign up with GitHub",
       "already-have-account": "Already have an account?",
@@ -464,6 +466,9 @@
       "ISLENGTH": "OTP must be exactly 6 digits",
       "IS_EMPTY": "Please enter your OTP code"
     },
+    "identifier": {
+      "USER_NOT_FOUND": "No account found with that email or username"
+    },
     "name": {
       "CONTAINSLETTER": "What's your name?",
       "NOT_A_STRING": "What's your name?",
@@ -591,6 +596,15 @@
     "mute-and-block": {
       "title": "Mute and block",
       "description": "Manage your muted and blocked accounts."
+    },
+    "content-you-see": {
+      "title": "Content you see",
+      "description": "Decide what you see on Raven based on your Interests"
+    },
+    "interests": {
+      "title": "Interests",
+      "description": "These are some of the interests selected. These are used to personalize your experience across Raven. You can adjust your interests if something doesn't look right. Any changes you make may take a little while to go into effect.",
+      "update-success": "Successfully updated interests"
     },
     "muted": {
       "title": "Muted accounts",
@@ -760,6 +774,126 @@
     "placeholder": {
       "not-implemented": "Route is not implemented yet",
       "path": "Path: {path}"
+    }
+  },
+  "legal": {
+    "back-to-home": "Back to Home",
+    "common": {
+      "logo-alt": "Raven logo",
+      "numbered-title": "{number}. {title}",
+      "last-updated-text": "{label}: {date}"
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "last-updated": "Last Updated",
+      "last-updated-date": "December 15, 2025",
+      "acceptance": {
+        "title": "Acceptance of Terms",
+        "content": "By accessing or using Raven, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the service."
+      },
+      "eligibility": {
+        "title": "Eligibility",
+        "content": "You must be at least 13 years old to use Raven. By using the service, you represent that you meet this age requirement."
+      },
+      "account": {
+        "title": "Account Registration",
+        "content": "You are responsible for maintaining the confidentiality of your account credentials and for all activities under your account. You must provide accurate information when creating an account."
+      },
+      "content": {
+        "title": "User Content",
+        "content": "You retain ownership of content you post on Raven. By posting content, you grant Raven a worldwide, non-exclusive license to use, display, and distribute your content on the platform."
+      },
+      "prohibited": {
+        "title": "Prohibited Conduct",
+        "content": "When using Raven, you agree not to engage in any of the following:",
+        "items": {
+          "spam": "Spam or unsolicited advertising",
+          "harassment": "Harassment, bullying, or threatening behavior",
+          "impersonation": "Impersonating other users or entities",
+          "illegal": "Posting illegal or harmful content",
+          "malware": "Distributing malware or viruses",
+          "scraping": "Scraping or data mining without permission"
+        }
+      },
+      "termination": {
+        "title": "Termination",
+        "content": "Raven reserves the right to suspend or terminate your account for violations of these terms, at our sole discretion, without prior notice."
+      },
+      "disclaimer": {
+        "title": "Disclaimer of Warranties",
+        "content": "Raven is provided \"as is\" without warranties of any kind. We do not guarantee uninterrupted or error-free service."
+      },
+      "changes": {
+        "title": "Changes to Terms",
+        "content": "We may update these terms from time to time. Continued use of the service after changes constitutes acceptance of the new terms."
+      },
+      "contact": {
+        "title": "Contact Us",
+        "content": "If you have any questions about these Terms of Service, please contact us at legal{'@'}raven.app."
+      }
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "last-updated": "Last Updated",
+      "last-updated-date": "December 15, 2025",
+      "collection": {
+        "title": "Information We Collect",
+        "content": "We collect information you provide directly to us, including:",
+        "items": {
+          "account": "Account information (name, email, username, birthdate)",
+          "content": "Content you post (tweets, messages, media)",
+          "usage": "Usage data (interactions, preferences)",
+          "device": "Device information (device type, OS version)"
+        }
+      },
+      "use": {
+        "title": "How We Use Your Information",
+        "content": "We use the information we collect to:",
+        "items": {
+          "service": "Provide, maintain, and improve our services",
+          "personalize": "Personalize your experience and content recommendations",
+          "communicate": "Communicate with you about updates and notifications",
+          "security": "Ensure security and prevent fraud"
+        }
+      },
+      "sharing": {
+        "title": "Information Sharing",
+        "content": "We do not sell your personal information. We may share information with service providers who assist in operating our platform, or when required by law."
+      },
+      "cookies": {
+        "title": "Cookies and Tracking",
+        "content": "We use cookies and similar technologies to remember your preferences, authenticate sessions, and analyze platform usage to improve our services."
+      },
+      "security": {
+        "title": "Data Security",
+        "content": "We implement appropriate security measures to protect your personal information, including encryption, secure storage, and access controls."
+      },
+      "rights": {
+        "title": "Your Rights",
+        "content": "You have the right to:",
+        "items": {
+          "access": "Access your personal data",
+          "correct": "Correct inaccurate information",
+          "delete": "Request deletion of your account",
+          "export": "Export your data"
+        }
+      },
+      "retention": {
+        "title": "Data Retention",
+        "content": "We retain your information for as long as your account is active or as needed to provide services. You can request account deletion at any time."
+      },
+      "children": {
+        "title": "Children's Privacy",
+        "content": "Raven is not intended for users under 13 years of age. We do not knowingly collect information from children under 13."
+      },
+      "changes": {
+        "title": "Changes to This Policy",
+        "content": "We may update this Privacy Policy from time to time. We will notify you of significant changes through the app or via email."
+      },
+      "contact": {
+        "title": "Contact Us",
+        "content": "If you have questions about this Privacy Policy, please contact us at raven.cufe{'@'}gmail.com."
+      }
     }
   }
 }

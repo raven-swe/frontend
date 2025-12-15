@@ -5,7 +5,6 @@ import messages from '~~/i18n/locales/en.json';
 import PostTweetDialog from '~/components/tweet/composer/PostTweetDialog.vue';
 import TweetComposer from '~/components/tweet/composer/TweetComposer.vue';
 import { useUserStore } from '@/stores/user';
-import type { Tweet } from '~~/shared/types/tweets';
 
 const i18n = createI18n({
   locale: 'en',
@@ -143,8 +142,8 @@ describe('PostTweetDialog', () => {
       });
 
       const composer = wrapper.findComponent(TweetComposer);
-      const newTweet = { id: 'new-tweet-123', content: 'Test tweet' } as unknown as Tweet;
-      await composer.vm.$emit('posted', newTweet);
+
+      await composer.vm.$emit('post-success');
 
       expect(wrapper.emitted('update:open')).toBeTruthy();
       expect(wrapper.emitted('update:open')?.[0]).toEqual([false]);
@@ -164,7 +163,7 @@ describe('PostTweetDialog', () => {
       expect(composer.exists()).toBe(true);
 
       // Simulate successful tweet post
-      await composer.vm.$emit('posted', { id: 'tweet-1' } as unknown as Tweet);
+      await composer.vm.$emit('post-success');
 
       // Should emit update:open with false
       const emissions = wrapper.emitted('update:open') as boolean[][];
@@ -267,7 +266,7 @@ describe('PostTweetDialog', () => {
 
       // Post tweet
       const composer = wrapper.findComponent(TweetComposer);
-      await composer.vm.$emit('posted', { id: 'new-tweet' } as unknown as Tweet);
+      await composer.vm.$emit('post-success');
 
       // Should emit close
       expect(wrapper.emitted('update:open')).toBeTruthy();

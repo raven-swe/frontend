@@ -21,6 +21,7 @@ export function useOAuthComplete() {
           },
         },
       );
+      if (import.meta.client) sessionStorage.setItem('showAccountSetup', 'true');
       if (result.value?.success) {
         await router.push('/home');
       }

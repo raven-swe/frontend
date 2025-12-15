@@ -15,7 +15,7 @@ onMounted(() => {
 <template>
   <NuxtLayout name="default">
     <AccountSetup v-if="isOpen" />
-    <Tabs>
+    <Tabs class="bg-background/65 sticky top-0 z-10 backdrop-blur-md">
       <Tab
         :label="$t('home.tabs.for-you')"
         route="/home/for-you"
@@ -27,6 +27,7 @@ onMounted(() => {
         :is-active="$route.path === '/home/following'"
       />
     </Tabs>
+    <TweetComposer class="border-b" />
     <slot />
   </NuxtLayout>
 </template>

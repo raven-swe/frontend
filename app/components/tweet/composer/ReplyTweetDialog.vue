@@ -9,12 +9,10 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  'update:open': [value: boolean];
-  'reply-success': [tweet: Tweet];
+  (event: 'update:open', value: boolean): void;
 }>();
 
-const onReplySuccess = (tweet: Tweet) => {
-  emit('reply-success', tweet);
+const onReplySuccess = () => {
   emit('update:open', false);
 };
 
@@ -27,8 +25,8 @@ const localOpen = computed({
 <template>
   <UiDialog v-model:open="localOpen">
     <UiDialogContent class="h-auto max-w-lg p-0" content-height="h-auto max-h-[95vh]">
-      <TweetDefaultCard :tweet="replyTweet" is-root no-actions />
-      <TweetComposer :reply-to-tweet-id="replyTweet.id" type="reply" @posted="onReplySuccess">
+      <TweetDefaultCard :tweet-id="replyTweet.id" is-root no-actions />
+      <TweetComposer :reply-to-tweet-id="replyTweet.id" type="reply" @post-success="onReplySuccess">
       </TweetComposer>
     </UiDialogContent>
   </UiDialog>

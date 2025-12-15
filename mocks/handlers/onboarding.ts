@@ -4,6 +4,7 @@ import rawUsers from '../data/mock-users.json' assert { type: 'json' };
 import type { CompactUser, User } from '../../shared/types/user';
 import type { ApiSuccessResponse, ApiValidationErrorResponse } from '../../shared/types/api';
 import type { Interest } from '../../shared/types/interests';
+import { interests } from './mockUserDB';
 const mockUsers = rawUsers as User[];
 
 const mockCompactUsers: CompactUser[] = mockUsers.map((user) => ({
@@ -54,6 +55,18 @@ export const handlers = [
         { status: 422 },
       );
     }
+
+    // Update the mock interests data
+    Array.from({ length: interests.length }, (_, i) => {
+      if (interests[i]) interests[i].isSelected = false;
+    });
+    selectedInterests.forEach((interestCode) => {
+      const interestIndex = interests.findIndex((i) => i.code === interestCode);
+      if (interestIndex !== -1 && interests[interestIndex]) {
+        interests[interestIndex].isSelected = true;
+      }
+    });
+
     return HttpResponse.json(
       {
         success: true,
@@ -67,113 +80,7 @@ export const handlers = [
     return HttpResponse.json<ApiSuccessResponse<Interest[]>>({
       success: true,
       message: 'Interests fetched successfully',
-      data: [
-        {
-          name: 'News',
-          code: 'NEWS',
-          isSelected: false,
-        },
-        {
-          name: 'Sports',
-          code: 'SPORTS',
-          isSelected: false,
-        },
-        {
-          name: 'Entertainment',
-          code: 'ENTERTAINMENT',
-          isSelected: false,
-        },
-        {
-          name: 'Technology',
-          code: 'TECHNOLOGY',
-          isSelected: false,
-        },
-        {
-          name: 'Music',
-          code: 'MUSIC',
-          isSelected: false,
-        },
-        {
-          name: 'Art',
-          code: 'ART',
-          isSelected: false,
-        },
-        {
-          name: 'Travel',
-          code: 'TRAVEL',
-          isSelected: false,
-        },
-        {
-          name: 'Food',
-          code: 'FOOD',
-          isSelected: false,
-        },
-        {
-          name: 'Fashion',
-          code: 'FASHION',
-          isSelected: false,
-        },
-        {
-          name: 'Health',
-          code: 'HEALTH',
-          isSelected: false,
-        },
-        {
-          name: 'Science',
-          code: 'SCIENCE',
-          isSelected: false,
-        },
-        {
-          name: 'Gaming',
-          code: 'GAMING',
-          isSelected: false,
-        },
-        {
-          name: 'Movies',
-          code: 'MOVIES',
-          isSelected: false,
-        },
-        {
-          name: 'Books',
-          code: 'BOOKS',
-          isSelected: false,
-        },
-        {
-          name: 'Photography',
-          code: 'PHOTOGRAPHY',
-          isSelected: false,
-        },
-        {
-          name: 'Business',
-          code: 'BUSINESS',
-          isSelected: false,
-        },
-        {
-          name: 'Education',
-          code: 'EDUCATION',
-          isSelected: false,
-        },
-        {
-          name: 'Nature',
-          code: 'NATURE',
-          isSelected: false,
-        },
-        {
-          name: 'History',
-          code: 'HISTORY',
-          isSelected: false,
-        },
-        {
-          name: 'Politics',
-          code: 'POLITICS',
-          isSelected: false,
-        },
-        {
-          name: 'Comedy',
-          code: 'COMEDY',
-          isSelected: false,
-        },
-      ],
+      data: interests,
     });
   }),
 
