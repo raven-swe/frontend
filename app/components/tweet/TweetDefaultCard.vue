@@ -18,6 +18,7 @@ const props = withDefaults(defineProps<Props>(), {
   noActions: false,
   isParent: false,
   isRoot: false,
+  reposterId: null,
 });
 const router = useRouter();
 const userStore = useUserStore();

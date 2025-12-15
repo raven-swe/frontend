@@ -15,6 +15,7 @@ interface Props<T> {
     index: number,
     key: VirtualItem['key'],
   ) => string | number | VirtualItem['key'];
+  dataCy?: string;
 }
 
 const props = withDefaults(defineProps<Props<T>>(), {
@@ -75,7 +76,7 @@ watch(
 </script>
 
 <template>
-  <div ref="parentRef">
+  <div ref="parentRef" :data-cy="props.dataCy">
     <div
       :style="{
         height: `${totalSize}px`,
