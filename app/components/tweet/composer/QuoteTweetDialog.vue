@@ -10,11 +10,9 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:open': [value: boolean];
-  'quote-success': [];
 }>();
 
 const onQuoteSuccess = () => {
-  emit('quote-success');
   emit('update:open', false);
 };
 
@@ -27,7 +25,11 @@ const localOpen = computed({
 <template>
   <UiDialog v-model:open="localOpen">
     <UiDialogContent class="h-auto max-w-lg" content-height="h-auto max-h-[95vh]">
-      <TweetComposer :quote-to-tweet-id="quoteToTweet.id" type="quote" @posted="onQuoteSuccess">
+      <TweetComposer
+        :quote-to-tweet-id="quoteToTweet.id"
+        type="quote"
+        @post-success="onQuoteSuccess"
+      >
         <template #reposted-tweet>
           <TweetQuoteCard :tweet="quoteToTweet" :is-preview="true" />
         </template>

@@ -4,6 +4,8 @@ import { ref } from 'vue';
 import type { Tweet } from '~~/shared/types/tweets';
 import type { CompactUser } from '~~/shared/types/user';
 import TopPage from '~/pages/search/top.vue';
+import type { RouteLocationNormalizedLoaded } from 'vue-router';
+import type { UseInfiniteQueryReturnType } from '@tanstack/vue-query';
 
 const mockTweet: Tweet = {
   id: 'tw-1',
@@ -30,8 +32,13 @@ const mockUser: CompactUser = {
   displayName: 'Test User',
   avatarUrl: 'https://example.com/avatar.jpg',
   bio: 'Test bio',
-  isFollowing: false,
-  isFollower: false,
+  bioEntities: null,
+  relationship: {
+    following: false,
+    follower: false,
+    blocking: false,
+    muted: false,
+  },
 };
 
 const { searchServiceMock } = vi.hoisted(() => ({
@@ -53,13 +60,15 @@ const mockSearchQuery = ref('');
 const mockRouteQuery = ref<Record<string, string>>({});
 
 mockNuxtImport('useSearchStore', () => {
-  return () => searchStoreMock;
+  return () =>
+    searchStoreMock as unknown as ReturnType<typeof import('~/stores/search').useSearchStore>;
 });
 
 mockNuxtImport('useRoute', () => {
-  return () => ({
-    query: mockRouteQuery.value,
-  });
+  return () =>
+    ({
+      query: mockRouteQuery.value,
+    }) as unknown as RouteLocationNormalizedLoaded;
 });
 
 mockNuxtImport('useSearchQuery', () => {
@@ -77,6 +86,12 @@ mockNuxtImport('useSearchQuery', () => {
 // Create mock query result that will be dynamically updated
 let mockTweetsQueryResult: ReturnType<typeof createMockQueryResult>;
 let mockUsersQueryResult: ReturnType<typeof createMockQueryResult>;
+
+mockNuxtImport('useI18n', () => {
+  return () => ({
+    t: (key: string) => key,
+  });
+});
 
 function createMockQueryResult() {
   return {
@@ -98,7 +113,7 @@ function createMockQueryResult() {
     isFetchingNextPage: ref(false),
     isFetching: ref(false),
     suspense: vi.fn().mockResolvedValue(undefined),
-  };
+  } as unknown as UseInfiniteQueryReturnType<unknown, unknown>;
 }
 
 vi.mock('@tanstack/vue-query', async () => {
@@ -118,7 +133,7 @@ vi.mock('@tanstack/vue-query', async () => {
       const result = queryCallCount % 2 === 0 ? mockUsersQueryResult : mockTweetsQueryResult;
       queryCallCount++;
       return result;
-    }),
+    }) as unknown as typeof import('@tanstack/vue-query').useInfiniteQuery,
   };
 });
 
@@ -148,6 +163,10 @@ describe('Search top.vue', () => {
     const wrapper = await mountSuspended(TopPage, {
       route: '/search/top?q=test',
       global: {
+        mocks: {
+          $t: (key: string, params?: Record<string, unknown>) =>
+            params ? `${key} ${JSON.stringify(params)}` : key,
+        },
         stubs: {
           TweetDefaultCard: true,
           UserList: true,
@@ -168,6 +187,10 @@ describe('Search top.vue', () => {
     await mountSuspended(TopPage, {
       route: '/search/top?q=javascript',
       global: {
+        mocks: {
+          $t: (key: string, params?: Record<string, unknown>) =>
+            params ? `${key} ${JSON.stringify(params)}` : key,
+        },
         stubs: {
           TweetDefaultCard: true,
           UserList: true,
@@ -183,7 +206,7 @@ describe('Search top.vue', () => {
     expect(tweetCalls[0]?.[0]).toMatchObject({
       query: 'javascript',
       tab: 'top',
-      pagination: { limit: 10, cursor: null },
+      pagination: { cursor: null },
     });
 
     const peopleCalls = searchServiceMock.getPeople.mock.calls;
@@ -213,6 +236,10 @@ describe('Search top.vue', () => {
     const wrapper = await mountSuspended(TopPage, {
       route: '/search/top?q=test',
       global: {
+        mocks: {
+          $t: (key: string, params?: Record<string, unknown>) =>
+            params ? `${key} ${JSON.stringify(params)}` : key,
+        },
         stubs: {
           TweetDefaultCard: true,
           UserList: true,
@@ -244,6 +271,10 @@ describe('Search top.vue', () => {
     const wrapper = await mountSuspended(TopPage, {
       route: '/search/top?q=test',
       global: {
+        mocks: {
+          $t: (key: string, params?: Record<string, unknown>) =>
+            params ? `${key} ${JSON.stringify(params)}` : key,
+        },
         stubs: {
           TweetDefaultCard: true,
           UserList: true,
@@ -263,6 +294,10 @@ describe('Search top.vue', () => {
     await mountSuspended(TopPage, {
       route: '/search/top?q=test&pf=on',
       global: {
+        mocks: {
+          $t: (key: string, params?: Record<string, unknown>) =>
+            params ? `${key} ${JSON.stringify(params)}` : key,
+        },
         stubs: {
           TweetDefaultCard: true,
           UserList: true,
@@ -290,6 +325,10 @@ describe('Search top.vue', () => {
     await mountSuspended(TopPage, {
       route: '/search/top?q=test',
       global: {
+        mocks: {
+          $t: (key: string, params?: Record<string, unknown>) =>
+            params ? `${key} ${JSON.stringify(params)}` : key,
+        },
         stubs: {
           TweetDefaultCard: true,
           UserList: true,
@@ -386,6 +425,10 @@ describe('Search top.vue', () => {
     await mountSuspended(TopPage, {
       route: '/search/top?q=initial',
       global: {
+        mocks: {
+          $t: (key: string, params?: Record<string, unknown>) =>
+            params ? `${key} ${JSON.stringify(params)}` : key,
+        },
         stubs: {
           TweetDefaultCard: true,
           UserList: true,
@@ -419,6 +462,10 @@ describe('Search top.vue', () => {
     const wrapper = await mountSuspended(TopPage, {
       route: '/search/top?q=test',
       global: {
+        mocks: {
+          $t: (key: string, params?: Record<string, unknown>) =>
+            params ? `${key} ${JSON.stringify(params)}` : key,
+        },
         stubs: {
           TweetDefaultCard: true,
           UserList: true,
@@ -477,6 +524,10 @@ describe('Search top.vue', () => {
     const wrapper = await mountSuspended(TopPage, {
       route: '/search/top?q=test',
       global: {
+        mocks: {
+          $t: (key: string, params?: Record<string, unknown>) =>
+            params ? `${key} ${JSON.stringify(params)}` : key,
+        },
         stubs: {
           TweetDefaultCard: true,
           UserList: true,
@@ -518,6 +569,10 @@ describe('Search top.vue', () => {
     const wrapper = await mountSuspended(TopPage, {
       route: '/search/top?q=test',
       global: {
+        mocks: {
+          $t: (key: string, params?: Record<string, unknown>) =>
+            params ? `${key} ${JSON.stringify(params)}` : key,
+        },
         stubs: {
           TweetDefaultCard: true,
           UserList: true,

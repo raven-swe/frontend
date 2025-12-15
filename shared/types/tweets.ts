@@ -38,6 +38,7 @@ export type Tweet = {
   repostedBy?: {
     displayName: string;
     username: string;
+    id?: string;
   };
   quoteToTweetId?: string | null;
   quotedTweet?: Tweet | DeletedTweet | null;
@@ -55,4 +56,9 @@ export type CreateTweetRequest = {
   media?: string[];
   replyToTweetId?: string | null;
   quoteToTweetId?: string | null;
+};
+
+export type TweetListItem = {
+  id: string;
+  reposterId?: string | null;
 };

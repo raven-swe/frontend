@@ -16,7 +16,7 @@ import type { CursorPagination } from '~~/shared/types/api';
 import { tweetsService } from '~/services/tweet/tweetsService';
 import { isApiError, isApiValidationError } from '~/utils/errorUtils';
 import { showToaster } from '~/utils/showToaster';
-import { useInfiniteQuery, useQueryClient } from '@tanstack/vue-query';
+import { useQueryClient } from '@tanstack/vue-query';
 import { useWindowVirtualizer } from '@tanstack/vue-virtual';
 import MediaItemCompact from '~/components/tweet/MediaItemCompact.vue';
 import Carousel from '~/components/ui/carousel/Carousel.vue';
@@ -24,6 +24,7 @@ import CarouselContent from '~/components/ui/carousel/CarouselContent.vue';
 import CarouselItem from '~/components/ui/carousel/CarouselItem.vue';
 import CarouselNext from '~/components/ui/carousel/CarouselNext.vue';
 import CarouselPrevious from '~/components/ui/carousel/CarouselPrevious.vue';
+import { useTweetReplies } from '~/composables/tweet/useTweetLists';
 
 definePageMeta({
   layout: 'media',
@@ -69,22 +70,18 @@ async function loadMainTweet() {
 }
 
 const {
-  data: response,
+  data: repliesResponse,
   fetchNextPage,
   hasNextPage,
   isFetchingNextPage,
-  isLoading: isRepliesLoading,
+  isPending: isRepliesLoading,
   suspense,
-} = useInfiniteQuery({
-  queryKey: ['tweet-replies', tweetid],
-  initialPageParam: null as string | null,
-  queryFn: async ({ pageParam = null }) =>
-    await tweetsService.replies(tweetid.value, { limit: 10, cursor: pageParam }),
-  getNextPageParam: (lastPage) =>
-    lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined,
-});
+} = useTweetReplies(
+  tweetid,
+  computed(() => !!tweetData.value),
+);
 
-const tweets = computed(() => response.value?.pages.flatMap((page) => page.data) || []);
+const tweets = computed(() => repliesResponse.value?.pages.flatMap((page) => page.data) || []);
 
 // Virtualization setup
 const parentRef = ref<HTMLElement | null>(null);
@@ -261,7 +258,7 @@ function handleReplied(tweet: Tweet) {
                 </Carousel>
               </div>
 
-              <div class="ms-auto min-h-screen w-80 overflow-y-auto">
+              <div class="ms-auto min-h-screen w-100 overflow-y-auto">
                 <div v-if="tweetData">
                   <TweetView :tweet="tweetData" :media="false" />
                 </div>
@@ -272,7 +269,7 @@ function handleReplied(tweet: Tweet) {
                   @posted="handleReplied"
                 />
 
-                <div ref="parentRef" class="border-border mx-auto max-w-[700px] border-y">
+                <div ref="parentRef" class="border-border border-y">
                   <ClientOnly>
                     <div v-if="tweets">
                       <div
@@ -297,13 +294,14 @@ function handleReplied(tweet: Tweet) {
                         >
                           <div
                             v-for="virtualRow in virtualRows"
-                            :key="tweets[virtualRow.index]?.id || String(virtualRow.key)"
+                            :key="String(virtualRow.key)"
                             :ref="measureElement"
                             :data-index="virtualRow.index"
                           >
                             <TweetDefaultCard
                               v-if="tweets[virtualRow.index]"
-                              :tweet="tweets[virtualRow.index]!"
+                              :tweet-id="tweets[virtualRow.index]!.id"
+                              :show-replying-to="false"
                             />
                           </div>
                         </div>

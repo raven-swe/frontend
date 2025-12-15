@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useInfiniteQuery } from '@tanstack/vue-query';
 import VirtualInfiniteScroller from '~/components/common/VirtualInfiniteScroller.vue';
-import { profileTabsService } from '~/services/profile/profileTabsService';
+import { useProfileTweets } from '~/composables/tweet/useTweetLists';
+import { getItemKey } from '~/constants/query-keys';
 
 definePageMeta({
   layout: 'profile',
@@ -17,19 +17,10 @@ const {
   isFetchingNextPage,
   isLoading,
   suspense,
-} = useInfiniteQuery({
-  queryKey: ['profile', user?.value.username, 'tweets-likes'],
-  initialPageParam: null as string | null,
-  queryFn: async ({ pageParam = null }) =>
-    await profileTabsService.getProfileTweetsPaginated(
-      user?.value.username || '',
-      'likes',
-      pageParam,
-    ),
-
-  getNextPageParam: (lastPage) =>
-    lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined,
-});
+} = useProfileTweets(
+  'likes',
+  computed(() => user?.value.username || ''),
+);
 
 const tweets = computed(() => response.value?.pages.flatMap((page) => page.data) || []);
 
@@ -47,10 +38,10 @@ onServerPrefetch(async () => {
         :has-next-page="hasNextPage"
         :is-fetching-next-page="isFetchingNextPage"
         :fetch-next-page="fetchNextPage"
-        :get-key="(item, index, key) => `${item?.id}-${key || index}`"
+        :get-key="getItemKey"
       >
         <template #item="{ item }">
-          <TweetDefaultCard v-if="item" :tweet="item" />
+          <TweetDefaultCard v-if="item" :tweet-id="item.id" :reposter-id="item.reposterId" />
         </template>
       </VirtualInfiniteScroller>
 

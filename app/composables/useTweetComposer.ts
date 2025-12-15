@@ -80,7 +80,6 @@ export const useTweetComposer = (
       });
 
       showToaster('success', t('tweet.composer.post-success'));
-
       return newTweet;
     } catch {
       showToaster('error', t('tweet.composer.post-error'));

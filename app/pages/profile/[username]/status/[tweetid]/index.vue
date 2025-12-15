@@ -1,31 +1,27 @@
 <script setup lang="ts">
 import TweetView from '~/components/tweet/TweetView.vue';
-import type { Tweet, TweetWithParents } from '~~/shared/types/tweets';
-import type { ApiErrorResponse, ApiSuccessResponse } from '~~/shared/types/api';
-import { tweetsService } from '~/services/tweet/tweetsService';
 import { isApiError, isApiValidationError } from '~/utils/errorUtils';
-import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { isTweetDeleted } from '~/utils/tweetDeleted';
 import DeletedTweetPlaceholder from '~/components/tweet/DeletedTweetPlaceholder.vue';
+import { useTweetReplies } from '~/composables/tweet/useTweetLists';
+import { useTweetWithParents } from '~/composables/tweet/useTweet';
 
 const router = useRouter();
-const queryClient = useQueryClient();
 const username = computed(() => router.currentRoute.value.params.username as string);
 const tweetid = computed(() => router.currentRoute.value.params.tweetid as string);
 
+const { data: tweetData, suspense, isPending, error } = useTweetWithParents(tweetid);
+
 const {
-  data: tweetData,
-  suspense,
-  isPending,
-  error,
-} = useQuery<TweetWithParents, ApiErrorResponse>({
-  queryKey: ['tweet', tweetid],
-  queryFn: async () => (await tweetsService.tweet(tweetid.value)).data,
-  refetchOnWindowFocus: false,
-  refetchOnMount: false,
-  retry: false,
-  structuralSharing: false,
-});
+  data: repliesResponse,
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage,
+  isPending: isRepliesLoading,
+} = useTweetReplies(
+  tweetid,
+  computed(() => !!tweetData.value),
+);
 
 const oldestParent = computed(() => tweetData.value?.parentTweets?.at(0) || null);
 
@@ -59,48 +55,8 @@ watch(
   { immediate: true },
 );
 
-const {
-  data: repliesResponse,
-  fetchNextPage,
-  hasNextPage,
-  isFetchingNextPage,
-  isPending: isRepliesLoading,
-} = useInfiniteQuery({
-  queryKey: ['tweet-replies', tweetid],
-  initialPageParam: null as string | null,
-  queryFn: async ({ pageParam = null }) =>
-    await tweetsService.replies(tweetid.value, { limit: 10, cursor: pageParam }),
-  getNextPageParam: (lastPage) =>
-    lastPage.pagination?.hasNextPage ? lastPage.pagination.nextCursor : undefined,
-  enabled: computed(() => !!tweetData.value),
-});
-
 const replies = computed(() => repliesResponse.value?.pages.flatMap((page) => page.data) || []);
 
-function handleReplied(tweet: Tweet) {
-  if (tweet.replyToTweetId !== tweetid.value) return;
-
-  queryClient.setQueryData<{
-    pages: Array<ApiSuccessResponse<Tweet[]>>;
-    pageParams: Array<string | null>;
-  }>(['tweet-replies', tweetid], (old) => {
-    if (!old) return old;
-
-    const first = old.pages[0];
-    if (!first) return old;
-
-    return {
-      ...old,
-      pages: [
-        {
-          ...first,
-          data: [tweet, ...first.data],
-        },
-        ...old.pages.slice(1),
-      ],
-    };
-  });
-}
 onMounted(async () => {
   await nextTick(() => {
     scrollMainTweetIntoView();
@@ -150,7 +106,7 @@ onServerPrefetch(async () => {
       <TweetDefaultCard
         v-if="tweetData.rootTweet && !isTweetDeleted(tweetData.rootTweet)"
         is-root
-        :tweet="tweetData.rootTweet"
+        :tweet-id="tweetData.rootTweet.id"
       />
       <div v-else-if="tweetData.rootTweet" class="bg-background relative h-14">
         <div class="px-4 pb-2">
@@ -174,7 +130,7 @@ onServerPrefetch(async () => {
         </p>
       </NuxtLink>
       <template v-for="(tweet, i) in tweetData.parentTweets ?? []" :key="i">
-        <TweetDefaultCard v-if="!isTweetDeleted(tweet)" :tweet="tweet" is-parent />
+        <TweetDefaultCard v-if="!isTweetDeleted(tweet)" :tweet-id="tweet.id" is-parent />
         <div v-else class="px-4 py-2">
           <DeletedTweetPlaceholder>
             {{ $t('tweet.deleted-parent') }}
@@ -187,7 +143,7 @@ onServerPrefetch(async () => {
       <TweetView :tweet="tweetData" :media="true" />
 
       <div class="border-b">
-        <TweetComposer :reply-to-tweet-id="tweetData?.id" type="reply" @posted="handleReplied" />
+        <TweetComposer :reply-to-tweet-id="tweetid" type="reply" />
       </div>
 
       <ClientOnly placeholder-tag="div">
@@ -197,11 +153,11 @@ onServerPrefetch(async () => {
           :has-next-page="hasNextPage"
           :is-fetching-next-page="isFetchingNextPage"
           :fetch-next-page="fetchNextPage"
-          :get-key="(tweet, idx, key) => tweet.id ?? key"
+          :get-key="(tweet, idx, key) => tweet?.id ?? key"
           data-cy="tweet-replies"
         >
           <template #item="{ item: tweet }">
-            <TweetDefaultCard v-if="tweet" :tweet="tweet" />
+            <TweetDefaultCard v-if="tweet" :tweet-id="tweet.id" :show-replying-to="false" />
           </template>
         </CommonVirtualInfiniteScroller>
         <div

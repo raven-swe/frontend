@@ -128,5 +128,13 @@ declare namespace Cypress {
      * @example cy.retweetTweet(12345, false, false) // Unretweet tweet
      */
     retweetTweet(tweetId: string | number, retweet?: boolean, useSlave?: boolean): Chainable<void>;
+
+    /**
+     * Custom command to change username
+     * @param newUsername - New username to set
+     * @param useSlave - Whether to use external access token (default: false)
+     * @example cy.changeUsername('newusername', false)
+     */
+    changeUsername(newUsername: string, useSlave?: boolean): Chainable<void>;
   }
 }

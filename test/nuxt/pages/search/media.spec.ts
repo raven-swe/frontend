@@ -163,7 +163,7 @@ describe('Search media.vue', () => {
     expect(calls[0]?.[0]).toMatchObject({
       query: 'javascript',
       tab: 'media',
-      pagination: { limit: 10, cursor: null },
+      pagination: { cursor: null },
     });
   });
 

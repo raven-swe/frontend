@@ -1,121 +1,64 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import Avatar from '~/components/ui/Avatar.vue';
-import type { Tweet } from '~~/shared/types/tweets';
 import TweetMedia from './TweetMedia.vue';
 import TweetActionButtons from './TweetActionButtons.vue';
 import QuotedTweetCard from './QuotedTweetCard.vue';
 import AiSummary from './AiSummary.vue';
 import { useUserStore } from '~/stores/user';
-import { useQueryClient } from '@tanstack/vue-query';
+import { useTweet, useTweetReposter } from '~/composables/tweet/useTweet';
 interface Props {
-  tweet: Tweet;
+  tweetId: string;
+  reposterId?: string | null;
   isParent?: boolean;
   isRoot?: boolean;
   noActions?: boolean;
+  showReplyingTo?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
   noActions: false,
   isParent: false,
   isRoot: false,
+  reposterId: null,
+  showReplyingTo: true,
 });
 const router = useRouter();
 const userStore = useUserStore();
-const originalUsername = ref<string>(userStore.user?.username || '');
+const originalUsername = computed(() => userStore.user?.username ?? '');
+
+const { data: tweet } = useTweet(props.tweetId);
+
+const { data: reposter } = useTweetReposter(props.reposterId);
 
 // Format createdAt to a short relative time like "6h", "3d", "2m"
-const tweet = ref<Tweet>(JSON.parse(JSON.stringify(props.tweet)));
 const aiSummaryRef = ref<InstanceType<typeof AiSummary> | null>(null);
-
-const onLikeSuccess = () => {
-  if (!tweet.value.isLiked) {
-    tweet.value.isLiked = true;
-    tweet.value.likeCount = (tweet.value.likeCount ?? 0) + 1;
-  }
-};
-
-const onUnlikeSuccess = () => {
-  if (tweet.value.isLiked) {
-    tweet.value.isLiked = false;
-    const next = (tweet.value.likeCount ?? 0) - 1;
-    tweet.value.likeCount = next < 0 ? 0 : next;
-  }
-};
-const onRetweetSuccess = () => {
-  if (!tweet.value.isRetweeted) {
-    tweet.value.isRetweeted = true;
-    tweet.value.retweetCount += 1;
-  }
-};
-
-const onUndoRetweetSuccess = () => {
-  if (tweet.value.isRetweeted) {
-    tweet.value.isRetweeted = false;
-    const next = (tweet.value.retweetCount ?? 0) - 1;
-    tweet.value.retweetCount = next < 0 ? 0 : next;
-  }
-};
 
 function handleAiSummary() {
   aiSummaryRef.value?.handleAiSummary?.();
 }
 
 function handleTweetClick() {
-  router.push(`/profile/${props.tweet.author.username}/status/${props.tweet.id}`);
+  router.push(`/profile/${tweet.value?.author.username}/status/${tweet.value?.id}`);
 }
 
-const { mutate: followUser } = useFollowMutation();
-const { mutate: blockUser } = useBlockMutation();
-
-const onReplySuccess = (replyTweet: Tweet) => {
-  tweet.value.replyCount = (tweet.value.replyCount ?? 0) + 1;
-  handleReplied(replyTweet);
-};
-const queryClient = useQueryClient();
-const tweetid = computed(() => tweet.value.id as string);
-
-function handleReplied(tweet: Tweet) {
-  if (tweet.replyToTweetId !== tweetid.value) return;
-
-  queryClient.setQueryData<{
-    pages: Array<ApiSuccessResponse<Tweet[]>>;
-    pageParams: Array<string | null>;
-  }>(['tweet-replies', tweetid.value], (old) => {
-    if (!old) return old;
-
-    const first = old.pages[0];
-    if (!first) return old;
-
-    return {
-      ...old,
-      pages: [
-        {
-          ...first,
-          data: [tweet, ...first.data],
-        },
-        ...old.pages.slice(1),
-      ],
-    };
-  });
-}
+const onReplySuccess = () => {};
 </script>
 
 <template>
+  <!-- note that we need to change the username here to be the id once backend provide it -->
   <NuxtLink
-    v-if="props.tweet.repostedBy"
-    :to="`/profile/${props.tweet.repostedBy.username}`"
+    v-if="reposter"
+    :to="`/profile/${reposter.username}`"
     class="text-muted-foreground ms-5 mt-1 flex items-center gap-2 px-6 text-sm"
   >
     <Icon name="tabler:repeat" />
-    <span v-if="props.tweet.repostedBy.username === originalUsername">
+    <span v-if="reposter.username === originalUsername">
       {{ $t('tweet.retweeted-by-you') }}
     </span>
-    <span v-else>{{
-      $t('tweet.retweeted-by', { username: props.tweet.repostedBy.displayName })
-    }}</span>
+    <span v-else>{{ $t('tweet.retweeted-by', { username: reposter.displayName }) }}</span>
   </NuxtLink>
   <article
-    :id="'tweet-' + props.tweet.id"
+    v-if="tweet"
     class="border-b-border bg-background hover:bg-foreground/5 flex w-full max-w-[700px] cursor-pointer gap-2 px-4 transition-colors duration-100"
     :class="{
       'border-b-1': !isParent && !isRoot,
@@ -130,16 +73,10 @@ function handleReplied(tweet: Tweet) {
           'bg-thread-foreground': isParent,
         }"
       ></div>
-      <UserHoverCard
-        :username="props.tweet.author.username"
-        @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
-        @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
-        @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
-        @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
-      >
-        <NuxtLink :to="`/profile/${props.tweet.author.username}`" @click.stop>
+      <UserHoverCard :username="tweet.author.username">
+        <NuxtLink :to="`/profile/${tweet.author.username}`" @click.stop>
           <Avatar
-            :img="props.tweet.author.avatarUrl || '/default_profile.png'"
+            :img="tweet.author.avatarUrl || '/default_profile.png'"
             size="sm"
             variant="primary"
           />
@@ -155,34 +92,22 @@ function handleReplied(tweet: Tweet) {
         <div
           class="flex w-full items-center gap-x-1 overflow-hidden pe-12 text-sm whitespace-nowrap"
         >
-          <UserHoverCard
-            :username="props.tweet.author.username"
-            @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
-            @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
-            @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
-            @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
-          >
+          <UserHoverCard :username="tweet.author.username">
             <NuxtLink
-              :to="`/profile/${props.tweet.author.username}`"
+              :to="`/profile/${tweet.author.username}`"
               class="cursor-pointer truncate overflow-hidden hover:underline"
               @click.stop
             >
-              {{ props.tweet.author.displayName }}
+              {{ tweet.author.displayName }}
             </NuxtLink>
           </UserHoverCard>
-          <UserHoverCard
-            :username="props.tweet.author.username"
-            @follow="followUser({ username: props.tweet.author.username, action: 'follow' })"
-            @block="blockUser({ username: props.tweet.author.username, action: 'block' })"
-            @unblock="blockUser({ username: props.tweet.author.username, action: 'unblock' })"
-            @unfollow="followUser({ username: props.tweet.author.username, action: 'unfollow' })"
-          >
+          <UserHoverCard :username="tweet.author.username">
             <NuxtLink
-              :to="`/profile/${props.tweet.author.username}`"
+              :to="`/profile/${tweet.author.username}`"
               class="text-muted-foreground cursor-pointer truncate overflow-hidden"
               @click.stop
             >
-              {{ '@' + props.tweet.author.username }}
+              {{ '@' + tweet.author.username }}
             </NuxtLink>
           </UserHoverCard>
           <span class="text-muted-foreground">·</span>
@@ -207,7 +132,7 @@ function handleReplied(tweet: Tweet) {
             >
               <Icon name="vscode-icons:file-type-gemini" size="1.2rem" />
             </UiButton>
-            <TweetDropdown :tweet="props.tweet" :username="originalUsername">
+            <TweetDropdown :tweet="tweet" :username="originalUsername">
               <UiButton
                 variant="ghost-default"
                 size="icon-xs"
@@ -223,31 +148,16 @@ function handleReplied(tweet: Tweet) {
       </div>
 
       <div
-        v-if="tweet.replyToTweet"
+        v-if="tweet.replyToTweet && props.showReplyingTo"
         class="text-muted-foreground mb-1 flex items-center gap-1 text-sm"
       >
         <p>
           {{ $t('tweet.replying-to') }}
         </p>
-        <UserHoverCard
-          v-if="props.tweet.replyToTweet"
-          :username="props.tweet.replyToTweet.author.username"
-          @follow="
-            followUser({ username: props.tweet.replyToTweet.author.username, action: 'follow' })
-          "
-          @block="
-            blockUser({ username: props.tweet.replyToTweet.author.username, action: 'block' })
-          "
-          @unblock="
-            blockUser({ username: props.tweet.replyToTweet.author.username, action: 'unblock' })
-          "
-          @unfollow="
-            followUser({ username: props.tweet.replyToTweet.author.username, action: 'unfollow' })
-          "
-        >
-          <NuxtLink :to="`/profile/${props.tweet.replyToTweet.author.username}`" @click.stop>
+        <UserHoverCard v-if="tweet.replyToTweet" :username="tweet.replyToTweet.author.username">
+          <NuxtLink :to="`/profile/${tweet.replyToTweet.author.username}`" @click.stop>
             <span class="text-primary cursor-pointer hover:underline">{{
-              '@' + props.tweet.replyToTweet.author.username
+              '@' + tweet.replyToTweet.author.username
             }}</span>
           </NuxtLink>
         </UserHoverCard>
@@ -265,16 +175,17 @@ function handleReplied(tweet: Tweet) {
 
       <QuotedTweetCard v-if="tweet.quotedTweet" :tweet="tweet.quotedTweet" />
 
-      <AiSummary ref="aiSummaryRef" :tweet-id="props.tweet.id" />
+      <AiSummary ref="aiSummaryRef" :tweet-id="tweet.id" />
 
       <!-- Actions -->
       <TweetActionButtons
         v-if="!props.noActions"
         :tweet="tweet"
-        @like-success="onLikeSuccess"
-        @unlike-success="onUnlikeSuccess"
-        @retweet-success="onRetweetSuccess"
-        @undo-retweet-success="onUndoRetweetSuccess"
+        @click.stop
+        @like-success="() => {}"
+        @unlike-success="() => {}"
+        @retweet-success="() => {}"
+        @undo-retweet-success="() => {}"
         @reply-success="onReplySuccess"
       />
     </div>
