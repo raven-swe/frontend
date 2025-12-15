@@ -2,12 +2,26 @@
 import { useTweetDeleteMutation } from '~/composables/tweet/useTweetMutation';
 import type { Tweet } from '~~/shared/types/tweets';
 
-const props = defineProps<{
-  tweet: Tweet;
-  username: string;
-}>();
+const props = withDefaults(
+  defineProps<{
+    tweet: Tweet;
+    username: string;
+    inTweetView?: boolean;
+  }>(),
+  {
+    inTweetView: false,
+  },
+);
 
 const { mutate: deleteTweet } = useTweetDeleteMutation();
+const router = useRouter();
+
+const handleDeleteTweet = () => {
+  deleteTweet({ tweetId: props.tweet.id });
+  if (props.inTweetView) {
+    router.back();
+  }
+};
 </script>
 <template>
   <UiAlertDialog>
@@ -50,7 +64,7 @@ const { mutate: deleteTweet } = useTweetDeleteMutation();
         <UiAlertDialogAction
           class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           data-cy="tweet-delete-confirm-button"
-          @click="deleteTweet({ tweetId: props.tweet.id })"
+          @click="handleDeleteTweet"
         >
           {{ $t('ui.delete') }}
         </UiAlertDialogAction>
