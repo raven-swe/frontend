@@ -13,8 +13,9 @@ mockNuxtImport('useI18n', () => {
 // Router mock
 const pushSpy = vi.fn();
 const replaceSpy = vi.fn();
+const backSpy = vi.fn();
 mockNuxtImport('useRouter', () => {
-  return () => ({ push: pushSpy, replace: replaceSpy });
+  return () => ({ push: pushSpy, replace: replaceSpy, back: backSpy });
 });
 
 // User store mock
@@ -147,6 +148,7 @@ describe('Settings Username Page', () => {
     userStoreData = { user: { username: 'current' }, updateUser: updateUserSpy };
     updateUserSpy.mockReset();
     pushSpy.mockReset();
+    backSpy.mockReset();
     suggestionsList = ['alice', 'bob'];
     patchShouldFail = false;
     hoisted.apiFetchMock.mockReset();
@@ -436,7 +438,7 @@ describe('Settings Username Page', () => {
     await icon.trigger('click');
     await wrapper.vm.$nextTick();
 
-    expect(pushSpy).toHaveBeenCalledWith('/settings/account');
+    expect(backSpy).toHaveBeenCalled();
   });
 
   it('reinstates username-taken error when validation error clears but username is still marked as taken', async () => {
