@@ -160,6 +160,8 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --breakpoint-midd: 1080px;
+  --width-8xl: 82rem;
 }
 
 @layer base {
