@@ -29,6 +29,7 @@ const selectEmoji = (emoji: string) => {
         class="bg-background hover:bg-accent absolute -bottom-2 flex h-5 w-5 items-center justify-center rounded-full border text-xs opacity-0 shadow-sm transition-all group-hover:opacity-100"
         :class="isMine ? '-left-1' : '-right-1'"
         :title="$t('dm.reaction.add')"
+        data-cy="dm-reaction-picker-button"
       >
         <Icon name="lucide:smile-plus" class="text-muted-foreground h-3 w-3" />
       </button>
@@ -39,6 +40,7 @@ const selectEmoji = (emoji: string) => {
           v-for="emoji in emojis"
           :key="emoji"
           class="hover:bg-accent rounded p-1 text-lg transition-colors"
+          data-cy="dm-reaction-picker-emoji"
           @click="selectEmoji(emoji)"
         >
           {{ emoji }}

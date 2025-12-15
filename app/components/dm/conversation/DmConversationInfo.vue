@@ -12,15 +12,19 @@ const avatarUrl = computed(() => props.conversation?.participant.avatarUrl || ''
     <NuxtLink
       :to="`/profile/${username}`"
       class="hover:bg-foreground/10 flex cursor-pointer flex-col items-center pt-4 pb-20"
+      data-cy="dm-conversation-info-link"
     >
       <NuxtImg
         :src="avatarUrl"
         alt="Profile picture"
         class="z-20 size-14 rounded-full border-1 object-cover"
         loading="eager"
+        data-cy="dm-conversation-info-avatar"
       />
-      <span class="text-md font-bold">{{ displayName }}</span>
-      <span class="text-md text-muted-foreground"> {{ '@' + username }} </span>
+      <span class="text-md font-bold" data-cy="dm-conversation-info-name">{{ displayName }}</span>
+      <span class="text-md text-muted-foreground" data-cy="dm-conversation-info-username">
+        {{ '@' + username }}
+      </span>
     </NuxtLink>
   </div>
 </template>

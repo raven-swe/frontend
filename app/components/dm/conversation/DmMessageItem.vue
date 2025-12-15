@@ -36,10 +36,11 @@ const hasReaction = computed(() => {
     <div
       class="flex max-w-[68%] flex-col gap-1"
       :class="message.isMine ? 'items-end' : 'items-start'"
+      :data-cy="message.isMine ? 'dm-message-item-mine' : 'dm-message-item-theirs'"
     >
       <!-- Message bubble with reactions -->
       <div class="flex items-end gap-2">
-        <div v-if="message.isMine">
+        <div v-if="message.isMine" data-cy="dm-message-item-dropdown">
           <DmMessageDropDown
             :conversation-id="conversationId"
             :message-id="message.id"
@@ -57,6 +58,7 @@ const hasReaction = computed(() => {
                 :alt="$t('dm.attachedImage')"
                 class="max-h-64 object-cover"
                 loading="eager"
+                data-cy="dm-message-item-image"
               />
             </div>
           </template>
@@ -64,6 +66,7 @@ const hasReaction = computed(() => {
             <div
               class="w-fit rounded-3xl px-4 py-2 text-sm leading-relaxed break-all whitespace-pre-wrap"
               :class="message.isMine ? 'bg-primary text-white' : 'bg-accent text-foreground'"
+              data-cy="dm-message-item-content"
             >
               <template v-for="(segment, idx) in renderSegments(message)" :key="idx">
                 <span
@@ -96,9 +99,18 @@ const hasReaction = computed(() => {
         </div>
       </div>
 
-      <span class="text-muted-foreground text-[11px]" :class="message.isMine ? 'self-end' : ''">
+      <span
+        class="text-muted-foreground text-[11px]"
+        :class="message.isMine ? 'self-end' : ''"
+        data-cy="dm-message-item-timestamp"
+      >
         {{ formatDate(message.createdAt) }}
-        <span v-if="isSeen && message.isMine" class="text-primary ms-1">· {{ $t('dm.seen') }}</span>
+        <span
+          v-if="isSeen && message.isMine"
+          class="text-primary ms-1"
+          data-cy="dm-message-item-seen"
+          >· {{ $t('dm.seen') }}</span
+        >
       </span>
     </div>
   </div>

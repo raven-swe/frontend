@@ -12,7 +12,9 @@ function openNewMessage() {
     <div class="flex max-w-sm flex-col items-start gap-4 p-8 text-center">
       <h2 class="text-3xl font-bold">{{ $t('dm.empty.select') }}</h2>
       <p class="text-muted-foreground text-sm">{{ $t('dm.empty.description') }}</p>
-      <Button size="xl" variant="primary" @click="openNewMessage">{{ $t('dm.empty.new') }}</Button>
+      <Button size="xl" variant="primary" data-cy="empty-new-dm-button" @click="openNewMessage">{{
+        $t('dm.empty.new')
+      }}</Button>
       <DmNewMessageDialog v-model:open="showNewMessage" />
     </div>
   </div>

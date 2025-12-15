@@ -8,6 +8,7 @@ export type ActorSummary = {
 
 export type ActorSummaryContainer = {
   previewActors?: ActorSummary[];
+  totalCount?: number;
 };
 
 export type Notification = {

@@ -18,7 +18,7 @@ watch(
   () => props.tab.badgeCount,
   (newCount, oldCount) => {
     if (oldCount === undefined || newCount === undefined) return;
-    if (newCount > oldCount) {
+    if (newCount > oldCount && props.tab.route.includes('notifications')) {
       play();
     }
   },
@@ -36,6 +36,7 @@ watch(
         <span
           v-if="tab.badgeCount && tab.badgeCount > 0"
           class="bg-primary text-foreground border-background absolute -end-1 -top-1 inline-flex min-w-5 items-center justify-center rounded-full border-1 p-0.75 text-xs leading-none"
+          :data-cy="`left-sidebar-tab-badge-${tab.label}`"
         >
           {{ tab.badgeCount > 99 ? '99+' : tab.badgeCount }}
         </span>

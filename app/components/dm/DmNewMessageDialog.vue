@@ -11,6 +11,11 @@ const selectedUsername = ref<string | null>(null);
 const open = defineModel<boolean>('open', { default: false });
 
 const { users, loading } = useSearchUsers(search);
+const userStore = useUserStore();
+const currentUsername = computed(() => userStore.user?.username);
+const filteredUsers = computed(() => {
+  return users.value?.filter((u) => u.username !== currentUsername.value) || [];
+});
 const router = useRouter();
 const { startConversation, isStarting } = useStartConversation();
 
@@ -58,14 +63,17 @@ async function onNewConversation() {
             {{ $t('dm.dialog.new-message') }}
           </UiDialogTitle>
 
-          <UiButton :disabled="!canProceed || isStarting" @click="onNewConversation">
+          <UiButton
+            :disabled="!canProceed || isStarting"
+            data-cy="dm-dialog-next-button"
+            @click="onNewConversation"
+          >
             {{ $t('dm.dialog.next') }}
           </UiButton>
         </div>
         <UiDialogDescription class="sr-only">
           {{ $t('dm.dialog.search-people') }}
         </UiDialogDescription>
-        <!-- Search input -->
         <div class="px-4 pt-3 pb-2">
           <label class="sr-only" :for="'dm-search'">{{ $t('dm.dialog.search-people') }}</label>
           <div class="bg-muted/20 flex items-center gap-2 rounded-xl px-3 py-2">
@@ -76,6 +84,7 @@ async function onNewConversation() {
               type="text"
               :placeholder="$t('dm.dialog.search-people')"
               class="placeholder:text-muted-foreground/70 w-full bg-transparent outline-none"
+              data-cy="dm-search-input"
             />
           </div>
         </div>
@@ -91,7 +100,7 @@ async function onNewConversation() {
 
         <div v-else>
           <div
-            v-for="u in users || []"
+            v-for="u in filteredUsers || []"
             :key="u.username"
             class="flex items-center gap-3 px-4 py-3"
             :class="{
@@ -99,18 +108,32 @@ async function onNewConversation() {
               'hover:bg-muted/20 cursor-pointer': !isBlocked(u),
               'cursor-not-allowed opacity-50': isBlocked(u),
             }"
+            data-cy="dm-user-item"
             @click="handleUserClick(u)"
           >
             <UiAvatar size="sm" :img="u.avatarUrl" />
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-2">
-                <p class="truncate font-medium">{{ u.displayName }}</p>
-                <p class="text-muted-foreground truncate before:content-['@']">{{ u.username }}</p>
+                <p class="truncate font-medium" data-cy="dm-user-item-name">{{ u.displayName }}</p>
+                <p
+                  class="text-muted-foreground truncate before:content-['@']"
+                  data-cy="dm-user-item-username"
+                >
+                  {{ u.username }}
+                </p>
               </div>
-              <p v-if="isBlocked(u)" class="text-destructive mt-0.5 flex text-sm">
+              <p
+                v-if="isBlocked(u)"
+                class="text-destructive mt-0.5 flex text-sm"
+                data-cy="dm-user-item-blocked"
+              >
                 {{ $t('dm.dialog.cant-message') }}
               </p>
-              <p v-else-if="followStatus(u)" class="text-muted-foreground mt-0.5 flex text-sm">
+              <p
+                v-else-if="followStatus(u)"
+                class="text-muted-foreground mt-0.5 flex text-sm"
+                data-cy="dm-user-item-follow-status"
+              >
                 <Icon name="ic:sharp-person" size="18" class="text-muted-foreground" />
                 {{ followStatus(u) }}
               </p>

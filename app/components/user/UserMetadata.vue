@@ -7,9 +7,6 @@ import BlockToggleButton from '@/components/ui/BlockToggleButton.vue';
 const props = defineProps<{
   username: string;
 }>();
-const emit = defineEmits<{
-  (e: 'follow' | 'unfollow' | 'unblock'): void;
-}>();
 
 const queryKey = computed(() => ['profile', props.username.toLowerCase()]);
 const { data: user, isLoading } = useQuery({
@@ -23,16 +20,8 @@ const isCurrentUser = computed(() => {
   return userStore.user?.username.toLowerCase() === props.username.toLowerCase();
 });
 
-const followUser = () => {
-  emit('follow');
-};
-const unfollowUser = () => {
-  emit('unfollow');
-};
-
-const unblockUser = () => {
-  emit('unblock');
-};
+const { mutate: followUser } = useFollowMutation();
+const { mutate: unblockUser } = useBlockMutation();
 </script>
 
 <template>
@@ -45,13 +34,13 @@ const unblockUser = () => {
         <BlockToggleButton
           v-if="user.relationship?.blocking && !isCurrentUser"
           :relationship="user.relationship"
-          @unblock="unblockUser"
+          @unblock="unblockUser({ username: user.username, action: 'unblock' })"
         />
         <FollowToggleButton
           v-else-if="!isCurrentUser"
           :relationship="user.relationship"
-          @follow="followUser"
-          @unfollow="unfollowUser"
+          @follow="followUser({ username: user.username, action: 'follow' })"
+          @unfollow="followUser({ username: user.username, action: 'unfollow' })"
         />
       </header>
       <NuxtLink :to="`/profile/${user.username}`">

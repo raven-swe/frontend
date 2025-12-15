@@ -6,6 +6,7 @@ const emit = defineEmits<{ 'add-image': [] }>();
     <button
       type="button"
       class="text-primary transition-opacity hover:opacity-80"
+      data-cy="dm-message-add-image-button"
       @click="emit('add-image')"
     >
       <Icon name="ic:outline-add-photo-alternate" size="20" />
