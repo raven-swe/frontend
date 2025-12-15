@@ -5,12 +5,8 @@ import { isTweetDeleted } from '~/utils/tweetDeleted';
 import DeletedTweetPlaceholder from '~/components/tweet/DeletedTweetPlaceholder.vue';
 import { useTweetReplies } from '~/composables/tweet/useTweetLists';
 import { useTweetWithParents } from '~/composables/tweet/useTweet';
-import { useQueryClient } from '@tanstack/vue-query';
-import { tweetKeys } from '~/constants/query-keys';
-import { prependTweetToInfiniteLists } from '~/composables/tweet/updateTweetList';
 
 const router = useRouter();
-const queryClient = useQueryClient();
 const username = computed(() => router.currentRoute.value.params.username as string);
 const tweetid = computed(() => router.currentRoute.value.params.tweetid as string);
 
@@ -66,14 +62,6 @@ onMounted(async () => {
     scrollMainTweetIntoView();
   });
 });
-
-const handleNewReply = (newReply: Tweet) => {
-  const queryKeys = [
-    tweetKeys.profileTab(newReply.author.username, 'replies'),
-    tweetKeys.replyList(tweetid.value),
-  ];
-  prependTweetToInfiniteLists(queryClient, queryKeys, newReply);
-};
 
 onServerPrefetch(async () => {
   await suspense();
@@ -155,7 +143,7 @@ onServerPrefetch(async () => {
       <TweetView :tweet="tweetData" :media="true" />
 
       <div class="border-b">
-        <TweetComposer :reply-to-tweet-id="tweetid" type="reply" @posted="handleNewReply" />
+        <TweetComposer :reply-to-tweet-id="tweetid" type="reply" />
       </div>
 
       <ClientOnly placeholder-tag="div">
