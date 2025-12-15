@@ -56,14 +56,16 @@ const handleLogout = async () => {
         :tab="{ label: 'settings', icon: 'settings', route: '/settings' }"
         data-cy="sidebar-settings-btn"
       ></SideBarLeftTab>
-      <div class="flex w-full flex-col items-start gap-1">
+      <div class="w-full xl:pe-8">
         <UiButton
           variant="default"
           data-cy="sidebar-post-btn"
-          class="h-12.5 w-12.5 shrink-0 transition-[width] xl:w-auto"
+          class="my-2 h-12.5 w-12.5 shrink-0 transition-[width] xl:w-full"
           @click="showPostDialog = true"
         >
-          <Icon name="mingcute:quill-pen-ai-line" size="1.6rem" class="shrink-0" />
+          <p class="flex xl:hidden">
+            <Icon name="mingcute:quill-pen-ai-line" size="1.6rem" class="shrink-0" />
+          </p>
           <p class="mx-6 hidden text-xl font-extrabold xl:block">{{ $t('ui.post') }}</p>
         </UiButton>
       </div>
