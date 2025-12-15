@@ -2,6 +2,7 @@
 import type { ActorSummary } from '~~/shared/types/notifications';
 import type { Tweet } from '~~/shared/types/tweets';
 import TweetQuoteCard from '../tweet/TweetQuoteCard.vue';
+import { QueryClient } from '@tanstack/vue-query';
 
 const props = defineProps<{
   timestamp: string;
@@ -16,6 +17,10 @@ const icon = {
   color: 'text-brand-turquoise',
 };
 
+const queryClient = new QueryClient();
+queryClient.invalidateQueries({
+  queryKey: ['user-list', props.tweet.author.username, 'tweet', props.tweet.id, 'reposts'],
+});
 const linkTo = `/profile/${props.tweet.author.username}/status/${props.tweet.id}/reposts`;
 const repostPluralIndex = computed(() => Math.min(props.totalActorsCount - 1, 3));
 

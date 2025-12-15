@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ActorSummary } from '~~/shared/types/notifications';
+import { QueryClient } from '@tanstack/vue-query';
 const userStore = useUserStore();
 
 const props = defineProps<{
@@ -14,7 +15,11 @@ const icon = {
   color: 'text-brand-blue',
 };
 
-const linkTo = `/profile/${userStore.user?.username}/followers`; // should lead to a page showing the new followers
+const queryClient = new QueryClient();
+queryClient.invalidateQueries({
+  queryKey: ['user-list', userStore.user?.username, 'followers'],
+});
+const linkTo = `/profile/${userStore.user?.username}/followers`;
 const followPluralIndex = computed(() => Math.min(props.totalActorsCount - 1, 3));
 
 // Get up to 3 actors for display in the message

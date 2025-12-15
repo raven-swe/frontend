@@ -2,6 +2,7 @@
 import type { ActorSummary } from '~~/shared/types/notifications';
 import type { Tweet } from '~~/shared/types/tweets';
 import TweetQuoteCard from '../tweet/TweetQuoteCard.vue';
+import { QueryClient } from '@tanstack/vue-query';
 
 const props = defineProps<{
   timestamp: string;
@@ -15,6 +16,11 @@ const icon = {
   name: 'lucide:heart',
   color: 'text-brand-red',
 };
+
+const queryClient = new QueryClient();
+queryClient.invalidateQueries({
+  queryKey: ['user-list', props.tweet.author.username, 'tweet', props.tweet.id, 'likes'],
+});
 
 const linkTo = `/profile/${props.tweet.author.username}/status/${props.tweet.id}/likes`;
 const likePluralIndex = computed(() => Math.min(props.totalActorsCount - 1, 3));
