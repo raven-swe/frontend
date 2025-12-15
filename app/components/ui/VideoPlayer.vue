@@ -9,6 +9,7 @@ interface Props {
 }
 const props = withDefaults(defineProps<Props>(), {
   fluid: true,
+  poster: '',
 });
 </script>
 

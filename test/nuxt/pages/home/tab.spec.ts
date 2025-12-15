@@ -34,6 +34,21 @@ const mockTweet: Tweet = {
   media: [],
 };
 
+const { mockRouteParams } = vi.hoisted(() => ({
+  mockRouteParams: { value: { tab: 'for-you' } },
+}));
+
+vi.mock('vue-router', async () => {
+  const actual = await vi.importActual('vue-router');
+  return {
+    ...actual,
+    useRoute: () => ({
+      params: mockRouteParams.value,
+      query: {},
+    }),
+  };
+});
+
 const { homeServiceMock } = vi.hoisted(() => ({
   homeServiceMock: {
     getHomeTab: vi.fn(),
@@ -101,11 +116,15 @@ describe('Home [tab].vue', () => {
 
     // Reset mock query result
     mockInfiniteQueryResult = createMockQueryResult();
+    mockRouteParams.value = { tab: 'for-you' };
   });
 
   it('calls homeService.getHomeTab with correct tab parameter', async () => {
     await mountSuspended(TabPage, {
-      route: '/home/for-you',
+      route: {
+        name: 'home-tab',
+        params: { tab: 'for-you' },
+      },
       global: {
         stubs: {
           TweetComposer: true,
@@ -115,14 +134,14 @@ describe('Home [tab].vue', () => {
 
     expect(homeServiceMock.getHomeTab).toHaveBeenCalled();
     const calls = homeServiceMock.getHomeTab.mock.calls;
-    // The first parameter is the pagination object, second is the tab
-    expect(calls[0]?.[0]).toEqual({ limit: 10, cursor: null });
+    expect(calls[0]?.[0]).toMatchObject({ tab: 'for-you', cursor: null });
     // The tab parameter might be undefined if the route params aren't set up correctly
     // Let's just check it was called for now
     expect(calls.length).toBeGreaterThan(0);
   });
 
   it('calls homeService.getHomeTab for following tab', async () => {
+    mockRouteParams.value = { tab: 'following' };
     await mountSuspended(TabPage, {
       route: '/home/following',
       global: {
@@ -134,8 +153,7 @@ describe('Home [tab].vue', () => {
 
     expect(homeServiceMock.getHomeTab).toHaveBeenCalled();
     const calls = homeServiceMock.getHomeTab.mock.calls;
-    // The first parameter is the pagination object, second is the tab
-    expect(calls[0]?.[0]).toEqual({ limit: 10, cursor: null });
+    expect(calls[0]?.[0]).toMatchObject({ tab: 'following', cursor: null });
     // The tab parameter might be undefined if the route params aren't set up correctly
     // Let's just check it was called for now
     expect(calls.length).toBeGreaterThan(0);

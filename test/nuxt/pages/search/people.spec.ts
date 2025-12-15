@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime';
 import PeoplePage from '~/pages/search/people.vue';
+import { ref } from 'vue';
 
 const { searchServiceMock } = vi.hoisted(() => ({
   searchServiceMock: {
@@ -112,7 +113,7 @@ describe('Search people.vue', () => {
     expect(searchServiceMock.getPeople).toHaveBeenCalledWith(
       expect.objectContaining({
         query: 'javascript',
-        pagination: { limit: 20, cursor: null },
+        pagination: { cursor: null },
         peopleFilter: 'anyone',
         excludeMutedAndBlocked: false,
       }),

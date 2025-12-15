@@ -75,7 +75,7 @@ describe('tweetsService', () => {
     });
 
     const payload = { limit: 10, cursor: null };
-    const res = await tweetsService.replies('456', payload);
+    const res = await tweetsService.replies({ tweetid: '456', ...payload });
 
     expect(res).toEqual({
       data: {
@@ -118,7 +118,7 @@ describe('tweetsService', () => {
     });
 
     const payload = { limit: 10, cursor: 'cursor-1' };
-    const res = await tweetsService.replies('789', payload);
+    const res = await tweetsService.replies({ tweetid: '789', ...payload });
 
     expect(res).toEqual({
       data: {
