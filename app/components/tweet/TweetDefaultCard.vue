@@ -21,7 +21,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const router = useRouter();
 const userStore = useUserStore();
-const originalUsername = ref<string>(userStore.user?.username || '');
+const originalUsername = computed(() => userStore.user?.username ?? '');
 
 const { data: tweet } = useTweet(props.tweetId);
 
