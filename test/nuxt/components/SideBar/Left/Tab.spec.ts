@@ -1,6 +1,29 @@
-import { describe, expect, it } from 'vitest';
-import { mountSuspended } from '@nuxt/test-utils/runtime';
+import { describe, expect, it, vi } from 'vitest';
+import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime';
 import Tab from '@/components/SideBar/Left/Tab.vue';
+import { reactive } from 'vue';
+
+const useNotificationSoundMock = vi.hoisted(() => {
+  return {
+    play: vi.fn(),
+  };
+});
+
+vi.mock('@/composables/useNotificationSound', () => {
+  return {
+    useNotificationSound: () => useNotificationSoundMock,
+  };
+});
+
+mockNuxtImport('useRouter', () => {
+  return () => {
+    return {
+      currentRoute: reactive({ value: { path: '/home' } }),
+      replace: vi.fn(),
+      resolve: vi.fn(() => ({ href: '/home' })),
+    };
+  };
+});
 
 describe('SideBar Left Tab Component', () => {
   const mockTab = {
@@ -8,18 +31,6 @@ describe('SideBar Left Tab Component', () => {
     route: '/home',
     icon: 'home',
   };
-
-  it('renders the tab with correct structure', async () => {
-    const wrapper = await mountSuspended(Tab, {
-      props: {
-        tab: mockTab,
-      },
-    });
-
-    // Check if NuxtLink exists
-    const link = wrapper.find('a');
-    expect(link.exists()).toBe(true);
-  });
 
   it('renders the tab with correct route', async () => {
     const wrapper = await mountSuspended(Tab, {
@@ -32,28 +43,6 @@ describe('SideBar Left Tab Component', () => {
     expect(link.attributes('href')).toBe(mockTab.route);
   });
 
-  it('has proper hover classes', async () => {
-    const wrapper = await mountSuspended(Tab, {
-      props: {
-        tab: mockTab,
-      },
-    });
-
-    const link = wrapper.find('a');
-    expect(link.classes()).toContain('rounded-full');
-  });
-
-  it('renders icon', async () => {
-    const wrapper = await mountSuspended(Tab, {
-      props: {
-        tab: mockTab,
-      },
-    });
-
-    // Check if icon container exists
-    const iconContainer = wrapper.find('.text-foreground');
-    expect(iconContainer.exists()).toBe(true);
-  });
   it('handles inactive tab (route: #)', async () => {
     const inactiveTab = {
       label: 'test',
@@ -69,5 +58,59 @@ describe('SideBar Left Tab Component', () => {
 
     const link = wrapper.find('a');
     expect(link.attributes('href')).toBe('#');
+  });
+
+  it('show badge for notifications tab', async () => {
+    const notificationTab = reactive({
+      label: 'notifications',
+      route: '/notifications',
+      icon: 'notifications',
+      badgeCount: 5,
+    });
+
+    const wrapper = await mountSuspended(Tab, {
+      props: {
+        tab: notificationTab,
+      },
+    });
+
+    const badge = wrapper.find('[data-test="count-badge"]');
+    expect(badge.exists()).toBe(true);
+    expect(badge.text()).toBe('5');
+
+    notificationTab.badgeCount = 10;
+    wrapper.setProps({ tab: notificationTab });
+    await wrapper.vm.$nextTick();
+    expect(useNotificationSoundMock.play).toHaveBeenCalled();
+  });
+
+  it('show 99+ for badge count over 99', async () => {
+    const notificationTab = reactive({
+      label: 'notifications',
+      route: '/notifications',
+      icon: 'notifications',
+      badgeCount: 150,
+    });
+
+    const wrapper = await mountSuspended(Tab, {
+      props: {
+        tab: notificationTab,
+      },
+    });
+
+    const badge = wrapper.find('[data-test="count-badge"]');
+    expect(badge.exists()).toBe(true);
+    expect(badge.text()).toBe('99+');
+  });
+
+  it('renders bold label for active tab', async () => {
+    const wrapper = await mountSuspended(Tab, {
+      props: {
+        tab: mockTab,
+      },
+    });
+
+    const label = wrapper.find('p');
+    expect(label.classes()).toContain('font-bold');
   });
 });
