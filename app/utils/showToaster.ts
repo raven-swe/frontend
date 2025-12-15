@@ -1,43 +1,13 @@
 import { toast } from 'vue-sonner';
 import { useNuxtApp } from '#app';
 
-const typeConfig = {
-  success: {
-    icon: '✔️',
-    bg: 'var(--toaster-bg-success)',
-    color: 'var(--toaster-text-success)',
-  },
-  error: {
-    icon: '❌',
-    bg: 'var(--toaster-bg-error)',
-    color: 'var(--toaster-text-error)',
-  },
-  warning: {
-    icon: '⚠️',
-    bg: 'var(--toaster-bg-warning)',
-    color: 'var(--toaster-text-warning)',
-  },
-  info: {
-    icon: 'ℹ️',
-    bg: 'var(--toaster-bg-info)',
-    color: 'var(--toaster-text-info)',
-  },
-} as const;
-
-type ToastType = keyof typeof typeConfig;
-
-export function showToaster(type: ToastType, message: string, translate: boolean = false) {
-  const { icon, bg, color } = typeConfig[type];
+export function showToaster(
+  type: 'success' | 'error' | 'warning' | 'info',
+  message: string,
+  translate = false,
+) {
   const { $i18n } = useNuxtApp();
+  const text = translate ? $i18n.t(message) : message;
 
-  const translatedMessage = translate ? $i18n.t(message) : message;
-
-  toast(`${icon} ${translatedMessage}`, {
-    style: {
-      background: bg,
-      color: color,
-      padding: '10px 14px',
-      borderRadius: '20px',
-    },
-  });
+  toast[type](text);
 }
