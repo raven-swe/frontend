@@ -127,14 +127,14 @@ describe('Password Store', () => {
       passwordServiceMock.checkUser.mockRejectedValue(rateLimitError);
       const store = await createStore();
       await store.checkUserExists({ identifier: 'test@example.com', recaptchaToken: 'recap' });
-      expect(showToasterMock).toHaveBeenCalledWith('error', 'toaster.checkUser.rateLimit');
+      expect(showToasterMock).toHaveBeenCalledWith('error', 'toaster.checkUser.rateLimit', true);
     });
 
     it('shows toaster for generic errors', async () => {
       passwordServiceMock.checkUser.mockRejectedValue(new Error('Network error'));
       const store = await createStore();
       await store.checkUserExists({ identifier: 'fail', recaptchaToken: 'recap' });
-      expect(showToasterMock).toHaveBeenCalledWith('error', 'toaster.checkUser.error');
+      expect(showToasterMock).toHaveBeenCalledWith('error', 'toaster.checkUser.error', true);
     });
   });
 
@@ -176,7 +176,7 @@ describe('Password Store', () => {
       const store = await createStore();
       await store.checkUserExists({ identifier: 'a', recaptchaToken: 'b' });
       await store.verifyUser('wrong');
-      expect(showToasterMock).toHaveBeenCalledWith('error', 'toaster.verifyUser.error');
+      expect(showToasterMock).toHaveBeenCalledWith('error', 'toaster.verifyUser.error', true);
     });
   });
 
@@ -188,7 +188,7 @@ describe('Password Store', () => {
       await store.checkUserExists({ identifier: 'a', recaptchaToken: 'b' });
       await store.resendOtp();
       expect(passwordServiceMock.resendOtp).toHaveBeenCalledWith('token');
-      expect(showToasterMock).toHaveBeenCalledWith('success', 'toaster.resendOtp.success');
+      expect(showToasterMock).toHaveBeenCalledWith('success', 'toaster.resendOtp.success', true);
       expect(store.step).toBe(1);
     });
 
@@ -218,7 +218,7 @@ describe('Password Store', () => {
       const store = await createStore();
       await store.checkUserExists({ identifier: 'a', recaptchaToken: 'b' });
       await store.resendOtp();
-      expect(showToasterMock).toHaveBeenCalledWith('error', 'toaster.resendOtp.error');
+      expect(showToasterMock).toHaveBeenCalledWith('error', 'toaster.resendOtp.error', true);
     });
   });
 
@@ -231,7 +231,11 @@ describe('Password Store', () => {
       const store = await createStore();
       await store.checkUserExists({ identifier: 'x', recaptchaToken: 'y' });
       await store.resetPassword('Pass123!');
-      expect(showToasterMock).toHaveBeenCalledWith('success', 'toaster.resetPassword.success');
+      expect(showToasterMock).toHaveBeenCalledWith(
+        'success',
+        'toaster.resetPassword.success',
+        true,
+      );
       expect(routerMock.push).toHaveBeenCalledWith('/home');
       expect(store.step).toBe(0);
       expect(store.open).toBe(false);
@@ -265,7 +269,7 @@ describe('Password Store', () => {
       const store = await createStore();
       await store.checkUserExists({ identifier: 'x', recaptchaToken: 'y' });
       await store.resetPassword('fail');
-      expect(showToasterMock).toHaveBeenCalledWith('error', 'toaster.resetPassword.error');
+      expect(showToasterMock).toHaveBeenCalledWith('error', 'toaster.resetPassword.error', true);
       expect(store.loading).toBe(false);
     });
   });
