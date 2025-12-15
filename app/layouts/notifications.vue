@@ -3,10 +3,12 @@ const tabs = [
   {
     label: $t('notifications.tabs.all'),
     route: '/notifications',
+    datacy: 'notifications-all-tab',
   },
   {
     label: $t('notifications.tabs.mentions'),
     route: '/notifications/mentions',
+    datacy: 'notifications-mentions-tab',
   },
 ];
 </script>
@@ -22,6 +24,7 @@ const tabs = [
           :label="tab.label"
           :route="tab.route"
           :is-active="$route.path.toLowerCase() === tab.route"
+          :data-cy="tab.datacy"
         />
       </UiTabs>
     </div>

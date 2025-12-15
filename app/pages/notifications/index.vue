@@ -71,6 +71,7 @@ watch(
       <div v-if="notifications">
         <div
           data-testid="notifications-list"
+          data-cy="notifications-list"
           :style="{
             height: `${totalSize}px`,
             width: '100%',
@@ -91,6 +92,7 @@ watch(
               :key="notifications[virtualRow.index]?.id || String(virtualRow.key)"
               :ref="measureElement"
               :data-index="virtualRow.index"
+              data-cy="notification-item"
             >
               <component
                 :is="componentForType(notifications[virtualRow.index]!.type)"
@@ -102,6 +104,7 @@ watch(
                 "
                 :is-seen="notifications[virtualRow.index]!.isSeen"
                 :tweet="notifications[virtualRow.index]!.tweetSummary?.primaryTweet"
+                :data-cy="`notification-${notifications[virtualRow.index]!.type.toLowerCase()}`"
                 @follow="(username: string) => followUser({ username, action: 'follow' })"
                 @unfollow="(username: string) => followUser({ username, action: 'unfollow' })"
               />
