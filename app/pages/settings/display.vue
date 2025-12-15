@@ -1,3 +1,5 @@
+/* eslint-disable regex/invalid */
+
 <script lang="ts" setup>
 definePageMeta({ layout: 'settings' });
 
@@ -16,12 +18,16 @@ const COLORS: ThemeColor[] = [
 ];
 
 const { mode, toggleTheme, primary, setPrimary } = useTheme();
+const { locale, setLocale } = useI18n();
+const arabicLocales = ['العربية', 'العربية الفصحى'];
+const englishLocales = ['English', 'English (US)'];
 
 function applyPrimaryColor(color: string) {
   setPrimary(color);
 }
 </script>
 
+<!-- eslint-disable regex/invalid -->
 <template>
   <div>
     <!-- Header -->
@@ -112,6 +118,62 @@ function applyPrimaryColor(color: string) {
               />
             </span>
             {{ $t('setting.display.lights-out') }}
+          </button>
+        </div>
+      </section>
+
+      <!-- Language -->
+      <section class="px-4">
+        <h2 class="text-foreground mb-3 text-xl font-semibold">
+          {{ $t('setting.display.language') }}
+        </h2>
+
+        <div class="flex flex-col gap-3 p-4">
+          <button
+            class="flex w-full items-center justify-between gap-3 rounded-xl border px-4 py-3 text-start font-medium transition hover:shadow-sm"
+            :aria-pressed="locale === 'en-US'"
+            :aria-current="locale === 'en-US'"
+            @click="setLocale('en-US')"
+          >
+            <div class="flex items-center gap-3">
+              <span
+                v-if="locale === 'en-US'"
+                class="bg-primary flex h-8 w-8 items-center justify-center rounded-full text-white"
+              >
+                <Icon name="lucide:globe" size="1rem" />
+              </span>
+              <div class="flex flex-col">
+                <span>{{ englishLocales[0] }}</span>
+                <span class="text-muted-foreground text-sm">{{ englishLocales[1] }}</span>
+              </div>
+            </div>
+            <span v-if="locale === 'en-US'" class="text-primary">
+              <Icon name="lucide:check" size="1rem" />
+            </span>
+          </button>
+
+          <button
+            class="flex w-full items-center justify-between gap-3 rounded-xl border px-4 py-3 text-start font-medium transition hover:shadow-sm"
+            dir="rtl"
+            :aria-pressed="locale === 'ar-EG'"
+            :aria-current="locale === 'ar-EG'"
+            @click="setLocale('ar-EG')"
+          >
+            <div class="flex items-center">
+              <span
+                v-if="locale === 'ar-EG'"
+                class="bg-primary flex h-8 w-8 items-center justify-center rounded-full text-white"
+              >
+                <Icon name="lucide:globe" size="1rem" />
+              </span>
+              <div class="flex flex-col">
+                <span>{{ arabicLocales[0] }}</span>
+                <span class="text-muted-foreground text-sm">{{ arabicLocales[1] }}</span>
+              </div>
+            </div>
+            <span v-if="locale === 'ar-EG'" class="text-primary">
+              <Icon name="lucide:check" size="1rem" />
+            </span>
           </button>
         </div>
       </section>
