@@ -30,6 +30,14 @@ export function usePostTweet() {
         return clone;
       });
 
+      // Also update the extended tweet detail if exists
+      queryClient.setQueryData<Tweet>(tweetKeys.detail(replyToTweetId), (old) => {
+        if (!old) return old;
+        const clone = JSON.parse(JSON.stringify(old)) as Tweet;
+        clone.replyCount = clone.replyCount + 1;
+        return clone;
+      });
+
       prependTweetToInfiniteLists(queryClient, [tweetKeys.replyList(replyToTweetId)], tweet);
     } else {
       prependTweetToInfiniteLists(
@@ -42,6 +50,13 @@ export function usePostTweet() {
     if (quoteToTweetId) {
       // quote tweet is considered repost so its count increase
       queryClient.setQueryData<Tweet>(tweetKeys.entity(quoteToTweetId), (old) => {
+        if (!old) return old;
+        const clone = JSON.parse(JSON.stringify(old)) as Tweet;
+        clone.retweetCount = clone.retweetCount + 1;
+        return clone;
+      });
+
+      queryClient.setQueryData<Tweet>(tweetKeys.detail(quoteToTweetId), (old) => {
         if (!old) return old;
         const clone = JSON.parse(JSON.stringify(old)) as Tweet;
         clone.retweetCount = clone.retweetCount + 1;
