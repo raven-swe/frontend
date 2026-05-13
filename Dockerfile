@@ -7,6 +7,7 @@ RUN corepack enable
 # Stage 1: Build the application
 FROM base AS build
 ENV NODE_ENV=development
+ENV CI=true
 
 ARG NUXT_PUBLIC_RECAPTCHA_SITE_KEY
 ARG NUXT_PUBLIC_DM_WS_URL
@@ -17,7 +18,7 @@ ENV NUXT_PUBLIC_DM_WS_URL=$NUXT_PUBLIC_DM_WS_URL
 ENV RAVEN_TENOR_KEY=$RAVEN_TENOR_KEY
 
 # Install dependencies
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
     pnpm install --frozen-lockfile
 
@@ -40,7 +41,7 @@ FROM base
 # Copy build output and necessary files
 ENV NODE_ENV=production
 COPY --from=build /app/.output /app/.output
-COPY package.json ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 EXPOSE 3000
 CMD ["pnpm", "start"]

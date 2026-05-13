@@ -13,7 +13,7 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "prepare": "node -e \"if (process.env.NODE_ENV !== 'production') require('child_process').execSync('husky', {stdio: 'inherit'})\"",
+    "prepare": "node -e \"if (process.env.NODE_ENV !== 'production' && process.env.CI !== 'true') require('child_process').execSync('husky', {stdio: 'inherit'})\"",
     "lint": "eslint . --ext .js,.ts,.vue --fix",
     "lint:check": "eslint . --ext .js,.ts,.vue",
     "format": "prettier --write .",
@@ -106,6 +106,13 @@
   },
   "engines": {
     "node": ">=22.0.0"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "10.28.0",
+      "onFail": "download"
+    }
   },
   "msw": {
     "workerDirectory": [
