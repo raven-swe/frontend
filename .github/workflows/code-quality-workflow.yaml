@@ -19,10 +19,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up pnpm
-        run: corepack prepare pnpm@latest --activate
-
-      - name: Add pnpm to PATH
-        run: echo "/home/btngana/.local/share/pnpm" >> $GITHUB_PATH
+        run: corepack prepare pnpm@10.28 --activate
 
       - uses: actions/setup-node@v4
         with:
