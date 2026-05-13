@@ -12,7 +12,7 @@ permissions:
 jobs:
   validate-merge-permissions:
     if: github.event.pull_request.base.ref == 'main'
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     name: Validate Merge Permissions
     steps:
       - name: Verify Authorized User
@@ -31,7 +31,7 @@ jobs:
   branch-name-validation:
     if: github.event.pull_request.base.ref == 'dev'
     name: Validate branch naming convention
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Enforce kebab-case branch name
@@ -49,7 +49,7 @@ jobs:
 
   validate-pr-title:
     name: Validate PR title format
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Check PR title format
