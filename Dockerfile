@@ -17,7 +17,7 @@ ENV NUXT_PUBLIC_DM_WS_URL=$NUXT_PUBLIC_DM_WS_URL
 ENV RAVEN_TENOR_KEY=$RAVEN_TENOR_KEY
 
 # Install dependencies
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
     pnpm install --frozen-lockfile
 
