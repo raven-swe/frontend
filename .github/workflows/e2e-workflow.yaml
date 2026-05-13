@@ -7,7 +7,7 @@ on:
 
 jobs:
   e2e-tests:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     environment: e2e
     env:
       APP_POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
