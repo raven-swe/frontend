@@ -1,4 +1,5 @@
 ignoredBuiltDependencies:
+  - cypress
   - msw
   - unrs-resolver
   - vue-demi
