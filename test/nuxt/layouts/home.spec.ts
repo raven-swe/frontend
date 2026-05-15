@@ -2,10 +2,15 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mountSuspended } from '@nuxt/test-utils/runtime';
 import { createI18n } from 'vue-i18n';
 import messages from '@@/i18n/locales/en.json';
+import { ref } from 'vue';
 
 const i18n = createI18n({ locale: 'en', messages: { en: messages } });
 
 vi.stubGlobal('$route', { path: '/home' });
+vi.stubGlobal('useAccountSetup', () => ({
+  start: vi.fn(),
+  isOpen: ref(false),
+}));
 
 describe('Home layout', () => {
   beforeEach(() => {
@@ -22,6 +27,7 @@ describe('Home layout', () => {
           Tabs: { template: '<div><slot /></div>' },
           Tab: { name: 'Tab', template: '<div />' },
           TweetComposer: { template: '<div class="tweet-composer-stub" />' },
+          AccountSetup: true,
         },
         plugins: [i18n],
       },

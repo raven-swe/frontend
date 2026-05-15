@@ -258,7 +258,7 @@ function handleReplied(tweet: Tweet) {
                 </Carousel>
               </div>
 
-              <div class="ms-auto min-h-screen w-100 overflow-y-auto">
+              <div class="ms-auto hidden min-h-screen w-100 overflow-y-auto lg:block">
                 <div v-if="tweetData">
                   <TweetView :tweet="tweetData" :media="false" />
                 </div>
