@@ -40,10 +40,10 @@ export const uploadMediaService = () => {
   };
 
   // upload gif
-  const uploadGif = async (tenorId: string) => {
+  const uploadGif = async (klipyId: string) => {
     const response = await apiFetch('/api/media/upload/gif', {
       method: 'POST',
-      body: JSON.stringify({ tenorId }),
+      body: JSON.stringify({ klipyId }),
     });
 
     return response.data.id;

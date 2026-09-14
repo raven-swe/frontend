@@ -100,18 +100,18 @@ export const handlers = [
 
   // POST /media/upload/gif
   http.post(`${API_URL}/media/upload/gif`, async ({ request }) => {
-    const body = (await request.json()) as { tenorId: string };
-    const { tenorId } = body;
+    const body = (await request.json()) as { klipyId: string };
+    const { klipyId } = body;
 
-    if (!tenorId) {
+    if (!klipyId) {
       return HttpResponse.json(
-        { success: false, message: 'No Tenor ID provided.' },
+        { success: false, message: 'No KLIPY ID provided.' },
         { status: 400 },
       );
     }
 
     const id = genId();
-    const url = `https://media.tenor.com/images/${tenorId}/tenor.gif`;
+    const url = `https://static.klipy.com/gifs/${klipyId}.gif`;
 
     mediaStore.set(id, { id, url, type: 'GIF' });
 

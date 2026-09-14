@@ -37,7 +37,7 @@ A modern, responsive web application for the Raven social media platform built w
   - Hashtag highlighting and auto-linking
   - User mention highlighting and auto-linking
   - Native emoji picker integration
-  - GIF picker via Tenor API
+  - GIF picker via KLIPY API
   - Media attachments (up to 4 images/videos per tweet)
   - Character count with visual indicator
 - **Quote Tweets** - Retweet with your own commentary
@@ -251,7 +251,7 @@ Key environment variables (see `.env.example` for full list):
 | `NUXT_PUBLIC_RECAPTCHA_SITE_KEY`  | reCAPTCHA site key             |
 | `NUXT_PUBLIC_BASE_URL`            | Frontend base URL              |
 | `NUXT_PUBLIC_DM_WS_URL`           | Direct messaging WebSocket URL |
-| `RAVEN_TENOR_KEY`                 | Tenor API key for GIF picker   |
+| `RAVEN_KLIPY_KEY`                 | KLIPY API key for GIF picker   |
 
 ## Licenses
 

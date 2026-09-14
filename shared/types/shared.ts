@@ -29,5 +29,5 @@ export type MediaItem = {
   url: string;
   type: MediaType;
   altText?: string;
-  tenorId?: string; // for GIFs
+  klipyId?: string; // for GIFs
 };

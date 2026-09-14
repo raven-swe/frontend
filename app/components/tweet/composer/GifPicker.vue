@@ -4,14 +4,14 @@ import { useInfiniteQuery } from '@tanstack/vue-query';
 import { useDebounceFn } from '@vueuse/core';
 
 const config = useRuntimeConfig();
-const API_KEY = config.public.tenorApiKey;
+const API_KEY = config.public.klipyApiKey;
 
 const searchQuery = ref('');
 const isFocused = ref(false);
 
 const emit = defineEmits<{
   (e: 'close'): void;
-  (e: 'select', payload: { tenorId: string; url: string }): void;
+  (e: 'select', payload: { klipyId: string; url: string }): void;
 }>();
 
 interface Category {
@@ -36,7 +36,7 @@ interface GifResult {
   };
 }
 
-interface TenorResponse {
+interface KlipyResponse {
   results: GifResult[];
   next: string;
 }
@@ -84,7 +84,7 @@ const debouncedSearch = useDebounceFn((query: string) => {
   debouncedQuery.value = query;
 }, 500);
 
-async function fetchGifs(query: string, pos?: string | null): Promise<TenorResponse> {
+async function fetchGifs(query: string, pos?: string | null): Promise<KlipyResponse> {
   const params: Record<string, string | number> = {
     key: API_KEY,
     q: query,
@@ -96,7 +96,7 @@ async function fetchGifs(query: string, pos?: string | null): Promise<TenorRespo
     params.pos = pos;
   }
 
-  const res = await $fetch<TenorResponse>('https://tenor.googleapis.com/v2/search', {
+  const res = await $fetch<KlipyResponse>('https://api.klipy.com/v2/search', {
     method: 'GET',
     params,
   });
@@ -201,7 +201,7 @@ onUnmounted(() => {
 
 function selectGif(gif: GifResult) {
   emit('select', {
-    tenorId: gif.id,
+    klipyId: gif.id,
     url: gif.media_formats.gif.url,
   });
   emit('close');

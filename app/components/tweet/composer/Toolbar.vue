@@ -25,7 +25,7 @@ interface Emits {
   (e: 'post'): void;
   (e: 'add-media', files: File[]): void;
   (e: 'insert-emoji', emoji: string): void;
-  (e: 'insert-gif', payload: { tenorId: string; url: string }): void;
+  (e: 'insert-gif', payload: { klipyId: string; url: string }): void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -68,7 +68,7 @@ const handleGifClick = () => {
   isGifPickerOpen.value = true;
 };
 
-const handleGifSelect = (payload: { tenorId: string; url: string }) => {
+const handleGifSelect = (payload: { klipyId: string; url: string }) => {
   isGifPickerOpen.value = false;
   emit('insert-gif', payload);
 };

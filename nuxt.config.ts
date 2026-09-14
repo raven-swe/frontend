@@ -18,7 +18,7 @@ export default defineNuxtConfig({
       baseUrl: process.env.NUXT_PUBLIC_BASE_URL || 'http://localhost:5173',
       dmWebSocketUrl: process.env.NUXT_PUBLIC_DM_WS_URL || 'wss://api.raven.cmp27.space/ws/dm',
       dmSseUrl: process.env.NUXT_PUBLIC_DM_SSE_URL || '',
-      tenorApiKey: process.env.RAVEN_TENOR_KEY || '',
+      klipyApiKey: process.env.RAVEN_KLIPY_KEY || '',
     },
   },
   devtools: {
