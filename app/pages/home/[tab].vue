@@ -2,6 +2,7 @@
 import { useRoute } from 'vue-router';
 import TweetDefaultCard from '~/components/tweet/TweetDefaultCard.vue';
 import VirtualInfiniteScroller from '~/components/common/VirtualInfiniteScroller.vue';
+import NewTweetsIndicator from '~/components/tweet/NewTweetsIndicator.vue';
 import { useTimelineTweets } from '~/composables/tweet/useTweetLists';
 import { getItemKey } from '~/constants/query-keys';
 
@@ -17,6 +18,10 @@ definePageMeta({
 const route = useRoute();
 const tab = computed(() => route.params.tab as HomeTab);
 
+// Inject timeline following avatars from SSE (array of avatar URL strings)
+const timelineFollowingAvatars = inject<Ref<string[]>>('timelineFollowingAvatars', ref([]));
+const clearTimelineFollowingAvatars = inject<() => void>('clearTimelineFollowingAvatars', () => {});
+
 const {
   data: response,
   fetchNextPage,
@@ -28,6 +33,10 @@ const {
 
 const tweets = computed(() => response.value?.pages.flatMap((page) => page.data) || []);
 
+const handleNewTweetsClick = () => {
+  clearTimelineFollowingAvatars();
+};
+
 onServerPrefetch(async () => {
   await suspense();
 });
@@ -35,6 +44,9 @@ onServerPrefetch(async () => {
 
 <template>
   <div class="border-border mx-auto max-w-[700px]">
+    <div v-if="tab === 'following'" class="sticky top-20 z-50">
+      <NewTweetsIndicator :avatars="timelineFollowingAvatars" @click="handleNewTweetsClick" />
+    </div>
     <ClientOnly fallback="span">
       <template #fallback>
         <div class="text-primary mt-20 flex shrink-0 items-center justify-center py-4">

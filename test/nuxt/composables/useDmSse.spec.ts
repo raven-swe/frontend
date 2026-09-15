@@ -103,7 +103,7 @@ describe('useDmSse', () => {
     result.connect();
 
     expect(EventSourcePolyfill).toHaveBeenCalledWith(
-      '/api/stream?topics=dm,notifications',
+      '/api/stream?topics=dm,notifications,timeline',
       expect.objectContaining({
         withCredentials: true,
         heartbeatTimeout: 120_000,
@@ -125,6 +125,30 @@ describe('useDmSse', () => {
       'dm.new_message',
       expect.any(Function),
     );
+    expect(mockEventSource.addEventListener).toHaveBeenCalledWith(
+      'timeline.following',
+      expect.any(Function),
+    );
+  });
+
+  it('timeline.following event sets avatars and clear resets them', async () => {
+    const { useDmSse } = await import('@/composables/useDmSse');
+    const result = useDmSse();
+
+    result.connect();
+
+    const authors = ['https://cdn.example.com/a.png', 'https://cdn.example.com/b.png'];
+
+    const handlers = eventListeners['timeline.following'];
+    if (handlers && handlers[0]) {
+      handlers[0]({ data: JSON.stringify({ authors }) } as MessageEvent);
+    }
+
+    expect(result.timelineFollowingAvatars.value).toEqual(authors);
+
+    result.clearTimelineFollowingAvatars();
+
+    expect(result.timelineFollowingAvatars.value).toEqual([]);
   });
 
   it('onopen sets isConnected and resets state', async () => {

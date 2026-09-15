@@ -201,7 +201,10 @@ export interface DmConversationMessagesResponse {
   messages: DmMessage[];
 }
 
-export type DmSseEventName = 'dm.unseen_conversations_count' | 'dm.new_message';
+export type DmSseEventName =
+  | 'dm.unseen_conversations_count'
+  | 'dm.new_message'
+  | 'timeline.following';
 
 export interface DmUnseenConversationsCountEventData {
   count: number;
@@ -220,7 +223,12 @@ export interface DmNewMessageEventData {
   createdAt: string;
 }
 
+export interface TimelineFollowingEventData {
+  authors: string[]; // Array of avatar URLs
+}
+
 export interface DmSseEventMap {
   'dm.unseen_conversations_count': DmUnseenConversationsCountEventData;
   'dm.new_message': DmNewMessageEventData;
+  'timeline.following': TimelineFollowingEventData;
 }

@@ -13,11 +13,12 @@ interface UseDmSseOptions {
 export function useDmSse(options: UseDmSseOptions = {}) {
   const { autoReconnect = true, maxReconnectAttempts = 5, baseReconnectDelay = 1000 } = options;
 
-  const SSEendpoint = `/api/stream?topics=dm,notifications`;
+  const SSEendpoint = `/api/stream?topics=dm,notifications,timeline`;
   const unseenCount = ref<number>(0);
   const lastNewMessageinfo = ref<DmSseEventMap['dm.new_message'] | null>(null);
   const lastNotification = ref<Notification | null>(null);
   const unseenNotificationsCount = ref<number>(0);
+  const timelineFollowingAvatars = ref<string[]>([]);
   const isConnected = ref<boolean>(false);
   const error = ref<Event | null>(null);
   const reconnectAttempts = ref<number>(0);
@@ -229,6 +230,15 @@ export function useDmSse(options: UseDmSseOptions = {}) {
           createError('Failed to parse notifications.new event data');
         }
       });
+
+      es.addEventListener('timeline.following', (evt: MessageEvent) => {
+        try {
+          const data = JSON.parse(evt.data) as DmSseEventMap['timeline.following'];
+          timelineFollowingAvatars.value = data.authors;
+        } catch {
+          createError('Failed to parse timeline.following event data');
+        }
+      });
     } catch {
       scheduleReconnect();
     }
@@ -255,12 +265,17 @@ export function useDmSse(options: UseDmSseOptions = {}) {
     disconnect();
   });
 
+  const clearTimelineFollowingAvatars = () => {
+    timelineFollowingAvatars.value = [];
+  };
+
   return {
     // state
     unseenCount,
     lastNewMessageinfo,
     lastNotification,
     unseenNotificationsCount,
+    timelineFollowingAvatars,
     isConnected,
     error,
     reconnectAttempts,
@@ -268,5 +283,6 @@ export function useDmSse(options: UseDmSseOptions = {}) {
     connect,
     disconnect,
     reconnect,
+    clearTimelineFollowingAvatars,
   };
 }
